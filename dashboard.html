@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veta — Operations Dashboard</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f7;color:#1a1d2e;min-height:100vh;display:flex}
+#sidebar{width:230px;min-height:100vh;background:#1a1d2e;color:#a8b2c8;display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100}
+.sidebar-logo{padding:22px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sidebar-logo h1{color:#fff;font-size:20px;font-weight:700;letter-spacing:-0.3px}
+.sidebar-logo p{color:#4a5568;font-size:11px;margin-top:2px}
+.sidebar-nav{padding:10px 0;flex:1;overflow-y:auto}
+.nav-label{padding:14px 20px 5px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4a5c}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 20px;cursor:pointer;color:#7a8599;font-size:13.5px;transition:all .12s;border-left:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.04);color:#c5cdd8}
+.nav-item.active{color:#fff;background:rgba(99,102,241,.14);border-left-color:#6366f1}
+.nav-item .icon{font-size:15px;width:18px;text-align:center}
+.sidebar-foot{padding:14px 20px;border-top:1px solid rgba(255,255,255,.07);font-size:11px;color:#3d4a5c}
+#main{margin-left:230px;flex:1;min-height:100vh}
+.topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 28px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50}
+.topbar h2{font-size:17px;font-weight:600;color:#1a1d2e}
+.topbar-date{font-size:12px;color:#64748b}
+.content{padding:28px}
+.view{display:none}
+.view.active{display:block}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat{background:#fff;border-radius:10px;padding:18px;border:1px solid #e2e8f0}
+.stat .lbl{font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.stat .val{font-size:26px;font-weight:700;color:#1a1d2e;margin:5px 0 2px}
+.stat .sub{font-size:11px;color:#94a3b8}
+.stat.c-indigo .val{color:#6366f1}
+.stat.c-green .val{color:#16a34a}
+.stat.c-amber .val{color:#d97706}
+.stat.c-red .val{color:#dc2626}
+.card{background:#fff;border-radius:10px;border:1px solid #e2e8f0;margin-bottom:18px;overflow:hidden}
+.card-head{padding:14px 18px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center}
+.card-head h3{font-size:14px;font-weight:600;color:#1a1d2e}
+.card-body{padding:18px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#64748b;border-bottom:1px solid #e2e8f0;background:#f8fafc;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid #f1f5f9;color:#334155;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafbfd}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.b-red{background:#fef2f2;color:#dc2626}
+.b-yellow{background:#fffbeb;color:#d97706}
+.b-green{background:#f0fdf4;color:#16a34a}
+.b-blue{background:#eff6ff;color:#2563eb}
+.b-purple{background:#f5f3ff;color:#7c3aed}
+.b-gray{background:#f1f5f9;color:#475569}
+.b-indigo{background:#eef2ff;color:#4338ca}
+.b-pink{background:#fdf2f8;color:#9d174d}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .12s;font-family:inherit}
+.btn-primary{background:#6366f1;color:#fff}
+.btn-primary:hover{background:#4f46e5}
+.btn-ghost{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+.btn-ghost:hover{background:#e2e8f0}
+.btn-danger{background:#fef2f2;color:#dc2626}
+.btn-danger:hover{background:#fee2e2}
+.btn-sm{padding:4px 9px;font-size:12px}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.section-head h2{font-size:17px;font-weight:600;color:#1a1d2e}
+.table-wrap{overflow-x:auto}
+.empty{text-align:center;padding:36px 20px;color:#94a3b8}
+.empty .ei{font-size:28px;margin-bottom:10px}
+.empty p{font-size:13px}
+.t-dental{background:#dbeafe;color:#1d4ed8;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
+.t-legal{background:#dcfce7;color:#15803d;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
+.t-aesthetic{background:#fce7f3;color:#be185d;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
+.t-cross{background:#f5f3ff;color:#6d28d9;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
+.task-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9}
+.task-item:last-child{border-bottom:none}
+.task-cb{width:16px;height:16px;cursor:pointer;margin-top:2px;accent-color:#6366f1;flex-shrink:0}
+.task-body{flex:1}
+.task-title{font-size:13.5px;font-weight:500;color:#1e293b}
+.task-title.done{text-decoration:line-through;color:#94a3b8}
+.task-meta{font-size:11px;color:#94a3b8;margin-top:2px}
+.task-del{background:none;border:none;cursor:pointer;color:#cbd5e1;font-size:16px;padding:0 2px;line-height:1}
+.task-del:hover{color:#ef4444}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:12px;padding:26px;width:520px;max-width:92vw;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.18)}
+.modal h2{font-size:16px;font-weight:600;margin-bottom:18px;color:#1a1d2e}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:22px}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:12.5px;font-weight:500;color:#374151;margin-bottom:5px}
+.fi,.fs,.ft{width:100%;padding:7px 11px;border:1px solid #d1d5db;border-radius:7px;font-size:13px;color:#1f2937;background:#fff;font-family:inherit;transition:border-color .12s}
+.fi:focus,.fs:focus,.ft:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+.ft{resize:vertical;min-height:72px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.kpi-card{background:#fff;border-radius:10px;border:1px solid #e2e8f0;padding:16px}
+.kpi-lbl{font-size:11.5px;color:#64748b;font-weight:500}
+.kpi-val{font-size:22px;font-weight:700;margin:6px 0 3px}
+.kpi-tgt{font-size:11px;color:#94a3b8}
+.kp{color:#16a34a}.kw{color:#d97706}.kf{color:#dc2626}.kn{color:#94a3b8}
+.pb{height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden}
+.pb-fill{height:100%;border-radius:3px;background:#6366f1;transition:width .3s}
+.pipe-board{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px}
+.pipe-col{min-width:180px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;padding:10px;flex-shrink:0}
+.pipe-col-head{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.pipe-cnt{background:#e2e8f0;border-radius:10px;padding:1px 7px;font-size:11px;color:#475569}
+.pipe-card{background:#fff;border-radius:8px;border:1px solid #e2e8f0;padding:10px;margin-bottom:7px;cursor:pointer;transition:box-shadow .12s}
+.pipe-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.pipe-card-name{font-size:13px;font-weight:600;color:#1e293b}
+.pipe-card-meta{font-size:11px;color:#94a3b8;margin-top:3px}
+.pipe-card-val{font-size:12px;font-weight:600;color:#6366f1;margin-top:5px}
+.pipe-empty{font-size:11px;color:#cbd5e1;text-align:center;padding:16px 0}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#e2e8f0;border-radius:10px;overflow:hidden}
+.cal-h{background:#f8fafc;text-align:center;padding:8px;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase}
+.cal-day{background:#fff;min-height:76px;padding:5px;vertical-align:top}
+.cal-day.other{background:#fafafa}
+.cal-day.today{background:#f0f0ff}
+.cal-num{font-size:12px;font-weight:600;color:#374151;margin-bottom:3px}
+.cal-day.today .cal-num{color:#fff;background:#6366f1;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px}
+.cal-ev{font-size:10px;border-radius:3px;padding:1px 4px;margin-bottom:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.cal-ev.content{background:#f0fdf4;color:#166534}
+.cal-ev.pipeline{background:#fff7ed;color:#9a3412}
+.cal-ev.partner{background:#fdf4ff;color:#7e22ce}
+.rev-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid #f1f5f9}
+.rev-row:last-child{border-bottom:none}
+.urgent-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9}
+.urgent-item:last-child{border-bottom:none}
+.urg-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.urg-red{background:#fef2f2}
+.urg-yellow{background:#fffbeb}
+.urg-body h4{font-size:13px;font-weight:600;color:#1e293b}
+.urg-body p{font-size:11px;color:#64748b;margin-top:2px}
+.mt18{margin-top:18px}
+</style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <h1>Veta</h1>
+    <p>Operations Dashboard</p>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-label">Overview</div>
+    <div class="nav-item active" data-view="overview"><span class="icon">⚡</span> Today's Brief</div>
+    <div class="nav-label">Acquisition</div>
+    <div class="nav-item" data-view="pipeline"><span class="icon">🔄</span> Client Pipeline</div>
+    <div class="nav-item" data-view="content"><span class="icon">📝</span> Content Calendar</div>
+    <div class="nav-item" data-view="partners"><span class="icon">🤝</span> Partnerships</div>
+    <div class="nav-label">Operations</div>
+    <div class="nav-item" data-view="tasks"><span class="icon">✅</span> Tasks</div>
+    <div class="nav-item" data-view="calendar"><span class="icon">📅</span> Calendar</div>
+    <div class="nav-item" data-view="revenue"><span class="icon">💰</span> Revenue & KPIs</div>
+    <div class="nav-label">Reference</div>
+    <div class="nav-item" data-view="guide"><span class="icon">📖</span> Agency Guide</div>
+  </div>
+  <div class="sidebar-foot">Veta Ops · v1.0</div>
+</nav>
+
+<div id="main">
+  <div class="topbar">
+    <h2 id="page-title">Today's Brief</h2>
+    <div class="topbar-date" id="today-label"></div>
+  </div>
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div id="view-overview" class="view active">
+      <div class="stats-grid">
+        <div class="stat"><div class="lbl">Pipeline Value</div><div class="val" id="ov-pipe">$0</div><div class="sub" id="ov-pipe-w">Weighted: $0</div></div>
+        <div class="stat c-green"><div class="lbl">Active Engagements</div><div class="val" id="ov-active">0</div><div class="sub">SOW signed or in build</div></div>
+        <div class="stat c-indigo"><div class="lbl">Content Published</div><div class="val" id="ov-pub">0</div><div class="sub" id="ov-draft">0 in progress</div></div>
+        <div class="stat c-amber"><div class="lbl">Tasks Due Today</div><div class="val" id="ov-tasks">0</div><div class="sub" id="ov-over">0 overdue</div></div>
+      </div>
+      <div class="two-col">
+        <div>
+          <div class="card">
+            <div class="card-head"><h3>🔴 Urgent</h3></div>
+            <div class="card-body" id="ov-urgent"><div class="empty"><div class="ei">✅</div><p>Nothing urgent.</p></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>🎯 Current Priorities</h3></div>
+            <div class="card-body" id="ov-priorities"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-head"><h3>Pipeline Snapshot</h3><button class="btn btn-ghost btn-sm" onclick="go('pipeline')">All →</button></div>
+            <div class="card-body" id="ov-pipeline-snap"><div class="empty"><div class="ei">🔄</div><p>No prospects yet.</p></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Content This Week</h3><button class="btn btn-ghost btn-sm" onclick="go('content')">All →</button></div>
+            <div class="card-body" id="ov-content-snap"><div class="empty"><div class="ei">📝</div><p>Nothing scheduled this week.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PIPELINE -->
+    <div id="view-pipeline" class="view">
+      <div class="section-head">
+        <h2>Client Pipeline</h2>
+        <button class="btn btn-primary" onclick="openModal('m-client')">+ Add Prospect</button>
+      </div>
+      <div class="pipe-board" id="pipe-board"></div>
+      <div class="card mt18">
+        <div class="card-head"><h3>All Prospects</h3></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Practice</th><th>Vertical</th><th>Stage</th><th>Value</th><th>Last Contact</th><th>Next Action</th><th></th></tr></thead>
+            <tbody id="pipe-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div id="view-content" class="view">
+      <div class="section-head">
+        <h2>Content Calendar</h2>
+        <button class="btn btn-primary" onclick="openModal('m-content')">+ Add Content</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat c-green"><div class="lbl">Published</div><div class="val" id="cs-pub">0</div><div class="sub">Live pieces</div></div>
+        <div class="stat c-indigo"><div class="lbl">In Progress</div><div class="val" id="cs-prog">0</div><div class="sub">Idea → Ready</div></div>
+        <div class="stat c-red"><div class="lbl">Overdue</div><div class="val" id="cs-over">0</div><div class="sub">Past target date</div></div>
+        <div class="stat"><div class="lbl">Pillar Pieces</div><div class="val" id="cs-pillar">0</div><div class="sub">Target: 9 total</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>All Content</h3></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Title</th><th>Type</th><th>Vertical</th><th>Status</th><th>Target Date</th><th>GEO</th><th></th></tr></thead>
+            <tbody id="content-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARTNERS -->
+    <div id="view-partners" class="view">
+      <div class="section-head">
+        <h2>Partnerships</h2>
+        <button class="btn btn-primary" onclick="openModal('m-partner')">+ Add Partner</button>
+      </div>
+      <div class="three-col" style="margin-bottom:18px;">
+        <div class="stat c-green"><div class="lbl">Partners Active</div><div class="val" id="pt-active">0</div><div class="sub">Signed agreements</div></div>
+        <div class="stat c-indigo"><div class="lbl">In Outreach</div><div class="val" id="pt-out">0</div><div class="sub">Contacted, not yet active</div></div>
+        <div class="stat c-amber"><div class="lbl">Referrals Received</div><div class="val" id="pt-ref">0</div><div class="sub">From active partners</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Partner Tracker</h3></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Firm</th><th>Category</th><th>Vertical</th><th>Status</th><th>Last Contact</th><th>Next Action</th><th>Refs</th><th></th></tr></thead>
+            <tbody id="partner-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TASKS -->
+    <div id="view-tasks" class="view">
+      <div class="section-head">
+        <h2>Tasks</h2>
+        <button class="btn btn-primary" onclick="openModal('m-task')">+ Add Task</button>
+      </div>
+      <div class="two-col">
+        <div>
+          <div class="card">
+            <div class="card-head"><h3>🔴 High Priority</h3><span class="badge b-red" id="tc-high">0</span></div>
+            <div class="card-body" id="tl-high"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>🟡 Medium Priority</h3><span class="badge b-yellow" id="tc-med">0</span></div>
+            <div class="card-body" id="tl-med"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-head"><h3>🟢 Low Priority</h3><span class="badge b-green" id="tc-low">0</span></div>
+            <div class="card-body" id="tl-low"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>✅ Done</h3><button class="btn btn-ghost btn-sm" onclick="clearDone()">Clear</button></div>
+            <div class="card-body" id="tl-done"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div id="view-calendar" class="view">
+      <div class="section-head">
+        <h2>Calendar</h2>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-ghost" onclick="prevMo()">← Prev</button>
+          <span id="cal-label" style="font-size:14px;font-weight:600;min-width:140px;text-align:center;"></span>
+          <button class="btn btn-ghost" onclick="nextMo()">Next →</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:14px;">
+          <div style="display:flex;gap:14px;margin-bottom:10px;font-size:11px;color:#64748b;">
+            <span>🟩 Content deadline</span>
+            <span>🟧 Pipeline action</span>
+            <span>🟪 Partner action</span>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVENUE & KPIs -->
+    <div id="view-revenue" class="view">
+      <div class="section-head">
+        <h2>Revenue & KPIs</h2>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost" onclick="openModal('m-revenue')">Update Revenue</button>
+          <button class="btn btn-primary" onclick="openModal('m-kpis')">Update KPIs</button>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat c-green"><div class="lbl">Build Revenue MTD</div><div class="val" id="rv-build">$0</div><div class="sub">Milestone payments</div></div>
+        <div class="stat c-indigo"><div class="lbl">MRR (Retainers)</div><div class="val" id="rv-mrr">$0</div><div class="sub">Embedded partner retainers</div></div>
+        <div class="stat"><div class="lbl">Pipeline (Raw)</div><div class="val" id="rv-raw">$0</div><div class="sub">All open opportunities</div></div>
+        <div class="stat c-amber"><div class="lbl">Pipeline (Weighted)</div><div class="val" id="rv-weighted">$0</div><div class="sub">70% / 40% / 15% by stage</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>KPI Scorecard</h3></div>
+        <div class="card-body">
+          <div class="kpi-grid">
+            <div class="kpi-card"><div class="kpi-lbl">Discovery → Proposal</div><div class="kpi-val kn" id="kv-d2p">—</div><div class="kpi-tgt">Target ≥ 70%</div></div>
+            <div class="kpi-card"><div class="kpi-lbl">Proposal → SOW</div><div class="kpi-val kn" id="kv-p2s">—</div><div class="kpi-tgt">Target ≥ 50%</div></div>
+            <div class="kpi-card"><div class="kpi-lbl">Pipeline Coverage</div><div class="kpi-val kn" id="kv-cov">—</div><div class="kpi-tgt">Target ≥ 2.5×</div></div>
+            <div class="kpi-card"><div class="kpi-lbl">On-Time Milestones</div><div class="kpi-val kn" id="kv-mile">—</div><div class="kpi-tgt">Target ≥ 80%</div></div>
+            <div class="kpi-card"><div class="kpi-lbl">Retainer Conversion</div><div class="kpi-val kn" id="kv-ret">—</div><div class="kpi-tgt">Target ≥ 40%</div></div>
+            <div class="kpi-card"><div class="kpi-lbl">Share of Model (SoM)</div><div class="kpi-val kn" id="kv-som">—</div><div class="kpi-tgt">Target ≥ 5% by mo. 6</div></div>
+            <div class="kpi-card"><div class="kpi-lbl">Workflow Time Recovered</div><div class="kpi-val kn" id="kv-time">—</div><div class="kpi-tgt">Target ≥ 60%</div></div>
+            <div class="kpi-card"><div class="kpi-lbl">Agent Accuracy</div><div class="kpi-val kn" id="kv-acc">—</div><div class="kpi-tgt">Target ≥ 95%</div></div>
+            <div class="kpi-card"><div class="kpi-lbl">Client NPS</div><div class="kpi-val kn" id="kv-nps">—</div><div class="kpi-tgt">Target ≥ 8/10</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Revenue Concentration</h3></div>
+        <div class="card-body" id="rv-conc"><p style="font-size:13px;color:#94a3b8;">No engagements yet. Rule: no single client > 40% of total revenue.</p></div>
+      </div>
+    </div>
+
+    <!-- GUIDE -->
+    <div id="view-guide" class="view">
+      <div class="section-head"><h2>Agency Guide</h2><span style="font-size:12px;color:#94a3b8">Everything you built — what it is, what to do with it</span></div>
+
+      <!-- What Veta is -->
+      <div class="card">
+        <div class="card-head"><h3>🏢 What Veta Is</h3></div>
+        <div class="card-body">
+          <p style="font-size:14px;line-height:1.7;color:#334155;margin-bottom:14px"><strong>An AI-native vertical agent agency.</strong> You ship complete, production-ready agent systems scoped to a specific functional cluster inside a specific vertical — specialty dental, specialty legal, aesthetic medicine. You are not an AI consulting firm, not a software company, not a digital marketing agency. You replace workflows by building systems that handle specific functional clusters end-to-end.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+            <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#64748b;margin-bottom:6px">Cluster Sprint</div>
+              <div style="font-size:18px;font-weight:700;color:#6366f1">$18K – $45K</div>
+              <div style="font-size:12px;color:#64748b;margin-top:4px">One cluster · 6–8 weeks · fixed scope</div>
+            </div>
+            <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#64748b;margin-bottom:6px">Vertical Stack</div>
+              <div style="font-size:18px;font-weight:700;color:#6366f1">$55K – $120K</div>
+              <div style="font-size:12px;color:#64748b;margin-top:4px">Multiple clusters · full vertical automation</div>
+            </div>
+            <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#64748b;margin-bottom:6px">Embedded Partner</div>
+              <div style="font-size:18px;font-weight:700;color:#6366f1">$4K – $12K/mo</div>
+              <div style="font-size:12px;color:#64748b;margin-top:4px">Ongoing retainer · operate + expand</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Market validation -->
+      <div class="card">
+        <div class="card-head"><h3>📊 Market Validation</h3></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="background:#eef2ff;border-radius:8px;padding:14px">
+              <div style="font-size:11px;font-weight:700;color:#4338ca;margin-bottom:4px">YC BET #02 — 2025</div>
+              <div style="font-size:13px;color:#1e293b;font-weight:600">"Vertical AI Agents Over Horizontal Tools"</div>
+              <div style="font-size:12px;color:#64748b;margin-top:4px">Named examples: <strong>Taiga</strong> (AI medical billing) and <strong>Andco</strong> (agentic legal case workups) — direct analogues to Veta</div>
+            </div>
+            <div style="background:#f0fdf4;border-radius:8px;padding:14px">
+              <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px">SCALE BENCHMARK</div>
+              <div style="font-size:13px;color:#1e293b;font-weight:600">$100M ARR / 30 employees</div>
+              <div style="font-size:12px;color:#64748b;margin-top:4px">AI-native companies hit this because the system does the work, not the headcount</div>
+            </div>
+            <div style="background:#fff7ed;border-radius:8px;padding:14px">
+              <div style="font-size:11px;font-weight:700;color:#c2410c;margin-bottom:4px">THE GAP</div>
+              <div style="font-size:13px;color:#1e293b;font-weight:600">88% experimenting · 81% no gains yet</div>
+              <div style="font-size:12px;color:#64748b;margin-top:4px">The gap between "we're experimenting" and "we have a running system" is exactly what Veta solves</div>
+            </div>
+            <div style="background:#fdf4ff;border-radius:8px;padding:14px">
+              <div style="font-size:11px;font-weight:700;color:#7e22ce;margin-bottom:4px">GEO CONVERSION</div>
+              <div style="font-size:13px;color:#1e293b;font-weight:600">18.4% vs 2.1%</div>
+              <div style="font-size:12px;color:#64748b;margin-top:4px">AI-referred visitors convert at 18.4% vs 2.1% for organic search — GEO citations are disproportionately valuable</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- The repo -->
+      <div class="card">
+        <div class="card-head"><h3>📁 The Repo — What Each File Does</h3></div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>File</th><th>What it does</th><th>When to use it</th></tr></thead>
+            <tbody>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">docs/positioning.md</code></td><td>What Veta is, what it isn't, who it sells to, the pitch in plain language, market validation</td><td>Before any sales conversation. Know this cold.</td></tr>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">docs/service-catalog.md</code></td><td>3 tiers with inclusions, exclusions, pricing floors, scope rules, what you do not sell</td><td>When scoping a proposal. Pricing floors are non-negotiable.</td></tr>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">verticals/specialty-dental/playbook.md</code></td><td>5 clusters ranked by leverage, integration map, HIPAA checklist, discovery Qs, objections + responses</td><td>Read before every dental prospect call</td></tr>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">verticals/specialty-legal/playbook.md</code></td><td>5 clusters, Clio/MyCase/Filevine map, privilege + UPL constraints, 2026 adoption stats</td><td>Read before every legal prospect call</td></tr>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">verticals/aesthetic-medicine/playbook.md</code></td><td>5 clusters, Nextech/Aesthetic Record map, Instagram DM channel, HIPAA + FTC rules</td><td>Read before every aesthetics prospect call</td></tr>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">delivery/discovery-framework.md</code></td><td>45-min call structure, section-by-section questions, 4-dimension quantification, qualification criteria</td><td>Open during or immediately before every discovery call</td></tr>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">delivery/sow-template.md</code></td><td>Binding SOW: scope, milestones, payment schedule (30/20/25/25), IP ownership, change order triggers</td><td>Fill in after a verbal agreement. Send within 3–5 days.</td></tr>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">delivery/onboarding-checklist.md</code></td><td>Kickoff agenda, credential collection, compliance pre-checks, spec sign-off process</td><td>Run through this after every SOW is signed</td></tr>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">delivery/handoff-protocol.md</code></td><td>8-point definition of done, 90-min handoff session, 3-day independent test, 30-day support scope</td><td>At the end of every engagement before closing the invoice</td></tr>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">agents/_base/agent-spec-template.md</code></td><td>Every agent build starts here — inputs, outputs, logic, exception handling, compliance flags, read-only phase</td><td>Before writing any code for a client agent</td></tr>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">agents/_base/evaluation-rubric.md</code></td><td>Pass/fail thresholds: ≥95% accuracy, ≤3% FP, ≤5% FN, ≥99% uptime, 0 unhandled failures</td><td>Before handing any agent to a client</td></tr>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">agents/acquirer/content-strategy.md</code></td><td>5 content types, production cadence, 45 example titles, GEAF structure, voice rules</td><td>Before writing any piece of content</td></tr>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">agents/acquirer/seo-geo-playbook.md</code></td><td>Query bank (30 queries), citation multipliers, llms.txt, bot management, Share of Model metric</td><td>Before publishing content. Implement llms.txt + robots.txt once.</td></tr>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">agents/acquirer/partnership-outreach.md</code></td><td>5 partner categories per vertical, cold email template, 2-followup max, partner agreement structure</td><td>When starting partner outreach for any vertical</td></tr>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">ops/pricing-architecture.md</code></td><td>4-step value-based pricing framework, hard floors, edge case responses (pilot, revenue share, etc.)</td><td>When building any proposal. Never go below the floor.</td></tr>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">ops/kpi-framework.md</code></td><td>3 layers of KPIs: agency health, delivery quality, client outcomes — with targets and tracking columns</td><td>Monthly review. Feed into the Revenue & KPIs screen here.</td></tr>
+              <tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">ops/run-book.md</code></td><td>Daily 15-min sweep, Friday 60-min review, monthly 90-min, quarterly 3-hour — what to look at, in order</td><td>Every morning. Every Friday. Every month.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Dashboard guide -->
+      <div class="card">
+        <div class="card-head"><h3>🖥 This Dashboard — What Each Section Does</h3></div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>Section</th><th>What you do with it</th><th>Update frequency</th></tr></thead>
+            <tbody>
+              <tr><td><strong>⚡ Today's Brief</strong></td><td>Morning check — urgent items, today's priorities, pipeline and content snapshots at a glance</td><td>Every morning</td></tr>
+              <tr><td><strong>🔄 Client Pipeline</strong></td><td>Add every prospect the moment you speak to them. Move them through stages as they progress. Kanban shows the full funnel. Pipeline value feeds into weighted revenue automatically.</td><td>After every prospect interaction</td></tr>
+              <tr><td><strong>📝 Content Calendar</strong></td><td>Track every content piece from Idea → Published. Set target dates. Mark GEO tracking active once published and being monitored in Perplexity/ChatGPT/Claude.</td><td>Weekly — update status as pieces progress</td></tr>
+              <tr><td><strong>🤝 Partnerships</strong></td><td>Log every consultant, CPA, broker, or rep you contact. Track outreach status (max 2 follow-ups). Count referrals from active partners.</td><td>After every outreach action</td></tr>
+              <tr><td><strong>✅ Tasks</strong></td><td>Prioritised task list. 6 starter tasks are pre-loaded. Add tasks as they come up. Check off as done. High priority tasks surface on Today's Brief automatically.</td><td>Daily</td></tr>
+              <tr><td><strong>📅 Calendar</strong></td><td>Auto-populated from content target dates, pipeline next-action dates, and partner next-action dates. Shows everything in a single monthly view.</td><td>No direct entry needed — flows from other sections</td></tr>
+              <tr><td><strong>💰 Revenue & KPIs</strong></td><td>Enter build revenue and MRR monthly. Update KPIs as you have data. Pipeline value calculates automatically from the Pipeline section. 9 KPIs show green/amber/red against targets.</td><td>Monthly (revenue) · as data is available (KPIs)</td></tr>
+              <tr><td><strong>📖 Agency Guide</strong></td><td>This screen — complete summary of what everything is and when to use it. Reference any time.</td><td>Read-only reference</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Verticals -->
+      <div class="card">
+        <div class="card-head"><h3>🎯 Active Verticals — Top Clusters by Leverage</h3></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#1d4ed8;margin-bottom:10px;padding:6px 10px;background:#dbeafe;border-radius:6px">🦷 Specialty Dental</div>
+              <div style="font-size:12px;color:#334155;line-height:1.8">
+                <div><strong>1.</strong> Insurance Pre-Auth <span style="color:#6366f1;font-weight:600">$22–38K</span></div>
+                <div><strong>2.</strong> Treatment Plan Follow-Up <span style="color:#6366f1;font-weight:600">$18–28K</span></div>
+                <div><strong>3.</strong> New Patient Intake <span style="color:#6366f1;font-weight:600">$18–25K</span></div>
+                <div><strong>4.</strong> Recall &amp; Reactivation</div>
+                <div><strong>5.</strong> Morning Huddle Prep</div>
+              </div>
+              <div style="margin-top:10px;font-size:11px;color:#94a3b8">EHR: Open Dental · Dentrix · Eaglesoft · Curve</div>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#15803d;margin-bottom:10px;padding:6px 10px;background:#dcfce7;border-radius:6px">⚖️ Specialty Legal</div>
+              <div style="font-size:12px;color:#334155;line-height:1.8">
+                <div><strong>1.</strong> Document Assembly <span style="color:#6366f1;font-weight:600">$22–35K</span></div>
+                <div><strong>2.</strong> Client Status Comms <span style="color:#6366f1;font-weight:600">$18–25K</span></div>
+                <div><strong>3.</strong> Matter Intake + Conflict Check <span style="color:#6366f1;font-weight:600">$20–30K</span></div>
+                <div><strong>4.</strong> Doc Collection Follow-Up</div>
+                <div><strong>5.</strong> Deadline Docketing</div>
+              </div>
+              <div style="margin-top:10px;font-size:11px;color:#94a3b8">PMS: Clio · MyCase · Filevine · PracticePanther</div>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#be185d;margin-bottom:10px;padding:6px 10px;background:#fce7f3;border-radius:6px">💉 Aesthetic Medicine</div>
+              <div style="font-size:12px;color:#334155;line-height:1.8">
+                <div><strong>1.</strong> Consultation Follow-Up</div>
+                <div><strong>2.</strong> Post-Treatment + Reviews</div>
+                <div><strong>3.</strong> Pre-Treatment Consent</div>
+                <div><strong>4.</strong> Membership Management</div>
+                <div><strong>5.</strong> New Patient Intake</div>
+              </div>
+              <div style="margin-top:10px;font-size:11px;color:#94a3b8">EHR: Nextech · Aesthetic Record · PatientNow · Zenoti</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Next steps -->
+      <div class="card">
+        <div class="card-head"><h3>🚀 Where You Are Now &amp; What Comes Next</h3></div>
+        <div class="card-body">
+          <div style="margin-bottom:18px;padding:14px;background:#f0fdf4;border-radius:8px;border-left:4px solid #16a34a">
+            <div style="font-size:12px;font-weight:700;color:#15803d;margin-bottom:4px">CURRENT STATE</div>
+            <div style="font-size:13px;color:#1e293b">0 engagements · 0 content published · 0 partners active. The full operating system is built. Execution starts now.</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="background:#fafbff;border-radius:8px;padding:14px;border:1px solid #e2e8f0">
+              <div style="font-size:12px;font-weight:700;color:#4338ca;margin-bottom:8px">TRACK 1 — Get Inbound (Content)</div>
+              <div style="font-size:12px;color:#334155;line-height:1.9">
+                <div>① Write dental pre-auth pillar piece (GEAF format)</div>
+                <div>② Implement llms.txt + robots.txt bot management</div>
+                <div>③ Set up weekly GEO citation monitoring log</div>
+                <div>④ Publish → distribute excerpt on LinkedIn</div>
+                <div>⑤ 2–3 problem/solution pieces per month after that</div>
+              </div>
+            </div>
+            <div style="background:#fafbff;border-radius:8px;padding:14px;border:1px solid #e2e8f0">
+              <div style="font-size:12px;font-weight:700;color:#4338ca;margin-bottom:8px">TRACK 2 — Get Clients (Outbound)</div>
+              <div style="font-size:12px;color:#334155;line-height:1.9">
+                <div>① Identify 5 dental practice management consultants by name</div>
+                <div>② Send cold outreach using the &lt;150-word template</div>
+                <div>③ Book first dental discovery call</div>
+                <div>④ Run discovery framework · quantify cluster cost on call</div>
+                <div>⑤ Send proposal within 3–5 days · use SOW template</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:14px;padding:12px;background:#fffbeb;border-radius:8px;font-size:12px;color:#92400e;border-left:4px solid #d97706">
+            <strong>The rule:</strong> Both tracks run in parallel at all times. Content compounds over months. Outbound generates revenue now. Never let either track go to zero.
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent build lifecycle -->
+      <div class="card">
+        <div class="card-head"><h3>🤖 Agent Build Lifecycle — 8 Steps (Every Build)</h3></div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>#</th><th>Phase</th><th>What happens</th><th>Gate to proceed</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td><strong>Spec</strong></td><td>Write agent spec using the template — inputs, outputs, logic, compliance flags, exception handling</td><td>Client and Veta sign off on spec</td></tr>
+              <tr><td>2</td><td><strong>Tool Manifest</strong></td><td>Document every integration — auth, endpoints, rate limits, data sensitivity, failure modes, BAA status</td><td>All credentials confirmed, BAAs signed</td></tr>
+              <tr><td>3</td><td><strong>Read-Only Build</strong></td><td>Build the agent with read-only access — it observes and logs but changes nothing</td><td>—</td></tr>
+              <tr><td>4</td><td><strong>Read-Only Sign-Off</strong></td><td>Client reviews 2 weeks of read-only logs and confirms the agent is making the right decisions</td><td>Client sign-off in writing</td></tr>
+              <tr><td>5</td><td><strong>Write-Access Build</strong></td><td>Enable write access — agent now takes actions in the live system</td><td>—</td></tr>
+              <tr><td>6</td><td><strong>Write-Access Review</strong></td><td>Monitor for 2 weeks with daily check-ins. Catch edge cases.</td><td>Accuracy ≥95%, 0 unhandled failures</td></tr>
+              <tr><td>7</td><td><strong>Handoff</strong></td><td>90-min handoff session · client team operates independently · 3-day independent test</td><td>Client team passes independent operation test</td></tr>
+              <tr><td>8</td><td><strong>Post-Launch</strong></td><td>30-day support window · retainer offer at day 20–25</td><td>Final invoice released after handoff confirmed</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="m-client">
+  <div class="modal">
+    <h2 id="mc-title">Add Prospect</h2>
+    <div class="form-row">
+      <div class="fg"><label>Practice / Client Name *</label><input class="fi" id="mc-name" placeholder="e.g. Northside Implant Group"></div>
+      <div class="fg"><label>Vertical</label><select class="fs" id="mc-vert"><option value="dental">Specialty Dental</option><option value="legal">Specialty Legal</option><option value="aesthetic">Aesthetic Medicine</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Stage</label><select class="fs" id="mc-stage"><option value="identified">Identified</option><option value="discovery">Discovery Scheduled</option><option value="discovery-done">Discovery Complete</option><option value="proposal">Proposal Sent</option><option value="sow">SOW Signed</option><option value="active">Active Engagement</option><option value="handoff">Handoff</option><option value="retainer">Retainer</option><option value="complete">Complete</option></select></div>
+      <div class="fg"><label>Deal Value ($)</label><input class="fi" id="mc-val" type="number" placeholder="e.g. 28000"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Last Contact</label><input class="fi" id="mc-lc" type="date"></div>
+      <div class="fg"><label>Next Action Date</label><input class="fi" id="mc-nad" type="date"></div>
+    </div>
+    <div class="fg"><label>Next Action</label><input class="fi" id="mc-na" placeholder="e.g. Send proposal"></div>
+    <div class="fg"><label>Notes</label><textarea class="ft" id="mc-notes" placeholder="Cluster focus, objections, key contacts..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-client')">Cancel</button>
+      <button class="btn btn-primary" id="mc-btn" onclick="saveClient()">Add Prospect</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-content">
+  <div class="modal">
+    <h2 id="mco-title">Add Content</h2>
+    <div class="fg"><label>Title *</label><input class="fi" id="mco-title-i" placeholder="e.g. The Dental Coordinator's Guide to Pre-Auth Automation"></div>
+    <div class="form-row">
+      <div class="fg"><label>Type</label><select class="fs" id="mco-type"><option value="pillar">Pillar</option><option value="problem-solution">Problem / Solution</option><option value="integration">Integration Guide</option><option value="benchmark">Benchmark Page</option><option value="case-study">Case Study</option></select></div>
+      <div class="fg"><label>Vertical</label><select class="fs" id="mco-vert"><option value="dental">Dental</option><option value="legal">Legal</option><option value="aesthetic">Aesthetic</option><option value="cross">Cross-vertical</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Status</label><select class="fs" id="mco-status"><option value="idea">Idea</option><option value="outlined">Outlined</option><option value="draft">In Draft</option><option value="review">In Review</option><option value="ready">Ready to Publish</option><option value="published">Published</option><option value="needs-update">Needs Update</option></select></div>
+      <div class="fg"><label>Target Publish Date</label><input class="fi" id="mco-date" type="date"></div>
+    </div>
+    <div class="fg"><label>Target Query</label><input class="fi" id="mco-query" placeholder="e.g. how to automate dental insurance pre-authorization"></div>
+    <div class="fg"><label>Published URL</label><input class="fi" id="mco-url" placeholder="https://..."></div>
+    <div class="fg" style="display:flex;align-items:center;gap:8px;">
+      <input type="checkbox" id="mco-geo" style="width:15px;height:15px;accent-color:#6366f1;">
+      <label style="margin-bottom:0;font-size:12.5px;font-weight:500;color:#374151;">GEO citation tracked (Perplexity / ChatGPT / Claude monitoring)</label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-content')">Cancel</button>
+      <button class="btn btn-primary" id="mco-btn" onclick="saveContent()">Add Content</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-partner">
+  <div class="modal">
+    <h2 id="mp-title">Add Partner</h2>
+    <div class="form-row">
+      <div class="fg"><label>Contact Name *</label><input class="fi" id="mp-name" placeholder="First Last"></div>
+      <div class="fg"><label>Firm / Company</label><input class="fi" id="mp-firm" placeholder="e.g. Dental Consulting Alliance"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Category</label><select class="fs" id="mp-cat"><option value="consultant">Practice Mgmt Consultant</option><option value="cpa">CPA / Financial Advisor</option><option value="broker">Broker / Transition</option><option value="rep">Supply / Software Rep</option><option value="association">Association / Study Club</option><option value="malpractice">Malpractice Broker</option><option value="bar">Bar Tech Committee</option><option value="incubator">Law School Incubator</option><option value="cme">CME Provider</option><option value="other">Other</option></select></div>
+      <div class="fg"><label>Vertical</label><select class="fs" id="mp-vert"><option value="dental">Dental</option><option value="legal">Legal</option><option value="aesthetic">Aesthetic</option><option value="cross">Cross-vertical</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Source</label><select class="fs" id="mp-src"><option value="cold">Cold</option><option value="warm">Warm Intro</option><option value="conference">Conference</option><option value="content">Content</option></select></div>
+      <div class="fg"><label>Status</label><select class="fs" id="mp-status"><option value="identified">Identified</option><option value="outreach-sent">Outreach Sent</option><option value="followup-1">Follow-up 1</option><option value="followup-2">Follow-up 2</option><option value="call-scheduled">Call Scheduled</option><option value="call-done">Call Complete</option><option value="active">Active Partner</option><option value="dormant">Dormant</option><option value="dnc">Do Not Contact</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Last Contact</label><input class="fi" id="mp-lc" type="date"></div>
+      <div class="fg"><label>Next Action Date</label><input class="fi" id="mp-nad" type="date"></div>
+    </div>
+    <div class="fg"><label>Next Action</label><input class="fi" id="mp-na" placeholder="e.g. Send follow-up email"></div>
+    <div class="fg"><label>Referrals Generated</label><input class="fi" id="mp-refs" type="number" placeholder="0"></div>
+    <div class="fg"><label>Notes</label><textarea class="ft" id="mp-notes" placeholder="LinkedIn URL, mutual connections, what they focus on..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-partner')">Cancel</button>
+      <button class="btn btn-primary" id="mp-btn" onclick="savePartner()">Add Partner</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-task">
+  <div class="modal">
+    <h2>Add Task</h2>
+    <div class="fg"><label>Task *</label><input class="fi" id="mt-title" placeholder="What needs to be done?"></div>
+    <div class="form-row">
+      <div class="fg"><label>Priority</label><select class="fs" id="mt-pri"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select></div>
+      <div class="fg"><label>Category</label><select class="fs" id="mt-cat"><option value="content">Content</option><option value="pipeline">Pipeline</option><option value="partnership">Partnership</option><option value="seo">SEO / GEO</option><option value="delivery">Delivery</option><option value="ops">Operations</option><option value="other">Other</option></select></div>
+    </div>
+    <div class="fg"><label>Due Date</label><input class="fi" id="mt-due" type="date"></div>
+    <div class="fg"><label>Notes</label><textarea class="ft" id="mt-notes" placeholder="Context, references, details..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-task')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTask()">Add Task</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-revenue">
+  <div class="modal">
+    <h2>Update Revenue</h2>
+    <div class="fg"><label>Build Revenue MTD ($)</label><input class="fi" id="mr-build" type="number" placeholder="0"></div>
+    <div class="fg"><label>MRR — Retainer Revenue ($)</label><input class="fi" id="mr-mrr" type="number" placeholder="0"></div>
+    <div class="fg"><label>AR Aging — Overdue ($)</label><input class="fi" id="mr-ar" type="number" placeholder="0"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-revenue')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRevenue()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-kpis">
+  <div class="modal">
+    <h2>Update KPIs</h2>
+    <p style="font-size:12px;color:#94a3b8;margin-bottom:14px;">Enter percentages as numbers (e.g. 72 for 72%). Leave blank for N/A.</p>
+    <div class="form-row">
+      <div class="fg"><label>Discovery → Proposal (%)</label><input class="fi" id="mk-d2p" type="number" min="0" max="100" placeholder="—"></div>
+      <div class="fg"><label>Proposal → SOW (%)</label><input class="fi" id="mk-p2s" type="number" min="0" max="100" placeholder="—"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Pipeline Coverage (×)</label><input class="fi" id="mk-cov" type="number" step="0.1" placeholder="—"></div>
+      <div class="fg"><label>On-Time Milestones (%)</label><input class="fi" id="mk-mile" type="number" min="0" max="100" placeholder="—"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Retainer Conversion (%)</label><input class="fi" id="mk-ret" type="number" min="0" max="100" placeholder="—"></div>
+      <div class="fg"><label>Share of Model — SoM (%)</label><input class="fi" id="mk-som" type="number" step="0.1" placeholder="—"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Workflow Time Recovered (%)</label><input class="fi" id="mk-time" type="number" min="0" max="100" placeholder="—"></div>
+      <div class="fg"><label>Agent Accuracy (%)</label><input class="fi" id="mk-acc" type="number" min="0" max="100" placeholder="—"></div>
+    </div>
+    <div class="fg"><label>Client NPS (0–10)</label><input class="fi" id="mk-nps" type="number" min="0" max="10" step="0.1" placeholder="—"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('m-kpis')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveKPIs()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────
+const SK = 'veta_v1';
+const defaults = {
+  clients: [],
+  content: [{id:1,title:"The Dental Coordinator's Guide to Automating Pre-Authorization",type:'pillar',vert:'dental',status:'idea',query:'how to automate dental insurance pre-authorization',date:'',url:'',geo:false}],
+  partners: [],
+  tasks: [
+    {id:1,title:'Write dental pre-auth pillar piece',pri:'high',status:'todo',cat:'content',due:'',notes:'GEAF structure · 2,500–4,500 words · benchmark table · limitations section (1.7× citation multiplier)'},
+    {id:2,title:'Identify 5 dental practice management consultants by name',pri:'high',status:'todo',cat:'partnership',due:'',notes:'LinkedIn · Dental Town · prioritize geographic overlap + evident alignment'},
+    {id:3,title:'Book first dental discovery call',pri:'high',status:'todo',cat:'pipeline',due:'',notes:'Use discovery framework · even non-converting call sharpens workflow data'},
+    {id:4,title:'Implement llms.txt on agency website',pri:'medium',status:'todo',cat:'seo',due:'',notes:'30-min task · declares content structure to AI crawlers'},
+    {id:5,title:'Configure robots.txt bot management',pri:'medium',status:'todo',cat:'seo',due:'',notes:'Allow: Claude-SearchBot, OAI-SearchBot, PerplexityBot · Block: GPTBot, Google-Extended'},
+    {id:6,title:'Set up weekly GEO citation monitoring log',pri:'medium',status:'todo',cat:'seo',due:'',notes:'Run query bank across Perplexity / ChatGPT / Claude weekly · track Share of Model'},
+  ],
+  revenue:{build:0,mrr:0,ar:0},
+  kpis:{d2p:null,p2s:null,cov:null,mile:null,ret:null,som:null,time:null,acc:null,nps:null}
+};
+
+let D = (() => { try { const s=localStorage.getItem(SK); return s?JSON.parse(s):JSON.parse(JSON.stringify(defaults)); } catch(e){return JSON.parse(JSON.stringify(defaults));} })();
+let editId = null;
+let calY, calM;
+
+function save(){localStorage.setItem(SK,JSON.stringify(D));}
+function nid(arr){return arr.length?Math.max(...arr.map(x=>x.id))+1:1;}
+
+// ── NAV ───────────────────────────────────────────────────────────
+const titles={overview:"Today's Brief",pipeline:"Client Pipeline",content:"Content Calendar",partners:"Partnerships",tasks:"Tasks",calendar:"Calendar",revenue:"Revenue & KPIs"};
+function go(v){
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.querySelector(`[data-view="${v}"]`).classList.add('active');
+  document.getElementById('page-title').textContent=titles[v];
+  render(v);
+}
+document.querySelectorAll('.nav-item').forEach(el=>el.addEventListener('click',()=>go(el.dataset.view)));
+
+// ── MODALS ────────────────────────────────────────────────────────
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open'); editId=null; resetModals();}
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+function resetModals(){
+  document.getElementById('mc-title').textContent='Add Prospect'; document.getElementById('mc-btn').textContent='Add Prospect'; document.getElementById('mc-btn').onclick=saveClient;
+  document.getElementById('mco-title').textContent='Add Content'; document.getElementById('mco-btn').textContent='Add Content'; document.getElementById('mco-btn').onclick=saveContent;
+  document.getElementById('mp-title').textContent='Add Partner'; document.getElementById('mp-btn').textContent='Add Partner'; document.getElementById('mp-btn').onclick=savePartner;
+}
+
+// ── RENDER DISPATCH ───────────────────────────────────────────────
+function render(v){
+  const fn={overview:renderOverview,pipeline:renderPipeline,content:renderContent,partners:renderPartners,tasks:renderTasks,calendar:renderCalendar,revenue:renderRevenue};
+  if(fn[v])fn[v]();
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmt$(n){return '$'+Math.round(n||0).toLocaleString();}
+function today(){const d=new Date();d.setHours(0,0,0,0);return d;}
+
+const STAGE_LABEL={identified:'Identified',discovery:'Discovery',proposal:'Proposal','discovery-done':'Discovery Done',sow:'SOW Signed',active:'Active',handoff:'Handoff',retainer:'Retainer',complete:'Complete'};
+const STAGE_COLOR={identified:'b-gray',discovery:'b-blue','discovery-done':'b-blue',proposal:'b-purple',sow:'b-indigo',active:'b-green',handoff:'b-yellow',retainer:'b-indigo',complete:'b-green'};
+const STAGE_W={sow:.7,proposal:.4,'discovery-done':.4,active:.7,discovery:.15,identified:.1,handoff:.85,retainer:1,complete:0};
+
+function stageTag(s){return `<span class="badge ${STAGE_COLOR[s]||'b-gray'}">${STAGE_LABEL[s]||s}</span>`;}
+function vertTag(v){const m={dental:'t-dental',legal:'t-legal',aesthetic:'t-aesthetic',cross:'t-cross'};return `<span class="${m[v]||'t-cross'}">${v}</span>`;}
+function contentTypeTag(t){const m={'pillar':'b-indigo','problem-solution':'b-blue','integration':'b-gray','benchmark':'b-purple','case-study':'b-green'};const l={'pillar':'Pillar','problem-solution':'Problem/Sol','integration':'Integration','benchmark':'Benchmark','case-study':'Case Study'};return `<span class="badge ${m[t]||'b-gray'}">${l[t]||t}</span>`;}
+function contentStatusTag(s){const m={idea:'b-gray',outlined:'b-blue',draft:'b-yellow',review:'b-purple',ready:'b-indigo',published:'b-green','needs-update':'b-red'};const l={idea:'Idea',outlined:'Outlined',draft:'Draft',review:'Review',ready:'Ready',published:'Published','needs-update':'Needs Update'};return `<span class="badge ${m[s]||'b-gray'}">${l[s]||s}</span>`;}
+function partnerStatusTag(s){const m={'identified':'b-gray','outreach-sent':'b-blue','followup-1':'b-blue','followup-2':'b-blue','call-scheduled':'b-purple','call-done':'b-indigo','active':'b-green','dormant':'b-yellow','dnc':'b-red'};const l={'identified':'Identified','outreach-sent':'Outreach Sent','followup-1':'Follow-up 1','followup-2':'Follow-up 2','call-scheduled':'Call Scheduled','call-done':'Call Done','active':'Active','dormant':'Dormant','dnc':'Do Not Contact'};return `<span class="badge ${m[s]||'b-gray'}">${l[s]||s}</span>`;}
+const CAT_LABEL={'consultant':'Practice Consultant','cpa':'CPA/Advisor','broker':'Broker','rep':'Supply/SW Rep','association':'Association','malpractice':'Malpractice Broker','bar':'Bar Tech','incubator':'Law School','cme':'CME Provider','other':'Other'};
+
+function rawPipeline(){return D.clients.reduce((s,c)=>s+(parseFloat(c.val)||0),0);}
+function weightedPipeline(){return D.clients.reduce((s,c)=>s+(parseFloat(c.val)||0)*(STAGE_W[c.stage]||.1),0);}
+
+// ── OVERVIEW ──────────────────────────────────────────────────────
+function renderOverview(){
+  const td=today();
+  const active=D.clients.filter(c=>['sow','active','handoff','retainer'].includes(c.stage)).length;
+  const pub=D.content.filter(c=>c.status==='published').length;
+  const prog=D.content.filter(c=>['idea','outlined','draft','review','ready'].includes(c.status)).length;
+  const due=D.tasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<=td).length;
+  const over=D.tasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<td).length;
+  const rp=rawPipeline(), wp=weightedPipeline();
+
+  document.getElementById('ov-pipe').textContent=fmt$(rp);
+  document.getElementById('ov-pipe-w').textContent='Weighted: '+fmt$(wp);
+  document.getElementById('ov-active').textContent=active;
+  document.getElementById('ov-pub').textContent=pub;
+  document.getElementById('ov-draft').textContent=prog+' in progress';
+  document.getElementById('ov-tasks').textContent=due;
+  document.getElementById('ov-over').textContent=over+' overdue';
+
+  // Urgent
+  const urgItems=D.tasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<=td);
+  const urgEl=document.getElementById('ov-urgent');
+  if(!urgItems.length){urgEl.innerHTML='<div class="empty"><div class="ei">✅</div><p>Nothing urgent.</p></div>';}
+  else{urgEl.innerHTML=urgItems.map(t=>{const isO=new Date(t.due)<td;return`<div class="urgent-item"><div class="urg-icon ${isO?'urg-red':'urg-yellow'}">${isO?'🔴':'🟡'}</div><div class="urg-body"><h4>${esc(t.title)}</h4><p>${isO?'Overdue':'Due'}: ${t.due} · ${t.cat}</p></div></div>`}).join('');}
+
+  // Priorities
+  const priEl=document.getElementById('ov-priorities');
+  const priTasks=D.tasks.filter(t=>t.status!=='done'&&t.pri==='high').slice(0,4);
+  if(!priTasks.length){priEl.innerHTML='<div class="empty"><p>No high-priority tasks. Add tasks to track them here.</p></div>';}
+  else{priEl.innerHTML=priTasks.map(t=>`<div class="urgent-item"><div class="urg-icon urg-yellow">→</div><div class="urg-body"><h4>${esc(t.title)}</h4><p>${t.cat}${t.due?' · Due: '+t.due:''}</p></div></div>`).join('');}
+
+  // Pipeline snap
+  const pipeEl=document.getElementById('ov-pipeline-snap');
+  const active2=D.clients.filter(c=>c.stage!=='complete').slice(0,5);
+  if(!active2.length){pipeEl.innerHTML='<div class="empty"><div class="ei">🔄</div><p>No prospects yet.</p></div>';}
+  else{pipeEl.innerHTML=active2.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9"><div><div style="font-size:13px;font-weight:600">${esc(c.name)}</div><div style="font-size:11px;color:#94a3b8">${c.vert} · ${STAGE_LABEL[c.stage]||c.stage}</div></div><div style="font-size:13px;font-weight:600;color:#6366f1">${c.val?fmt$(c.val):'—'}</div></div>`).join('');}
+
+  // Content snap
+  const endW=new Date(); endW.setDate(endW.getDate()+7);
+  const contEl=document.getElementById('ov-content-snap');
+  const wContent=D.content.filter(c=>c.date&&new Date(c.date)<=endW&&c.status!=='published');
+  if(!wContent.length){contEl.innerHTML='<div class="empty"><div class="ei">📝</div><p>Nothing scheduled this week.</p></div>';}
+  else{contEl.innerHTML=wContent.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9"><div style="flex:1;margin-right:10px"><div style="font-size:13px;font-weight:600">${esc(c.title)}</div><div style="font-size:11px;color:#94a3b8">${c.type} · ${c.date}</div></div>${contentStatusTag(c.status)}</div>`).join('');}
+}
+
+// ── PIPELINE ──────────────────────────────────────────────────────
+function renderPipeline(){
+  const stages=[{id:'identified',l:'Identified'},{id:'discovery',l:'Discovery'},{id:'discovery-done',l:'Discovery Done'},{id:'proposal',l:'Proposal Sent'},{id:'sow',l:'SOW Signed'},{id:'active',l:'Active'},{id:'handoff',l:'Handoff'},{id:'retainer',l:'Retainer'}];
+  document.getElementById('pipe-board').innerHTML=stages.map(s=>{
+    const cs=D.clients.filter(c=>c.stage===s.id);
+    return`<div class="pipe-col"><div class="pipe-col-head">${s.l}<span class="pipe-cnt">${cs.length}</span></div>${cs.length?cs.map(c=>`<div class="pipe-card" onclick="editClient(${c.id})"><div class="pipe-card-name">${esc(c.name)}</div><div class="pipe-card-meta">${vertTag(c.vert)}</div>${c.val?`<div class="pipe-card-val">${fmt$(c.val)}</div>`:''}</div>`).join(''):'<div class="pipe-empty">—</div>'}</div>`;
+  }).join('');
+
+  const tbody=document.getElementById('pipe-tbody');
+  if(!D.clients.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty"><div class="ei">🔄</div><p>No prospects yet.</p></div></td></tr>';return;}
+  tbody.innerHTML=D.clients.map(c=>`<tr><td><strong>${esc(c.name)}</strong>${c.notes?`<div style="font-size:11px;color:#94a3b8;margin-top:2px">${esc(c.notes.slice(0,60))}${c.notes.length>60?'...':''}</div>`:''}</td><td>${vertTag(c.vert)}</td><td>${stageTag(c.stage)}</td><td style="font-weight:600;color:#6366f1">${c.val?fmt$(c.val):'—'}</td><td>${c.lc||'—'}</td><td style="font-size:12px">${c.na?esc(c.na):'—'}</td><td><div style="display:flex;gap:5px"><button class="btn btn-ghost btn-sm" onclick="editClient(${c.id})">Edit</button><button class="btn btn-danger btn-sm" onclick="delClient(${c.id})">×</button></div></td></tr>`).join('');
+}
+
+// ── CONTENT ───────────────────────────────────────────────────────
+function renderContent(){
+  const td=today();
+  const pub=D.content.filter(c=>c.status==='published').length;
+  const prog=D.content.filter(c=>['idea','outlined','draft','review','ready'].includes(c.status)).length;
+  const over=D.content.filter(c=>c.status!=='published'&&c.date&&new Date(c.date)<td).length;
+  const pillar=D.content.filter(c=>c.type==='pillar').length;
+  document.getElementById('cs-pub').textContent=pub;
+  document.getElementById('cs-prog').textContent=prog;
+  document.getElementById('cs-over').textContent=over;
+  document.getElementById('cs-pillar').textContent=pillar;
+  const tbody=document.getElementById('content-tbody');
+  if(!D.content.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty"><p>No content yet.</p></div></td></tr>';return;}
+  tbody.innerHTML=D.content.map(c=>{
+    const isOver=c.status!=='published'&&c.date&&new Date(c.date)<td;
+    return`<tr><td><strong style="font-size:13px">${esc(c.title)}</strong>${c.query?`<div style="font-size:11px;color:#94a3b8;margin-top:2px">Query: ${esc(c.query)}</div>`:''}</td><td>${contentTypeTag(c.type)}</td><td>${vertTag(c.vert)}</td><td>${contentStatusTag(c.status)}</td><td style="${isOver?'color:#dc2626;font-weight:600':''}">${c.date||'—'}</td><td>${c.geo?'<span class="badge b-indigo">Tracked</span>':'<span class="badge b-gray">—</span>'}</td><td><div style="display:flex;gap:5px"><button class="btn btn-ghost btn-sm" onclick="editContent(${c.id})">Edit</button><button class="btn btn-danger btn-sm" onclick="delContent(${c.id})">×</button></div></td></tr>`;
+  }).join('');
+}
+
+// ── PARTNERS ──────────────────────────────────────────────────────
+function renderPartners(){
+  const active=D.partners.filter(p=>p.status==='active').length;
+  const out=D.partners.filter(p=>['outreach-sent','followup-1','followup-2','call-scheduled','call-done'].includes(p.status)).length;
+  const refs=D.partners.reduce((s,p)=>s+(parseInt(p.refs)||0),0);
+  document.getElementById('pt-active').textContent=active;
+  document.getElementById('pt-out').textContent=out;
+  document.getElementById('pt-ref').textContent=refs;
+  const tbody=document.getElementById('partner-tbody');
+  if(!D.partners.length){tbody.innerHTML='<tr><td colspan="9"><div class="empty"><div class="ei">🤝</div><p>No partners yet. Start with dental practice management consultants.</p></div></td></tr>';return;}
+  tbody.innerHTML=D.partners.map(p=>`<tr><td><strong>${esc(p.name)}</strong></td><td>${esc(p.firm||'—')}</td><td style="font-size:12px">${CAT_LABEL[p.cat]||p.cat}</td><td>${vertTag(p.vert)}</td><td>${partnerStatusTag(p.status)}</td><td>${p.lc||'—'}</td><td style="font-size:12px">${p.na?esc(p.na):'—'}</td><td style="text-align:center">${p.refs||0}</td><td><div style="display:flex;gap:5px"><button class="btn btn-ghost btn-sm" onclick="editPartner(${p.id})">Edit</button><button class="btn btn-danger btn-sm" onclick="delPartner(${p.id})">×</button></div></td></tr>`).join('');
+}
+
+// ── TASKS ─────────────────────────────────────────────────────────
+function renderTasks(){
+  ['high','medium','low'].forEach(p=>{
+    const items=D.tasks.filter(t=>t.pri===p&&t.status!=='done');
+    const key=p==='medium'?'med':p;
+    document.getElementById('tc-'+key).textContent=items.length;
+    document.getElementById('tl-'+key).innerHTML=items.length?items.map(taskHtml).join(''):'<div class="empty"><p>None.</p></div>';
+  });
+  const done=D.tasks.filter(t=>t.status==='done');
+  document.getElementById('tl-done').innerHTML=done.length?done.map(taskHtml).join(''):'<div class="empty"><p>None yet.</p></div>';
+}
+function taskHtml(t){return`<div class="task-item"><input type="checkbox" class="task-cb" ${t.status==='done'?'checked':''} onchange="toggleTask(${t.id})"><div class="task-body"><div class="task-title ${t.status==='done'?'done':''}">${esc(t.title)}</div><div class="task-meta">${t.cat}${t.due?' · Due: '+t.due:''}${t.notes?' · '+esc(t.notes.slice(0,55))+(t.notes.length>55?'...':''):''}</div></div><button class="task-del" onclick="delTask(${t.id})">×</button></div>`;}
+
+// ── CALENDAR ──────────────────────────────────────────────────────
+function renderCalendar(){
+  if(!calY){const n=new Date();calY=n.getFullYear();calM=n.getMonth();}
+  const mnames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-label').textContent=`${mnames[calM]} ${calY}`;
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const events={};
+  D.content.forEach(c=>{if(c.date){if(!events[c.date])events[c.date]=[];events[c.date].push({l:c.title.slice(0,22)+'…',t:'content'});}});
+  D.clients.forEach(c=>{if(c.nad){if(!events[c.nad])events[c.nad]=[];events[c.nad].push({l:c.name+': '+(c.na||'action'),t:'pipeline'});}});
+  D.partners.forEach(p=>{if(p.nad){if(!events[p.nad])events[p.nad]=[];events[p.nad].push({l:p.name+': '+(p.na||'action'),t:'partner'});}});
+  const first=new Date(calY,calM,1);
+  let dow=first.getDay();dow=dow===0?6:dow-1;
+  const dim=new Date(calY,calM+1,0).getDate();
+  const dipm=new Date(calY,calM,0).getDate();
+  const tnow=new Date();
+  let html=days.map(d=>`<div class="cal-h">${d}</div>`).join('');
+  const total=Math.ceil((dow+dim)/7)*7;
+  for(let i=0;i<total;i++){
+    let day,other=false,ds='';
+    if(i<dow){day=dipm-dow+i+1;other=true;const m2=calM-1<0?11:calM-1,y2=calM-1<0?calY-1:calY;ds=`${y2}-${String(m2+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;}
+    else if(i-dow>=dim){day=i-dow-dim+1;other=true;const m2=calM+1>11?0:calM+1,y2=calM+1>11?calY+1:calY;ds=`${y2}-${String(m2+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;}
+    else{day=i-dow+1;ds=`${calY}-${String(calM+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;}
+    const isToday=!other&&tnow.getFullYear()===calY&&tnow.getMonth()===calM&&tnow.getDate()===day;
+    const evs=(events[ds]||[]).slice(0,3).map(e=>`<div class="cal-ev ${e.t}" title="${esc(e.l)}">${esc(e.l)}</div>`).join('');
+    const numHtml=isToday?`<div class="cal-num" style="display:flex"><div class="cal-num">${day}</div></div>`.replace('display:flex','').replace('<div class="cal-num">','<div class="cal-num" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#6366f1;color:#fff;font-size:11px">'):`<div class="cal-num">${day}</div>`;
+    html+=`<div class="cal-day${other?' other':''}${isToday?' today':''}"><div class="cal-num" style="${isToday?'display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#6366f1;color:#fff;font-size:11px':''}">${day}</div>${evs}</div>`;
+  }
+  document.getElementById('cal-grid').innerHTML=html;
+}
+function prevMo(){if(!calY){const n=new Date();calY=n.getFullYear();calM=n.getMonth();}calM--;if(calM<0){calM=11;calY--;}renderCalendar();}
+function nextMo(){if(!calY){const n=new Date();calY=n.getFullYear();calM=n.getMonth();}calM++;if(calM>11){calM=0;calY++;}renderCalendar();}
+
+// ── REVENUE ───────────────────────────────────────────────────────
+function renderRevenue(){
+  document.getElementById('rv-build').textContent=fmt$(D.revenue.build);
+  document.getElementById('rv-mrr').textContent=fmt$(D.revenue.mrr);
+  document.getElementById('rv-raw').textContent=fmt$(rawPipeline());
+  document.getElementById('rv-weighted').textContent=fmt$(weightedPipeline());
+  const k=D.kpis;
+  setKPI('kv-d2p',k.d2p,70,'%');setKPI('kv-p2s',k.p2s,50,'%');setKPIx('kv-cov',k.cov,2.5);
+  setKPI('kv-mile',k.mile,80,'%');setKPI('kv-ret',k.ret,40,'%');setKPIsom('kv-som',k.som);
+  setKPI('kv-time',k.time,60,'%');setKPI('kv-acc',k.acc,95,'%');setKPInps('kv-nps',k.nps);
+  const rp=rawPipeline();
+  const conc=document.getElementById('rv-conc');
+  if(!D.clients.length||!rp){conc.innerHTML='<p style="font-size:13px;color:#94a3b8">No engagements yet. Rule: no single client > 40% of total revenue.</p>';return;}
+  const sorted=[...D.clients].filter(c=>c.val).sort((a,b)=>b.val-a.val);
+  conc.innerHTML=`<p style="font-size:12px;color:#94a3b8;margin-bottom:12px">Rule: no single client > 40% of total pipeline value.</p>`+sorted.slice(0,6).map(c=>{const pct=Math.round((c.val/rp)*100);const warn=pct>40;return`<div class="rev-row"><div><div style="font-size:13px;font-weight:500">${esc(c.name)}</div><div style="font-size:11px;color:#94a3b8">${STAGE_LABEL[c.stage]||c.stage}</div></div><div style="display:flex;align-items:center;gap:10px"><div style="width:100px"><div class="pb"><div class="pb-fill" style="width:${Math.min(pct,100)}%;background:${warn?'#ef4444':'#6366f1'}"></div></div></div><span style="font-size:13px;font-weight:600;color:${warn?'#dc2626':'#334155'}">${pct}%${warn?' ⚠️':''}</span></div></div>`;}).join('');
+}
+function setKPI(id,v,tgt,u){const el=document.getElementById(id);if(v===null||v===undefined||v===''){el.textContent='—';el.className='kpi-val kn';return;}const n=parseFloat(v);el.textContent=n+u;el.className='kpi-val '+(n>=tgt?'kp':n>=tgt*.8?'kw':'kf');}
+function setKPIx(id,v,tgt){const el=document.getElementById(id);if(v===null||v===undefined||v===''){el.textContent='—';el.className='kpi-val kn';return;}const n=parseFloat(v);el.textContent=n+'×';el.className='kpi-val '+(n>=tgt?'kp':n>=tgt*.8?'kw':'kf');}
+function setKPIsom(id,v){const el=document.getElementById(id);if(v===null||v===undefined||v===''){el.textContent='—';el.className='kpi-val kn';return;}const n=parseFloat(v);el.textContent=n+'%';el.className='kpi-val '+(n>=5?'kp':n>0?'kw':'kf');}
+function setKPInps(id,v){const el=document.getElementById(id);if(v===null||v===undefined||v===''){el.textContent='—';el.className='kpi-val kn';return;}const n=parseFloat(v);el.textContent=n+'/10';el.className='kpi-val '+(n>=8?'kp':n>=6?'kw':'kf');}
+
+// ── CRUD: CLIENTS ─────────────────────────────────────────────────
+function saveClient(){
+  const name=document.getElementById('mc-name').value.trim();
+  if(!name)return alert('Client name required.');
+  const obj={id:editId||nid(D.clients),name,vert:document.getElementById('mc-vert').value,stage:document.getElementById('mc-stage').value,val:document.getElementById('mc-val').value,lc:document.getElementById('mc-lc').value,na:document.getElementById('mc-na').value,nad:document.getElementById('mc-nad').value,notes:document.getElementById('mc-notes').value};
+  if(editId){const i=D.clients.findIndex(x=>x.id===editId);if(i>-1)D.clients[i]=obj;}else D.clients.push(obj);
+  save();closeModal('m-client');clearF('m-client');renderPipeline();renderOverview();
+}
+function editClient(id){
+  const c=D.clients.find(x=>x.id===id);if(!c)return;editId=id;
+  setF({n:'mc-name',v:c.name},{n:'mc-vert',v:c.vert},{n:'mc-stage',v:c.stage},{n:'mc-val',v:c.val||''},{n:'mc-lc',v:c.lc||''},{n:'mc-na',v:c.na||''},{n:'mc-nad',v:c.nad||''},{n:'mc-notes',v:c.notes||''});
+  document.getElementById('mc-title').textContent='Edit Prospect';document.getElementById('mc-btn').textContent='Save Changes';
+  openModal('m-client');
+}
+function delClient(id){if(!confirm('Remove this prospect?'))return;D.clients=D.clients.filter(c=>c.id!==id);save();renderPipeline();renderOverview();}
+
+// ── CRUD: CONTENT ─────────────────────────────────────────────────
+function saveContent(){
+  const title=document.getElementById('mco-title-i').value.trim();
+  if(!title)return alert('Title required.');
+  const obj={id:editId||nid(D.content),title,type:document.getElementById('mco-type').value,vert:document.getElementById('mco-vert').value,status:document.getElementById('mco-status').value,query:document.getElementById('mco-query').value,date:document.getElementById('mco-date').value,url:document.getElementById('mco-url').value,geo:document.getElementById('mco-geo').checked};
+  if(editId){const i=D.content.findIndex(x=>x.id===editId);if(i>-1)D.content[i]=obj;}else D.content.push(obj);
+  save();closeModal('m-content');clearF('m-content');renderContent();
+}
+function editContent(id){
+  const c=D.content.find(x=>x.id===id);if(!c)return;editId=id;
+  setF({n:'mco-title-i',v:c.title},{n:'mco-type',v:c.type},{n:'mco-vert',v:c.vert},{n:'mco-status',v:c.status},{n:'mco-query',v:c.query||''},{n:'mco-date',v:c.date||''},{n:'mco-url',v:c.url||''});
+  document.getElementById('mco-geo').checked=c.geo||false;
+  document.getElementById('mco-title').textContent='Edit Content';document.getElementById('mco-btn').textContent='Save Changes';
+  openModal('m-content');
+}
+function delContent(id){if(!confirm('Remove this content item?'))return;D.content=D.content.filter(c=>c.id!==id);save();renderContent();}
+
+// ── CRUD: PARTNERS ────────────────────────────────────────────────
+function savePartner(){
+  const name=document.getElementById('mp-name').value.trim();
+  if(!name)return alert('Contact name required.');
+  const obj={id:editId||nid(D.partners),name,firm:document.getElementById('mp-firm').value,cat:document.getElementById('mp-cat').value,vert:document.getElementById('mp-vert').value,src:document.getElementById('mp-src').value,status:document.getElementById('mp-status').value,lc:document.getElementById('mp-lc').value,na:document.getElementById('mp-na').value,nad:document.getElementById('mp-nad').value,refs:document.getElementById('mp-refs').value||0,notes:document.getElementById('mp-notes').value};
+  if(editId){const i=D.partners.findIndex(x=>x.id===editId);if(i>-1)D.partners[i]=obj;}else D.partners.push(obj);
+  save();closeModal('m-partner');clearF('m-partner');renderPartners();
+}
+function editPartner(id){
+  const p=D.partners.find(x=>x.id===id);if(!p)return;editId=id;
+  setF({n:'mp-name',v:p.name},{n:'mp-firm',v:p.firm||''},{n:'mp-cat',v:p.cat},{n:'mp-vert',v:p.vert},{n:'mp-src',v:p.src},{n:'mp-status',v:p.status},{n:'mp-lc',v:p.lc||''},{n:'mp-na',v:p.na||''},{n:'mp-nad',v:p.nad||''},{n:'mp-refs',v:p.refs||0},{n:'mp-notes',v:p.notes||''});
+  document.getElementById('mp-title').textContent='Edit Partner';document.getElementById('mp-btn').textContent='Save Changes';
+  openModal('m-partner');
+}
+function delPartner(id){if(!confirm('Remove this partner?'))return;D.partners=D.partners.filter(p=>p.id!==id);save();renderPartners();}
+
+// ── CRUD: TASKS ───────────────────────────────────────────────────
+function saveTask(){
+  const title=document.getElementById('mt-title').value.trim();
+  if(!title)return alert('Task required.');
+  D.tasks.push({id:nid(D.tasks),title,pri:document.getElementById('mt-pri').value,cat:document.getElementById('mt-cat').value,due:document.getElementById('mt-due').value,notes:document.getElementById('mt-notes').value,status:'todo'});
+  save();closeModal('m-task');clearF('m-task');renderTasks();renderOverview();
+}
+function toggleTask(id){const t=D.tasks.find(x=>x.id===id);if(t){t.status=t.status==='done'?'todo':'done';save();renderTasks();renderOverview();}}
+function delTask(id){D.tasks=D.tasks.filter(t=>t.id!==id);save();renderTasks();renderOverview();}
+function clearDone(){D.tasks=D.tasks.filter(t=>t.status!=='done');save();renderTasks();}
+
+// ── REVENUE / KPI SAVE ────────────────────────────────────────────
+function saveRevenue(){
+  D.revenue.build=parseFloat(document.getElementById('mr-build').value)||0;
+  D.revenue.mrr=parseFloat(document.getElementById('mr-mrr').value)||0;
+  D.revenue.ar=parseFloat(document.getElementById('mr-ar').value)||0;
+  save();closeModal('m-revenue');renderRevenue();
+}
+function saveKPIs(){
+  const g=id=>{const v=document.getElementById(id).value;return v===''?null:parseFloat(v);};
+  D.kpis={d2p:g('mk-d2p'),p2s:g('mk-p2s'),cov:g('mk-cov'),mile:g('mk-mile'),ret:g('mk-ret'),som:g('mk-som'),time:g('mk-time'),acc:g('mk-acc'),nps:g('mk-nps')};
+  save();closeModal('m-kpis');renderRevenue();
+}
+
+// ── FORM UTILS ────────────────────────────────────────────────────
+function setF(...pairs){pairs.forEach(({n,v})=>{const el=document.getElementById(n);if(el)el.value=v;});}
+function clearF(modalId){document.getElementById(modalId).querySelectorAll('input,select,textarea').forEach(el=>{if(el.type==='checkbox')el.checked=false;else el.value='';});}
+
+// ── INIT ──────────────────────────────────────────────────────────
+const now=new Date();
+document.getElementById('today-label').textContent=now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+renderOverview();
+</script>
+</body>
+</html>

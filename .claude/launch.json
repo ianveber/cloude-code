@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "TaskMaster (Python)",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["/tmp/tm_server.py"],
+      "port": 3000
+    }
+  ]
+}
