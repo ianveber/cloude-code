@@ -1,0 +1,3283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic OS — Veta</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #181818;
+    --surface3: #202020;
+    --border: #2a2a2a;
+    --accent: #ff3b30;
+    --accent2: #ff6b35;
+    --green: #30d158;
+    --yellow: #ffd60a;
+    --blue: #0a84ff;
+    --purple: #bf5af2;
+    --pink: #ff375f;
+    --text: #f0f0f0;
+    --text2: #888;
+    --text3: #555;
+    --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; overflow-x: hidden; }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    height: 44px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .topbar-logo {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-right: 24px;
+    white-space: nowrap;
+  }
+  .tabs {
+    display: flex;
+    gap: 0;
+    height: 44px;
+    flex: 1;
+  }
+  .tab {
+    padding: 0 16px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .tab:hover { color: var(--text2); }
+  .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+  .tab-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dot-red { background: var(--accent); }
+  .dot-green { background: var(--green); }
+  .dot-yellow { background: var(--yellow); }
+  .dot-blue { background: var(--blue); }
+  .dot-purple { background: var(--purple); }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+  }
+  .integration-badge {
+    font-size: 10px;
+    font-family: var(--mono);
+    font-weight: 600;
+    padding: 3px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+  .badge-on { color: var(--green); border-color: rgba(48,209,88,0.3); background: rgba(48,209,88,0.08); }
+  .badge-off { color: var(--text3); border-color: var(--border); background: transparent; }
+
+  /* ── STATS BAR ── */
+  .statsbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display: grid;
+    grid-template-columns: auto auto auto auto auto 1fr;
+    gap: 0;
+    align-items: center;
+  }
+  .stat-block {
+    padding: 0 20px;
+    border-right: 1px solid var(--border);
+  }
+  .stat-block:first-child { padding-left: 0; }
+  .stat-block:last-child { border-right: none; }
+  .stat-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 4px;
+  }
+  .stat-value {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .stat-sub { font-size: 11px; color: var(--text3); }
+  .stat-bar-wrap { margin-top: 4px; height: 3px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
+  .stat-bar { height: 100%; border-radius: 2px; transition: width 1s ease; }
+  .bar-red { background: var(--accent); }
+  .bar-green { background: var(--green); }
+  .bar-yellow { background: var(--yellow); }
+  .bar-blue { background: var(--blue); }
+
+  .stat-graph { padding-left: 20px; }
+  .mini-graph { display: flex; align-items: flex-end; gap: 2px; height: 24px; }
+  .mini-bar {
+    width: 6px;
+    border-radius: 1px 1px 0 0;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    background: var(--accent);
+  }
+  .mini-bar:hover { opacity: 1; }
+
+  /* ── MAIN LAYOUT ── */
+  .main { display: grid; grid-template-columns: 240px 1fr; gap: 0; min-height: calc(100vh - 100px); }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 16px 0;
+  }
+  .sidebar-section { margin-bottom: 8px; }
+  .sidebar-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 4px 16px 8px;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.1s;
+    border-left: 2px solid transparent;
+    text-decoration: none;
+  }
+  .sidebar-item:hover { background: var(--surface2); color: var(--text); }
+  .sidebar-item.active { background: var(--surface2); color: var(--text); border-left-color: var(--accent); }
+  .sidebar-icon { width: 14px; text-align: center; font-size: 12px; }
+  .sidebar-badge {
+    margin-left: auto;
+    font-size: 10px;
+    font-family: var(--mono);
+    background: var(--surface3);
+    color: var(--text3);
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+  .sidebar-divider { height: 1px; background: var(--border); margin: 8px 16px; }
+
+  /* ── CONTENT ── */
+  .content { padding: 24px; overflow-y: auto; }
+  .content-section { display: none; }
+  .content-section.active { display: block; }
+
+  /* ── SKILLS ── */
+  .skills-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .skills-title { font-size: 20px; font-weight: 700; }
+  .skills-subtitle { font-size: 13px; color: var(--text2); margin-top: 2px; }
+  .skills-search {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: var(--text);
+    font-family: var(--font);
+    width: 220px;
+    outline: none;
+  }
+  .skills-search:focus { border-color: var(--accent); }
+  .skills-search::placeholder { color: var(--text3); }
+
+  .category-section { margin-bottom: 32px; }
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .category-name {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text2);
+  }
+  .category-tag {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 3px;
+    color: var(--text3);
+    border: 1px solid var(--border);
+  }
+  .category-count {
+    margin-left: auto;
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--text3);
+  }
+
+  .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+  .skill-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .skill-card:hover {
+    border-color: var(--accent);
+    background: var(--surface3);
+    transform: translateY(-1px);
+  }
+  .skill-card:hover .skill-arrow { opacity: 1; transform: translateX(0); }
+  .skill-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--card-accent, var(--accent));
+    border-radius: 10px 0 0 10px;
+  }
+  .skill-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .skill-arrow {
+    font-size: 14px;
+    color: var(--text3);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all 0.15s;
+  }
+  .skill-sub {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: var(--mono);
+  }
+  .skill-type {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 3px;
+    color: var(--text3);
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+  .skill-hot { color: var(--yellow); border-color: rgba(255,214,10,0.3); background: rgba(255,214,10,0.06); }
+  .skill-ai { color: var(--blue); border-color: rgba(10,132,255,0.3); background: rgba(10,132,255,0.06); }
+
+  /* ── VAULT ── */
+  .vault-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+  .vault-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .vault-card-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .vault-file {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 12px;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .vault-file:last-child { border-bottom: none; }
+  .vault-file:hover { color: var(--text); }
+  .vault-file-icon { font-size: 11px; }
+
+  /* ── RUNS ── */
+  .run-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .run-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .run-ok { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .run-warn { background: var(--yellow); }
+  .run-err { background: var(--accent); }
+  .run-info { flex: 1; }
+  .run-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .run-meta { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+  .run-time { font-size: 11px; color: var(--text3); font-family: var(--mono); white-space: nowrap; }
+
+  /* ── ACTIVITY GRAPH ── */
+  .graph-container {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .graph-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .graph-title { font-size: 13px; font-weight: 600; }
+  .graph-period {
+    display: flex;
+    gap: 4px;
+  }
+  .period-btn {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    color: var(--text3);
+    background: transparent;
+    font-family: var(--font);
+    transition: all 0.1s;
+  }
+  .period-btn.active { background: var(--surface3); color: var(--text); border-color: var(--accent); }
+  .period-btn:hover { color: var(--text2); }
+  .chart-area { height: 80px; display: flex; align-items: flex-end; gap: 3px; }
+  .chart-bar {
+    flex: 1;
+    border-radius: 2px 2px 0 0;
+    background: var(--accent);
+    opacity: 0.6;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    min-height: 4px;
+  }
+  .chart-bar:hover { opacity: 1; }
+  .chart-bar.today { opacity: 1; box-shadow: 0 0 8px rgba(255,59,48,0.5); }
+  .chart-labels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 9px; color: var(--text3); font-family: var(--mono); }
+
+  /* ── DAILY NOTE ── */
+  .daily-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .daily-date {
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .daily-day { font-size: 13px; color: var(--text2); margin-top: 2px; }
+  .note-area {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .note-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .note-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .todo-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 7px 0;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text2);
+  }
+  .todo-item:last-child { border-bottom: none; }
+  .todo-checkbox {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: var(--green);
+  }
+  .todo-done { text-decoration: line-through; color: var(--text3); }
+  .todo-tag {
+    margin-left: auto;
+    font-size: 9px;
+    font-family: var(--mono);
+    padding: 1px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    color: var(--text3);
+    white-space: nowrap;
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 999;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    max-width: 380px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-icon { font-size: 16px; }
+  .toast-text { flex: 1; line-height: 1.4; }
+  .toast-close { color: var(--text3); cursor: pointer; font-size: 16px; }
+
+  /* ── PROMPT MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    width: 680px;
+    max-width: 92vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.8);
+  }
+  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 16px; }
+  .modal-prompt {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 12px;
+    font-family: var(--mono);
+    color: var(--text2);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    max-height: 140px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+  }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 0; }
+  .btn {
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: var(--font);
+    transition: all 0.15s;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #ff5249; }
+  .btn-primary:disabled { background: #444; color: #666; cursor: not-allowed; }
+  .btn-execute { background: var(--green); color: #000; }
+  .btn-execute:hover { background: #28b04a; }
+  .btn-execute:disabled { background: #1a4d2a; color: #3a7a4a; cursor: not-allowed; }
+  .btn-secondary { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .btn-secondary:hover { color: var(--text); }
+
+  /* ── RESULT PANEL ── */
+  .result-panel {
+    display: none;
+    margin-top: 20px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+  }
+  .result-panel.show { display: block; }
+  .result-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .result-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+  }
+  .result-badge.running { background: rgba(255,214,10,0.15); color: var(--yellow); }
+  .result-badge.done { background: rgba(48,209,88,0.15); color: var(--green); }
+  .result-badge.error { background: rgba(255,59,48,0.15); color: var(--accent); }
+  .result-time { font-size: 11px; color: var(--text3); margin-left: auto; }
+  .result-body {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    max-height: 380px;
+    overflow-y: auto;
+    font-family: var(--font);
+  }
+  .result-spinner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text2);
+    font-size: 13px;
+    padding: 20px 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner-ring {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  .result-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    justify-content: flex-end;
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">⚡ AGENTIC OS</div>
+  <div class="tabs">
+    <a class="tab active" onclick="showTab('skills')" href="#">
+      <span class="tab-dot dot-red"></span> SKILLS
+    </a>
+    <a class="tab" onclick="showTab('vault')" href="#">
+      <span class="tab-dot dot-purple"></span> VAULT
+    </a>
+    <a class="tab" onclick="showTab('daily')" href="#">
+      <span class="tab-dot dot-green"></span> DAILY NOTE
+    </a>
+    <a class="tab" onclick="showTab('runs')" href="#">
+      <span class="tab-dot dot-yellow"></span> RUNS
+    </a>
+    <a class="tab" onclick="showTab('output')" href="#">
+      <span class="tab-dot dot-blue"></span> OUTPUT
+    </a>
+  </div>
+  <div class="topbar-right">
+    <span class="integration-badge badge-on">N8N ✓</span>
+    <span class="integration-badge badge-on">GMAIL ✓</span>
+    <span class="integration-badge badge-on">NOTION ✓</span>
+    <span class="integration-badge badge-on">CALENDAR ✓</span>
+    <span class="integration-badge badge-off">GITHUB —</span>
+    <span class="integration-badge" id="apiKeyBadge" onclick="handleApiKeyClick()" style="cursor:pointer;user-select:none;" title="Click to set Anthropic API key for in-dashboard execution">⚙ API KEY</span>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="statsbar">
+  <div class="stat-block">
+    <div class="stat-label">Session</div>
+    <div class="stat-value" id="sessionStatus">
+      <span style="color:var(--green);font-size:10px;">●</span> ACTIVE
+    </div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-label">Skills Run Today</div>
+    <div class="stat-value"><span id="skillsToday">0</span><span class="stat-sub">/ session</span></div>
+    <div class="stat-bar-wrap"><div class="stat-bar bar-red" id="barSkills" style="width:0%"></div></div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-label">Agents Active</div>
+    <div class="stat-value"><span style="color:var(--green)">4</span><span class="stat-sub">/ 5</span></div>
+    <div class="stat-bar-wrap"><div class="stat-bar bar-green" style="width:80%"></div></div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-label">Projects</div>
+    <div class="stat-value">3<span class="stat-sub"> active</span></div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-label">Cumulative Activity</div>
+    <div class="stat-value"><span id="activityCount">0</span><span class="stat-sub"> runs</span></div>
+  </div>
+  <div class="stat-block stat-graph">
+    <div class="stat-label">30-Day Activity</div>
+    <div class="mini-graph" id="miniGraph"></div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Projects</div>
+      <a class="sidebar-item active" href="#" onclick="filterSkills('all')">
+        <span class="sidebar-icon">⚡</span> All Skills
+        <span class="sidebar-badge" id="allCount">0</span>
+      </a>
+      <a class="sidebar-item" href="#" onclick="filterSkills('ethospheres')">
+        <span class="sidebar-icon">🧴</span> Ethospheres
+        <span class="sidebar-badge" id="ethoCount">0</span>
+      </a>
+      <a class="sidebar-item" href="#" onclick="filterSkills('autoflow')">
+        <span class="sidebar-icon">🤖</span> AutoFlow
+        <span class="sidebar-badge" id="autoCount">0</span>
+      </a>
+      <a class="sidebar-item" href="#" onclick="filterSkills('veta')">
+        <span class="sidebar-icon">🏢</span> Veta Agency
+        <span class="sidebar-badge" id="vetaCount">0</span>
+      </a>
+      <a class="sidebar-item" href="#" onclick="filterSkills('agentic-os')">
+        <span class="sidebar-icon">⚙️</span> Agentic OS
+        <span class="sidebar-badge" id="osCount">0</span>
+      </a>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Tools</div>
+      <a class="sidebar-item" href="#" onclick="filterSkills('github')">
+        <span class="sidebar-icon">🐙</span> GitHub Tools
+        <span class="sidebar-badge" id="githubCount">0</span>
+      </a>
+      <a class="sidebar-item" href="#" onclick="filterSkills('gworkspace')">
+        <span class="sidebar-icon">📧</span> Google Workspace
+        <span class="sidebar-badge" id="gworkspaceCount">0</span>
+      </a>
+      <a class="sidebar-item" href="#" onclick="filterSkills('social')">
+        <span class="sidebar-icon">📱</span> Social Media Agent
+        <span class="sidebar-badge" id="socialCount">0</span>
+      </a>
+      <a class="sidebar-item" href="#" onclick="filterSkills('content')" style="border-left-color:#f59e0b">
+        <span class="sidebar-icon">🎬</span> Content Studio
+        <span class="sidebar-badge" id="contentCount" style="color:#f59e0b">0</span>
+      </a>
+    </div>
+    <div class="sidebar-divider" style="display:none">
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Agents</div>
+      <a class="sidebar-item" href="https://ian199999.app.n8n.cloud/workflow/4WwekqSJWqzix0AV" target="_blank">
+        <span class="sidebar-icon">📧</span> Email Agent
+        <span class="sidebar-badge" style="color:var(--green)">live</span>
+      </a>
+      <a class="sidebar-item" href="https://ian199999.app.n8n.cloud/workflow/6vMBDHDVoYUiw3TY" target="_blank">
+        <span class="sidebar-icon">📅</span> Calendar Agent
+        <span class="sidebar-badge" style="color:var(--green)">live</span>
+      </a>
+      <a class="sidebar-item" href="https://ian199999.app.n8n.cloud/workflow/t6H02QOssSDlYwFP" target="_blank">
+        <span class="sidebar-icon">🗂️</span> Project Agent
+        <span class="sidebar-badge" style="color:var(--yellow)">setup</span>
+      </a>
+      <a class="sidebar-item" href="https://ian199999.app.n8n.cloud/workflow/wrMzV3d9EXsLZywL" target="_blank">
+        <span class="sidebar-icon">🧠</span> Knowledge Agent
+        <span class="sidebar-badge" style="color:var(--yellow)">setup</span>
+      </a>
+      <a class="sidebar-item" href="#">
+        <span class="sidebar-icon">📁</span> File Agent
+        <span class="sidebar-badge" style="color:var(--green)">local</span>
+      </a>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Quick Links</div>
+      <a class="sidebar-item" href="dashboard.html" target="_blank">
+        <span class="sidebar-icon">📊</span> Project Dashboard
+      </a>
+      <a class="sidebar-item" href="https://ian199999.app.n8n.cloud" target="_blank">
+        <span class="sidebar-icon">🔀</span> n8n Console
+      </a>
+    </div>
+  </div>
+
+  <!-- CONTENT PANELS -->
+  <div class="content">
+
+    <!-- SKILLS -->
+    <div class="content-section active" id="section-skills">
+      <div class="skills-header">
+        <div>
+          <div class="skills-title">Skills</div>
+          <div class="skills-subtitle">Click any skill to load the prompt into Claude</div>
+        </div>
+        <input class="skills-search" type="text" placeholder="Search skills..." oninput="searchSkills(this.value)">
+      </div>
+      <div id="skillsContainer"></div>
+    </div>
+
+    <!-- VAULT -->
+    <div class="content-section" id="section-vault">
+      <div class="skills-header">
+        <div>
+          <div class="skills-title">Vault</div>
+          <div class="skills-subtitle">Knowledge base & project files</div>
+        </div>
+      </div>
+      <div class="vault-grid">
+        <div class="vault-card">
+          <div class="vault-card-title">📁 raw/</div>
+          <div class="vault-file"><span class="vault-file-icon">📄</span> Drop input data here</div>
+        </div>
+        <div class="vault-card">
+          <div class="vault-card-title">📚 vault/wiki/</div>
+          <div class="vault-file"><span class="vault-file-icon">📄</span> ethosome-technology.md</div>
+          <div class="vault-file"><span class="vault-file-icon">📄</span> geo-strategy.md</div>
+          <div class="vault-file"><span class="vault-file-icon">📄</span> korean-oem-manufacturing.md</div>
+          <div class="vault-file"><span class="vault-file-icon">📄</span> cosmesotherapy-market.md</div>
+        </div>
+        <div class="vault-card">
+          <div class="vault-card-title">📤 output/reports/</div>
+          <div class="vault-file"><span class="vault-file-icon">📄</span> Agent outputs appear here</div>
+        </div>
+        <div class="vault-card">
+          <div class="vault-card-title">📅 output/daily/</div>
+          <div class="vault-file"><span class="vault-file-icon">📄</span> Daily briefings here</div>
+        </div>
+      </div>
+      <div class="graph-container">
+        <div class="graph-header">
+          <div class="graph-title">Activity — Cumulative runs</div>
+          <div class="graph-period">
+            <button class="period-btn active">7D</button>
+            <button class="period-btn">30D</button>
+            <button class="period-btn">ALL</button>
+          </div>
+        </div>
+        <div class="chart-area" id="mainChart"></div>
+        <div class="chart-labels" id="chartLabels"></div>
+      </div>
+    </div>
+
+    <!-- DAILY NOTE -->
+    <div class="content-section" id="section-daily">
+      <div class="daily-header">
+        <div>
+          <div class="daily-date" id="dailyDate"></div>
+          <div class="daily-day" id="dailyDay"></div>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-section-title">Urgent</div>
+        <div class="todo-item">
+          <div class="todo-checkbox"></div>
+          Register ethospheres.com domain (still available)
+          <span class="todo-tag">ethospheres</span>
+        </div>
+        <div class="todo-item">
+          <div class="todo-checkbox"></div>
+          Submit KOTRA buyer inquiry (free, 20 min)
+          <span class="todo-tag">ethospheres</span>
+        </div>
+        <div class="todo-item">
+          <div class="todo-checkbox"></div>
+          File USPTO Class 3 trademark application
+          <span class="todo-tag">legal</span>
+        </div>
+        <div class="todo-item">
+          <div class="todo-checkbox"></div>
+          Activate Email Agent workflow in n8n
+          <span class="todo-tag">agentic-os</span>
+        </div>
+        <div class="todo-item">
+          <div class="todo-checkbox"></div>
+          Add Notion database ID to Project Agent
+          <span class="todo-tag">agentic-os</span>
+        </div>
+      </div>
+      <div class="note-area">
+        <div class="note-section-title">This Week</div>
+        <div class="todo-item">
+          <div class="todo-checkbox">✓</div>
+          <span class="todo-done">Email Agent deployed to n8n</span>
+          <span class="todo-tag">done</span>
+        </div>
+        <div class="todo-item">
+          <div class="todo-checkbox">✓</div>
+          <span class="todo-done">Calendar Agent deployed</span>
+          <span class="todo-tag">done</span>
+        </div>
+        <div class="todo-item">
+          <div class="todo-checkbox">✓</div>
+          <span class="todo-done">Project Agent deployed</span>
+          <span class="todo-tag">done</span>
+        </div>
+        <div class="todo-item">
+          <div class="todo-checkbox">✓</div>
+          <span class="todo-done">Knowledge Agent deployed</span>
+          <span class="todo-tag">done</span>
+        </div>
+        <div class="todo-item">
+          <div class="todo-checkbox"></div>
+          AutoFlow: validate with 3 paying customers
+          <span class="todo-tag">autoflow</span>
+        </div>
+        <div class="todo-item">
+          <div class="todo-checkbox"></div>
+          Send Korean OEM outreach emails (Kolmar, Cosmax, Namu Life)
+          <span class="todo-tag">ethospheres</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RUNS -->
+    <div class="content-section" id="section-runs">
+      <div class="skills-header">
+        <div>
+          <div class="skills-title">Run History</div>
+          <div class="skills-subtitle">Recent skill executions this session</div>
+        </div>
+      </div>
+      <div id="runsContainer">
+        <div style="color:var(--text3);font-size:13px;padding:40px 0;text-align:center;">No runs yet this session. Click a skill to start.</div>
+      </div>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="content-section" id="section-output">
+      <div class="skills-header">
+        <div>
+          <div class="skills-title">Output</div>
+          <div class="skills-subtitle">Agent reports & generated content</div>
+        </div>
+      </div>
+      <div style="color:var(--text3);font-size:13px;padding:40px 0;text-align:center;">
+        Agent outputs will appear here after runs complete.<br>
+        <span style="font-size:11px;">Files save to <code style="color:var(--accent)">/output/reports/</code> and <code style="color:var(--accent)">/output/daily/</code></span>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Skill Name</div>
+    <div class="modal-sub" id="modalSub">agentic-os · os · memory — Execute or copy prompt</div>
+    <div class="modal-prompt" id="modalPrompt"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-secondary" onclick="copyPrompt()" id="btnCopy">📋 Copy</button>
+      <button class="btn btn-execute" onclick="executeSkill()" id="btnExecute">⚡ Execute</button>
+    </div>
+
+    <!-- Result panel (shown after execution) -->
+    <div class="result-panel" id="resultPanel">
+      <div class="result-header">
+        <span class="result-badge running" id="resultBadge">RUNNING</span>
+        <span id="resultSkillName" style="font-size:13px;font-weight:600;"></span>
+        <span class="result-time" id="resultTime"></span>
+      </div>
+      <div id="resultBody" class="result-body">
+        <div class="result-spinner">
+          <div class="spinner-ring"></div>
+          Claude is working on this skill…
+        </div>
+      </div>
+      <div class="result-actions" id="resultActions" style="display:none;">
+        <button class="btn btn-secondary" onclick="copyResult()">📋 Copy Result</button>
+        <button class="btn btn-secondary" onclick="saveResult()">💾 Save to Output</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">✓</span>
+  <span class="toast-text" id="toastText"></span>
+  <span class="toast-close" onclick="hideToast()">×</span>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+const SKILLS = [
+  // ETHOSPHERES
+  {
+    id: 'oem-research', category: 'ethospheres', name: 'Korean OEM Research',
+    sub: 'research · manufacturers',
+    accentColor: '#d53f8c',
+    type: 'research', hot: true,
+    prompt: `You are a Korean cosmetics manufacturing specialist. Research and provide a comprehensive briefing on Korean OEM/ODM manufacturers capable of producing ethosome-based skincare formulations.
+
+Context: Ethospheres is a pre-launch cosmesotherapy skincare brand. We need manufacturers who:
+1. Have ethosome or advanced lipid vesicle technology
+2. Offer OEM/ODM with MOQ ≤ 5,000 units
+3. Have EU/FDA cosmetics compliance capability
+4. KOTRA-verified or K-beauty certified
+
+Provide:
+- Top 5 manufacturer recommendations with contact info
+- Capability matrix (ethosome tech, MOQ, certifications, lead time)
+- Questions to ask in initial inquiry
+- Red flags to watch for
+- Recommended outreach sequence`
+  },
+  {
+    id: 'geo-article', category: 'ethospheres', name: 'GEO Article Writer',
+    sub: 'content · science hub',
+    accentColor: '#d53f8c',
+    type: 'content', ai: true,
+    prompt: `Write a GEAF-format (Generative Engine Optimization) science article for Ethospheres Science Hub.
+
+GEAF Structure:
+1. DEFINE — Clear definition of the topic (AI-extractable)
+2. MECHANISM — How it works (step-by-step, numbered)
+3. EVIDENCE — Clinical studies and data points
+4. LIMITATIONS — Honest constraints (builds trust)
+5. APPLICATION — How Ethospheres applies this
+
+Requirements:
+- Primary keyword + 3 semantic variants
+- Structured data (JSON-LD schema)
+- llms.txt citation format
+- 800-1200 words
+- Technical but accessible
+
+Topic: [PASTE TOPIC HERE — e.g. "Ethosome penetration depth vs liposomes"]`
+  },
+  {
+    id: 'kotra-brief', category: 'ethospheres', name: 'KOTRA Inquiry Brief',
+    sub: 'outreach · matchmaking',
+    accentColor: '#d53f8c',
+    type: 'outreach',
+    prompt: `Draft a KOTRA buyer-manufacturer matchmaking inquiry for Ethospheres.
+
+Background:
+- Brand: Ethospheres — cosmesotherapy skincare using ethosome technology
+- Stage: Pre-launch, seeking Korean OEM partner
+- Technology: Phospholipid + ethanol nanocarrier vesicles (100-300nm)
+- Products: 6 SKUs (face serum, eye cream, barrier cream, body serum, scalp treatment, booster)
+- Target markets: EU + USA
+- MOQ requirement: ≤ 5,000 units per SKU initially
+
+Write:
+1. Formal KOTRA inquiry email (Korean business etiquette)
+2. Company profile section (1 page)
+3. Technical requirements document
+4. Questions for manufacturer screening`
+  },
+  {
+    id: 'competitor-scan', category: 'ethospheres', name: 'Competitor Scan',
+    sub: 'research · positioning',
+    accentColor: '#d53f8c',
+    type: 'research', ai: true,
+    prompt: `Conduct a competitive intelligence scan for Ethospheres in the cosmesotherapy/ethosome skincare space.
+
+Analyse:
+1. Direct competitors using ethosome technology (ISOV, TransDerm, any DTC brands)
+2. Adjacent competitors (liposome skincare, professional cosmesotherapy brands)
+3. Positioning gaps we can exploit
+4. Pricing benchmarks (retail + professional)
+5. Distribution channels they use
+6. Marketing angles and claims
+
+Output format:
+- Competitor matrix table (brand, tech, price, channels, positioning)
+- Top 3 positioning gaps for Ethospheres
+- Recommended differentiation angle
+- Claims to avoid (legal/competitive risk)`
+  },
+  {
+    id: 'sku-formulation', category: 'ethospheres', name: 'SKU Formulation Brief',
+    sub: 'product · development',
+    accentColor: '#d53f8c',
+    type: 'product',
+    prompt: `Create a technical formulation brief for an Ethospheres SKU to send to Korean OEM manufacturers.
+
+Ethospheres SKUs:
+- RESTORE — Retinol alternative (bakuchiol + HPR, ethosome delivery)
+- ILLUMINATE — Vitamin C + niacinamide serum
+- CALM — Centella asiatica barrier repair
+- RENEW — AHA/PHA exfoliation
+- SHIELD — SPF30 mineral sunscreen
+- BOOST — Peptide complex concentrate
+
+SKU to brief: [SPECIFY SKU]
+
+Include:
+- Key actives + target concentrations
+- Ethosome formulation specs (particle size <300nm, zeta potential ≥±30mV, ethanol 20-45%)
+- EU/FDA compliance requirements
+- Texture/feel target
+- Packaging compatibility (airless pump)
+- Stability requirements (24 months, 40°C/75% RH)`
+  },
+  {
+    id: 'gtm-plan', category: 'ethospheres', name: 'GTM Launch Plan',
+    sub: 'strategy · go-to-market',
+    accentColor: '#d53f8c',
+    type: 'strategy',
+    prompt: `Build a go-to-market launch plan for Ethospheres skincare brand.
+
+Context:
+- AI-native DTC brand with ethosome technology
+- Two-tier model: B2C (direct) + B2B (aesthetic clinics/medspas as resellers)
+- Target launch: Q4 2026
+- Starting SKUs: RESTORE + ILLUMINATE (hero products)
+- Primary differentiation: cosmesotherapy science + Korean manufacturing + AI-native systems
+
+Create:
+1. Pre-launch timeline (reverse from Q4 2026)
+2. Phase 1 — Professional channel (B2B medspa outreach)
+3. Phase 2 — Consumer launch (DTC, GEO content, AI-native marketing)
+4. KPIs per phase
+5. Budget allocation framework
+6. First 90 days post-launch milestones`
+  },
+
+  // AUTOFLOW
+  {
+    id: 'lead-scoring', category: 'autoflow', name: 'Lead Scoring Prompt',
+    sub: 'saas · scoring',
+    accentColor: '#0a84ff',
+    type: 'ai',
+    prompt: `Build a Claude API prompt for AutoFlow's lead scoring system.
+
+AutoFlow context:
+- B2B SaaS: AI-powered lead scoring + email automation
+- Target customers: marketing agencies, B2B SaaS companies
+- Pricing: €79/month
+- Core feature: score inbound leads 1-100 based on fit + intent signals
+
+Write a Claude API system prompt that:
+1. Takes a lead record (company name, role, email, source, behavior data)
+2. Scores 1-100 with reasoning
+3. Categorizes: hot (80+), warm (50-79), cold (<50)
+4. Suggests personalized email subject line + opening line
+5. Flags disqualification criteria
+
+Output as valid JSON:
+{ "score": 0, "category": "", "reasoning": "", "subject": "", "opening": "", "disqualified": false }`
+  },
+  {
+    id: 'validation-email', category: 'autoflow', name: 'Customer Validation',
+    sub: 'saas · validation',
+    accentColor: '#0a84ff',
+    type: 'outreach',
+    prompt: `Write customer discovery/validation outreach for AutoFlow SaaS.
+
+AutoFlow: AI lead scoring + email automation SaaS at €79/month.
+Goal: Validate willingness to pay BEFORE building the backend.
+
+Target: Marketing agencies and B2B SaaS founders who:
+- Manually score leads today
+- Spend time personalizing cold emails
+- Have a sales team or are doing outbound
+
+Write:
+1. LinkedIn connection request (300 chars)
+2. Discovery email (250 words max)
+3. 5 validation questions for discovery call
+4. Ideal customer profile (ICP) hypothesis based on pain
+5. Pricing test: would they pay €79/month vs €149/month?`
+  },
+  {
+    id: 'feature-brief', category: 'autoflow', name: 'Feature Spec Brief',
+    sub: 'saas · product',
+    accentColor: '#0a84ff',
+    type: 'product',
+    prompt: `Write a technical feature specification for AutoFlow.
+
+AutoFlow tech stack: Supabase (DB + auth) + Vercel (frontend) + Claude API (scoring) + n8n (automation flows)
+
+Create a feature brief for: [FEATURE NAME]
+
+Include:
+1. User story (as a [user], I want [feature], so that [outcome])
+2. Acceptance criteria (numbered list)
+3. Technical implementation notes (Supabase schema changes, API endpoints, Claude prompt changes)
+4. UI/UX requirements
+5. Edge cases to handle
+6. Estimated complexity: S/M/L/XL`
+  },
+
+  // VETA
+  {
+    id: 'client-brief', category: 'veta', name: 'Client Strategy Brief',
+    sub: 'agency · strategy',
+    accentColor: '#2f855a',
+    type: 'strategy',
+    prompt: `Write a client strategy brief for a Veta agency engagement.
+
+Veta is an AI-native marketing agency. We build AI-powered marketing systems for businesses in vertical specialties (aesthetic medicine, dental, legal, B2B services).
+
+Client details:
+- Business: [NAME]
+- Vertical: [AESTHETIC / DENTAL / LEGAL / OTHER]
+- Current situation: [DESCRIBE]
+- Goal: [WHAT THEY WANT]
+- Budget: [TIER 1: €18-45K / TIER 2: €55-120K / TIER 3: €4-12K/mo]
+
+Write:
+1. Situation analysis (current state, pain points)
+2. Recommended solution (3 AI-powered systems with ROI rationale)
+3. 90-day implementation roadmap
+4. KPIs and success metrics
+5. Investment proposal framing (value-based, not hourly)`
+  },
+  {
+    id: 'sow-generator', category: 'veta', name: 'SOW Generator',
+    sub: 'agency · delivery',
+    accentColor: '#2f855a',
+    type: 'document',
+    prompt: `Generate a Statement of Work (SOW) for a Veta agency project.
+
+Veta pricing tiers:
+- Tier 1 (AI-native build): €18,000–€45,000 | 30/20/25/25 payment
+- Tier 2 (full AI transformation): €55,000–€120,000 | 30/20/25/25
+- Tier 3 (AI retainer): €4,000–€12,000/month
+
+Client: [NAME]
+Project type: [DESCRIBE]
+Tier: [1/2/3]
+Timeline: [WEEKS]
+
+Generate SOW sections:
+1. Project Overview & Objectives
+2. Scope of Work (detailed deliverables list)
+3. Out of Scope
+4. Timeline & Milestones
+5. Investment & Payment Schedule
+6. Client Responsibilities
+7. Assumptions & Dependencies
+8. Change Request Process`
+  },
+  {
+    id: 'vertical-playbook', category: 'veta', name: 'Vertical AI Playbook',
+    sub: 'agency · verticals',
+    accentColor: '#2f855a',
+    type: 'strategy',
+    prompt: `Create a Veta vertical AI automation playbook for a new client vertical.
+
+Veta specializes in: aesthetic medicine, specialty dental, specialty legal.
+Target vertical: [SPECIFY]
+
+Build a playbook covering:
+1. Vertical overview (market size, pain points, typical tech stack)
+2. Top 3 AI automation opportunities with ROI estimates
+3. Lead generation approach for this vertical
+4. Sample client pitch script
+5. Common objections + rebuttals
+6. Case study template (before/after AI implementation)
+7. Pricing recommendation for this vertical`
+  },
+  {
+    id: 'weekly-report', category: 'veta', name: 'Weekly Client Report',
+    sub: 'agency · reporting',
+    accentColor: '#2f855a',
+    type: 'document',
+    prompt: `Generate a weekly client progress report for a Veta engagement.
+
+Format: Professional but concise. Client reads in 3 minutes max.
+
+Client: [NAME]
+Week: [WEEK NUMBER] of [TOTAL]
+Phase: [DISCOVERY / BUILD / LAUNCH / OPTIMIZE]
+
+Sections:
+1. Executive Summary (3 bullet points max)
+2. ✅ Completed this week
+3. 🚧 In progress
+4. 📋 Next week plan
+5. ⚠️ Blockers / decisions needed from client
+6. 📊 KPI update (if applicable)
+7. Upcoming milestones
+
+Tone: Confident, clear, proactive. No fluff.`
+  },
+
+  // GITHUB
+  {
+    id: 'github-finder', category: 'github', name: 'GitHub Repo Finder',
+    sub: 'tools · search',
+    accentColor: '#e8c468',
+    type: 'auto', hot: true,
+    prompt: `You are a GitHub repo discovery agent for Ian Veber.
+
+Use the Bash tool to run GitHub CLI searches. If gh isn't available, use curl against the GitHub API.
+
+Steps:
+1. Run: gh search repos "[KEYWORDS]" --sort=stars --limit=15 --json name,description,url,stargazerCount,primaryLanguage,updatedAt
+   OR: curl "https://api.github.com/search/repositories?q=[KEYWORDS]+in:name,description&sort=stars&order=desc&per_page=15"
+
+2. Present results as a table:
+   | Repo | Stars | Language | Last Updated | Description |
+
+3. Highlight top 3 picks with reasoning: why is it useful for Ian?
+
+4. For each top pick provide:
+   - git clone [URL]
+   - Setup summary (1-2 lines)
+   - Use case for Veta/Ethospheres/AutoFlow
+
+Search query: [DESCRIBE WHAT YOU NEED — e.g. "AI lead scoring", "n8n automation tools", "skincare ingredient database", "React dashboard dark theme"]`
+  },
+  {
+    id: 'github-downloader', category: 'github', name: 'Repo Downloader',
+    sub: 'tools · clone · setup',
+    accentColor: '#e8c468',
+    type: 'auto', hot: true,
+    prompt: `You are a GitHub repository setup agent. Download and set up a repo on Ian's machine.
+
+Repository URL: [PASTE GITHUB URL HERE — e.g. https://github.com/username/repo]
+
+Steps:
+1. Parse the repo URL and extract owner/repo name
+2. Clone it:
+   git clone [URL] ~/Desktop/[repo-name]
+   cd ~/Desktop/[repo-name]
+
+3. Detect project type from files present:
+   - package.json → Node/JS → npm install
+   - requirements.txt / Pipfile → Python → pip install -r requirements.txt
+   - Gemfile → Ruby → bundle install
+   - go.mod → Go → go mod download
+   - pom.xml → Java → mvn install
+
+4. Run the appropriate install commands
+
+5. Check for .env.example → show required environment variables
+
+6. Read README.md and summarize:
+   - What this project does
+   - How to run it (npm start / python main.py / etc)
+   - Any important setup notes
+
+7. Open the project folder in Finder: open ~/Desktop/[repo-name]
+
+Execute all steps automatically. Report what was done.`
+  },
+  {
+    id: 'github-trending', category: 'github', name: 'GitHub Trending',
+    sub: 'tools · discovery',
+    accentColor: '#e8c468',
+    type: 'research',
+    prompt: `You are a GitHub trending intelligence agent.
+
+Fetch today's trending repositories using the GitHub API:
+
+curl "https://api.github.com/search/repositories?q=created:>$(date -v-7d +%Y-%m-%d)&sort=stars&order=desc&per_page=20"
+
+Filter options (pick one or leave for all):
+- Language: [PYTHON / JAVASCRIPT / TYPESCRIPT / GO / leave blank]
+- Topic: [AI / AUTOMATION / TOOLS / SAAS / leave blank]
+
+From the results:
+1. Show top 10 trending repos as a table: Repo | Stars | Language | Description
+2. Pick 3 standout repos and explain why they're worth watching
+3. Identify any patterns: what type of tools are gaining traction?
+4. Highlight anything relevant to Ian's stack: n8n, Claude API, Supabase, skincare/beauty tech, SaaS
+
+Deliver a clean briefing Ian can read in 2 minutes.`
+  },
+  {
+    id: 'github-analyzer', category: 'github', name: 'Repo Analyzer',
+    sub: 'tools · code intelligence',
+    accentColor: '#e8c468',
+    type: 'research',
+    prompt: `You are a GitHub repository intelligence agent. Analyze a repo in depth.
+
+Repository to analyze: [PASTE GITHUB URL]
+
+Steps:
+1. Clone or fetch the repo metadata:
+   curl https://api.github.com/repos/[OWNER]/[REPO]
+   curl https://raw.githubusercontent.com/[OWNER]/[REPO]/main/README.md
+
+2. Analyze:
+   - Tech stack (languages, frameworks, databases, APIs used)
+   - Project purpose (1-paragraph summary)
+   - Code quality signals: Does it have tests? CI/CD? Good documentation?
+   - Activity: Last commit date, number of contributors, open issues
+   - License type (MIT / Apache / GPL / proprietary)
+
+3. Rate it (1-5):
+   ⭐ Value for Ian's use cases
+   🔧 Ease of setup and integration
+   📚 Documentation quality
+   🔄 Maintenance / still active?
+
+4. Verdict: Should Ian use it, fork it, learn from it, or skip it?
+5. If useful: provide a concrete integration idea for Veta/Ethospheres/AutoFlow`
+  },
+
+  // GOOGLE WORKSPACE
+  {
+    id: 'gws-gmail-triage', category: 'gworkspace', name: 'Gmail Inbox Triage',
+    sub: 'workspace · inbox',
+    accentColor: '#4285f4',
+    type: 'auto', hot: true,
+    prompt: `You are an inbox intelligence agent for Ian Veber. Use the Gmail MCP tools to triage the inbox.
+
+Ian's email: ian.veber@gmail.com
+
+Steps:
+1. Call the Gmail MCP search_threads tool with query "is:unread" (limit 30)
+2. For threads with content: call get_thread to read them
+3. Categorize every email:
+   🔴 URGENT — client, deal, deadline, needs reply TODAY
+   🟡 ACTION — needs response this week
+   🟢 FYI — info only, no reply needed
+   📰 NEWSLETTER — batch-read later
+   🗑️ IGNORE — spam / irrelevant
+
+4. For 🔴 and 🟡 emails: suggest a 1-line reply Ian should send
+5. List newsletter senders to consider unsubscribing from
+
+Output format:
+## Inbox Summary
+[Counts: X urgent, Y action, Z fyi, W newsletters]
+
+## 🔴 Urgent (reply today)
+[Sender | Subject | Suggested reply]
+
+## 🟡 Action (this week)
+[Sender | Subject | Suggested reply]
+
+## 📰 Newsletters to Unsubscribe
+[Sender | Reason]
+
+Do not draft, send, or archive anything — read-only triage only.`
+  },
+  {
+    id: 'gws-gmail-labels', category: 'gworkspace', name: 'Gmail Label Organizer',
+    sub: 'workspace · labels',
+    accentColor: '#4285f4',
+    type: 'auto',
+    prompt: `You are a Gmail organization agent. Set up a smart label system for Ian's inbox.
+
+Use the Gmail MCP tools.
+
+Ian's work contexts:
+- Veta agency (clients: CASTRUM, ZALIFE, Tower Spa, 10th Planet, AI Univerza, Alissa)
+- Ethospheres (Korean OEM manufacturers, KOTRA, regulatory, partners)
+- AutoFlow SaaS (users, beta testers, payments, feedback)
+- Admin (invoices, bank, legal, personal)
+
+Steps:
+1. Call list_labels to see what already exists
+2. Create the following labels with create_label:
+   - VETA/Clients
+   - VETA/Prospects
+   - VETA/Ops
+   - ETHOSPHERES/Manufacturing
+   - ETHOSPHERES/KOTRA
+   - ETHOSPHERES/Regulatory
+   - AUTOFLOW/Users
+   - AUTOFLOW/Payments
+   - ADMIN/Invoices
+   - ADMIN/Legal
+   - FOLLOW-UP
+   - NEWSLETTERS
+
+3. Report: which labels were created vs already existed
+
+4. Provide Gmail filter rules Ian should manually add in Settings → Filters:
+   (sender domains → which label to apply)
+
+Note: Only create labels — do not move or delete any emails.`
+  },
+  {
+    id: 'gws-drive-finder', category: 'gworkspace', name: 'Drive File Finder',
+    sub: 'workspace · files',
+    accentColor: '#4285f4',
+    type: 'auto',
+    prompt: `You are a Google Drive file discovery agent. Find files across Ian's Drive.
+
+Use the Google Drive MCP tools: search_files and list_recent_files.
+
+Search query: [DESCRIBE WHAT YOU'RE LOOKING FOR — e.g. "SOW template" or "Ethospheres brand guide" or "invoice 2026"]
+
+Steps:
+1. Call search_files with: q="[KEYWORDS]" and appropriate file type if known
+2. Call list_recent_files to see recently accessed files
+3. For each result show:
+   - File name
+   - File type (Doc / Sheet / PDF / Folder)
+   - Last modified date
+   - Direct link (if available)
+   - Where it is (parent folder)
+
+4. If no results: suggest 3 alternative search terms
+5. If multiple matches: rank by likely relevance to Ian's work
+
+Search for: [PASTE YOUR SEARCH TERMS]`
+  },
+  {
+    id: 'gws-drive-organizer', category: 'gworkspace', name: 'Drive Organizer',
+    sub: 'workspace · folders',
+    accentColor: '#4285f4',
+    type: 'auto',
+    prompt: `You are a Google Drive organization agent. Create a structured folder system for Ian's work.
+
+Use the Google Drive MCP create_file tool (mimeType: 'application/vnd.google-apps.folder') to create folders.
+
+Steps:
+1. Call list_recent_files to understand what's currently in Drive
+2. Create the following folder structure (top-level first, then subfolders):
+
+   📁 VETA/
+     └── Clients/
+     └── Templates/ (SOW, proposals, reports)
+     └── Internal/
+   📁 ETHOSPHERES/
+     └── Manufacturing/
+     └── Brand/
+     └── Legal/
+     └── Products/
+   📁 AUTOFLOW/
+     └── Product/
+     └── Marketing/
+     └── Finance/
+   📁 ARCHIVE/
+
+3. For each folder created: report its name and Google Drive ID
+4. Provide a "file routing guide" — a cheat sheet for where to save future files
+
+Important: Only CREATE folders — do not move, rename, or delete anything.`
+  },
+  {
+    id: 'gws-calendar-week', category: 'gworkspace', name: 'Calendar Week Planner',
+    sub: 'workspace · calendar',
+    accentColor: '#4285f4',
+    type: 'auto', hot: true,
+    prompt: `You are a calendar intelligence agent for Ian Veber. Plan this week using Calendar MCP tools.
+
+Ian's timezone: Europe/Ljubljana (CEST = UTC+2)
+Ian's top priorities:
+1. Ethospheres — domain registration (ethospheres.com), KOTRA inquiry, OEM research
+2. AutoFlow — customer validation (5 outreach messages per day)
+3. Veta — active client deliverables
+
+Steps:
+1. Call list_calendars to see all calendars
+2. Call list_events for today through Sunday (7-day window)
+3. Analyze the week:
+   - Identify conflicts (overlapping events)
+   - Flag overloaded days (5+ hours scheduled)
+   - Find days with no deep work blocks
+
+4. Recommend 3 deep work blocks to add (2-hour slots, morning preferred):
+   - One for Ethospheres tasks
+   - One for AutoFlow validation
+   - One for Veta delivery
+
+5. Call suggest_time for each recommended block to find optimal slots
+
+6. Present a weekly overview table:
+   | Day | Scheduled | Free Hours | Priority Task |
+
+7. Ask: should I create these calendar events? (Do not create without confirmation.)`
+  },
+  {
+    id: 'gws-email-writer', category: 'gworkspace', name: 'Smart Email Writer',
+    sub: 'workspace · drafts',
+    accentColor: '#4285f4',
+    type: 'auto',
+    prompt: `You are an email drafting agent for Ian Veber. Write professional emails that sound like Ian.
+
+Ian's voice: Direct, warm, confident, concise. No corporate fluff. Signs as "Ian" or "Ian Veber, Veta".
+
+Email type: [INQUIRY / PROPOSAL / FOLLOW-UP / COLD OUTREACH / REPLY / KOTRA INQUIRY]
+
+Fill in the details:
+To: [RECIPIENT NAME, ROLE, COMPANY]
+Context: [WHAT THIS EMAIL IS ABOUT]
+Key message: [MAIN POINT TO COMMUNICATE]
+Desired outcome: [WHAT SHOULD HAPPEN AFTER THEY READ IT]
+Tone: [FORMAL / SEMI-FORMAL / WARM]
+
+Deliver:
+1. Subject line — 3 options:
+   A) Direct: [states the ask clearly]
+   B) Benefit-led: [leads with their gain]
+   C) Question: [opens with curiosity]
+
+2. Email body (150-250 words max)
+   - Opening: connect to them personally or state purpose immediately
+   - Body: clear value or ask, 2-3 short paragraphs
+   - CTA: one clear next step
+
+3. P.S. line (optional — adds personality)
+
+4. Follow-up note: when to follow up and what to say if no reply`
+  },
+  {
+    id: 'gws-docs-creator', category: 'gworkspace', name: 'Docs Creator',
+    sub: 'workspace · documents',
+    accentColor: '#4285f4',
+    type: 'auto',
+    prompt: `You are a Google Docs creation agent. Create a structured, professional document.
+
+Use the Google Drive MCP create_file tool:
+- mimeType: 'application/vnd.google-apps.document'
+- contentMimeType: 'text/plain' (for content)
+
+Document request:
+Type: [BRIEF / PROPOSAL / STRATEGY / REPORT / SOW / ARTICLE / MEETING NOTES]
+Title: [DOCUMENT TITLE]
+Purpose: [WHO IS THIS FOR AND WHY]
+Key sections: [LIST THE MAIN SECTIONS NEEDED]
+
+Steps:
+1. Generate the full document content
+2. Create the Google Doc using create_file with the content
+3. Return:
+   - The document link
+   - The document ID
+   - A summary of what was created
+
+4. Suggest: should this be shared with anyone? (Do not share without confirmation.)
+
+Document content to generate: [DESCRIBE WHAT YOU NEED IN THE DOCUMENT]`
+  },
+
+  // SOCIAL MEDIA
+  {
+    id: 'social-all-4', category: 'social', name: 'Post to All 4 Accounts',
+    sub: 'social · multi-platform · content',
+    accentColor: '#e1306c',
+    type: 'auto',
+    hot: true,
+    ai: true,
+    prompt: `[SOCIAL_LIVE — topic required]`
+  },
+  {
+    id: 'social-instagram', category: 'social', name: 'Instagram — Ethospheres',
+    sub: 'social · instagram · skincare',
+    accentColor: '#e1306c',
+    type: 'auto',
+    prompt: `[SOCIAL_LIVE — topic required]`
+  },
+  {
+    id: 'social-linkedin', category: 'social', name: 'LinkedIn — Veta / Ian',
+    sub: 'social · linkedin · agency',
+    accentColor: '#0a66c2',
+    type: 'auto',
+    hot: true,
+    prompt: `[SOCIAL_LIVE — topic required]`
+  },
+  {
+    id: 'social-tiktok', category: 'social', name: 'TikTok — Ethospheres',
+    sub: 'social · tiktok · skincare',
+    accentColor: '#69c9d0',
+    type: 'auto',
+    prompt: `[SOCIAL_LIVE — topic required]`
+  },
+  {
+    id: 'social-twitter', category: 'social', name: 'Twitter/X — AutoFlow',
+    sub: 'social · twitter · saas',
+    accentColor: '#1d9bf0',
+    type: 'auto',
+    prompt: `[SOCIAL_LIVE — topic required]`
+  },
+  {
+    id: 'social-repurpose', category: 'social', name: 'Repurpose Content (Social)',
+    sub: 'social · repurpose · all platforms',
+    accentColor: '#e1306c',
+    type: 'auto',
+    ai: true,
+    prompt: `[SOCIAL_LIVE — topic required]`
+  },
+
+  // ── CONTENT STUDIO ──────────────────────────────────────────────
+  {
+    id: 'content-studio', category: 'content', name: '🎬 Full Content Studio',
+    sub: 'content · copy · image · video · higgsfield',
+    accentColor: '#f59e0b',
+    type: 'pipeline', hot: true, ai: true,
+    prompt: '[CONTENT_STUDIO_LIVE]'
+  },
+  {
+    id: 'content-copy-ai', category: 'content', name: 'AI Copy Generator',
+    sub: 'content · copy · captions · hooks',
+    accentColor: '#f59e0b',
+    type: 'copy', ai: true,
+    prompt: '[CONTENT_STUDIO_LIVE]'
+  },
+  {
+    id: 'content-image-pro', category: 'content', name: 'Image Prompt Engine',
+    sub: 'content · midjourney · dall-e · flux · prompts',
+    accentColor: '#f59e0b',
+    type: 'image', ai: true,
+    prompt: '[CONTENT_STUDIO_LIVE]'
+  },
+  {
+    id: 'content-video-higgsfield', category: 'content', name: 'Higgsfield Video Creator',
+    sub: 'content · video · higgsfield · cinematic',
+    accentColor: '#f59e0b',
+    type: 'video', hot: true, ai: true,
+    prompt: '[CONTENT_STUDIO_LIVE]'
+  },
+  {
+    id: 'content-script-pro', category: 'content', name: 'Video Script + Shot List',
+    sub: 'content · script · storyboard · higgsfield',
+    accentColor: '#f59e0b',
+    type: 'script', ai: true,
+    prompt: '[CONTENT_STUDIO_LIVE]'
+  },
+  {
+    id: 'content-repurpose-pro', category: 'content', name: 'Repurpose → All Formats',
+    sub: 'content · repurpose · multi-platform · rewrite',
+    accentColor: '#f59e0b',
+    type: 'repurpose', ai: true,
+    prompt: '[CONTENT_STUDIO_LIVE]'
+  },
+  {
+    id: 'content-calendar', category: 'content', name: 'Monthly Content Calendar',
+    sub: 'content · strategy · calendar · planning',
+    accentColor: '#f59e0b',
+    type: 'strategy', ai: true,
+    prompt: `You are a senior content strategist building a full 30-day content calendar.
+
+Generate a complete monthly content calendar for Ian Veber's brands.
+
+BRANDS + ACCOUNTS:
+- Ethospheres (@ethospheres) — skincare science brand, Instagram + TikTok
+- Veta / Ian Veber — AI agency founder, LinkedIn
+- AutoFlow — B2B SaaS, Twitter/X
+- ATHLOS — sports performance AI platform, Instagram + LinkedIn
+
+OUTPUT FORMAT — for each of the 30 days:
+Day [N] | [Day of week]
+Platform: [platform]
+Brand: [brand]
+Type: [carousel/reel/static/thread/story]
+Topic: [specific topic]
+Hook: [opening line]
+Content pillar: [education/social proof/behind-the-scenes/promotion/engagement]
+
+Group by week. Include:
+- 4 content pillars rotating across all brands
+- At least 2 educational posts per brand per week
+- 1 "building in public" post per week (Veta/Ian)
+- 1 science post per week (Ethospheres)
+- Monthly theme suggestion
+
+Today is ${new Date().toLocaleDateString('en-GB',{weekday:'long',month:'long',year:'numeric'})}.`
+  },
+
+  // AGENTIC OS
+  {
+    id: 'daily-summary', category: 'agentic-os', name: 'Daily Summary',
+    sub: 'os · briefing',
+    accentColor: '#bf5af2',
+    type: 'os',
+    prompt: `Generate a daily business summary for Ian Veber.
+
+Ian is:
+- Founder of Veta (AI-native marketing agency, Slovenia)
+- Co-founder of Ethospheres (Korean ethosome skincare brand, pre-launch Q4 2026)
+- Building AutoFlow (B2B SaaS lead scoring, €79/month)
+
+Today's date: ${new Date().toLocaleDateString('en-GB', {weekday:'long', year:'numeric', month:'long', day:'numeric'})}
+
+Based on what you know about Ian's current priorities, provide:
+1. Top 3 things Ian must do TODAY
+2. Quick status of each active project (1 line each)
+3. One strategic insight or question to consider
+4. Energy check: what type of work fits this time of day?`
+  },
+  {
+    id: 'memory-update', category: 'agentic-os', name: 'Memory Update',
+    sub: 'os · memory',
+    accentColor: '#bf5af2',
+    type: 'os',
+    prompt: `Update the Obsidian memory files with what happened in this session.
+
+Obsidian vault: /Users/ianveber/Documents/Obsidian Vault/_claude-memory/
+
+Review this conversation and:
+1. Identify any new decisions made → decisions-log.md
+2. Any tasks completed or phase status changes → ethospheres.md or relevant file
+3. Any new context about Ian, Veta, or clients → context.md
+4. Any new files created → update relevant memory file
+
+Then write the updates to the appropriate files and confirm what was updated.
+End with: "Memory updated — [one line per file changed]"`
+  },
+  {
+    id: 'file-agent-run', category: 'agentic-os', name: 'Run File Agent',
+    sub: 'os · file management',
+    accentColor: '#bf5af2',
+    type: 'os',
+    prompt: `Run the Agentic OS File Agent.
+
+The File Agent script is at:
+/Users/ianveber/Desktop/Cloude CODE/agents/file-agent/file-agent.py
+
+Steps:
+1. First run a DRY RUN to see what would be moved:
+   python3 '/Users/ianveber/Desktop/Cloude CODE/agents/file-agent/file-agent.py' --dry-run
+
+2. Show me the output and ask for confirmation
+
+3. If confirmed, run the actual sort:
+   python3 '/Users/ianveber/Desktop/Cloude CODE/agents/file-agent/file-agent.py'
+
+4. Show the summary log from the Obsidian vault:
+   /Users/ianveber/Documents/Obsidian Vault/Agentic-OS/04-Agent-Logs/file-agent/`
+  },
+  {
+    id: 'n8n-status', category: 'agentic-os', name: 'Agent Status Check',
+    sub: 'os · monitoring',
+    accentColor: '#bf5af2',
+    type: 'os',
+    prompt: `Check the status of all Agentic OS agents.
+
+n8n Workflows:
+- Email Agent: https://ian199999.app.n8n.cloud/workflow/4WwekqSJWqzix0AV
+- Calendar Agent: https://ian199999.app.n8n.cloud/workflow/6vMBDHDVoYUiw3TY
+- Project Agent: https://ian199999.app.n8n.cloud/workflow/t6H02QOssSDlYwFP
+- Knowledge Agent: https://ian199999.app.n8n.cloud/workflow/wrMzV3d9EXsLZywL
+
+File Agent: /Users/ianveber/Desktop/Cloude CODE/agents/file-agent/
+
+Check:
+1. Are the n8n workflows active? (Open each URL)
+2. When did each last run successfully?
+3. Are there any errors in the execution history?
+4. Is the File Agent installed (launchctl list | grep veta.fileagent)?
+
+Report status for each agent: ✅ running / ⚠️ warning / ❌ error`
+  },
+  {
+    id: 'obsidian-sync', category: 'agentic-os', name: 'Vault Sync',
+    sub: 'os · obsidian',
+    accentColor: '#bf5af2',
+    type: 'os',
+    prompt: `Read the current state of all Obsidian memory files and give me a full context summary.
+
+Read in this order:
+1. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/🗺️ Master MOC.md
+2. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/context.md
+3. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/ethospheres.md
+4. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/decisions-log.md
+5. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/agentic-os.md
+
+Then summarize:
+- What's the current state of each active project?
+- What are the most urgent open items across everything?
+- What has been built vs what still needs building?
+- Any decisions that seem stale or need revisiting?`
+  }
+];
+
+// ── STATE ──────────────────────────────────────────────────────
+let currentFilter = 'all';
+let skillsRunToday = 0;
+let totalRuns = parseInt(localStorage.getItem('totalRuns') || '0');
+let runHistory = JSON.parse(localStorage.getItem('runHistory') || '[]');
+let currentPrompt = '';
+
+// ── API KEY BADGE ──────────────────────────────────────────────
+function updateApiKeyBadge() {
+  const badge = document.getElementById('apiKeyBadge');
+  if (!badge) return;
+  const hasKey = !!getApiKey();
+  badge.className = 'integration-badge ' + (hasKey ? 'badge-on' : 'badge-off');
+  badge.textContent = hasKey ? '⚙ API KEY ✓' : '⚙ API KEY';
+  badge.title = hasKey
+    ? 'Anthropic API key set — click to update or clear'
+    : 'Click to set your Anthropic API key for in-dashboard skill execution';
+}
+
+function handleApiKeyClick() {
+  const existing = getApiKey();
+  const choice = existing
+    ? prompt('API key is set.\n\nOptions:\n• Type a new key to update\n• Type "clear" to remove it\n• Cancel to keep current\n\nCurrent: ' + existing.substring(0, 12) + '…')
+    : prompt('Enter your Anthropic API key to enable in-dashboard execution.\n(Stored in browser localStorage only — sent only to api.anthropic.com)\n\nGet your key at: console.anthropic.com');
+  if (choice === null) return;
+  if (choice.toLowerCase() === 'clear') {
+    localStorage.removeItem('anthropicApiKey');
+    showToast('✓', 'API key removed');
+  } else if (choice.startsWith('sk-ant-')) {
+    setApiKey(choice);
+    showToast('✓', 'API key saved — skills ready to execute');
+  } else if (choice.trim()) {
+    showToast('⚠', 'Key format looks wrong — should start with sk-ant-');
+    return;
+  }
+  updateApiKeyBadge();
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+window.onload = function() {
+  renderSkills();
+  updateCounts();
+  initStats();
+  renderMiniGraph();
+  renderMainChart();
+  initDailyNote();
+  renderRuns();
+  updateApiKeyBadge();
+};
+
+function initStats() {
+  // Animate counters
+  animateCounter('activityCount', 0, totalRuns + skillsRunToday, 800);
+}
+
+function animateCounter(id, from, to, dur) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const start = performance.now();
+  function step(now) {
+    const p = Math.min((now - start) / dur, 1);
+    el.textContent = Math.round(from + (to - from) * p);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function renderMiniGraph() {
+  const g = document.getElementById('miniGraph');
+  const vals = JSON.parse(localStorage.getItem('activityData') || '[]');
+  const data = vals.length >= 14 ? vals.slice(-14) : [...Array(14 - vals.length).fill(0), ...vals];
+  const max = Math.max(...data, 1);
+  g.innerHTML = data.map((v, i) => {
+    const h = Math.max(4, Math.round((v / max) * 24));
+    const isToday = i === data.length - 1;
+    return `<div class="mini-bar" style="height:${h}px;opacity:${isToday?1:0.4};background:var(--accent)"></div>`;
+  }).join('');
+}
+
+function renderMainChart() {
+  const chart = document.getElementById('mainChart');
+  const labels = document.getElementById('chartLabels');
+  if (!chart) return;
+  const vals = JSON.parse(localStorage.getItem('activityData') || '[]');
+  const data = vals.length >= 7 ? vals.slice(-7) : [...Array(7 - vals.length).fill(0), ...vals];
+  const max = Math.max(...data, 1);
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const today = new Date().getDay();
+  chart.innerHTML = data.map((v, i) => {
+    const h = Math.max(4, Math.round((v / max) * 80));
+    const isToday = i === data.length - 1;
+    return `<div class="chart-bar${isToday?' today':''}" style="height:${h}px" title="${v} runs"></div>`;
+  }).join('');
+  labels.innerHTML = data.map((_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (data.length - 1 - i));
+    return `<span>${d.toLocaleDateString('en-GB',{weekday:'short'})}</span>`;
+  }).join('');
+}
+
+function initDailyNote() {
+  const now = new Date();
+  document.getElementById('dailyDate').textContent = now.toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
+  document.getElementById('dailyDay').textContent = now.toLocaleDateString('en-GB', {weekday:'long'});
+
+  // Checkbox click handlers
+  document.querySelectorAll('.todo-checkbox').forEach(cb => {
+    cb.addEventListener('click', function() {
+      const item = this.parentElement;
+      if (this.textContent === '✓') {
+        this.textContent = '';
+        item.querySelector('span:not(.todo-tag)')?.classList.remove('todo-done');
+      } else {
+        this.textContent = '✓';
+        const text = item.childNodes;
+        item.querySelectorAll('span:not(.todo-tag),.todo-checkbox ~ *:not(.todo-tag)');
+        // Simple toggle
+        this.style.color = 'var(--green)';
+      }
+    });
+  });
+}
+
+// ── SKILLS ──────────────────────────────────────────────────────
+function renderSkills(filter = 'all', search = '') {
+  const container = document.getElementById('skillsContainer');
+
+  const categories = [
+    { id: 'ethospheres', name: 'Ethospheres', tag: 'skincare · pre-launch', color: '#d53f8c' },
+    { id: 'autoflow', name: 'AutoFlow', tag: 'saas · validation', color: '#0a84ff' },
+    { id: 'veta', name: 'Veta Agency', tag: 'agency · delivery', color: '#2f855a' },
+    { id: 'agentic-os', name: 'Agentic OS', tag: 'os · infrastructure', color: '#bf5af2' },
+    { id: 'github', name: 'GitHub Tools', tag: 'tools · repos · automation', color: '#e8c468' },
+    { id: 'gworkspace', name: 'Google Workspace', tag: 'tools · gmail · drive · calendar', color: '#4285f4' },
+    { id: 'social', name: 'Social Media Agent', tag: 'instagram · linkedin · tiktok · twitter/x', color: '#e1306c' },
+    { id: 'content', name: '🎬 Content Studio', tag: 'copy · image · video · higgsfield · ai-generated', color: '#f59e0b' }
+  ];
+
+  let html = '';
+
+  categories.forEach(cat => {
+    if (filter !== 'all' && filter !== cat.id) return;
+
+    const skills = SKILLS.filter(s => {
+      const matchCat = s.category === cat.id;
+      const matchSearch = search === '' ||
+        s.name.toLowerCase().includes(search.toLowerCase()) ||
+        s.sub.toLowerCase().includes(search.toLowerCase());
+      return matchCat && matchSearch;
+    });
+
+    if (skills.length === 0) return;
+
+    html += `<div class="category-section">
+      <div class="category-header">
+        <span class="category-name" style="color:${cat.color}">${cat.name}</span>
+        <span class="category-tag">${cat.tag}</span>
+        <span class="category-count">${skills.length} skills</span>
+      </div>
+      <div class="skills-grid">
+        ${skills.map(s => `
+          <div class="skill-card" style="--card-accent:${s.accentColor}" onclick="openSkill('${s.id}')">
+            <div class="skill-name">
+              ${s.name}
+              <span class="skill-arrow">→</span>
+            </div>
+            <div class="skill-sub">${s.sub}</div>
+            <div style="margin-top:8px;display:flex;gap:6px;">
+              ${s.hot ? '<span class="skill-type skill-hot">⚡ active</span>' : ''}
+              ${s.ai ? '<span class="skill-type skill-ai">🤖 ai</span>' : ''}
+              <span class="skill-type">${s.type}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  });
+
+  if (!html) html = `<div style="color:var(--text3);font-size:13px;padding:40px 0;text-align:center;">No skills found.</div>`;
+  container.innerHTML = html;
+}
+
+function updateCounts() {
+  const cats = ['ethospheres','autoflow','veta','agentic-os'];
+  document.getElementById('allCount').textContent = SKILLS.length;
+  cats.forEach(c => {
+    const el = document.getElementById(c.replace('-','')+'Count') || document.getElementById(c+'Count');
+    if (el) el.textContent = SKILLS.filter(s=>s.category===c).length;
+  });
+  document.getElementById('ethoCount').textContent = SKILLS.filter(s=>s.category==='ethospheres').length;
+  document.getElementById('autoCount').textContent = SKILLS.filter(s=>s.category==='autoflow').length;
+  document.getElementById('vetaCount').textContent = SKILLS.filter(s=>s.category==='veta').length;
+  document.getElementById('osCount').textContent = SKILLS.filter(s=>s.category==='agentic-os').length;
+  document.getElementById('githubCount').textContent = SKILLS.filter(s=>s.category==='github').length;
+  document.getElementById('gworkspaceCount').textContent = SKILLS.filter(s=>s.category==='gworkspace').length;
+  document.getElementById('socialCount').textContent = SKILLS.filter(s=>s.category==='social').length;
+  document.getElementById('contentCount').textContent = SKILLS.filter(s=>s.category==='content').length;
+}
+
+function filterSkills(cat) {
+  currentFilter = cat;
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  event.target.closest('.sidebar-item').classList.add('active');
+  showTab('skills');
+  renderSkills(cat);
+}
+
+function searchSkills(q) {
+  renderSkills(currentFilter, q);
+}
+
+// ── SKILL EXECUTION ENGINE ────────────────────────────────────────────
+const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
+const CLAUDE_MODEL = 'claude-sonnet-4-6-20250514';
+
+// Skills that require Claude Code's local tools (MCP/Bash) — not runnable from browser
+const LOCAL_ONLY_SKILLS = new Set([
+  'file-agent-run', 'memory-update', 'obsidian-sync',
+  'gws-gmail-triage', 'gws-gmail-labels', 'gws-drive-finder',
+  'gws-drive-organizer', 'gws-calendar-week', 'gws-docs-creator'
+]);
+
+// GitHub skills that get real data injected before Claude call
+const GITHUB_LIVE_SKILLS = new Set(['github-finder', 'github-trending', 'github-analyzer', 'github-downloader']);
+
+// Social media skills — prompt user for topic before building Claude prompt
+const SOCIAL_LIVE_SKILLS = new Set(['social-all-4', 'social-instagram', 'social-linkedin', 'social-tiktok', 'social-twitter', 'social-repurpose']);
+const CONTENT_LIVE_SKILLS = new Set(['content-studio','content-copy-ai','content-image-pro','content-video-higgsfield','content-script-pro','content-repurpose-pro']);
+
+let currentSkillId = null;
+let lastResult = '';
+
+function getApiKey() {
+  return localStorage.getItem('anthropicApiKey') || '';
+}
+
+function setApiKey(key) {
+  localStorage.setItem('anthropicApiKey', key.trim());
+}
+
+function promptApiKey() {
+  const existing = getApiKey();
+  const key = prompt(
+    existing
+      ? 'Update your Anthropic API key (leave blank to keep current):'
+      : 'Enter your Anthropic API key to enable in-dashboard execution.\nIt is stored only in your browser localStorage — never sent anywhere except api.anthropic.com:',
+    existing ? '••••••••••••••••' : ''
+  );
+  if (key && key !== '••••••••••••••••') setApiKey(key);
+  return getApiKey();
+}
+
+function openSkill(id) {
+  const skill = SKILLS.find(s => s.id === id);
+  if (!skill) return;
+  currentSkillId = id;
+  currentPrompt = skill.prompt;
+  lastResult = '';
+
+  const isLocal = LOCAL_ONLY_SKILLS.has(id);
+  const isGithubLive = GITHUB_LIVE_SKILLS.has(id);
+  const isSocialLive = SOCIAL_LIVE_SKILLS.has(id);
+  const isContentLive = CONTENT_LIVE_SKILLS.has(id);
+  if (isContentLive) { openContentStudio(id); return; }
+
+  document.getElementById('modalTitle').textContent = skill.name;
+
+  let subText = `${skill.category} · ${skill.sub}`;
+  if (isLocal) {
+    subText += ' — 🖥️ Run in Claude Code (needs MCP tools)';
+  } else if (isGithubLive) {
+    subText += ' — ⚡ Live GitHub API + Claude';
+  } else if (isSocialLive) {
+    subText += ' — 📱 Social Media Agent · Claude API';
+  } else {
+    subText += ' — ⚡ Runs directly via Claude API';
+  }
+  document.getElementById('modalSub').textContent = subText;
+  document.getElementById('modalPrompt').textContent = skill.prompt;
+
+  // Reset result panel
+  document.getElementById('resultPanel').classList.remove('show');
+  document.getElementById('resultBody').innerHTML = '<div class="result-spinner"><div class="spinner-ring"></div>Claude is working on this skill…</div>';
+  document.getElementById('resultBadge').className = 'result-badge running';
+  document.getElementById('resultBadge').textContent = 'RUNNING';
+  document.getElementById('resultActions').style.display = 'none';
+
+  const btn = document.getElementById('btnExecute');
+  if (isLocal) {
+    btn.disabled = true;
+    btn.textContent = '🖥️ Claude Code Only';
+    btn.style.background = 'var(--surface3)';
+    btn.style.color = 'var(--text2)';
+    btn.title = 'This skill requires MCP tools — copy the prompt and paste into Claude Code';
+  } else {
+    btn.disabled = false;
+    btn.textContent = '⚡ Execute';
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.title = '';
+  }
+
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+
+// ── GITHUB DATA PREFETCH ────────────────────────────────────────────
+async function buildGithubPrompt(skill) {
+  if (skill.id === 'github-finder') {
+    const query = prompt('What repos are you looking for?\n(e.g. "n8n automation", "AI lead scoring", "skincare ingredient API")');
+    if (!query) return null;
+    try {
+      const res = await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&sort=stars&order=desc&per_page=15`);
+      const data = await res.json();
+      if (data.message) throw new Error(data.message);
+      const list = (data.items || []).map((r, i) =>
+        `${i+1}. **${r.full_name}** ⭐${r.stargazers_count.toLocaleString()} [${r.language || 'N/A'}]\n   ${r.description || 'No description'}\n   URL: ${r.html_url} | Updated: ${r.updated_at?.split('T')[0]}`
+      ).join('\n\n');
+      return `GitHub search results for "${query}" (sorted by stars):\n\n${list}\n\nFor Ian Veber (Veta agency, Ethospheres skincare, AutoFlow SaaS):\n1. Present top results as a clean table\n2. Pick your top 3 with reasoning — why is each one relevant or useful?\n3. For each top pick provide: git clone command + one-line setup\n4. Note any relevance to n8n, Claude API, Supabase, Korean beauty, or SaaS tools`;
+    } catch(e) {
+      return `Search for GitHub repositories related to: ${query}\n\nProvide top 10 recommended repos with: name, description, GitHub URL, git clone command, and why it's relevant for Ian's projects (Veta agency, Ethospheres skincare, AutoFlow SaaS).`;
+    }
+  }
+
+  if (skill.id === 'github-trending') {
+    try {
+      const d = new Date(); d.setDate(d.getDate() - 7);
+      const dateStr = d.toISOString().split('T')[0];
+      const res = await fetch(`https://api.github.com/search/repositories?q=created:>${dateStr}&sort=stars&order=desc&per_page=20`);
+      const data = await res.json();
+      if (data.message) throw new Error(data.message);
+      const list = (data.items || []).map((r, i) =>
+        `${i+1}. **${r.full_name}** ⭐${r.stargazers_count.toLocaleString()} [${r.language || 'N/A'}] — ${r.description || 'No description'}`
+      ).join('\n');
+      return `Today's top trending GitHub repositories (created in last 7 days, ranked by stars):\n\n${list}\n\nAnalysis for Ian Veber:\n1. Present as a clean numbered table\n2. Pick 3 standout repos worth watching and explain why\n3. Identify patterns — what types of tools are gaining traction?\n4. Highlight anything useful for: n8n workflows, Claude/AI tools, Supabase, SaaS products, or skincare/beauty tech`;
+    } catch(e) {
+      return `Fetch and analyze today's top trending repositories on GitHub. List top 10 with: repo name, stars, language, description. Then pick 3 highlights and identify any patterns in what's trending. Note anything relevant to AI, automation, SaaS, or beauty tech.`;
+    }
+  }
+
+  if (skill.id === 'github-analyzer') {
+    const url = prompt('GitHub repo URL to analyze:\n(e.g. https://github.com/owner/repo-name)');
+    if (!url) return null;
+    const match = url.match(/github\.com\/([^\/]+)\/([^\/\?\s#]+)/);
+    if (!match) return `Analyze the GitHub repository at: ${url}\n\nProvide: tech stack, purpose, code quality signals (tests/CI/docs), activity status, license, and a verdict on whether Ian Veber should use/fork/learn from it.`;
+    const [, owner, repo] = match;
+    try {
+      const [metaRes, readmeMain, readmeMaster] = await Promise.all([
+        fetch(`https://api.github.com/repos/${owner}/${repo}`),
+        fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/README.md`),
+        fetch(`https://raw.githubusercontent.com/${owner}/${repo}/master/README.md`)
+      ]);
+      const meta = await metaRes.json();
+      if (meta.message) throw new Error(meta.message);
+      const readmeText = readmeMain.ok ? await readmeMain.text() : (readmeMaster.ok ? await readmeMaster.text() : 'README not available');
+      return `Analyze this GitHub repository for Ian Veber:\n\n**METADATA:**\nName: ${meta.full_name}\nDescription: ${meta.description || 'N/A'}\nStars: ${meta.stargazers_count?.toLocaleString()} | Forks: ${meta.forks_count?.toLocaleString()} | Open Issues: ${meta.open_issues_count}\nLanguage: ${meta.language || 'N/A'} | Topics: ${(meta.topics||[]).join(', ') || 'none'}\nLicense: ${meta.license?.name || 'None'} | Created: ${meta.created_at?.split('T')[0]} | Last push: ${meta.pushed_at?.split('T')[0]}\n\n**README (first 4000 chars):**\n${readmeText.substring(0, 4000)}\n\nProvide:\n1. Tech stack breakdown\n2. What it does (clear 1-paragraph summary)\n3. Quality ratings (1-5): Value, Ease of Setup, Documentation, Maintenance\n4. Concrete integration idea for Veta/Ethospheres/AutoFlow\n5. Verdict: use it / fork it / learn from it / skip it — and why`;
+    } catch(e) {
+      return `Analyze the GitHub repository: ${url}\n\nProvide: tech stack, purpose, code quality signals, activity status, license, and verdict on whether Ian should use/fork/learn from it.`;
+    }
+  }
+
+  if (skill.id === 'github-downloader') {
+    const url = prompt('GitHub repo URL to download:\n(e.g. https://github.com/owner/repo-name)');
+    if (!url) return null;
+    return `I want to clone and set up this GitHub repository on my Mac: ${url}\n\nProvide step-by-step Terminal commands:\n1. git clone command (to ~/Desktop/[repo-name])\n2. cd into the folder\n3. Detect project type and provide the correct install commands:\n   - package.json → npm install (or yarn/pnpm)\n   - requirements.txt → pip install -r requirements.txt\n   - Pipfile → pipenv install\n   - go.mod → go mod download\n   - Gemfile → bundle install\n4. List any required environment variables (from .env.example if mentioned)\n5. Command to run the project\n6. Brief summary: what does this project do and how does Ian use it?\n\nFormat as clean numbered steps Ian can paste into Terminal.`;
+  }
+
+  return skill.prompt;
+}
+
+// ── SOCIAL MEDIA PROMPT BUILDER ────────────────────────────────────────────
+async function buildSocialPrompt(skill) {
+  const today = new Date().toLocaleDateString('en-GB', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+
+  const ACCOUNTS = {
+    instagram: {
+      brand: 'Ethospheres',
+      handle: '@ethospheres',
+      platform: 'Instagram',
+      voice: 'Clean, aesthetic, educational skincare. Mix of science + aspiration. Target: women 25–45 interested in professional skincare. No cringe, no exclamation spam. Caption length: 150–220 words. 5–8 relevant hashtags at the end.',
+      format: 'Hook (1 line) → Body (3–4 short paragraphs with line breaks) → CTA → Hashtags'
+    },
+    linkedin: {
+      brand: 'Veta / Ian Veber (personal)',
+      handle: 'Ian Veber on LinkedIn',
+      platform: 'LinkedIn',
+      voice: 'Founder/operator tone. Thoughtful, direct, slightly contrarian. No corporate buzzwords. Ian builds AI-native marketing systems for brands. Audience: founders, marketers, agency owners. Post length: 200–300 words. Hook must earn the scroll.',
+      format: 'Bold hook (1 line, no period) → White space → 3–5 short punchy paragraphs → 1 insight or question to close → 3 hashtags max'
+    },
+    tiktok: {
+      brand: 'Ethospheres',
+      handle: '@ethospheres',
+      platform: 'TikTok',
+      voice: 'Short, direct, education-first. Gen Z/Millennial. Skincare science made accessible. Hook must work in 2 seconds. Script style (for voiceover). No filter, no fake enthusiasm.',
+      format: 'HOOK (first 2 seconds — question or bold claim) → BODY (3–4 punchy points) → CTA ("save this", "follow for more") | Also provide: suggested visual/b-roll direction, 3–5 trending hashtags'
+    },
+    twitter: {
+      brand: 'AutoFlow',
+      handle: '@autoflow (or Ian personal)',
+      platform: 'Twitter/X',
+      voice: 'Tech-native, founder-building-in-public energy. Concise, smart, occasionally sharp. AutoFlow = AI lead scoring SaaS for B2B. Target: SaaS founders, operators, growth people. Tweet or thread format.',
+      format: 'Single tweet (max 280 chars) OR Thread (3–6 tweets, numbered). Pick whichever suits the topic better. End with a soft CTA or open question.'
+    }
+  };
+
+  if (skill.id === 'social-all-4') {
+    const topic = prompt('What do you want to post about?\n\nExamples:\n• "Ethospheres launch is coming — ethosome technology"\n• "How I use n8n + Claude to run my agency"\n• "Why Korean cosmetics OEM is underrated"\n• "AutoFlow feature update: real-time lead scoring"');
+    if (!topic) return null;
+    const extraContext = prompt('Any extra context or specific angle? (optional — press Cancel or leave blank to skip)', '');
+
+    const contextBlock = extraContext ? `\nExtra context / angle: ${extraContext}` : '';
+
+    return `Generate optimized social media content for 4 accounts. Today: ${today}
+Topic: ${topic}${contextBlock}
+
+Generate content for each account separately, formatted clearly with headers.
+
+---
+
+## 📸 INSTAGRAM — ${ACCOUNTS.instagram.brand} (${ACCOUNTS.instagram.handle})
+Voice: ${ACCOUNTS.instagram.voice}
+Format: ${ACCOUNTS.instagram.format}
+
+[Generate full caption here]
+
+---
+
+## 💼 LINKEDIN — ${ACCOUNTS.linkedin.brand} (${ACCOUNTS.linkedin.handle})
+Voice: ${ACCOUNTS.linkedin.voice}
+Format: ${ACCOUNTS.linkedin.format}
+
+[Generate full post here]
+
+---
+
+## 🎵 TIKTOK — ${ACCOUNTS.tiktok.brand} (${ACCOUNTS.tiktok.handle})
+Voice: ${ACCOUNTS.tiktok.voice}
+Format: ${ACCOUNTS.tiktok.format}
+
+[Generate script + visual notes here]
+
+---
+
+## 🐦 TWITTER/X — ${ACCOUNTS.twitter.brand} (${ACCOUNTS.twitter.handle})
+Voice: ${ACCOUNTS.twitter.voice}
+Format: ${ACCOUNTS.twitter.format}
+
+[Generate tweet or thread here]
+
+---
+
+After all 4 posts, add a brief section:
+## 📅 Posting Notes
+- Best time to post each (based on platform norms)
+- Any platform-specific tips for this topic
+- Suggested visual direction for Instagram/TikTok`;
+  }
+
+  if (skill.id === 'social-repurpose') {
+    const existingContent = prompt('Paste the content you want to repurpose:\n(article, email, blog post, LinkedIn post, etc.)');
+    if (!existingContent) return null;
+    return `Repurpose the following content into posts for all 4 social accounts. Today: ${today}
+
+ORIGINAL CONTENT TO REPURPOSE:
+"""
+${existingContent}
+"""
+
+Adapt and rewrite for each platform — do NOT just copy-paste. Each should feel native to that platform.
+
+## 📸 INSTAGRAM — Ethospheres
+${ACCOUNTS.instagram.voice}
+Format: ${ACCOUNTS.instagram.format}
+
+## 💼 LINKEDIN — Veta / Ian Veber
+${ACCOUNTS.linkedin.voice}
+Format: ${ACCOUNTS.linkedin.format}
+
+## 🎵 TIKTOK — Ethospheres
+${ACCOUNTS.tiktok.voice}
+Format: ${ACCOUNTS.tiktok.format}
+
+## 🐦 TWITTER/X — AutoFlow
+${ACCOUNTS.twitter.voice}
+Format: ${ACCOUNTS.twitter.format}`;
+  }
+
+  // Single platform skills
+  const platformMap = {
+    'social-instagram': 'instagram',
+    'social-linkedin': 'linkedin',
+    'social-tiktok': 'tiktok',
+    'social-twitter': 'twitter'
+  };
+  const platform = platformMap[skill.id];
+  const acct = ACCOUNTS[platform];
+
+  const topic = prompt(`What do you want to post on ${acct.platform} for ${acct.brand}?\n\nExamples:\n• A product insight, a behind-the-scenes update, a tip, a story`);
+  if (!topic) return null;
+
+  return `Write a ${acct.platform} post for ${acct.brand} (${acct.handle}). Today: ${today}
+Topic: ${topic}
+
+Brand voice: ${acct.voice}
+Format to follow: ${acct.format}
+
+Write the complete, ready-to-post content. No placeholders, no [brackets], no "here's a sample" intro — just the final post.`;
+}
+
+// ── MAIN EXECUTE FUNCTION ────────────────────────────────────────────
+async function executeSkill() {
+  const skill = SKILLS.find(s => s.id === currentSkillId);
+  if (!skill || LOCAL_ONLY_SKILLS.has(skill.id)) return;
+
+  const btn = document.getElementById('btnExecute');
+  const panel = document.getElementById('resultPanel');
+
+  // Ensure API key
+  let apiKey = getApiKey();
+  if (!apiKey) {
+    apiKey = promptApiKey();
+    if (!apiKey) {
+      showToast('⚠', 'No API key set — click ⚙ in the top bar to add it');
+      return;
+    }
+  }
+
+  // Build prompt (with live data for GitHub/Social skills)
+  let finalPrompt;
+  if (GITHUB_LIVE_SKILLS.has(skill.id)) {
+    finalPrompt = await buildGithubPrompt(skill);
+    if (!finalPrompt) return;
+  } else if (SOCIAL_LIVE_SKILLS.has(skill.id)) {
+    finalPrompt = await buildSocialPrompt(skill);
+    if (!finalPrompt) return;
+  } else {
+    finalPrompt = skill.prompt;
+  }
+
+  // Set running state
+  btn.disabled = true;
+  btn.textContent = '⏳ Running…';
+  btn.style.background = '';
+  btn.style.color = '';
+
+  panel.classList.add('show');
+  document.getElementById('resultSkillName').textContent = skill.name;
+  document.getElementById('resultTime').textContent = new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('resultBadge').className = 'result-badge running';
+  document.getElementById('resultBadge').textContent = 'RUNNING';
+  document.getElementById('resultBody').innerHTML = '<div class="result-spinner"><div class="spinner-ring"></div>Claude Sonnet is processing this skill…</div>';
+  document.getElementById('resultActions').style.display = 'none';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  const systemPrompt = `You are an expert AI assistant executing a skill for Ian Veber.
+
+Ian is:
+- Founder of Veta (AI-native marketing agency, Ljubljana, Slovenia)
+- Co-founder of Ethospheres (Korean ethosome skincare brand, pre-launch Q4 2026)
+- Building AutoFlow (B2B SaaS, AI lead scoring, €79/month)
+- Timezone: Europe/Ljubljana | Today: ${new Date().toLocaleDateString('en-GB', {weekday:'long', year:'numeric', month:'long', day:'numeric'})}
+
+Execution rules:
+- Be specific, actionable, and concise
+- Use clear headers and bullet points
+- For templates: generate complete, ready-to-use content
+- For research: give concrete findings, not generic advice
+- For strategies: include specific next steps with owners and timelines`;
+
+  try {
+    const res = await fetch(ANTHROPIC_API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: CLAUDE_MODEL,
+        max_tokens: 4096,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: finalPrompt }]
+      })
+    });
+
+    if (res.status === 401) {
+      throw new Error('Invalid API key. Click ⚙ in the top bar to update it.');
+    }
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error?.message || `API error ${res.status}`);
+    }
+
+    const data = await res.json();
+    const result = data.content?.[0]?.text || JSON.stringify(data);
+    lastResult = result;
+
+    document.getElementById('resultBadge').className = 'result-badge done';
+    document.getElementById('resultBadge').textContent = 'DONE';
+    document.getElementById('resultBody').textContent = result;
+    document.getElementById('resultActions').style.display = 'flex';
+    document.getElementById('resultTime').textContent = new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+    btn.disabled = false;
+    btn.textContent = '✓ Done — Run Again';
+
+    trackRun(skill);
+    showToast('⚡', `"${skill.name}" complete`);
+
+  } catch (err) {
+    document.getElementById('resultBadge').className = 'result-badge error';
+    document.getElementById('resultBadge').textContent = 'ERROR';
+    document.getElementById('resultBody').textContent = `${err.message}\n\nTip: Copy the prompt below and paste into Claude Code as a fallback.`;
+    btn.disabled = false;
+    btn.textContent = '⚡ Retry';
+    showToast('✗', err.message.substring(0, 60));
+  }
+}
+
+function copyResult() {
+  navigator.clipboard.writeText(lastResult).then(() => {
+    showToast('✓', 'Result copied to clipboard');
+  });
+}
+
+function saveResult() {
+  if (!lastResult) return;
+  const skill = SKILLS.find(s => s.id === currentSkillId);
+  const filename = `${(skill?.id || 'result')}-${new Date().toISOString().split('T')[0]}.txt`;
+  const blob = new Blob([lastResult], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+  showToast('💾', `Saved as ${filename}`);
+}
+
+function copyPrompt() {
+  navigator.clipboard.writeText(currentPrompt).then(() => {
+    const skill = SKILLS.find(s => s.id === currentSkillId);
+    trackRun(skill);
+    showToast('✓', `"${skill?.name}" prompt copied — paste into Claude Code`);
+  });
+}
+
+function trackRun(skill) {
+  skillsRunToday++;
+  totalRuns++;
+  localStorage.setItem('totalRuns', totalRuns);
+
+  const data = JSON.parse(localStorage.getItem('activityData') || '[]');
+  const today = new Date().toDateString();
+  const lastDay = localStorage.getItem('lastActivityDay');
+  if (lastDay !== today) {
+    data.push(skillsRunToday);
+    if (data.length > 30) data.shift();
+    localStorage.setItem('activityData', JSON.stringify(data));
+    localStorage.setItem('lastActivityDay', today);
+  } else {
+    if (data.length > 0) data[data.length-1] = skillsRunToday;
+    localStorage.setItem('activityData', JSON.stringify(data));
+  }
+
+  document.getElementById('skillsToday').textContent = skillsRunToday;
+  document.getElementById('barSkills').style.width = Math.min(skillsRunToday * 10, 100) + '%';
+  animateCounter('activityCount', totalRuns - 1, totalRuns, 300);
+  renderMiniGraph();
+
+  if (skill) {
+    runHistory.unshift({
+      name: skill.name,
+      category: skill.category,
+      time: new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'}),
+      date: new Date().toLocaleDateString('en-GB')
+    });
+    if (runHistory.length > 20) runHistory.pop();
+    localStorage.setItem('runHistory', JSON.stringify(runHistory));
+    renderRuns();
+  }
+}
+
+function renderRuns() {
+  const container = document.getElementById('runsContainer');
+  if (!container) return;
+  if (runHistory.length === 0) {
+    container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:40px 0;text-align:center;">No runs yet this session. Click a skill to start.</div>';
+    return;
+  }
+  const catColor = { ethospheres: '#d53f8c', autoflow: '#0a84ff', veta: '#2f855a', 'agentic-os': '#bf5af2' };
+  container.innerHTML = runHistory.map(r => `
+    <div class="run-item">
+      <div class="run-status run-ok"></div>
+      <div class="run-info">
+        <div class="run-name">${r.name}</div>
+        <div class="run-meta" style="color:${catColor[r.category]||'var(--text3)'}">/${r.category}</div>
+      </div>
+      <div class="run-time">${r.date} ${r.time}</div>
+    </div>
+  `).join('');
+}
+
+// ── TABS ──────────────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => {
+    if (t.getAttribute('onclick')?.includes(name)) t.classList.add('active');
+  });
+}
+
+// ── TOAST ──────────────────────────────────────────────────────
+let toastTimer;
+function showToast(icon, text) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastIcon').textContent = icon;
+  document.getElementById('toastText').textContent = text;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(hideToast, 4000);
+}
+function hideToast() { document.getElementById('toast').classList.remove('show'); }
+
+// Close modal on overlay click
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ── CONTENT STUDIO ─────────────────────────────────────────────────────────
+
+let csCurrentSkillId = null;
+let csRefImageBase64 = null;
+let csRefImageType = null;
+let csGeneratedCopy = '';
+let csGeneratedImagePrompts = {};
+let csVideoJobId = null;
+
+const CS_BRANDS = {
+  ethospheres: {
+    name: 'Ethospheres', handle: '@ethospheres',
+    desc: 'Korean ethosome skincare brand. Cosmesotherapy. Clinic-first. Science-backed. Pre-launch.',
+    visual: 'Dark luxury aesthetic. Deep navy, gold accents, clinical-clean. Serum droplets, skin close-ups, molecular geometry, laboratory precision.',
+    voice: 'Precise, scientific, non-condescending. Talks like a dermatologist colleague. Evidence-backed and direct.',
+    accent: '#d53f8c'
+  },
+  veta: {
+    name: 'Veta / Ian Veber', handle: 'Ian Veber on LinkedIn',
+    desc: 'AI-native marketing agency. Builds AI agent systems for brands. Founder/operator perspective.',
+    visual: 'Dark tech aesthetic. Deep black, electric blue, minimal. Digital interfaces, data flows, clean workspace.',
+    voice: 'Founder/operator. Thoughtful, direct, slightly contrarian. Builds in public.',
+    accent: '#2f855a'
+  },
+  athlos: {
+    name: 'ATHLOS', handle: '@athlosapp',
+    desc: 'AI sports performance platform for athletes and clubs. "The System That Knows Every Athlete."',
+    visual: 'Dark athletic. Deep black, electric purple, dynamic motion. Athletes in focus, stadium energy, precision training.',
+    voice: 'Performance-focused, data-driven, empowering. Speaks to serious athletes.',
+    accent: '#a855f7'
+  },
+  autoflow: {
+    name: 'AutoFlow', handle: '@autoflow',
+    desc: 'B2B SaaS — AI lead scoring for sales teams. €79/month.',
+    visual: 'Dark SaaS aesthetic. Dark UI, blue accents, green data viz. Clean dashboard interfaces, flow charts, metrics.',
+    voice: 'Tech-native, founder-building-in-public. Concise, smart, occasionally sharp.',
+    accent: '#0a84ff'
+  },
+  custom: {
+    name: 'Custom Brand', handle: '',
+    desc: '', visual: '', voice: '', accent: '#f59e0b'
+  }
+};
+
+const CS_PLATFORMS = ['Instagram','LinkedIn','TikTok','Twitter/X','YouTube','All Platforms'];
+const CS_TYPES = ['Image Post','Reel / Video','Carousel','Story','Thread','Short-Form Script'];
+
+const CS_IMG_MODELS = {
+  midjourney: 'Midjourney',
+  dalle: 'DALL-E 3',
+  flux: 'Flux 1.1 Pro',
+  sd: 'Stable Diffusion XL'
+};
+
+const HIGGSFIELD_MODELS = [
+  { id: 'haiper-video-2', name: 'Haiper Video 2 — Fast & Cinematic' },
+  { id: 'runway-gen3', name: 'Runway Gen-3 Alpha — Premium Motion' },
+  { id: 'luma-dream-machine', name: 'Luma Dream Machine — Photorealistic' },
+  { id: 'stable-video', name: 'Stable Video Diffusion — Consistent' },
+  { id: 'kling-v1', name: 'Kling v1.5 — Asian Cinematic' }
+];
+
+function getHiggsfieldKey() { return localStorage.getItem('higgsfieldApiKey') || ''; }
+function setHiggsfieldKey(k) { localStorage.setItem('higgsfieldApiKey', k.trim()); }
+
+function openContentStudio(skillId) {
+  csCurrentSkillId = skillId;
+  csRefImageBase64 = null;
+  csRefImageType = null;
+  csGeneratedCopy = '';
+  csGeneratedImagePrompts = {};
+  csVideoJobId = null;
+
+  const skill = SKILLS.find(s => s.id === skillId) || {};
+  const el = document.getElementById('contentStudio');
+
+  // Set skill-specific defaults
+  let defaultFocus = 'all';
+  if (skillId === 'content-copy-ai') defaultFocus = 'copy';
+  else if (skillId === 'content-image-pro') defaultFocus = 'image';
+  else if (skillId === 'content-video-higgsfield') defaultFocus = 'video';
+  else if (skillId === 'content-script-pro') defaultFocus = 'script';
+  else if (skillId === 'content-repurpose-pro') defaultFocus = 'repurpose';
+
+  document.getElementById('cs-skill-name').textContent = skill.name || 'Content Studio';
+  document.getElementById('cs-focus').value = defaultFocus;
+
+  // Reset tabs to input view
+  csShowPanel('cs-panel-input');
+  el.classList.add('show');
+}
+
+function closeContentStudio() {
+  document.getElementById('contentStudio').classList.remove('show');
+}
+
+function csShowPanel(id) {
+  ['cs-panel-input','cs-panel-result'].forEach(p => {
+    const el = document.getElementById(p);
+    if (el) el.style.display = p === id ? 'block' : 'none';
+  });
+}
+
+function csSelectBrand(brand) {
+  document.querySelectorAll('.cs-brand-pill').forEach(p => p.classList.remove('active'));
+  const pill = document.querySelector(`.cs-brand-pill[data-brand="${brand}"]`);
+  if (pill) pill.classList.add('active');
+
+  const b = CS_BRANDS[brand];
+  if (brand === 'custom') {
+    document.getElementById('cs-custom-brand').style.display = 'block';
+  } else {
+    document.getElementById('cs-custom-brand').style.display = 'none';
+    if (b && b.desc) {
+      document.getElementById('cs-brand-hint').textContent = b.desc;
+      document.getElementById('cs-brand-hint').style.display = 'block';
+    }
+  }
+}
+
+function csTogglePlatform(el) {
+  el.classList.toggle('active');
+}
+
+function csHandleImageUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    csRefImageBase64 = e.target.result.split(',')[1];
+    csRefImageType = file.type;
+    document.getElementById('cs-img-preview').src = e.target.result;
+    document.getElementById('cs-img-preview-wrap').style.display = 'block';
+    document.getElementById('cs-img-drop-label').textContent = file.name;
+    showToast('📸', 'Reference image loaded — will guide visual style');
+  };
+  reader.readAsDataURL(file);
+}
+
+function csClearImage() {
+  csRefImageBase64 = null; csRefImageType = null;
+  document.getElementById('cs-img-preview-wrap').style.display = 'none';
+  document.getElementById('cs-img-drop-label').textContent = 'Drop image or click to upload';
+  document.getElementById('cs-ref-upload').value = '';
+}
+
+function csGetSelectedBrand() {
+  const pill = document.querySelector('.cs-brand-pill.active');
+  return pill ? pill.dataset.brand : 'custom';
+}
+
+function csGetSelectedPlatforms() {
+  return Array.from(document.querySelectorAll('.cs-platform-pill.active')).map(p => p.textContent.trim());
+}
+
+async function csGenerate() {
+  const apiKey = getApiKey();
+  if (!apiKey) { showToast('⚠', 'No Anthropic API key — click ⚙ to add it'); return; }
+
+  const brandKey = csGetSelectedBrand();
+  const brand = CS_BRANDS[brandKey] || CS_BRANDS.custom;
+  const customBrandName = document.getElementById('cs-custom-brand-name')?.value || '';
+  const customBrandDesc = document.getElementById('cs-custom-brand-desc')?.value || '';
+  const platforms = csGetSelectedPlatforms();
+  const contentType = document.getElementById('cs-content-type').value;
+  const topic = document.getElementById('cs-topic').value.trim();
+  const style = document.getElementById('cs-style').value.trim();
+  const extras = document.getElementById('cs-extras').value.trim();
+  const focus = document.getElementById('cs-focus').value;
+  const selectedImgModels = Array.from(document.querySelectorAll('.cs-img-model-cb:checked')).map(cb => cb.value);
+
+  if (!topic) { showToast('⚠', 'Add a topic first'); return; }
+
+  const brandName = brandKey === 'custom' ? (customBrandName || 'Custom Brand') : brand.name;
+  const brandDesc = brandKey === 'custom' ? customBrandDesc : brand.desc;
+  const brandVisual = brandKey === 'custom' ? style : brand.visual + (style ? '. Additional style notes: ' + style : '');
+  const brandVoice = brandKey === 'custom' ? 'Professional and engaging' : brand.voice;
+  const platformStr = platforms.length ? platforms.join(', ') : 'Instagram';
+
+  const btn = document.getElementById('cs-generate-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating…';
+
+  const focusInstructions = {
+    all: 'Generate: (A) complete caption/copy, (B) image prompts for all requested models, (C) Higgsfield video prompt, (D) shot list.',
+    copy: 'Focus entirely on generating outstanding copy/captions. Provide 3 hook variations, full body copy, CTAs, hashtags.',
+    image: 'Focus on generating extremely detailed, production-ready image prompts for each requested model. Include negative prompts.',
+    video: 'Focus on Higgsfield video prompt + full cinematic shot list. Also provide a short script for voiceover.',
+    script: 'Generate a full production video script: shot-by-shot breakdown, visual directions, voiceover script, Higgsfield prompts per shot.',
+    repurpose: 'Take the topic and rewrite/repurpose it optimally for every selected platform with platform-specific hooks and formats.'
+  };
+
+  const imageModelInstructions = selectedImgModels.length
+    ? `\nGenerate image prompts for these models: ${selectedImgModels.map(m => CS_IMG_MODELS[m]).join(', ')}.
+Midjourney format: detailed scene description --ar 9:16 --v 6.1 --style raw --q 2
+DALL-E 3 format: photorealistic natural language, mention style, lighting, composition
+Flux format: [subject], [style], [lighting], [composition], [technical], [mood], masterpiece, highly detailed
+Stable Diffusion: detailed positive prompt | negative prompt format`
+    : '';
+
+  const imageContextBlock = csRefImageBase64
+    ? '\n\nA REFERENCE IMAGE has been provided. Analyze its: visual style, color palette, lighting, composition, mood, and subject treatment. All image/video prompts MUST be consistent with this reference aesthetic.'
+    : '';
+
+  const systemPrompt = `You are an elite content creator and creative director for ${brandName}.
+
+BRAND PROFILE:
+Name: ${brandName}
+Description: ${brandDesc}
+Visual identity: ${brandVisual}
+Brand voice: ${brandVoice}
+Platform(s): ${platformStr}
+Content type: ${contentType}
+
+You produce world-class, platform-optimized content that drives engagement. Every piece of copy is precise, on-brand, and ready to publish. Every visual prompt is cinematic, specific, and production-ready.
+
+Ian Veber is the founder. Context: Veta AI agency · Ethospheres skincare · ATHLOS sports platform · AutoFlow SaaS · Based in Ljubljana, Slovenia.`;
+
+  const userPrompt = `Create complete content for this brief:
+
+TOPIC: ${topic}
+${extras ? 'EXTRA CONTEXT: ' + extras : ''}
+${imageContextBlock}
+
+TASK: ${focusInstructions[focus] || focusInstructions.all}
+${imageModelInstructions}
+
+OUTPUT STRUCTURE:
+---
+## 📝 COPY
+[Full ready-to-post caption for ${platformStr}]
+
+### Hook Variations (3 options):
+1. [hook 1]
+2. [hook 2]
+3. [hook 3]
+
+### Full Caption:
+[complete caption — body + CTA + hashtags]
+
+---
+## 🖼️ IMAGE PROMPTS
+${selectedImgModels.includes('midjourney') ? '### Midjourney:\n[prompt]' : ''}
+${selectedImgModels.includes('dalle') ? '### DALL-E 3:\n[prompt]' : ''}
+${selectedImgModels.includes('flux') ? '### Flux 1.1 Pro:\n[prompt]' : ''}
+${selectedImgModels.includes('sd') ? '### Stable Diffusion XL:\n[positive prompt]\nNegative: [negative prompt]' : ''}
+
+---
+## 🎬 HIGGSFIELD VIDEO
+### Visual Concept:
+[2-3 sentence cinematic concept]
+
+### Shot List:
+Shot 1 — [shot type, duration, description]
+Shot 2 — [shot type, duration, description]
+Shot 3 — [shot type, duration, description]
+
+### Higgsfield Prompt:
+[cinematic, detailed, style-specific video generation prompt]
+
+### Aspect Ratio: [9:16 or 16:9 or 1:1]
+### Style: [realistic/cinematic/stylized]
+### Duration: [3-6 seconds per shot]
+
+---
+## 🎙 SCRIPT / VOICEOVER
+[If applicable: full spoken script or overlay text sequence]`;
+
+  try {
+    const messages = csRefImageBase64 ? [
+      { role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: csRefImageType || 'image/jpeg', data: csRefImageBase64 } },
+        { type: 'text', text: userPrompt }
+      ]}
+    ] : [{ role: 'user', content: userPrompt }];
+
+    const res = await fetch(ANTHROPIC_API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: CLAUDE_MODEL,
+        max_tokens: 4096,
+        system: systemPrompt,
+        messages
+      })
+    });
+
+    if (!res.ok) {
+      const e = await res.json().catch(()=>({}));
+      throw new Error(e.error?.message || `API error ${res.status}`);
+    }
+
+    const data = await res.json();
+    csGeneratedCopy = data.content?.[0]?.text || '';
+
+    // Parse sections
+    const copyMatch = csGeneratedCopy.match(/##\s*📝\s*COPY([\s\S]*?)(?=##\s*🖼️|$)/i);
+    const imageMatch = csGeneratedCopy.match(/##\s*🖼️\s*IMAGE PROMPTS([\s\S]*?)(?=##\s*🎬|$)/i);
+    const videoMatch = csGeneratedCopy.match(/##\s*🎬\s*HIGGSFIELD VIDEO([\s\S]*?)(?=##\s*🎙|$)/i);
+    const scriptMatch = csGeneratedCopy.match(/##\s*🎙\s*SCRIPT[\s\S]*/i);
+
+    document.getElementById('cs-out-copy').textContent = copyMatch ? copyMatch[1].trim() : csGeneratedCopy;
+    document.getElementById('cs-out-image').textContent = imageMatch ? imageMatch[1].trim() : '(No image prompts in this output)';
+
+    const videoText = videoMatch ? videoMatch[1].trim() : '';
+    document.getElementById('cs-out-video').textContent = videoText;
+
+    // Extract Higgsfield prompt for API call
+    const hfPromptMatch = videoText.match(/Higgsfield Prompt:\s*([\s\S]*?)(?=###|$)/i);
+    const hfPrompt = hfPromptMatch ? hfPromptMatch[1].trim() : topic;
+    document.getElementById('cs-hf-prompt').value = hfPrompt;
+
+    const hfAspectMatch = videoText.match(/Aspect Ratio:\s*([^\n]+)/i);
+    const hfAspect = hfAspectMatch ? hfAspectMatch[1].trim() : '9:16';
+    document.getElementById('cs-hf-aspect').value = hfAspect === '16:9' ? '16:9' : hfAspect === '1:1' ? '1:1' : '9:16';
+
+    document.getElementById('cs-out-script').textContent = scriptMatch ? scriptMatch[0].replace(/##.*SCRIPT.*/i,'').trim() : '(No separate script in this output)';
+
+    csShowPanel('cs-panel-result');
+    csShowResultTab('copy');
+    trackRun(SKILLS.find(s=>s.id===csCurrentSkillId)||{id:csCurrentSkillId,name:'Content Studio',category:'content'});
+    showToast('🎬', 'Content Studio — output ready');
+
+  } catch(err) {
+    showToast('✗', err.message.substring(0,80));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '⚡ Generate Content';
+  }
+}
+
+function csShowResultTab(tab) {
+  ['copy','image','video','script'].forEach(t => {
+    document.getElementById('cs-tab-'+t).classList.toggle('active', t === tab);
+    document.getElementById('cs-out-'+t+'-wrap').style.display = t === tab ? 'block' : 'none';
+  });
+}
+
+function csCopySection(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent || el.value).then(()=>showToast('✓','Copied to clipboard'));
+}
+
+// ── HIGGSFIELD API ──────────────────────────────────────────────────────
+async function csGenerateHiggsfieldVideo() {
+  let hfKey = getHiggsfieldKey();
+  if (!hfKey) {
+    hfKey = prompt('Enter your Higgsfield API key:\n(Get it at: higgsfield.ai/dashboard)\n\nStored locally in browser only.');
+    if (!hfKey) return;
+    setHiggsfieldKey(hfKey);
+  }
+
+  const prompt_text = document.getElementById('cs-hf-prompt').value.trim();
+  const model = document.getElementById('cs-hf-model').value;
+  const aspect = document.getElementById('cs-hf-aspect').value;
+  const duration = parseInt(document.getElementById('cs-hf-duration').value) || 4;
+
+  if (!prompt_text) { showToast('⚠', 'Add a video prompt first'); return; }
+
+  const btn = document.getElementById('cs-hf-generate-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Submitting to Higgsfield…';
+
+  const statusEl = document.getElementById('cs-hf-status');
+  statusEl.style.display = 'block';
+  statusEl.textContent = 'Sending request to Higgsfield API…';
+
+  try {
+    // Build request body based on whether we have a reference image
+    const reqBody = {
+      prompt: prompt_text,
+      aspect_ratio: aspect,
+      duration: duration,
+      ...(csRefImageBase64 && {
+        image: csRefImageBase64,
+        image_type: csRefImageType || 'image/jpeg'
+      })
+    };
+
+    const res = await fetch(`https://api.higgsfield.ai/v1/generation`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${hfKey}`,
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: JSON.stringify(reqBody)
+    });
+
+    if (res.status === 401) throw new Error('Invalid Higgsfield API key. Check your key at higgsfield.ai/dashboard');
+    if (!res.ok) {
+      const errData = await res.json().catch(()=>({}));
+      // Higgsfield endpoint may differ — show the curl command as fallback
+      throw new Error(errData.message || errData.error || `Higgsfield API error ${res.status}`);
+    }
+
+    const data = await res.json();
+    const jobId = data.id || data.job_id || data.generation_id || JSON.stringify(data).substring(0,100);
+    csVideoJobId = jobId;
+
+    statusEl.innerHTML = `
+      <div style="color:#4ade80;font-weight:600;margin-bottom:8px">✓ Video generation started!</div>
+      <div style="font-size:11px;color:#aaa">Job ID: ${jobId}</div>
+      <div style="margin-top:10px;font-size:12px;color:#ccc">Check status at: <a href="https://higgsfield.ai/dashboard" target="_blank" style="color:#f59e0b">higgsfield.ai/dashboard</a></div>
+      ${data.url ? `<div style="margin-top:10px"><a href="${data.url}" target="_blank" style="color:#f59e0b;font-weight:600">▶ Watch Video →</a></div>` : ''}`;
+    showToast('🎬', 'Video submitted to Higgsfield!');
+
+  } catch(err) {
+    // Show the curl command as a fallback so Ian can run it manually
+    const curlCmd = `curl -X POST https://api.higgsfield.ai/v1/generation \\
+  -H "Authorization: Bearer ${hfKey.substring(0,8)}..." \\
+  -H "Content-Type: application/json" \\
+  -d '{"prompt": "${prompt_text.replace(/'/g,'"').substring(0,200)}", "aspect_ratio": "${aspect}", "duration": ${duration}}'`;
+
+    statusEl.innerHTML = `
+      <div style="color:#f87171;font-weight:600;margin-bottom:6px">API error: ${err.message}</div>
+      <div style="font-size:11px;color:#aaa;margin-bottom:8px">The Higgsfield endpoint may require different authentication. Try the curl command below or use their web app directly.</div>
+      <div style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;padding:10px;font-family:monospace;font-size:11px;color:#ccc;white-space:pre-wrap;word-break:break-all">${curlCmd}</div>
+      <div style="margin-top:10px;font-size:12px"><a href="https://higgsfield.ai" target="_blank" style="color:#f59e0b">Open Higgsfield →</a> and paste the prompt manually.</div>`;
+    showToast('⚠', 'Higgsfield API — see fallback instructions');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🎬 Generate Video';
+  }
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeContentStudio(); }
+});
+</script>
+
+<!-- ── CONTENT STUDIO MODAL ─────────────────────────────────────────── -->
+<style>
+.cs-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.cs-overlay.show{display:flex}
+.cs-modal{background:#111;border:1px solid #2a2a2a;border-radius:12px;width:860px;max-width:98vw;box-shadow:0 32px 100px rgba(0,0,0,.8);position:relative}
+.cs-modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid #2a2a2a}
+.cs-modal-head h2{font-size:15px;font-weight:700;color:#f0f0f0}
+.cs-modal-head h2 span{color:#f59e0b}
+.cs-close{background:none;border:none;color:#666;font-size:18px;cursor:pointer;padding:0;line-height:1}
+.cs-close:hover{color:#f0f0f0}
+.cs-body{padding:20px 22px}
+.cs-section{margin-bottom:18px}
+.cs-label{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.07em;font-family:'SF Mono',monospace;margin-bottom:8px}
+.cs-pills{display:flex;flex-wrap:wrap;gap:6px}
+.cs-pill{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid #2a2a2a;background:#181818;color:#888;transition:all .12s;user-select:none}
+.cs-pill:hover{border-color:#444;color:#ccc}
+.cs-pill.active{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.5);color:#f59e0b}
+.cs-brand-pill.active{border-color:var(--bp-color,rgba(245,158,11,.5));color:var(--bp-color,#f59e0b)}
+.cs-input{width:100%;background:#181818;border:1px solid #2a2a2a;border-radius:6px;color:#f0f0f0;font-size:13px;padding:9px 12px;font-family:inherit;transition:border-color .12s;resize:vertical}
+.cs-input:focus{outline:none;border-color:#f59e0b;box-shadow:0 0 0 2px rgba(245,158,11,.12)}
+.cs-select{width:100%;background:#181818;border:1px solid #2a2a2a;border-radius:6px;color:#f0f0f0;font-size:13px;padding:8px 10px;font-family:inherit}
+.cs-select:focus{outline:none;border-color:#f59e0b}
+.cs-img-zone{border:1px dashed #2a2a2a;border-radius:8px;padding:14px;text-align:center;cursor:pointer;transition:all .12s;background:#0d0d0d}
+.cs-img-zone:hover{border-color:#f59e0b;background:rgba(245,158,11,.04)}
+.cs-img-zone label{cursor:pointer;font-size:12px;color:#666}
+.cs-img-zone label:hover{color:#aaa}
+.cs-img-preview-wrap{position:relative;display:inline-block;margin-top:8px}
+.cs-img-preview{max-height:80px;border-radius:6px;border:1px solid #2a2a2a}
+.cs-img-clear{position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:#181818;border:1px solid #2a2a2a;border-radius:50%;color:#888;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cs-img-clear:hover{color:#f87171}
+.cs-form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cs-generate-btn{width:100%;padding:12px;background:#f59e0b;color:#000;font-size:14px;font-weight:700;border:none;border-radius:8px;cursor:pointer;transition:all .15s;margin-top:4px}
+.cs-generate-btn:hover{background:#fbbf24}
+.cs-generate-btn:disabled{background:#444;color:#888;cursor:not-allowed}
+/* Result panel */
+.cs-result-head{padding:16px 22px;border-bottom:1px solid #2a2a2a;display:flex;justify-content:space-between;align-items:center}
+.cs-result-tabs{display:flex;gap:0;border-bottom:1px solid #2a2a2a}
+.cs-result-tab{padding:10px 18px;font-size:12px;font-weight:600;cursor:pointer;color:#666;border-bottom:2px solid transparent;transition:all .12s;text-transform:uppercase;letter-spacing:.06em}
+.cs-result-tab:hover{color:#ccc}
+.cs-result-tab.active{color:#f59e0b;border-bottom-color:#f59e0b}
+.cs-result-body{padding:16px 22px}
+.cs-out{font-size:12.5px;color:#ccc;line-height:1.7;white-space:pre-wrap;background:#0d0d0d;border:1px solid #1e1e1e;border-radius:8px;padding:14px;min-height:200px;max-height:380px;overflow-y:auto;font-family:'SF Mono','Fira Code',monospace}
+.cs-out-actions{display:flex;gap:8px;margin-top:8px}
+.cs-btn{padding:6px 12px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid #2a2a2a;background:#181818;color:#ccc;transition:all .12s}
+.cs-btn:hover{background:#202020;color:#f0f0f0}
+.cs-btn-accent{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.3);color:#f59e0b}
+.cs-btn-accent:hover{background:rgba(245,158,11,.25)}
+.cs-hf-panel{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:14px;margin-top:14px}
+.cs-hf-label{font-size:11px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.cs-hf-status{display:none;margin-top:12px;padding:12px;background:#111;border:1px solid #2a2a2a;border-radius:6px;font-size:12px}
+.cs-cb-group{display:flex;flex-wrap:wrap;gap:8px}
+.cs-cb-item{display:flex;align-items:center;gap:5px;padding:5px 10px;background:#181818;border:1px solid #2a2a2a;border-radius:6px;cursor:pointer;font-size:12px;color:#888}
+.cs-cb-item:hover{border-color:#444;color:#ccc}
+.cs-cb-item input{accent-color:#f59e0b;cursor:pointer}
+.cs-divider{height:1px;background:#1e1e1e;margin:14px 0}
+</style>
+
+<div id="contentStudio" class="cs-overlay">
+  <div class="cs-modal">
+    <div class="cs-modal-head">
+      <h2>🎬 <span>Content Studio</span> — <span id="cs-skill-name" style="color:#888;font-weight:500;font-size:13px">Full Pipeline</span></h2>
+      <button class="cs-close" onclick="closeContentStudio()">✕</button>
+    </div>
+
+    <!-- INPUT PANEL -->
+    <div id="cs-panel-input">
+      <div class="cs-body">
+        <input type="hidden" id="cs-focus" value="all">
+
+        <!-- Brand -->
+        <div class="cs-section">
+          <div class="cs-label">Brand</div>
+          <div class="cs-pills">
+            <div class="cs-pill cs-brand-pill active" data-brand="ethospheres" style="--bp-color:#d53f8c" onclick="csSelectBrand('ethospheres')" onmouseenter="this.style.setProperty('--bp-color','#d53f8c')">🧴 Ethospheres</div>
+            <div class="cs-pill cs-brand-pill" data-brand="veta" style="--bp-color:#4ade80" onclick="csSelectBrand('veta')">🏢 Veta / Ian</div>
+            <div class="cs-pill cs-brand-pill" data-brand="athlos" style="--bp-color:#a855f7" onclick="csSelectBrand('athlos')">🏆 ATHLOS</div>
+            <div class="cs-pill cs-brand-pill" data-brand="autoflow" style="--bp-color:#60a5fa" onclick="csSelectBrand('autoflow')">🤖 AutoFlow</div>
+            <div class="cs-pill cs-brand-pill" data-brand="custom" style="--bp-color:#f59e0b" onclick="csSelectBrand('custom')">✏️ Custom</div>
+          </div>
+          <div id="cs-brand-hint" style="display:block;font-size:11px;color:#555;margin-top:6px">Ethosome skincare brand · Cosmesotherapy · Clinic-first · Science-backed · Pre-launch.</div>
+          <div id="cs-custom-brand" style="display:none;margin-top:8px">
+            <div class="cs-form-row">
+              <input class="cs-input" id="cs-custom-brand-name" placeholder="Brand name…" style="min-height:unset;resize:none">
+              <input class="cs-input" id="cs-custom-brand-desc" placeholder="Brand description + visual style…" style="min-height:unset;resize:none">
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-form-row">
+          <!-- Platforms -->
+          <div class="cs-section">
+            <div class="cs-label">Platform(s) <span style="color:#555;font-weight:400;text-transform:none">(multi-select)</span></div>
+            <div class="cs-pills" style="gap:5px">
+              <div class="cs-pill cs-platform-pill active" onclick="csTogglePlatform(this)">Instagram</div>
+              <div class="cs-pill cs-platform-pill" onclick="csTogglePlatform(this)">LinkedIn</div>
+              <div class="cs-pill cs-platform-pill" onclick="csTogglePlatform(this)">TikTok</div>
+              <div class="cs-pill cs-platform-pill" onclick="csTogglePlatform(this)">Twitter/X</div>
+              <div class="cs-pill cs-platform-pill" onclick="csTogglePlatform(this)">YouTube</div>
+            </div>
+          </div>
+
+          <!-- Content type -->
+          <div class="cs-section">
+            <div class="cs-label">Content Type</div>
+            <select class="cs-select" id="cs-content-type">
+              <option value="Image Post">Image Post</option>
+              <option value="Reel / Video">Reel / Video</option>
+              <option value="Carousel">Carousel (multi-slide)</option>
+              <option value="Story">Story</option>
+              <option value="Thread">Thread</option>
+              <option value="Short-Form Script">Short-Form Script</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Topic -->
+        <div class="cs-section">
+          <div class="cs-label">Topic / Idea <span style="color:#555;font-weight:400;text-transform:none">(1–3 sentences — the more specific, the better)</span></div>
+          <textarea class="cs-input" id="cs-topic" rows="2" placeholder="e.g. 'The science behind why ethosome delivery penetrates skin 10× deeper than standard serums' or 'ATHLOS launch — AI knows every athlete's body better than they do'"></textarea>
+        </div>
+
+        <div class="cs-form-row">
+          <!-- Style/mood -->
+          <div class="cs-section">
+            <div class="cs-label">Visual Style / Mood <span style="color:#555;font-weight:400;text-transform:none">(keywords)</span></div>
+            <input class="cs-input" id="cs-style" placeholder="e.g. cinematic dark moody, or clean minimal professional" style="min-height:unset;resize:none">
+          </div>
+
+          <!-- Extra context -->
+          <div class="cs-section">
+            <div class="cs-label">Extra Context <span style="color:#555;font-weight:400;text-transform:none">(optional)</span></div>
+            <input class="cs-input" id="cs-extras" placeholder="Any specific angle, CTA, product feature, event…" style="min-height:unset;resize:none">
+          </div>
+        </div>
+
+        <!-- Image models -->
+        <div class="cs-section">
+          <div class="cs-label">Image Prompt Output For <span style="color:#555;font-weight:400;text-transform:none">(check all you use)</span></div>
+          <div class="cs-cb-group">
+            <label class="cs-cb-item"><input type="checkbox" class="cs-img-model-cb" value="midjourney" checked> Midjourney</label>
+            <label class="cs-cb-item"><input type="checkbox" class="cs-img-model-cb" value="dalle"> DALL-E 3</label>
+            <label class="cs-cb-item"><input type="checkbox" class="cs-img-model-cb" value="flux" checked> Flux 1.1 Pro</label>
+            <label class="cs-cb-item"><input type="checkbox" class="cs-img-model-cb" value="sd"> Stable Diffusion XL</label>
+          </div>
+        </div>
+
+        <!-- Reference image -->
+        <div class="cs-section">
+          <div class="cs-label">Reference Image <span style="color:#555;font-weight:400;text-transform:none">(optional — guides visual style)</span></div>
+          <div class="cs-img-zone" onclick="document.getElementById('cs-ref-upload').click()">
+            <input type="file" id="cs-ref-upload" accept="image/*" style="display:none" onchange="csHandleImageUpload(this)">
+            <div id="cs-img-drop-label">📎 Drop image or click to upload</div>
+            <div id="cs-img-preview-wrap" style="display:none">
+              <img id="cs-img-preview" class="cs-img-preview">
+              <div class="cs-img-clear" onclick="event.stopPropagation();csClearImage()">✕</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="padding:0 22px 20px">
+        <button class="cs-generate-btn" id="cs-generate-btn" onclick="csGenerate()">⚡ Generate Content</button>
+      </div>
+    </div>
+
+    <!-- RESULT PANEL -->
+    <div id="cs-panel-result" style="display:none">
+      <div class="cs-result-head">
+        <span style="font-size:13px;font-weight:600;color:#ccc">Content Ready</span>
+        <button class="cs-btn" onclick="csShowPanel('cs-panel-input')">← Edit Brief</button>
+      </div>
+      <div class="cs-result-tabs">
+        <div class="cs-result-tab active" id="cs-tab-copy" onclick="csShowResultTab('copy')">📝 Copy</div>
+        <div class="cs-result-tab" id="cs-tab-image" onclick="csShowResultTab('image')">🖼️ Image Prompts</div>
+        <div class="cs-result-tab" id="cs-tab-video" onclick="csShowResultTab('video')">🎬 Video</div>
+        <div class="cs-result-tab" id="cs-tab-script" onclick="csShowResultTab('script')">🎙 Script</div>
+      </div>
+      <div class="cs-result-body">
+
+        <!-- Copy tab -->
+        <div id="cs-out-copy-wrap">
+          <pre class="cs-out" id="cs-out-copy"></pre>
+          <div class="cs-out-actions">
+            <button class="cs-btn cs-btn-accent" onclick="csCopySection('cs-out-copy')">📋 Copy All</button>
+            <button class="cs-btn" onclick="csGenerate()">↺ Regenerate</button>
+          </div>
+        </div>
+
+        <!-- Image tab -->
+        <div id="cs-out-image-wrap" style="display:none">
+          <pre class="cs-out" id="cs-out-image"></pre>
+          <div class="cs-out-actions">
+            <button class="cs-btn cs-btn-accent" onclick="csCopySection('cs-out-image')">📋 Copy Prompts</button>
+          </div>
+        </div>
+
+        <!-- Video tab -->
+        <div id="cs-out-video-wrap" style="display:none">
+          <pre class="cs-out" id="cs-out-video" style="max-height:200px"></pre>
+          <div class="cs-out-actions">
+            <button class="cs-btn cs-btn-accent" onclick="csCopySection('cs-out-video')">📋 Copy</button>
+          </div>
+
+          <!-- Higgsfield API panel -->
+          <div class="cs-hf-panel">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div class="cs-hf-label" style="margin-bottom:0">🎬 Higgsfield API</div>
+              <a href="https://higgsfield.ai" target="_blank" style="font-size:11px;color:#f59e0b;text-decoration:none">higgsfield.ai →</a>
+            </div>
+            <div class="cs-hf-label">Video Prompt</div>
+            <textarea class="cs-input" id="cs-hf-prompt" rows="3" placeholder="Higgsfield video generation prompt…"></textarea>
+            <div class="cs-form-row" style="margin-top:8px">
+              <div>
+                <div class="cs-hf-label">Model</div>
+                <select class="cs-select" id="cs-hf-model">
+                  <option value="haiper-video-2">Haiper Video 2 — Fast & Cinematic</option>
+                  <option value="runway-gen3">Runway Gen-3 Alpha — Premium</option>
+                  <option value="luma-dream-machine">Luma Dream Machine — Photorealistic</option>
+                  <option value="stable-video">Stable Video Diffusion</option>
+                  <option value="kling-v1">Kling v1.5 — Asian Cinematic</option>
+                </select>
+              </div>
+              <div class="cs-form-row" style="gap:8px">
+                <div>
+                  <div class="cs-hf-label">Aspect</div>
+                  <select class="cs-select" id="cs-hf-aspect">
+                    <option value="9:16">9:16 Vertical</option>
+                    <option value="16:9">16:9 Landscape</option>
+                    <option value="1:1">1:1 Square</option>
+                  </select>
+                </div>
+                <div>
+                  <div class="cs-hf-label">Duration (s)</div>
+                  <select class="cs-select" id="cs-hf-duration">
+                    <option value="3">3s</option>
+                    <option value="4" selected>4s</option>
+                    <option value="5">5s</option>
+                    <option value="6">6s</option>
+                    <option value="8">8s</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <button class="cs-generate-btn" id="cs-hf-generate-btn" onclick="csGenerateHiggsfieldVideo()" style="margin-top:10px;padding:10px">🎬 Generate Video with Higgsfield</button>
+            <div id="cs-hf-status" class="cs-hf-status"></div>
+          </div>
+        </div>
+
+        <!-- Script tab -->
+        <div id="cs-out-script-wrap" style="display:none">
+          <pre class="cs-out" id="cs-out-script"></pre>
+          <div class="cs-out-actions">
+            <button class="cs-btn cs-btn-accent" onclick="csCopySection('cs-out-script')">📋 Copy Script</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
