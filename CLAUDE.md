@@ -79,6 +79,20 @@ Compile a structured markdown report at ./reports/YYYY-MM-DD-daily-briefing.md u
 - If no previous briefing exists, note "First run — no delta available" and proceed
 </memory_instructions>
 
+<obsidian_memory>
+Obsidian vault: /Users/ianveber/Documents/Obsidian Vault
+Memory folder: /Users/ianveber/Documents/Obsidian Vault/_claude-memory/
+
+At the start of EVERY session, before doing anything else, read these three files in order:
+1. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/context.md
+2. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/ethospheres.md
+3. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/decisions-log.md
+
+This restores full working memory of the user's business, active projects, and all decisions already made. Do not ask the user to re-explain context that is already in these files. After reading, confirm with one line: "Memory loaded — [brief summary of what's active]."
+
+When a session produces new decisions, completed tasks, or major project updates — write them to the relevant memory file before ending the session.
+</obsidian_memory>
+
 <error_handling>
 - GitHub API unavailable: log error, skip Step 1, continue with remaining steps
 - Notion sync fails: log error, skip Step 2, continue
@@ -98,3 +112,50 @@ Compile a structured markdown report at ./reports/YYYY-MM-DD-daily-briefing.md u
 5. All actions are logged in the Run Summary section of the daily briefing.
 6. If unsure whether an action is read-only or destructive, treat it as destructive and ask for confirmation.
 </rules>
+
+<memory_update_protocol>
+MANDATORY — apply to EVERY conversation without exception.
+
+SESSION START:
+- Read all 4 files in _claude-memory/ before doing anything else
+- Confirm with: "Memory loaded — [one line summary of what's active]"
+- Never ask Ian to re-explain context already in the memory files
+
+SESSION END (before closing or when Ian says goodbye/done/thanks):
+- Automatically update the relevant memory files with:
+  1. Any new decisions made → decisions-log.md
+  2. Any tasks completed or phase status changes → ethospheres.md (or relevant client file)
+  3. Any new files created (with full paths) → ethospheres.md
+  4. Any new context Ian provided about himself, Veta, or clients → context.md or veta-agency.md
+  5. Update the "Last updated" date at the top of any file that was changed
+- Do this silently and efficiently — do not ask permission, just do it
+- After writing, confirm with: "Memory updated." and list what changed in one line per file
+
+NEW CLIENT OR PROJECT:
+- Create a new memory file: _claude-memory/[client-name].md
+- Follow the same structure as ethospheres.md
+- Add the client to context.md under Active Clients
+
+Memory files (read in this order at session start):
+CORE (read every session):
+- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/🗺️ Master MOC.md       ← START HERE
+- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/context.md
+- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/decisions-log.md
+
+CLIENTS (read when relevant):
+- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/ethospheres.md           ← PRIMARY
+- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/clients/autoflow.md
+- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/clients/other-projects.md
+
+VETA INTERNAL:
+- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-agency.md
+- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-internal/veta-positioning.md
+- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-internal/veta-services.md
+- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-internal/veta-principles.md
+- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-internal/veta-kpis.md
+- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-internal/vertical-aesthetic-medicine.md
+
+KNOWLEDGE BASE:
+- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/knowledge/ethosome-technology.md
+- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/knowledge/geo-strategy.md
+</memory_update_protocol>
