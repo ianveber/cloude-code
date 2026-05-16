@@ -805,7 +805,7 @@ body::before{
     <div class="ig-setup-banner" id="ig-setup-banner">
       <div class="ig-setup-icon">📸</div>
       <div class="ig-setup-title">Connect Instagram</div>
-      <div class="ig-setup-desc">Add your Instagram Business Account ID and Access Token to start posting. Tap ⚙ Setup above.</div>
+      <div class="ig-setup-desc">Connect your Make.com webhook and ImgBB key to start posting. Tap ⚙ Setup above.</div>
       <button class="ig-setup-btn" onclick="igOpenSettings()">Connect Account</button>
     </div>
 
@@ -866,18 +866,15 @@ body::before{
         <button class="ig-modal-close" onclick="igCloseSettings()">✕</button>
       </div>
       <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6">
-        You need a <strong>Business or Creator</strong> Instagram account connected to a Facebook Page, plus a Meta access token.
-        <a href="https://developers.facebook.com/tools/explorer/" target="_blank" style="color:var(--accent)">Get token via Graph API Explorer →</a>
+        Powered by <strong>Make.com</strong> — your webhook receives the post and sends it to Instagram automatically.
       </div>
-      <label class="mp-label">Instagram Business Account ID</label>
-      <input class="mp-input" id="ig-account-id-input" placeholder="e.g. 17841400000000000" style="margin-bottom:12px">
-      <label class="mp-label">Access Token</label>
-      <input class="mp-input" id="ig-token-input" placeholder="EAAxxxxxxx…" style="margin-bottom:4px">
-      <div style="font-size:11px;color:var(--text3);margin-bottom:16px">Stored only in your browser localStorage.</div>
-      <label class="mp-label">Imgur Client ID (for image uploads)</label>
+      <label class="mp-label">Make.com Webhook URL</label>
+      <input class="mp-input" id="ig-webhook-input" placeholder="https://hook.eu2.make.com/…" style="margin-bottom:4px">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:16px">From your Make.com scenario → Webhooks module → copy URL.</div>
+      <label class="mp-label">ImgBB API Key (for image uploads)</label>
       <input class="mp-input" id="ig-imgur-id-input" placeholder="e.g. abc123def456" style="margin-bottom:4px">
       <div style="font-size:11px;color:var(--text3);margin-bottom:20px">
-        Free at <a href="https://api.imgur.com/oauth2/addclient" target="_blank" style="color:var(--accent)">api.imgur.com/oauth2/addclient</a> — choose "Anonymous usage".
+        Free at <a href="https://api.imgbb.com/" target="_blank" style="color:var(--accent)">api.imgbb.com</a> — sign up and grab your API key.
       </div>
       <button class="ig-post-btn" onclick="igSaveSettings()" style="font-size:14px;padding:13px">Save &amp; Connect</button>
     </div>
@@ -3755,15 +3752,13 @@ if ('serviceWorker' in navigator) {
 
 function igGetConfig() {
   return {
-    accountId: localStorage.getItem('ig_account_id') || '',
-    token:     localStorage.getItem('ig_token') || '',
-    imgurId:   localStorage.getItem('ig_imgur_id') || ''
+    webhook:  localStorage.getItem('ig_webhook') || '',
+    imgbbKey: localStorage.getItem('ig_imgbb_key') || ''
   };
 }
 
 function igIsConfigured() {
-  const c = igGetConfig();
-  return !!(c.accountId && c.token);
+  return !!localStorage.getItem('ig_webhook');
 }
 
 function igCheckSetup() {
@@ -3775,9 +3770,8 @@ function igCheckSetup() {
 
 function igOpenSettings() {
   const c = igGetConfig();
-  document.getElementById('ig-account-id-input').value = c.accountId;
-  document.getElementById('ig-token-input').value = c.token;
-  document.getElementById('ig-imgur-id-input').value = c.imgurId;
+  document.getElementById('ig-webhook-input').value = c.webhook;
+  document.getElementById('ig-imgur-id-input').value = c.imgbbKey;
   document.getElementById('ig-modal').style.display = 'flex';
 }
 
@@ -3788,13 +3782,11 @@ function igCloseSettings(e) {
 }
 
 function igSaveSettings() {
-  const accountId = document.getElementById('ig-account-id-input').value.trim();
-  const token     = document.getElementById('ig-token-input').value.trim();
-  const imgurId   = document.getElementById('ig-imgur-id-input').value.trim();
-  if (!accountId || !token) { showToast('⚠', 'Account ID and Access Token are required'); return; }
-  localStorage.setItem('ig_account_id', accountId);
-  localStorage.setItem('ig_token', token);
-  if (imgurId) localStorage.setItem('ig_imgur_id', imgurId);
+  const webhook  = document.getElementById('ig-webhook-input').value.trim();
+  const imgbbKey = document.getElementById('ig-imgur-id-input').value.trim();
+  if (!webhook) { showToast('⚠', 'Make.com Webhook URL is required'); return; }
+  localStorage.setItem('ig_webhook', webhook);
+  if (imgbbKey) localStorage.setItem('ig_imgbb_key', imgbbKey);
   document.getElementById('ig-modal').style.display = 'none';
   igCheckSetup();
   showToast('✓', 'Instagram connected!');
@@ -3812,16 +3804,16 @@ function igFileSelected(input) {
     img.src = e.target.result;
     img.style.display = 'block';
     document.getElementById('ig-drop-placeholder').style.display = 'none';
-    igUploadToImgur(file);
+    igUploadToImgbb(file);
   };
   reader.readAsDataURL(file);
 }
 
-async function igUploadToImgur(file) {
+async function igUploadToImgbb(file) {
   const status = document.getElementById('ig-upload-status');
-  const { imgurId } = igGetConfig();
-  if (!imgurId) {
-    status.textContent = '⚠ No Imgur Client ID — add one in ⚙ Setup to enable posting';
+  const { imgbbKey } = igGetConfig();
+  if (!imgbbKey) {
+    status.textContent = '⚠ No ImgBB API key — add one in ⚙ Setup to enable posting';
     status.style.color = 'var(--red)';
     return;
   }
@@ -3830,14 +3822,13 @@ async function igUploadToImgur(file) {
   try {
     const formData = new FormData();
     formData.append('image', file);
-    const res = await fetch('https://api.imgur.com/3/image', {
+    const res = await fetch('https://api.imgbb.com/1/upload?key=' + imgbbKey, {
       method: 'POST',
-      headers: { Authorization: 'Client-ID ' + imgurId },
       body: formData
     });
     const data = await res.json();
-    if (!data.success) throw new Error(data.data?.error || 'Upload failed');
-    igPublicImageUrl = data.data.link;
+    if (!data.success) throw new Error(data.error?.message || 'Upload failed');
+    igPublicImageUrl = data.data.url;
     status.textContent = '✓ Photo ready';
     status.style.color = 'var(--green)';
   } catch (err) {
@@ -3906,7 +3897,7 @@ Return ONLY the caption text (no quotes, no explanation). Then on a new line sta
 
 // ── Post to Instagram ───────────────────────────────────────
 async function igPost() {
-  const { accountId, token } = igGetConfig();
+  const { webhook } = igGetConfig();
   if (!igPublicImageUrl) { showToast('⚠', 'Select a photo first'); return; }
   const caption = document.getElementById('ig-caption').value.trim();
   const hashtags = document.getElementById('ig-hashtags').value.trim();
@@ -3917,34 +3908,20 @@ async function igPost() {
   const label = document.getElementById('ig-post-label');
   const status = document.getElementById('ig-post-status');
   btn.disabled = true;
-  label.textContent = '⏳ Creating post…';
-  status.textContent = '';
+  label.textContent = '⏳ Sending to Instagram…';
+  status.textContent = 'Firing Make.com webhook…';
 
   try {
-    // Step 1: Create media container
-    status.textContent = '1/2 Uploading to Instagram…';
-    const containerRes = await fetch(`https://graph.facebook.com/v19.0/${accountId}/media`, {
+    const res = await fetch(webhook, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image_url: igPublicImageUrl, caption: fullCaption, access_token: token })
+      body: JSON.stringify({ image_url: igPublicImageUrl, caption: fullCaption })
     });
-    const container = await containerRes.json();
-    if (container.error) throw new Error(container.error.message);
-    const containerId = container.id;
-
-    // Step 2: Publish
-    status.textContent = '2/2 Publishing…';
-    const publishRes = await fetch(`https://graph.facebook.com/v19.0/${accountId}/media_publish`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ creation_id: containerId, access_token: token })
-    });
-    const published = await publishRes.json();
-    if (published.error) throw new Error(published.error.message);
+    if (!res.ok) throw new Error('Webhook returned ' + res.status);
 
     // Save to history
     const history = JSON.parse(localStorage.getItem('ig_history') || '[]');
-    history.unshift({ id: published.id, imageUrl: igPublicImageUrl, caption: fullCaption, ts: Date.now() });
+    history.unshift({ imageUrl: igPublicImageUrl, caption: fullCaption, ts: Date.now() });
     localStorage.setItem('ig_history', JSON.stringify(history.slice(0, 20)));
 
     status.textContent = '✓ Posted!';
