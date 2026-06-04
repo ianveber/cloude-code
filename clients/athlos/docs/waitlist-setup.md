@@ -119,6 +119,28 @@ Beehiiv (the Sheet is the signup log; Beehiiv is the source of truth for confirm
 
 ---
 
+## Step 4 — Confirmed-status webhook (recommended)
+
+When someone completes double opt-in, Beehiiv pings ATHLOS so the Google Sheet
+flips their row from `pending` to `confirmed` (with a `confirmed_at` timestamp).
+Built and ready — just wire it:
+
+1. Pick a random secret and set it in `.env.local`:
+   ```
+   BEEHIIV_WEBHOOK_SECRET=some-long-random-string
+   ```
+2. In Beehiiv → Settings → Integrations → **Webhooks**, create a webhook:
+   - Event: **subscription.confirmed**
+   - URL: `https://<your-deployed-app>/api/esp-webhook?secret=some-long-random-string`
+3. Done. On each confirmation the endpoint finds the email in the Sheet and sets
+   `status = confirmed`. (Locally, with no secret set, the endpoint accepts any
+   POST so you can test it.)
+
+> Beehiiv doesn't sign webhooks, so the `?secret=` in the URL is the guard — keep
+> that URL private.
+
+---
+
 ## Launch — turning on membership purchases (later)
 
 The Stripe hook is built and gated. When the app drops:
@@ -134,7 +156,7 @@ waitlist" message — safe to leave deployed.
 
 ---
 
-## Optional follow-ups (not built yet — ask me)
-- **Confirmed-status sync:** a Beehiiv webhook → flip the Sheet row to `confirmed`.
-- **Privacy page** + link it into the consent checkbox.
-- **Full Stripe checkout** wiring (button → checkout → webhook → Supabase) at launch.
+## Optional follow-ups
+- ✅ **Confirmed-status sync** — built (Step 4): Beehiiv webhook flips the Sheet row to `confirmed`.
+- ✅ **Privacy page** (`/zasebnost`) — built + linked from the consent checkbox and footer.
+- **Full Stripe checkout** wiring (button → checkout → webhook → Supabase) at launch — ask me when you're ready.
