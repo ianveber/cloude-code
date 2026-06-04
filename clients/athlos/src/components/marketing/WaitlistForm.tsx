@@ -108,7 +108,16 @@ export default function WaitlistForm({
           aria-label="Soglasje za e-pošto"
         />
         <span>
-          Strinjam se, da mi ATHLOS pošilja e-pošto (nasveti za pripravo + novice o lansiranju). Odjava kadarkoli.
+          Strinjam se, da mi ATHLOS pošilja e-pošto (nasveti za pripravo + novice o lansiranju).{" "}
+          <a
+            href="/zasebnost"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Politika zasebnosti
+          </a>
+          . Odjava kadarkoli.
         </span>
       </label>
       {status === "error" && <div className="wl-error">{message}</div>}
