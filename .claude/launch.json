@@ -92,6 +92,19 @@
       "runtimeExecutable": "sh",
       "runtimeArgs": ["-c", "cd clients/athlos && bun run dev"],
       "port": 3001
+    },
+    {
+      "name": "grafy",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["clients/grafy/server.mjs"],
+      "env": { "PORT": "8781" },
+      "port": 8781
+    },
+    {
+      "name": "inspectus-os",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd inspectus-os && bun run dev"],
+      "port": 3020
     }
   ]
 }
