@@ -15,24 +15,50 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+  /* ——— DEPTH & GLASS · royal blue dimensional variant ——— */
+  @property --ring-angle{syntax:"<angle>";initial-value:0deg;inherits:false}
   :root{
     --blue:#2342ff;
+    --blue-deep:#1b35d6;
     --blue-soft:rgba(35,66,255,.08);
     --ink:#1a1d24;
     --gray:#5a6172;
     --line:#e3e6ee;
-    --bg:#f4f6fb;
+    /* layered shadow recipes — soft, deep, premium */
+    --shadow-sm:
+      0 1px 2px rgba(26,29,36,.05),
+      0 3px 6px rgba(26,29,36,.04),
+      0 8px 18px rgba(35,66,255,.05);
+    --shadow-md:
+      0 1px 2px rgba(26,29,36,.05),
+      0 4px 10px rgba(26,29,36,.05),
+      0 14px 28px rgba(26,29,36,.06),
+      0 28px 56px rgba(35,66,255,.08);
+    --shadow-lg:
+      0 2px 4px rgba(26,29,36,.06),
+      0 8px 16px rgba(26,29,36,.07),
+      0 24px 48px rgba(26,29,36,.10),
+      0 48px 96px rgba(35,66,255,.14);
+    --glass-bg:rgba(255,255,255,.55);
+    --glass-line:rgba(227,230,238,.9);
+    --glass-edge:inset 0 1px 0 rgba(255,255,255,.85);
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{height:100%}
+  html{overflow-x:hidden}
   body{
     font-family:'Inter',system-ui,-apple-system,sans-serif;
     color:var(--ink);
     background-color:#fff;
     -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
   }
-  body::before{
-    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+
+  /* ——— depth stack: grid (far) → squares (mid) → content (near) ——— */
+  .bg{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+  .layer{position:absolute;inset:-64px;will-change:transform}
+  .grid-lines{
+    position:absolute;inset:0;
     background-image:
       linear-gradient(var(--line) 1px,transparent 1px),
       linear-gradient(90deg,var(--line) 1px,transparent 1px);
@@ -40,10 +66,9 @@
     -webkit-mask-image:radial-gradient(120% 90% at 50% 42%,#000 25%,transparent 78%);
     mask-image:radial-gradient(120% 90% at 50% 42%,#000 25%,transparent 78%);
   }
-  .bg{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
   .bg-glow{
     position:absolute;inset:0;
-    background-image:radial-gradient(240px circle at var(--mx,-500px) var(--my,-500px),rgba(35,66,255,.07),transparent 70%);
+    background-image:radial-gradient(260px circle at var(--mx,-500px) var(--my,-500px),rgba(35,66,255,.08),transparent 70%);
   }
   .bg-glow::after{
     content:"";position:absolute;inset:0;
@@ -54,36 +79,62 @@
     -webkit-mask-image:radial-gradient(190px circle at var(--mx,-500px) var(--my,-500px),#000 0%,transparent 100%);
     mask-image:radial-gradient(190px circle at var(--mx,-500px) var(--my,-500px),#000 0%,transparent 100%);
   }
-  .sq{position:absolute;width:56px;height:56px;background:var(--blue-soft);border:1px solid rgba(35,66,255,.14);animation:floatsq 9s ease-in-out infinite alternate}
-  .sq1{left:112px;top:168px}
-  .sq2{right:168px;top:392px;animation-duration:12s;animation-delay:-3s;background:rgba(35,66,255,.05)}
-  .sq3{left:280px;bottom:120px;animation-duration:14s;animation-delay:-6s;background:rgba(35,66,255,.06)}
-  @keyframes floatsq{from{transform:translateY(0)}to{transform:translateY(-16px)}}
+  /* mid-layer floating glass squares */
+  .sq{
+    position:absolute;width:60px;height:60px;border-radius:12px;
+    background:rgba(35,66,255,.06);
+    border:1px solid rgba(35,66,255,.16);
+    box-shadow:var(--glass-edge),0 12px 28px rgba(35,66,255,.08);
+    -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+    animation:floatsq 9s ease-in-out infinite alternate;
+  }
+  .sq1{left:120px;top:180px}
+  .sq2{right:180px;top:420px;animation-duration:12s;animation-delay:-3s;background:rgba(35,66,255,.04);width:44px;height:44px}
+  .sq3{left:300px;bottom:130px;animation-duration:14s;animation-delay:-6s;background:rgba(35,66,255,.05);width:76px;height:76px;border-radius:16px}
+  @keyframes floatsq{from{transform:translateY(0) rotate(0deg)}to{transform:translateY(-18px) rotate(2deg)}}
+
+  /* ——— film grain over everything ——— */
+  .grain{
+    position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size:180px 180px;
+  }
+
+  /* ——— frosted lang toggle ——— */
   .lang-toggle{
     position:fixed;top:24px;right:24px;z-index:10;
     display:flex;gap:2px;padding:3px;
-    background:#fff;border:1px solid var(--line);border-radius:999px;
-    box-shadow:0 2px 12px rgba(26,29,36,.06);
+    background:var(--glass-bg);
+    -webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5);
+    border:1px solid var(--glass-line);border-radius:999px;
+    box-shadow:var(--glass-edge),0 2px 6px rgba(26,29,36,.05),0 10px 24px rgba(35,66,255,.08);
   }
   .lang-toggle button{
     border:0;background:transparent;cursor:pointer;
     font:inherit;font-size:13px;font-weight:600;color:var(--gray);
     padding:5px 12px;border-radius:999px;
+    transition:color .15s;
   }
-  .lang-toggle button.active{background:var(--blue);color:#fff}
+  .lang-toggle button.active{
+    background:var(--blue);color:#fff;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 2px 8px rgba(35,66,255,.45);
+  }
+
+  /* ——— hero ——— */
   .hero{
     min-height:100vh;min-height:100svh;
     max-width:1100px;margin:0 auto;
     display:grid;grid-template-columns:1.15fr .85fr;
     align-items:center;gap:72px;
     padding:64px 36px;
+    will-change:transform;
   }
   .kicker{
     display:inline-flex;align-items:center;gap:10px;
     font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
     color:var(--blue);margin-bottom:20px;
   }
-  .kicker::before{content:"";width:28px;height:2px;background:var(--blue);border-radius:2px}
+  .kicker::before{content:"";width:28px;height:2px;background:var(--blue);border-radius:2px;box-shadow:0 2px 6px rgba(35,66,255,.4)}
   h1{font-size:clamp(34px,4.6vw,54px);font-weight:800;letter-spacing:-.02em;line-height:1.05}
   .lead{
     font-size:clamp(18px,2vw,22px);font-weight:600;margin-top:14px;
@@ -96,27 +147,57 @@
   }
   @keyframes sheen{to{background-position:-200% center}}
   .bio{font-size:16px;line-height:1.65;color:var(--gray);margin-top:16px;max-width:52ch}
+
+  /* glass project chips */
   .projects{list-style:none;display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
   .projects li{
     display:flex;align-items:baseline;gap:8px;
-    background:#fff;border:1px solid var(--line);border-radius:999px;
+    background:var(--glass-bg);
+    -webkit-backdrop-filter:blur(12px) saturate(1.5);backdrop-filter:blur(12px) saturate(1.5);
+    border:1px solid var(--glass-line);border-radius:999px;
     padding:8px 16px;font-size:14px;
+    box-shadow:var(--glass-edge),var(--shadow-sm);
+    transition:transform .2s cubic-bezier(.16,1,.3,1),box-shadow .2s,border-color .2s;
+  }
+  .projects li:hover{
+    transform:translateY(-2px);
+    border-color:rgba(35,66,255,.35);
+    box-shadow:var(--glass-edge),var(--shadow-md);
   }
   .projects li strong{font-weight:700}
   .projects li span{color:var(--gray);font-size:13px}
+
+  /* CTA — primary stays solid royal blue */
   .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
   .btn{
     display:inline-flex;align-items:center;gap:8px;
     padding:12px 22px;border-radius:999px;
     font-size:15px;font-weight:600;text-decoration:none;
-    border:1.5px solid var(--line);color:var(--ink);background:#fff;
-    transition:border-color .15s,background .15s,color .15s,transform .15s;
+    border:1px solid var(--glass-line);color:var(--ink);
+    background:var(--glass-bg);
+    -webkit-backdrop-filter:blur(12px) saturate(1.5);backdrop-filter:blur(12px) saturate(1.5);
+    box-shadow:var(--glass-edge),var(--shadow-sm);
+    transition:border-color .15s,background .15s,color .15s,transform .15s,box-shadow .2s;
   }
-  .btn:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-1px)}
-  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
-  .btn.primary:hover{background:#1b35d6;color:#fff}
+  .btn:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-1px);box-shadow:var(--glass-edge),var(--shadow-md)}
+  .btn.primary{
+    background:var(--blue);border-color:var(--blue);color:#fff;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.28),
+      0 2px 4px rgba(35,66,255,.25),
+      0 8px 20px rgba(35,66,255,.35),
+      0 20px 44px rgba(35,66,255,.22);
+  }
+  .btn.primary:hover{
+    background:var(--blue-deep);color:#fff;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.28),
+      0 3px 6px rgba(35,66,255,.3),
+      0 12px 28px rgba(35,66,255,.42),
+      0 26px 56px rgba(35,66,255,.26);
+  }
   .btn svg{width:17px;height:17px;flex:none}
   .btn.pending{opacity:.45;pointer-events:none}
+
+  /* ——— frosted knowledge cards ——— */
   .knowledge{margin-top:40px}
   .knowledge-title{
     font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
@@ -124,32 +205,76 @@
   }
   .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-width:580px}
   .card{
-    display:block;background:#fff;border:1px solid var(--line);border-radius:14px;
+    display:block;border-radius:16px;
+    background:var(--glass-bg);
+    -webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5);
+    border:1px solid var(--glass-line);
     padding:14px 16px;text-decoration:none;color:inherit;
-    transition:border-color .15s,transform .15s,box-shadow .15s;
+    box-shadow:var(--glass-edge),var(--shadow-sm);
+    transition:border-color .2s,transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s;
   }
-  .card:hover{border-color:var(--blue);transform:translateY(-1px);box-shadow:0 8px 24px rgba(26,29,36,.08)}
+  .card:hover{
+    border-color:rgba(35,66,255,.45);
+    transform:translateY(-3px);
+    box-shadow:var(--glass-edge),var(--shadow-md);
+  }
   .card strong{display:block;font-size:14px;font-weight:700;color:var(--ink)}
   .card span{display:block;font-size:12.5px;line-height:1.45;color:var(--gray);margin-top:4px}
   .card .soon{display:inline-block;margin-top:8px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);font-style:normal}
   .card.pending{opacity:.55;pointer-events:none}
-  .portrait{position:relative;justify-self:end;width:min(100%,360px)}
-  .portrait::after{
-    content:"";position:absolute;inset:0;
-    border:2px solid var(--blue);border-radius:28px;
-    transform:translate(14px,14px);z-index:-1;
+
+  /* ——— portrait: backlight + conic ring + deep tilt ——— */
+  .portrait{
+    position:relative;justify-self:end;width:min(100%,360px);
+    transform-style:preserve-3d;
   }
+  /* breathing royal-blue backlight */
+  .portrait .backlight{
+    position:absolute;inset:-28%;z-index:-2;border-radius:50%;
+    background:radial-gradient(closest-side,rgba(35,66,255,.30),rgba(35,66,255,.12) 48%,transparent 72%);
+    animation:breathe 7s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes breathe{
+    0%,100%{transform:scale(.92);opacity:.65}
+    50%{transform:scale(1.08);opacity:1}
+  }
+  /* offset frame → rotating conic royal-blue ring (static blue fallback) */
+  .portrait::after{
+    content:"";position:absolute;inset:0;z-index:-1;
+    border-radius:30px;
+    transform:translate(16px,16px);
+    border:2px solid var(--blue);
+  }
+  @supports ((mask-composite:exclude) or (-webkit-mask-composite:xor)){
+    .portrait::after{
+      border:0;padding:2px;
+      background:conic-gradient(from var(--ring-angle,0deg),
+        #2342ff 0%, #93a5ff 22%, #2342ff 45%, #c3ccff 70%, #2342ff 100%);
+      -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor;
+      mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+      mask-composite:exclude;
+      animation:spin-ring 9s linear infinite;
+    }
+  }
+  @keyframes spin-ring{to{--ring-angle:360deg}}
   .portrait img{
     display:block;width:100%;height:auto;
     border-radius:28px;
-    box-shadow:0 24px 60px rgba(26,29,36,.16);
+    box-shadow:var(--shadow-lg);
   }
+  /* moving specular highlight */
   .portrait .shine{
     position:absolute;inset:0;border-radius:28px;pointer-events:none;
-    background:radial-gradient(420px circle at var(--sx,50%) var(--sy,50%),rgba(255,255,255,.16),transparent 65%);
+    background:radial-gradient(340px circle at var(--sx,50%) var(--sy,50%),
+      rgba(255,255,255,.32),rgba(255,255,255,.06) 42%,transparent 68%);
+    mix-blend-mode:screen;
     opacity:0;transition:opacity .25s;
   }
   .portrait:hover .shine{opacity:1}
+
+  /* ——— entrance ——— */
   .intro>*{animation:rise .7s cubic-bezier(.16,1,.3,1) both}
   .intro>*:nth-child(1){animation-delay:.04s}
   .intro>*:nth-child(2){animation-delay:.1s}
@@ -160,37 +285,46 @@
   .intro>*:nth-child(7){animation-delay:.4s}
   .portrait{animation:rise .8s cubic-bezier(.16,1,.3,1) .12s backwards;will-change:transform}
   @keyframes rise{from{opacity:0;transform:translateY(16px);filter:blur(5px)}to{opacity:1;transform:none;filter:blur(0)}}
+
   @media (prefers-reduced-motion:reduce){
-    .intro>*,.portrait,.sq,.lead{animation:none}
+    .intro>*,.portrait,.sq,.lead,.portrait .backlight,.portrait::after{animation:none}
   }
   @media (max-width:768px){
-    body::before{background-size:44px 44px}
+    .grid-lines,.bg-glow::after{background-size:44px 44px}
     .sq2,.sq3{display:none}
     .sq1{left:44px;top:132px}
     .hero{grid-template-columns:1fr;gap:40px;padding:96px 24px 64px;text-align:center}
     .portrait{order:-1;justify-self:center;width:min(70%,260px)}
     .portrait::after{transform:translate(10px,10px)}
+    .portrait .backlight{inset:-20%}
     .kicker{justify-content:center}
     .bio{margin-left:auto;margin-right:auto}
     .projects,.cta{justify-content:center}
     .knowledge{margin-top:32px}
     .cards{grid-template-columns:1fr;max-width:340px;margin:0 auto}
+    .grain{opacity:.03}
   }
 </style>
 </head>
 <body>
 <div class="bg" aria-hidden="true">
-  <div class="bg-glow" id="bg-glow"></div>
-  <div class="sq sq1"></div>
-  <div class="sq sq2"></div>
-  <div class="sq sq3"></div>
+  <div class="layer" id="layer-grid">
+    <div class="grid-lines"></div>
+    <div class="bg-glow" id="bg-glow"></div>
+  </div>
+  <div class="layer" id="layer-mid">
+    <div class="sq sq1"></div>
+    <div class="sq sq2"></div>
+    <div class="sq sq3"></div>
+  </div>
 </div>
+<div class="grain" aria-hidden="true"></div>
 <nav class="lang-toggle" aria-label="Jezik / Language">
   <button id="btn-sl" class="active" type="button" aria-pressed="true">SL</button>
   <button id="btn-en" type="button" aria-pressed="false">EN</button>
 </nav>
 
-<main class="hero">
+<main class="hero" id="hero">
   <div class="intro">
     <p class="kicker" data-sl="Soustanovitelj · Graditelj" data-en="Co-founder · Builder">Soustanovitelj · Graditelj</p>
     <h1>Ian Tajnšek Veber</h1>
@@ -222,7 +356,8 @@
   </div>
 
   <figure class="portrait">
-    <img src="ian.jpg" alt="Ian Tajnšek Veber" width="800" height="1000" fetchpriority="high">
+    <span class="backlight" aria-hidden="true"></span>
+    <img src="/ian.jpg" alt="Ian Tajnšek Veber" width="800" height="1000" fetchpriority="high">
     <span class="shine" aria-hidden="true"></span>
   </figure>
 </main>
@@ -304,26 +439,49 @@
   const motionOk = matchMedia("(prefers-reduced-motion: no-preference)").matches;
 
   if (fine && motionOk) {
+    // ——— Three-layer eased parallax + cursor grid glow (one rAF loop) ———
+    // Far grid drifts a little, mid squares drift more, content counter-drifts.
+    const PAD = 64;          // layers are inset by -64px so edges never show
+    const F_GRID = 12, F_MID = 26, F_FORE = -9;
     const glow = document.getElementById("bg-glow");
-    let gx = -500, gy = -500, raf = null;
+    const layerGrid = document.getElementById("layer-grid");
+    const layerMid = document.getElementById("layer-mid");
+    const hero = document.getElementById("hero");
+
+    let gx = -500, gy = -500;     // raw cursor for the glow
+    let tx = 0, ty = 0;           // parallax target (-.5 .. .5)
+    let cx = 0, cy = 0;           // eased current
+    let running = false;
+
+    function frame() {
+      cx += (tx - cx) * 0.07;
+      cy += (ty - cy) * 0.07;
+      layerGrid.style.transform = `translate3d(${(cx * F_GRID).toFixed(2)}px,${(cy * F_GRID).toFixed(2)}px,0)`;
+      layerMid.style.transform = `translate3d(${(cx * F_MID).toFixed(2)}px,${(cy * F_MID).toFixed(2)}px,0)`;
+      hero.style.transform = `translate3d(${(cx * F_FORE).toFixed(2)}px,${(cy * F_FORE).toFixed(2)}px,0)`;
+      // compensate glow for layer inset + drift so the lit grid tracks the cursor exactly
+      glow.style.setProperty("--mx", (gx + PAD - cx * F_GRID).toFixed(1) + "px");
+      glow.style.setProperty("--my", (gy + PAD - cy * F_GRID).toFixed(1) + "px");
+      if (Math.abs(tx - cx) + Math.abs(ty - cy) > 0.0004) requestAnimationFrame(frame);
+      else running = false;
+    }
     addEventListener("pointermove", e => {
       gx = e.clientX; gy = e.clientY;
-      raf ??= requestAnimationFrame(() => {
-        glow.style.setProperty("--mx", gx + "px");
-        glow.style.setProperty("--my", gy + "px");
-        raf = null;
-      });
+      tx = e.clientX / innerWidth - 0.5;
+      ty = e.clientY / innerHeight - 0.5;
+      if (!running) { running = true; requestAnimationFrame(frame); }
     }, { passive: true });
 
+    // ——— Portrait: deeper-perspective tilt + moving specular highlight ———
     const portrait = document.querySelector(".portrait");
     const shine = portrait.querySelector(".shine");
     portrait.addEventListener("pointermove", e => {
       const r = portrait.getBoundingClientRect();
       const px = (e.clientX - r.left) / r.width - .5;
       const py = (e.clientY - r.top) / r.height - .5;
-      portrait.style.transform = `perspective(900px) rotateY(${(px * 7).toFixed(2)}deg) rotateX(${(-py * 7).toFixed(2)}deg)`;
-      shine.style.setProperty("--sx", `${50 + px * 80}%`);
-      shine.style.setProperty("--sy", `${50 + py * 80}%`);
+      portrait.style.transform = `perspective(680px) rotateY(${(px * 9).toFixed(2)}deg) rotateX(${(-py * 9).toFixed(2)}deg)`;
+      shine.style.setProperty("--sx", `${50 + px * 90}%`);
+      shine.style.setProperty("--sy", `${50 + py * 90}%`);
     });
     portrait.addEventListener("pointerleave", () => {
       portrait.style.transition = "transform .4s cubic-bezier(.16,1,.3,1)";
@@ -331,6 +489,7 @@
       setTimeout(() => { portrait.style.transition = ""; }, 400);
     });
 
+    // ——— Magnetic buttons ———
     document.querySelectorAll(".btn").forEach(b => {
       b.addEventListener("pointermove", e => {
         if (b.classList.contains("pending")) return;
