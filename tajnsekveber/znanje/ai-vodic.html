@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kako začeti z AI agenti — vodič za podjetja — Ian Tajnšek Veber</title>
+<meta name="description" content="Praktičen vodič za slovenska podjetja: kaj AI agent v resnici je, katerih 5 nalog lahko prevzame ta teden in kako izbrati prvi projekt, ki se splača.">
+<meta property="og:title" content="Kako začeti z AI agenti — vodič za podjetja">
+<meta property="og:description" content="Praktičen vodič za slovenska podjetja: kaj AI agent v resnici je, katerih 5 nalog lahko prevzame ta teden in kako izbrati prvi projekt, ki se splača.">
+<meta property="og:type" content="article">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232342ff'/%3E%3Ctext x='32' y='43' font-family='Inter,Arial,sans-serif' font-size='28' font-weight='800' fill='white' text-anchor='middle'%3EIV%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--blue:#2342ff;--ink:#1a1d24;--gray:#5a6172;--line:#e3e6ee}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:56px 56px;opacity:.5;
+    -webkit-mask-image:radial-gradient(120% 70% at 50% 0%,#000 10%,transparent 70%);
+    mask-image:radial-gradient(120% 70% at 50% 0%,#000 10%,transparent 70%)}
+  .back{position:fixed;top:24px;left:24px;z-index:10;display:inline-flex;align-items:center;gap:8px;
+    background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 16px;
+    font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;box-shadow:0 2px 12px rgba(26,29,36,.06)}
+  .back:hover{border-color:var(--blue);color:var(--blue)}
+  .wrap{max-width:720px;margin:0 auto;padding:110px 24px 80px}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:14px}
+  h1{font-size:clamp(30px,5vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-bottom:14px}
+  .lead{font-size:18px;font-weight:500;color:var(--gray);line-height:1.6;margin-bottom:40px}
+  h2{font-size:22px;font-weight:700;margin:40px 0 12px;display:flex;align-items:center;gap:10px}
+  h2::before{content:"";width:22px;height:3px;background:var(--blue);border-radius:2px;flex:none}
+  p,li{font-size:16px;line-height:1.7;color:var(--gray)}
+  p{margin-bottom:14px}
+  ul,ol{margin:0 0 14px 22px}
+  li{margin-bottom:8px}
+  strong{color:var(--ink);font-weight:600}
+  .box{background:#fff;border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:12px;padding:18px 20px;margin:24px 0}
+  .box p{margin:0}
+  .cta-end{margin-top:56px;padding:28px;border:1px solid var(--line);border-radius:18px;text-align:center;background:#fff}
+  .cta-end p{margin-bottom:16px;color:var(--ink);font-weight:600;font-size:17px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;
+    font-size:15px;font-weight:600;text-decoration:none;border:1.5px solid var(--line);color:var(--ink);background:#fff}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+  .btn:hover{border-color:var(--blue)}
+  .btn.primary:hover{background:#1b35d6;color:#fff}
+  footer{margin-top:40px;text-align:center;font-size:13px;color:var(--gray)}
+  @media(max-width:768px){.wrap{padding-top:96px}}
+</style>
+</head>
+<body>
+<a class="back" href="/">← tajnsekveber.com</a>
+<main class="wrap">
+  <p class="eyebrow">Brezplačno znanje</p>
+  <h1>Kako začeti z AI agenti — vodič za podjetja</h1>
+  <p class="lead">Tvoja ekipa še vedno ročno prepisuje podatke, odgovarja na iste e-maile in sestavlja poročila v Excelu. Velik del tega lahko prevzame AI agent. Tukaj je vodič, kako začeti — brez praznih obljub, s konkretnimi koraki.</p>
+
+  <h2>Kaj je AI agent (in kaj ni)</h2>
+  <p>Chatbot odgovarja na vprašanja. Agent opravi nalogo. To je cela razlika.</p>
+  <p>ChatGPT ti napiše e-mail. Potem ga moraš sam kopirati, poslati in vpisati v CRM. Agent gre korak dlje: prebere e-mail, izvleče podatke, jih vpiše v sistem in ti pripravi odgovor v pregled. Ti samo potrdiš.</p>
+  <p>Agent ima tri stvari, ki jih navaden chatbot nima:</p>
+  <ul>
+    <li><strong>Dostop do tvojih orodij</strong> — e-pošta, Excel, interni sistem, koledar.</li>
+    <li><strong>Jasna pravila</strong> — kaj sme narediti sam in kdaj mora vprašati človeka.</li>
+    <li><strong>Cel proces</strong> — nalogo izpelje od začetka do konca, ne samo enega koraka.</li>
+  </ul>
+  <p>In kaj agent ni: ni čarovnik in ni zamenjava za ekipo. Je digitalni delavec za eno specifično nalogo. Dober agent dela eno stvar zanesljivo, ne sto stvari približno.</p>
+
+  <h2>5 stvari, ki jih agent lahko prevzame ta teden</h2>
+  <p>To ni znanstvena fantastika. To so naloge, ki jih agenti že danes opravljajo v slovenskih podjetjih:</p>
+  <ol>
+    <li><strong>Triaža e-pošte.</strong> Agent prebere vsak nov e-mail, ga razvrsti — stranka, račun, nujno, smeti — in pripravi osnutek odgovora. Ti zjutraj pregledaš in pošlješ.</li>
+    <li><strong>Priprava ponudb in poročil.</strong> Agent vzame podatke iz tvojega sistema in jih zloži v ponudbo ali mesečno poročilo po tvoji predlogi. Iz dveh ur dela nastane pet minut pregleda.</li>
+    <li><strong>Prepisovanje podatkov.</strong> Iz Excela v sistem, iz PDF-ja v tabelo, iz e-maila v CRM. Najbolj dolgočasno delo v podjetju — in najlažje za avtomatizacijo.</li>
+    <li><strong>Povzetki sestankov.</strong> Posnetek sestanka gre noter, ven pridejo sklepi, naloge in roki. Nič več »kdo si je to zapisal?«.</li>
+    <li><strong>Odgovori na ponavljajoča se vprašanja strank.</strong> Če tvoja ekipa desetič ta mesec razlaga isto stvar, lahko to razlaga agent — z istimi informacijami, brez slabe volje.</li>
+  </ol>
+  <p>Primer iz prakse: za slovensko podjetje, ki opravlja preglede vozil, smo zgradili agenta, ki prebere poročilo o pregledu, preveri podatke po vnaprej določenih pravilih in pripravi končni dokument. Delo, ki je prej vzelo ure, zdaj traja minute. Človek samo pregleda in potrdi.</p>
+
+  <h2>Kje začeti: najdi najdražjo ročno nalogo</h2>
+  <p>Najpogostejša napaka: podjetja začnejo pri tehnologiji (»rabimo AI«) namesto pri nalogi (»ta proces nas stane 20 ur na mesec«). Tehnologija je orodje. Naloga je razlog.</p>
+  <div class="box">
+    <p><strong>Moje pravilo: kjer je Excel, je priložnost.</strong> Če nekdo v tvojem podjetju redno ročno prenaša podatke v Excel ali iz njega, je to skoraj vedno prvi kandidat za agenta.</p>
+  </div>
+  <p>Dobro nalogo za avtomatizacijo prepoznaš po treh znakih:</p>
+  <ul>
+    <li><strong>Ponavlja se.</strong> Vsaj 10-krat na mesec, vedno po podobnem vzorcu.</li>
+    <li><strong>Ima jasna pravila.</strong> Če jo lahko razložiš novemu sodelavcu v 15 minutah, jo lahko razložiš tudi agentu.</li>
+    <li><strong>Žre ure.</strong> Seštej: ure na mesec krat urna postavka. Če je številka na letni ravni štirimestna, imaš svoj prvi projekt.</li>
+  </ul>
+  <p>Konkreten izračun: če sodelavec porabi 5 ur na teden za prepisovanje podatkov in te ura njegovega dela stane 25 €, je to čez 500 € na mesec — 6.000 € na leto za nalogo, ki je nihče ne mara. To je tvoja prva številka. Z njo primerjaš strošek avtomatizacije in odločitev postane matematika, ne občutek.</p>
+  <p>Naredi vajo še danes: vprašaj ekipo, katero nalogo najbolj sovražijo. Odgovor je skoraj vedno tudi najboljši kandidat za avtomatizacijo.</p>
+
+  <h2>Kako izgleda dober prvi projekt</h2>
+  <p>Ne začni z »AI strategijo«. Strategija na papirju ne prihrani niti minute. Začni z eno delujočo avtomatizacijo.</p>
+  <p>Dober prvi projekt ima tri lastnosti:</p>
+  <ul>
+    <li><strong>Majhen obseg.</strong> En proces, od začetka do konca. Ne »avtomatizirajmo prodajo«, ampak »avtomatizirajmo pripravo ponudb«.</li>
+    <li><strong>Merljiv rezultat v 2–4 tednih.</strong> Prej toliko ur, zdaj toliko minut. Če rezultata ne moreš izmeriti, projekt ni dobro zastavljen.</li>
+    <li><strong>Človek ostane v zanki.</strong> Agent pripravi, človek potrdi. Posebej na začetku. Zaupanje se gradi postopoma — tako kot pri novem sodelavcu.</li>
+  </ul>
+  <p>Še en primer: izobraževalni program za mlade je vsak teden ročno sestavljal vsebine za objavo in odgovore na prijave. Prvi projekt ni bil »prenova marketinga« — bil je en agent, ki pripravi osnutke, človek pa jih pregleda in objavi. Dva tedna do prvega rezultata. Šele potem je prišel na vrsto naslednji proces.</p>
+  <p>Ko prva avtomatizacija teče, imaš dve stvari: prihranjen čas in izkušnjo, kako to v praksi deluje. Druga naloga gre potem bistveno hitreje, ker sistem že stoji in ker ekipa orodju zaupa.</p>
+
+  <h2>Checklist za prvi korak</h2>
+  <p>Pet vprašanj. Odgovori si nanje danes — na papir ali v beležko na telefonu:</p>
+  <div class="box">
+    <ol>
+      <li>Katera naloga se pri nas vsak teden ponovi — in jo vsi sovražijo?</li>
+      <li>Koliko ur na mesec gre zanjo? Pomnoži z urno postavko.</li>
+      <li>Ali ima jasna pravila? Bi jo lahko razložil novemu sodelavcu v 15 minutah?</li>
+      <li>Kje živijo podatki — Excel, e-pošta, PDF, interni sistem?</li>
+      <li>Kdo bo agentovo delo pregledal in potrdil, preden gre naprej?</li>
+    </ol>
+  </div>
+  <p>Če imaš odgovore na vseh pet vprašanj, imaš definiran prvi projekt. Večina podjetij se ustavi pri tretjem — in točno tam se začne pravo delo: zapisati pravila, po katerih naloga v resnici poteka.</p>
+
+  <div class="cta-end">
+    <p>Imaš nalogo, ki ustreza checklistu? Piši mi in povem ti, ali se jo splača avtomatizirati.</p>
+    <a class="btn primary" href="mailto:ian.veber@gmail.com">Piši mi</a>
+    <a class="btn" href="https://www.linkedin.com/in/ian-tajnsek-veber-8305382a9/" target="_blank" rel="noopener">LinkedIn</a>
+  </div>
+  <footer>Ian Tajnšek Veber · tajnsekveber.com</footer>
+</main>
+</body>
+</html>

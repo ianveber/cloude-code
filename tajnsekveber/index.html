@@ -236,9 +236,9 @@
 
   // Free-knowledge cards — set url to activate a card; empty url = dimmed "kmalu".
   const KNOWLEDGE = [
-    { sl: "AI vodič za podjetja", en: "AI guide for business", descSl: "Kako začeti z AI agenti", descEn: "How to start with AI agents", url: "" },
-    { sl: "Avtomatizacije v praksi", en: "Automations in practice", descSl: "Primeri iz realnih projektov", descEn: "Examples from real projects", url: "" },
-    { sl: "Moja orodja", en: "My toolkit", descSl: "Tehnologije, ki jih uporabljam vsak dan", descEn: "The tech I use every day", url: "" }
+    { sl: "AI vodič za podjetja", en: "AI guide for business", descSl: "Kako začeti z AI agenti", descEn: "How to start with AI agents", url: "/znanje/ai-vodic.html" },
+    { sl: "Avtomatizacije v praksi", en: "Automations in practice", descSl: "Primeri iz realnih projektov", descEn: "Examples from real projects", url: "/znanje/avtomatizacije.html" },
+    { sl: "Moja orodja", en: "My toolkit", descSl: "Tehnologije, ki jih uporabljam vsak dan", descEn: "The tech I use every day", url: "/znanje/orodja.html" }
   ];
 
   for (const [key, url] of Object.entries(LINKS)) {
@@ -256,7 +256,10 @@
   for (const item of KNOWLEDGE) {
     const card = document.createElement("a");
     card.className = "card" + (item.url ? "" : " pending");
-    if (item.url) { card.href = item.url; card.target = "_blank"; card.rel = "noopener"; }
+    if (item.url) {
+      card.href = item.url;
+      if (/^https?:/.test(item.url)) { card.target = "_blank"; card.rel = "noopener"; }
+    }
     else { card.setAttribute("aria-disabled", "true"); }
     const title = document.createElement("strong");
     title.setAttribute("data-sl", item.sl);
