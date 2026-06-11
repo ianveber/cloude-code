@@ -12,7 +12,7 @@ One-page personal website for Ian Tajnšek Veber at **tajnsekveber.com**. Presen
 | Decision | Choice |
 |---|---|
 | Name on site | **Ian Tajnšek Veber** (matches domain) |
-| Positioning | **Founder / builder portfolio** — multi-project (AIS Slovenia, ATHLOS, Ethospheres) |
+| Positioning | **Founder / builder portfolio** — multi-project (AIS Slovenia, ATHLOS, Grafy nanoSolutions) |
 | Language | **Slovenian default + EN toggle** |
 | CTA | **Socials row: LinkedIn, Instagram, email** (ian.veber@gmail.com) |
 | Layout | **A — split hero** (text left, portrait card right) |
@@ -26,7 +26,7 @@ LinkedIn + Instagram URLs not yet provided — wired as two constants at the top
   1. Name — `Ian Tajnšek Veber` (large, near-black gray)
   2. One-line positioning (SL: builder/founder line; EN equivalent)
   3. 2–3 sentence bio in Ian's voice (drafted from `ian-voice.md`, Ian edits in review)
-  4. Slim row of three project chips: **AIS Slovenia · ATHLOS · Ethospheres** — static labels with a one-word descriptor each, no links off-page
+  4. Slim row of three project chips: **AIS Slovenia · ATHLOS · Grafy nanoSolutions** — static labels with a one-word descriptor each, no links off-page
   5. CTA row: LinkedIn, Instagram, email — icon + label pills, royal blue on hover/primary
 - **Top-right:** SL/EN toggle pill.
 - **Background:** AI-generated minimal workspace photo (desk, laptop, soft daylight, cool gray-blue grade), desaturated under ~85% white veil — reads as texture.
