@@ -13,7 +13,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232342ff'/%3E%3Ctext x='32' y='43' font-family='Inter,Arial,sans-serif' font-size='28' font-weight='800' fill='white' text-anchor='middle'%3EIV%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
     --blue:#2342ff;
@@ -32,7 +32,6 @@
     background-image:linear-gradient(rgba(255,255,255,.86),rgba(255,255,255,.86)),url('workspace.jpg');
     background-size:cover;
     background-position:center;
-    background-attachment:fixed;
     -webkit-font-smoothing:antialiased;
   }
   .lang-toggle{
@@ -100,7 +99,7 @@
   @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){.hero>*{animation:none}}
   @media (max-width:768px){
-    body{background-attachment:scroll;background-image:linear-gradient(rgba(255,255,255,.92),rgba(255,255,255,.92)),url('workspace.jpg')}
+    body{background-image:linear-gradient(rgba(255,255,255,.92),rgba(255,255,255,.92)),url('workspace.jpg')}
     .hero{grid-template-columns:1fr;gap:40px;padding:96px 24px 64px;text-align:center}
     .portrait{order:-1;justify-self:center;width:min(70%,260px)}
     .portrait::after{transform:translate(10px,10px)}
@@ -112,8 +111,8 @@
 </head>
 <body>
 <nav class="lang-toggle" aria-label="Jezik / Language">
-  <button id="btn-sl" class="active" type="button">SL</button>
-  <button id="btn-en" type="button">EN</button>
+  <button id="btn-sl" class="active" type="button" aria-pressed="true">SL</button>
+  <button id="btn-en" type="button" aria-pressed="false">EN</button>
 </nav>
 
 <main class="hero">
@@ -131,10 +130,10 @@
       <li><strong>Grafy nanoSolutions</strong><span data-sl="nanotehnologija" data-en="nanotech">nanotehnologija</span></li>
     </ul>
     <div class="cta">
-      <a id="link-linkedin" class="btn primary" target="_blank" rel="noopener">
+      <a id="link-linkedin" class="btn primary pending" aria-disabled="true">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
         LinkedIn</a>
-      <a id="link-instagram" class="btn" target="_blank" rel="noopener">
+      <a id="link-instagram" class="btn pending" aria-disabled="true">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.88 5.88 0 0 0-2.13 1.38A5.88 5.88 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.8.72 1.47 1.38 2.13a5.88 5.88 0 0 0 2.13 1.38c.76.3 1.64.5 2.91.56 1.28.06 1.69.07 4.95.07s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.88 5.88 0 0 0 2.13-1.38 5.88 5.88 0 0 0 1.38-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.88 5.88 0 0 0-1.38-2.13A5.88 5.88 0 0 0 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.41-11.85a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88z"/></svg>
         Instagram</a>
       <a class="btn" href="mailto:ian.veber@gmail.com">
@@ -157,7 +156,13 @@
 
   for (const [key, url] of Object.entries(LINKS)) {
     const a = document.getElementById("link-" + key);
-    if (url) { a.href = url; } else { a.classList.add("pending"); a.removeAttribute("target"); }
+    if (url) {
+      a.href = url;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.classList.remove("pending");
+      a.removeAttribute("aria-disabled");
+    }
   }
 
   const I18N_ATTRS = { sl: "data-sl", en: "data-en" };
@@ -168,11 +173,14 @@
     document.documentElement.lang = lang;
     document.getElementById("btn-sl").classList.toggle("active", lang === "sl");
     document.getElementById("btn-en").classList.toggle("active", lang === "en");
-    localStorage.setItem("lang", lang);
+    document.getElementById("btn-sl").setAttribute("aria-pressed", String(lang === "sl"));
+    document.getElementById("btn-en").setAttribute("aria-pressed", String(lang === "en"));
+    try { localStorage.setItem("lang", lang); } catch (e) {}
   }
   document.getElementById("btn-sl").addEventListener("click", () => setLang("sl"));
   document.getElementById("btn-en").addEventListener("click", () => setLang("en"));
-  const saved = localStorage.getItem("lang");
+  let saved = null;
+  try { saved = localStorage.getItem("lang"); } catch (e) {}
   if (saved === "en") setLang("en");
 </script>
 </body>
