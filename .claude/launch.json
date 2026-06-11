@@ -94,6 +94,12 @@
       "port": 3001
     },
     {
+      "name": "athlos-landing",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd clients/athlos-landing && node serve.js"],
+      "port": 8766
+    },
+    {
       "name": "grafy",
       "runtimeExecutable": "bun",
       "runtimeArgs": ["clients/grafy/server.mjs"],
@@ -105,6 +111,12 @@
       "runtimeExecutable": "sh",
       "runtimeArgs": ["-c", "cd inspectus-os && bun run dev"],
       "port": 3020
+    },
+    {
+      "name": "tajnsekveber",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["-e", "Bun.serve({port:8782,async fetch(req){const p=new URL(req.url).pathname;const f=Bun.file('tajnsekveber'+(p==='/'?'/index.html':p));return await f.exists()?new Response(f):new Response('Not found',{status:404})}});console.log('tajnsekveber on 8782')"],
+      "port": 8782
     }
   ]
 }
