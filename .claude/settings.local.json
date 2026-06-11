@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -fsSL https://bun.sh/install)",
+      "Bash(bash)",
+      "Bash(export PATH=\"$HOME/.bun/bin:$PATH\")",
+      "Read(//Users/ianveber/.claude/skills/gstack/**)",
+      "Bash(./setup)",
+      "Bash(./setup --team)",
+      "Bash(~/.claude/skills/gstack/bin/gstack-team-init required *)",
+      "Bash(git -C ~/Desktop/vetaads/Pacom rev-parse --git-dir)",
+      "Bash(~/.claude/skills/gstack/bin/gstack-team-init)",
+      "Bash(npx --version)",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}

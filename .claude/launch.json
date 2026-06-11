@@ -1,0 +1,110 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dashboard",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["server.mjs"],
+      "port": 8766
+    },
+    {
+      "name": "ethospheres",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["server.mjs"],
+      "env": { "PORT": "8767" },
+      "port": 8767
+    },
+    {
+      "name": "context-library",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["server.mjs"],
+      "env": { "PORT": "8768" },
+      "port": 8768
+    },
+    {
+      "name": "athlos-chatbot",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["athlos-chatbot/server.mjs"],
+      "port": 8010
+    },
+    {
+      "name": "ais-walk",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["ais-slovenia-copy/server.mjs"],
+      "env": { "PORT": "8769" },
+      "port": 8769
+    },
+    {
+      "name": "ais-os",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd ais-os && bun run dev"],
+      "port": 3010
+    },
+    {
+      "name": "ais-fresh",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["ais-fresh/server.mjs"],
+      "env": { "PORT": "8770" },
+      "port": 8770
+    },
+    {
+      "name": "space-station",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd space-station-website && bun run dev"],
+      "port": 3013
+    },
+    {
+      "name": "ais-walk-frames",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["ais-walk-frames/server.mjs"],
+      "env": { "PORT": "8771" },
+      "port": 8771
+    },
+    {
+      "name": "ais-site",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd ais-site && ANTHROPIC_API_KEY=$(cat ~/.anthropic_key) bun run dev"],
+      "port": 3014
+    },
+    {
+      "name": "ais-mirror",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["ais-slovenia-mirror/server.mjs"],
+      "env": { "PORT": "8772" },
+      "port": 8772
+    },
+    {
+      "name": "inspectus-demo",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["inspectus-demo/server.mjs"],
+      "env": { "PORT": "8775" },
+      "port": 8775
+    },
+    {
+      "name": "hermes-os",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["server.mjs"],
+      "env": { "PORT": "8776" },
+      "port": 8776
+    },
+    {
+      "name": "athlos",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd clients/athlos && bun run dev"],
+      "port": 3001
+    },
+    {
+      "name": "grafy",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["clients/grafy/server.mjs"],
+      "env": { "PORT": "8781" },
+      "port": 8781
+    },
+    {
+      "name": "inspectus-os",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd inspectus-os && bun run dev"],
+      "port": 3020
+    }
+  ]
+}
