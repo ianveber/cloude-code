@@ -28,11 +28,26 @@
   body{
     font-family:'Inter',system-ui,-apple-system,sans-serif;
     color:var(--ink);
-    background-color:var(--bg);
-    background-image:linear-gradient(rgba(255,255,255,.86),rgba(255,255,255,.86)),url('workspace.jpg');
-    background-size:cover;
-    background-position:center;
+    background-color:#fff;
     -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background-image:
+      linear-gradient(var(--line) 1px,transparent 1px),
+      linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:56px 56px;
+    -webkit-mask-image:radial-gradient(120% 90% at 50% 42%,#000 25%,transparent 78%);
+    mask-image:radial-gradient(120% 90% at 50% 42%,#000 25%,transparent 78%);
+  }
+  body::after{
+    content:"";position:fixed;left:0;top:0;width:56px;height:56px;z-index:-1;pointer-events:none;
+    background:transparent;
+    box-shadow:
+      112px 168px var(--blue-soft),
+      952px 392px var(--blue-soft),
+      280px 616px rgba(35,66,255,.05),
+      1120px 112px rgba(35,66,255,.06);
   }
   .lang-toggle{
     position:fixed;top:24px;right:24px;z-index:10;
@@ -83,6 +98,22 @@
   .btn.primary:hover{background:#1b35d6;color:#fff}
   .btn svg{width:17px;height:17px;flex:none}
   .btn.pending{opacity:.45;pointer-events:none}
+  .knowledge{margin-top:40px}
+  .knowledge-title{
+    font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--gray);margin-bottom:12px;
+  }
+  .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-width:580px}
+  .card{
+    display:block;background:#fff;border:1px solid var(--line);border-radius:14px;
+    padding:14px 16px;text-decoration:none;color:inherit;
+    transition:border-color .15s,transform .15s,box-shadow .15s;
+  }
+  .card:hover{border-color:var(--blue);transform:translateY(-1px);box-shadow:0 8px 24px rgba(26,29,36,.08)}
+  .card strong{display:block;font-size:14px;font-weight:700;color:var(--ink)}
+  .card span{display:block;font-size:12.5px;line-height:1.45;color:var(--gray);margin-top:4px}
+  .card .soon{display:inline-block;margin-top:8px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);font-style:normal}
+  .card.pending{opacity:.55;pointer-events:none}
   .portrait{position:relative;justify-self:end;width:min(100%,360px)}
   .portrait::after{
     content:"";position:absolute;inset:0;
@@ -99,13 +130,15 @@
   @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){.hero>*{animation:none}}
   @media (max-width:768px){
-    body{background-image:linear-gradient(rgba(255,255,255,.92),rgba(255,255,255,.92)),url('workspace.jpg')}
+    body::before{background-size:44px 44px}
     .hero{grid-template-columns:1fr;gap:40px;padding:96px 24px 64px;text-align:center}
     .portrait{order:-1;justify-self:center;width:min(70%,260px)}
     .portrait::after{transform:translate(10px,10px)}
     .kicker{justify-content:center}
     .bio{margin-left:auto;margin-right:auto}
     .projects,.cta{justify-content:center}
+    .knowledge{margin-top:32px}
+    .cards{grid-template-columns:1fr;max-width:340px;margin:0 auto}
   }
 </style>
 </head>
@@ -140,19 +173,30 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m3 6 9 7 9-7"/></svg>
         <span data-sl="Piši mi" data-en="Email me">Piši mi</span></a>
     </div>
+    <div class="knowledge">
+      <p class="knowledge-title" data-sl="Brezplačno znanje" data-en="Free knowledge">Brezplačno znanje</p>
+      <div class="cards" id="knowledge-cards"></div>
+    </div>
   </div>
 
   <figure class="portrait">
-    <img src="ian.jpg" alt="Ian Tajnšek Veber" width="900" height="1600" fetchpriority="high">
+    <img src="ian.jpg" alt="Ian Tajnšek Veber" width="800" height="1000" fetchpriority="high">
   </figure>
 </main>
 
 <script>
-  // Drop real profile URLs here — the only edit this file should ever need.
+  // Drop real profile URLs here.
   const LINKS = {
     linkedin: "",   // e.g. "https://www.linkedin.com/in/..."
     instagram: ""   // e.g. "https://www.instagram.com/..."
   };
+
+  // Free-knowledge cards — set url to activate a card; empty url = dimmed "kmalu".
+  const KNOWLEDGE = [
+    { sl: "AI vodič za podjetja", en: "AI guide for business", descSl: "Kako začeti z AI agenti", descEn: "How to start with AI agents", url: "" },
+    { sl: "Avtomatizacije v praksi", en: "Automations in practice", descSl: "Primeri iz realnih projektov", descEn: "Examples from real projects", url: "" },
+    { sl: "Moja orodja", en: "My toolkit", descSl: "Tehnologije, ki jih uporabljam vsak dan", descEn: "The tech I use every day", url: "" }
+  ];
 
   for (const [key, url] of Object.entries(LINKS)) {
     const a = document.getElementById("link-" + key);
@@ -163,6 +207,32 @@
       a.classList.remove("pending");
       a.removeAttribute("aria-disabled");
     }
+  }
+
+  const cardsEl = document.getElementById("knowledge-cards");
+  for (const item of KNOWLEDGE) {
+    const card = document.createElement("a");
+    card.className = "card" + (item.url ? "" : " pending");
+    if (item.url) { card.href = item.url; card.target = "_blank"; card.rel = "noopener"; }
+    else { card.setAttribute("aria-disabled", "true"); }
+    const title = document.createElement("strong");
+    title.setAttribute("data-sl", item.sl);
+    title.setAttribute("data-en", item.en);
+    title.textContent = item.sl;
+    const desc = document.createElement("span");
+    desc.setAttribute("data-sl", item.descSl);
+    desc.setAttribute("data-en", item.descEn);
+    desc.textContent = item.descSl;
+    card.append(title, desc);
+    if (!item.url) {
+      const soon = document.createElement("em");
+      soon.className = "soon";
+      soon.setAttribute("data-sl", "kmalu");
+      soon.setAttribute("data-en", "soon");
+      soon.textContent = "kmalu";
+      card.append(soon);
+    }
+    cardsEl.append(card);
   }
 
   const I18N_ATTRS = { sl: "data-sl", en: "data-en" };
