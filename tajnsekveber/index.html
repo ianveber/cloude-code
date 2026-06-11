@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ian Tajnšek Veber — gradim podjetja in AI sisteme</title>
+<meta name="description" content="Soustanovitelj AIS Slovenia. Gradim AI sisteme, avtomatizacije in produkte — AIS Slovenia, ATHLOS, Grafy nanoSolutions.">
+<meta property="og:title" content="Ian Tajnšek Veber">
+<meta property="og:description" content="Gradim podjetja in AI sisteme.">
+<meta property="og:image" content="https://tajnsekveber.com/ian.jpg">
+<meta property="og:url" content="https://tajnsekveber.com">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232342ff'/%3E%3Ctext x='32' y='43' font-family='Inter,Arial,sans-serif' font-size='28' font-weight='800' fill='white' text-anchor='middle'%3EIV%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#2342ff;
+    --blue-soft:rgba(35,66,255,.08);
+    --ink:#1a1d24;
+    --gray:#5a6172;
+    --line:#e3e6ee;
+    --bg:#f4f6fb;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    color:var(--ink);
+    background-color:var(--bg);
+    background-image:linear-gradient(rgba(255,255,255,.86),rgba(255,255,255,.86)),url('workspace.jpg');
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+  }
+  .lang-toggle{
+    position:fixed;top:24px;right:24px;z-index:10;
+    display:flex;gap:2px;padding:3px;
+    background:#fff;border:1px solid var(--line);border-radius:999px;
+    box-shadow:0 2px 12px rgba(26,29,36,.06);
+  }
+  .lang-toggle button{
+    border:0;background:transparent;cursor:pointer;
+    font:inherit;font-size:13px;font-weight:600;color:var(--gray);
+    padding:5px 12px;border-radius:999px;
+  }
+  .lang-toggle button.active{background:var(--blue);color:#fff}
+  .hero{
+    min-height:100vh;min-height:100svh;
+    max-width:1100px;margin:0 auto;
+    display:grid;grid-template-columns:1.15fr .85fr;
+    align-items:center;gap:72px;
+    padding:64px 36px;
+  }
+  .kicker{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--blue);margin-bottom:20px;
+  }
+  .kicker::before{content:"";width:28px;height:2px;background:var(--blue);border-radius:2px}
+  h1{font-size:clamp(34px,4.6vw,54px);font-weight:800;letter-spacing:-.02em;line-height:1.05}
+  .lead{font-size:clamp(18px,2vw,22px);font-weight:500;color:var(--ink);margin-top:14px}
+  .bio{font-size:16px;line-height:1.65;color:var(--gray);margin-top:16px;max-width:52ch}
+  .projects{list-style:none;display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+  .projects li{
+    display:flex;align-items:baseline;gap:8px;
+    background:#fff;border:1px solid var(--line);border-radius:999px;
+    padding:8px 16px;font-size:14px;
+  }
+  .projects li strong{font-weight:700}
+  .projects li span{color:var(--gray);font-size:13px}
+  .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:12px 22px;border-radius:999px;
+    font-size:15px;font-weight:600;text-decoration:none;
+    border:1.5px solid var(--line);color:var(--ink);background:#fff;
+    transition:border-color .15s,background .15s,color .15s,transform .15s;
+  }
+  .btn:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-1px)}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+  .btn.primary:hover{background:#1b35d6;color:#fff}
+  .btn svg{width:17px;height:17px;flex:none}
+  .btn.pending{opacity:.45;pointer-events:none}
+  .portrait{position:relative;justify-self:end;width:min(100%,360px)}
+  .portrait::after{
+    content:"";position:absolute;inset:0;
+    border:2px solid var(--blue);border-radius:28px;
+    transform:translate(14px,14px);z-index:-1;
+  }
+  .portrait img{
+    display:block;width:100%;height:auto;
+    border-radius:28px;
+    box-shadow:0 24px 60px rgba(26,29,36,.16);
+  }
+  .hero>*{animation:rise .7s ease both}
+  .portrait{animation-delay:.12s}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.hero>*{animation:none}}
+  @media (max-width:768px){
+    body{background-attachment:scroll;background-image:linear-gradient(rgba(255,255,255,.92),rgba(255,255,255,.92)),url('workspace.jpg')}
+    .hero{grid-template-columns:1fr;gap:40px;padding:96px 24px 64px;text-align:center}
+    .portrait{order:-1;justify-self:center;width:min(70%,260px)}
+    .portrait::after{transform:translate(10px,10px)}
+    .kicker{justify-content:center}
+    .bio{margin-left:auto;margin-right:auto}
+    .projects,.cta{justify-content:center}
+  }
+</style>
+</head>
+<body>
+<nav class="lang-toggle" aria-label="Jezik / Language">
+  <button id="btn-sl" class="active" type="button">SL</button>
+  <button id="btn-en" type="button">EN</button>
+</nav>
+
+<main class="hero">
+  <div class="intro">
+    <p class="kicker" data-sl="Soustanovitelj · Graditelj" data-en="Co-founder · Builder">Soustanovitelj · Graditelj</p>
+    <h1>Ian Tajnšek Veber</h1>
+    <p class="lead" data-sl="Gradim podjetja in AI sisteme." data-en="I build companies and AI systems.">Gradim podjetja in AI sisteme.</p>
+    <p class="bio"
+       data-sl="Soustanovitelj AIS Slovenia, kjer podjetjem postavljamo AI agente in avtomatizacije. Ob tem gradim ATHLOS — AI trening za športnike — in digitalno prisotnost Grafy nanoSolutions. Najboljši del: ko se ideja v nekaj tednih spremeni v delujoč sistem."
+       data-en="Co-founder of AIS Slovenia, where we build AI agents and automations for businesses. I'm also building ATHLOS — AI training for athletes — and the digital presence of Grafy nanoSolutions. The best part: watching an idea become a working system in weeks.">
+       Soustanovitelj AIS Slovenia, kjer podjetjem postavljamo AI agente in avtomatizacije. Ob tem gradim ATHLOS — AI trening za športnike — in digitalno prisotnost Grafy nanoSolutions. Najboljši del: ko se ideja v nekaj tednih spremeni v delujoč sistem.</p>
+    <ul class="projects">
+      <li><strong>AIS Slovenia</strong><span data-sl="AI agenti" data-en="AI agents">AI agenti</span></li>
+      <li><strong>ATHLOS</strong><span data-sl="AI trening" data-en="AI training">AI trening</span></li>
+      <li><strong>Grafy nanoSolutions</strong><span data-sl="nanotehnologija" data-en="nanotech">nanotehnologija</span></li>
+    </ul>
+    <div class="cta">
+      <a id="link-linkedin" class="btn primary" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+        LinkedIn</a>
+      <a id="link-instagram" class="btn" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.88 5.88 0 0 0-2.13 1.38A5.88 5.88 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.8.72 1.47 1.38 2.13a5.88 5.88 0 0 0 2.13 1.38c.76.3 1.64.5 2.91.56 1.28.06 1.69.07 4.95.07s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.88 5.88 0 0 0 2.13-1.38 5.88 5.88 0 0 0 1.38-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.88 5.88 0 0 0-1.38-2.13A5.88 5.88 0 0 0 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.41-11.85a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88z"/></svg>
+        Instagram</a>
+      <a class="btn" href="mailto:ian.veber@gmail.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m3 6 9 7 9-7"/></svg>
+        <span data-sl="Piši mi" data-en="Email me">Piši mi</span></a>
+    </div>
+  </div>
+
+  <figure class="portrait">
+    <img src="ian.jpg" alt="Ian Tajnšek Veber" width="900" height="1600" fetchpriority="high">
+  </figure>
+</main>
+
+<script>
+  // Drop real profile URLs here — the only edit this file should ever need.
+  const LINKS = {
+    linkedin: "",   // e.g. "https://www.linkedin.com/in/..."
+    instagram: ""   // e.g. "https://www.instagram.com/..."
+  };
+
+  for (const [key, url] of Object.entries(LINKS)) {
+    const a = document.getElementById("link-" + key);
+    if (url) { a.href = url; } else { a.classList.add("pending"); a.removeAttribute("target"); }
+  }
+
+  const I18N_ATTRS = { sl: "data-sl", en: "data-en" };
+  function setLang(lang) {
+    document.querySelectorAll("[data-sl]").forEach(el => {
+      el.textContent = el.getAttribute(I18N_ATTRS[lang]);
+    });
+    document.documentElement.lang = lang;
+    document.getElementById("btn-sl").classList.toggle("active", lang === "sl");
+    document.getElementById("btn-en").classList.toggle("active", lang === "en");
+    localStorage.setItem("lang", lang);
+  }
+  document.getElementById("btn-sl").addEventListener("click", () => setLang("sl"));
+  document.getElementById("btn-en").addEventListener("click", () => setLang("en"));
+  const saved = localStorage.getItem("lang");
+  if (saved === "en") setLang("en");
+</script>
+</body>
+</html>
