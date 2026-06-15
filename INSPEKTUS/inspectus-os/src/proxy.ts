@@ -1,7 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-export async function middleware(request: NextRequest) {
+// Next.js 16.2.6 renamed the middleware convention to `proxy.ts` / `export function proxy`.
+// This file IS the registered middleware — do not rename it back to middleware.ts.
+export async function proxy(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
