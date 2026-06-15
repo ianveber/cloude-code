@@ -24,6 +24,7 @@ export default function Prijava() {
             <label style={lbl}>Geslo</label>
             <input name="password" type="password" required autoComplete="current-password" style={inp} />
             {pwState?.error && <div style={err}>{pwState.error}</div>}
+            {pwState?.notice && <div style={ok}>{pwState.notice}</div>}
             <button type="submit" disabled={pwPending} style={btn}>{pwPending ? "Prijavljam…" : "Prijava"}</button>
             <button type="button" onClick={() => setShowMagic(true)} style={linkBtn}>Pošlji magično povezavo namesto gesla</button>
           </form>
