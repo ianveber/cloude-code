@@ -1,0 +1,52 @@
+# Supabase CLI config — INSPECTUS Center
+# Makes the whole backend reproducible: `supabase link --project-ref <ref>` then
+# `supabase db push` recreates this exact schema on ANY Supabase project
+# (ours now, INSPECTUS's later) or a local Docker stack (`supabase start`).
+# Docs: https://supabase.com/docs/guides/cli/config
+
+project_id = "inspectus-center"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+# Local-only email testing inbox (Inbucket) for `supabase start`.
+[inbucket]
+enabled = true
+port = 54324
+
+[auth]
+enabled = true
+# IMPORTANT: set this per-environment. Local dev: http://localhost:3020
+# Production: the deployed origin (e.g. https://inspectus-center.vercel.app).
+site_url = "http://localhost:3020"
+additional_redirect_urls = ["http://localhost:3020/auth/callback"]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+# No public/anonymous sign-ins — access is gated to @inspectus.si + the admin
+# allowlist by the handle_new_user trigger in the init migration.
+enable_anonymous_sign_ins = false
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+# Production: keep TRUE so accounts must confirm via email.
+# Local dev (supabase start): the CLI auto-confirms, so you can test without SMTP.
+enable_confirmations = true
+
+# Real outbound email (magic links / confirmations) requires an SMTP provider in
+# production. Configure under Auth → SMTP in the dashboard, or [auth.email.smtp] here.
