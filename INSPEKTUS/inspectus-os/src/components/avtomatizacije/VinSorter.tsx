@@ -58,20 +58,28 @@ export default function VinSorter() {
   const analyze = useCallback(async () => {
     if (!photos.length) return;
     setAnalyzing(true); setError("");
+    const BATCH = 3; // keep each POST small — base64 images must stay under the body-size limit
+    const byId: Record<string, string> = {};
+    let anyError = false;
     try {
-      const res = await fetch("/api/claude/vin", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ images: photos.map(p => ({ id: p.id, media_type: p.media_type, data: p.data })) }),
-      });
-      const json = await res.json() as { results?: { id: string; vin: string }[]; error?: string };
-      if (json.error) { setError("Analiza ni uspela — preveri povezavo. Fotografije ostanejo nerazvrščene."); }
-      const byId: Record<string, string> = {};
-      (json.results ?? []).forEach(r => { byId[r.id] = r.vin || UNSORTED; });
-      setAssign(prev => { const n = { ...prev }; photos.forEach(p => { n[p.id] = byId[p.id] ?? UNSORTED; }); return n; });
-      setAnalyzed(true);
-    } catch {
-      setError("Analiza ni uspela. Fotografije ostanejo nerazvrščene.");
+      for (let i = 0; i < photos.length; i += BATCH) {
+        const chunk = photos.slice(i, i + BATCH);
+        try {
+          const res = await fetch("/api/claude/vin", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ images: chunk.map(p => ({ id: p.id, media_type: p.media_type, data: p.data })) }),
+          });
+          if (!res.ok) { anyError = true; continue; }
+          const json = await res.json() as { results?: { id: string; vin: string }[]; error?: string };
+          if (json.error) anyError = true;
+          (json.results ?? []).forEach(r => { byId[r.id] = r.vin || UNSORTED; });
+        } catch { anyError = true; }
+      }
+      // Only touch photos we actually got a result for — preserves manual sorting on re-run.
+      setAssign(prev => { const n = { ...prev }; for (const id in byId) n[id] = byId[id]; return n; });
+      if (Object.keys(byId).length) setAnalyzed(true);
+      if (anyError) setError("Nekatere fotografije niso bile analizirane — ostanejo nerazvrščene.");
     } finally {
       setAnalyzing(false);
     }
