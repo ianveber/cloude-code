@@ -37,7 +37,7 @@ export default async function Domov() {
       </div>
 
       <div style={{ marginBottom: 32 }}>
-        <Link href="/obdelava" className="kpi-cta">＋ Nova obdelava</Link>
+        <Link href="/avtomatizacije" className="kpi-cta">＋ Nova obdelava</Link>
       </div>
 
       <div>

@@ -32,12 +32,6 @@ export const AUTOMATIONS: Automation[] = [
   },
 ];
 
-// Greyed "coming soon" tiles — purely to show the command center scales.
-export const SOON: { name: string; description: string; icon: string }[] = [
-  { name: "Samodejno poročilo", description: "Dnevni pregled obdelav in poškodb.", icon: "📊" },
-  { name: "E-pošta strankam", description: "Osnutki sporočil ob zaključku obdelave.", icon: "✉️" },
-];
-
 export function statusLabel(s: AutomationStatus): string {
   return s === "active" ? "Aktivno" : s === "demo" ? "Demo" : "Kmalu";
 }
