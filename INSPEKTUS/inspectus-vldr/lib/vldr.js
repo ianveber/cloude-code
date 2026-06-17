@@ -25,23 +25,13 @@ const DMG_COL_X = [
 const DMG_ROW_Y = [51.2, 53.5, 55.8, 58.1, 60.3, 62.6];
 const DMG_CAPACITY = DMG_COL_X.length * DMG_ROW_Y.length;   // 24
 
-// Location + Mode-of-Arrival + bottom-block overlay coordinates (% of form).
-// First-pass estimates against eu6546-form.png — fine-tuned visually with the client's screenshot.
-const LOC_X = 24, LOC_Y = 47.6;                            // Location of Inspection value
-const BOT_X = 26.5;                                        // carrier/signature block → column 1 (was 44.5 = column 2)
-const MODE_Y = 80.3;                                       // Mode of Arrival icon row
-const MODE_X = { truck: 18.5, rail: 23.5, ship: 28.5 };   // X over the chosen arrival icon
-
 export function renderVLDRCard(vehicle, header = {}) {
   const date = header.date || new Date().toISOString().slice(0, 10);
   const els = [];
 
-  // Model + Serial No. (VIN) — full VIN on the line (client decision 2026-06-17).
+  // Model + Serial No. (VIN)
   els.push(text(10, 13.4, vehicle.make_model, { size: 13, weight: 700 }));
   els.push(text(10, 16.5, vehicle.vin,        { size: 12, weight: 700, mono: true }));
-
-  // Location of Inspection (client 2026-06-17 — was empty on the card).
-  els.push(text(LOC_X, LOC_Y, header.location, { size: 9.5, weight: 600 }));
 
   // Damage codes — column-major fill across the 4 numbered columns
   vehicle.damages.slice(0, DMG_CAPACITY).forEach((d, i) => {
@@ -58,19 +48,16 @@ export function renderVLDRCard(vehicle, header = {}) {
   const remarks = buildRemarks(vehicle.damages, ": ");
   if (remarks) els.push(block(25, 67.4, 73, remarks, { size: 9.5 }));
 
-  // Mode of Arrival — X over the chosen icon (truck / rail / ship). Client 2026-06-17.
-  const mx = MODE_X[normMode(header.mode)];
-  if (mx != null) els.push(center(mx, MODE_Y, "✕", { size: 13, weight: 700 }));
+  // Bottom carrier / inspector block. Value-cell centres (the value column is subdivided finer than
+  // the label column): Delivering 81.9 · Truck/Ship 83.85 · Sig 85.75 · Receiving 90.0 · Sig 95.15 · Date 97.3
+  els.push(text(44.5, 81.9,  header.delivering_party, { size: 9.5, weight: 700 }));
+  els.push(text(44.5, 83.85, header.transport_id,     { size: 9.5 }));            // Truck No./Ship = vessel
+  els.push(text(44.5, 90.0,  header.receiving_party,  { size: 9.5, weight: 700 }));
+  els.push(text(44.5, 97.3,  date, { size: 10, weight: 600 }));
 
-  // Bottom carrier / inspector block — moved to COLUMN 1 (client 2026-06-17; was column 2 @44.5%).
-  els.push(text(BOT_X, 81.9,  header.delivering_party, { size: 9.5, weight: 700 }));
-  els.push(text(BOT_X, 83.85, header.transport_id,     { size: 9.5 }));            // Truck No./Ship = vessel
-  els.push(text(BOT_X, 90.0,  header.receiving_party,  { size: 9.5, weight: 700 }));
-  els.push(text(BOT_X, 97.3,  date, { size: 10, weight: 600 }));
-
-  // INSPECTUS signature (extracted from PRINT VLDR.xlsx, image6) — mandatory on the VLDR, both rows.
-  els.push(img(BOT_X + 1, 85.75, "/inspectus-signature.jpeg", 30));   // delivering carrier signature
-  els.push(img(BOT_X + 1, 95.15, "/inspectus-signature.jpeg", 30));   // inspector signature
+  // INSPECTUS logo + signature (extracted from PRINT VLDR.xlsx, image6) — mandatory on the VLDR.
+  els.push(img(45.5, 85.75, "/inspectus-signature.jpeg", 30));   // delivering carrier signature
+  els.push(img(45.5, 95.15, "/inspectus-signature.jpeg", 30));   // inspector signature
 
   return `<div class="vldr-card" data-vin="${esc(vehicle.vin)}" style="position:relative;width:${FORM_W}px;height:${FORM_H}px;background:#fff;font-family:'Open Sans',Arial,sans-serif;color:#111;overflow:hidden;">
     <img src="/eu6546-form.png" alt="EU 6546" style="position:absolute;inset:0;width:100%;height:100%;display:block;">
@@ -102,15 +89,6 @@ function block(x, y, wPct, t, o = {}) {
 // image, left-aligned, vertically centred on y, fixed pixel height
 function img(x, y, src, hPx) {
   return `<img src="${src}" alt="" style="position:absolute;left:${x}%;top:${y}%;height:${hPx}px;transform:translateY(-50%);">`;
-}
-
-// Map an arrival-mode value (Slovene or English) to one of truck/rail/ship.
-function normMode(m) {
-  const k = String(m ?? "").trim().toLowerCase();
-  if (/kamion|truck|cest/.test(k)) return "truck";
-  if (/železn|zelezn|rail|vlak|vagon/.test(k)) return "rail";
-  if (/ladij|ship|vessel|plov/.test(k)) return "ship";
-  return "ship"; // default — most INSPECTUS arrivals are by vessel (Port of Koper)
 }
 
 function fmtSev(s) {

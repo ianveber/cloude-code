@@ -47,8 +47,7 @@ function getHeader() {
     transport_id: val("hdr-transport"),
     delivering_party: val("hdr-delivering"),
     receiving_party: val("hdr-receiving"),
-    location: val("hdr-location"),
-    mode: val("hdr-mode")
+    location: val("hdr-location")
   };
 }
 
