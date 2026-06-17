@@ -94,6 +94,43 @@ Vrni IZKLJUČNO: {"filter":[{"field":"...","op":"...","value":...}]} ali {"error
 }
 
 // ---------------------------------------------------------------------------
+// "Vprašaj po podatkih" — combined endpoint. A Slovene question can be EITHER a
+// FILTER request ("pokaži vse VINe z resnostjo 3") -> {filter:[...]} OR an
+// ANALYTICAL/aggregate question ("koliko vozil, v %?") -> {answer:"…"} answered
+// ONLY from the aggregated stats the browser computes (no VINs/PII leave the page).
+// Ported from inspectus-vldr (client feedback 2026-06-17).
+// ---------------------------------------------------------------------------
+export async function runAsk(body: { query?: unknown; stats?: unknown }): Promise<Record<string, unknown>> {
+  const query = String(body.query ?? "");
+  const stats = body.stats ?? {};
+  const system = `Si analitični pomočnik za podatke o poškodbah vozil (INSPECTUS VLDR, standard AIAG-ECG).
+Uporabnik postavi vprašanje v slovenščini. Odločì se med dvema načinoma in vrni IZKLJUČNO veljaven JSON:
+
+1) FILTER — če želi prikazati/izpisati določena vozila ali poškodbe po pogoju
+   (npr. "pokaži vse VINe z resnostjo 3", "vozila razreda Observation").
+   Polja: vin (string), make_model (string), part_code (string), type_code (string),
+   severity (int 1-3), class ("No Damage Evidence"|"Damage"|"Observation"), cause (string), comments (string).
+   Vrni: {"filter":[{"field":"...","op":"eq|gt|gte|lt|lte|contains","value":...}]}
+
+2) ODGOVOR — če je vprašanje analitično/agregatno (števila, vsote, deleži, odstotki, porazdelitve,
+   povprečja, "koliko", "kolikšen delež", "v procentih"). Odgovori v slovenščini, jedrnato in konkretno,
+   z uporabo IZKLJUČNO spodnjih statistik (stats). Kjer je smiselno, navedi odstotke (zaokroži na 1 decimalko).
+   Ne izmišljuj si številk, ki jih v stats ni. Vrni: {"answer":"…"}
+   Polja v stats: vehicle_count, vehicles_damaged, vehicles_with_remarks, total_damage_records,
+   class_distribution, severity_histogram, top_damage_codes, damaged_parts (število poškodb po IMENU dela /
+   PART TEXT, npr. "Bumper/Cover/Ext-Front" — uporabi za vprašanja po delu, npr. "koliko Front Bumperjev je
+   poškodovanih"; imena delov so v angleščini, primerjaj pomensko).
+
+Pomen razredov: "Damage" = dejanska transportna poškodba; "Observation" = manjša opazka; "No Damage Evidence" = brez poškodbe.
+"Poškodovano vozilo" pomeni vozilo z vsaj eno poškodbo razreda Damage ali Observation (stats.vehicles_damaged).
+
+Če vprašanja ne razumeš, vrni: {"error":"could not parse"}.`;
+
+  const user = `Vprašanje: ${query}\n\nStatistika (JSON):\n${JSON.stringify(stats)}`;
+  return callClaude({ system, user, expectJson: true, maxTokens: 700 });
+}
+
+// ---------------------------------------------------------------------------
 // VIN photo sorter (vision). Reads the VIN visible in a single damage photo.
 // Uses claude-opus-4-8 (best VIN-reading accuracy) with a structured output so
 // the response is clean JSON — no preamble. One call per image; the route runs
