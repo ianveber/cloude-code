@@ -41,5 +41,5 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   // Run on everything except static assets and the favicon/logo.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|inspectus-logo.png|sample-survey-report.xlsx).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|inspectus-logo.png|sample-survey-report.xlsx|eu6546-form.png|inspectus-signature.jpeg).*)"],
 };
