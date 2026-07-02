@@ -1,7 +1,17 @@
 # Iman Gadzhi Context Profile — Design Spec
 Date: 2026-07-02
-Status: Approved by Ian (with one amendment: research must be maximally deep)
+Status: Approved by Ian (amendments: (1) research must be maximally deep; (2) PERSONAL BRAND is the primary advisor use case — see Amendment 2)
 Owner: Ian Veber / Claude
+
+## Amendment 2 (2026-07-02, mid-execution): personal brand is the center
+
+Ian's clarification: the advisor's PRIMARY job is **personal-brand consulting for Ian's own brand**. Other uses (general business decisions, dossier reference) stay, but weighting changes:
+
+- **Anchor source:** Iman's "How I Built a $100M Personal Brand (Full Breakdown)" (youtube.com/watch?v=R_D5DZvgBDw, 2024-11-25) + third-party analyses of it (Arnold Trinh's "Exposing Iman Gadzhi's $100M Personal brand playbook" VkuGEYurLs4; Trakyo Pod interview "Meet The Genius Behind Iman Gadzhi's $100M Personal Brand" JWd_92fkSXo, 2026-05-31).
+- **playbook.md:** personal-brand-as-distribution becomes the LEAD section, expanded into sub-frameworks (content architecture, audience trust mechanics, brand→funnel wiring, values/identity layer).
+- **advisor.md:** consult protocol tuned for personal-brand questions first (content strategy, positioning, audience building, monetizing attention); general business consults remain supported.
+- **Research:** a dedicated personal-brand lane added to the loop-until-dry rounds.
+- **Transcript targets:** personal-brand videos get priority in the 12–20 selection.
 
 ## Purpose
 
