@@ -41,6 +41,7 @@ export default function VinSorter() {
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzed, setAnalyzed] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [drag, setDrag] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -57,10 +58,10 @@ export default function VinSorter() {
 
   const analyze = useCallback(async () => {
     if (!photos.length) return;
-    setAnalyzing(true); setError("");
+    setAnalyzing(true); setError(""); setNotice("");
     const BATCH = 3; // keep each POST small — base64 images must stay under the body-size limit
     const byId: Record<string, string> = {};
-    let anyError = false;
+    let apiError: string | null = null;
     try {
       for (let i = 0; i < photos.length; i += BATCH) {
         const chunk = photos.slice(i, i + BATCH);
@@ -70,20 +71,49 @@ export default function VinSorter() {
             headers: { "content-type": "application/json" },
             body: JSON.stringify({ images: chunk.map(p => ({ id: p.id, media_type: p.media_type, data: p.data })) }),
           });
-          if (!res.ok) { anyError = true; continue; }
-          const json = await res.json() as { results?: { id: string; vin: string }[]; error?: string };
-          if (json.error) anyError = true;
+          const json = await res.json().catch(() => ({})) as { results?: { id: string; vin: string }[]; apiError?: string | null };
+          if (!res.ok) { apiError = apiError ?? json.apiError ?? "api"; continue; }
+          if (json.apiError) apiError = apiError ?? json.apiError;
           (json.results ?? []).forEach(r => { byId[r.id] = r.vin || UNSORTED; });
-        } catch { anyError = true; }
+        } catch { apiError = apiError ?? "network"; }
       }
-      // Only touch photos we actually got a result for — preserves manual sorting on re-run.
-      setAssign(prev => { const n = { ...prev }; for (const id in byId) n[id] = byId[id]; return n; });
+      // Fill ONLY photos that are still unsorted — never displace a manual drag or a
+      // prior good read. Functional update so a drag made DURING analysis isn't discarded.
+      setAssign(prev => {
+        const n = { ...prev };
+        for (const id in byId) {
+          if (byId[id] && byId[id] !== UNSORTED && (n[id] ?? UNSORTED) === UNSORTED) n[id] = byId[id];
+        }
+        return n;
+      });
       if (Object.keys(byId).length) setAnalyzed(true);
-      if (anyError) setError("Nekatere fotografije niso bile analizirane — ostanejo nerazvrščene.");
+
+      // Honest cumulative count for the message, projected from the snapshot at click
+      // time. The functional merge above is the source of truth, so a rare concurrent
+      // drag only nudges this number — never the actual state.
+      const projected: Record<string, string> = { ...assign };
+      for (const id in byId) {
+        if (byId[id] && byId[id] !== UNSORTED && (projected[id] ?? UNSORTED) === UNSORTED) projected[id] = byId[id];
+      }
+      const sorted = photos.filter(p => (projected[p.id] ?? UNSORTED) !== UNSORTED).length;
+      const N = photos.length;
+      if (sorted === N && !apiError) {
+        setNotice(`Razvrščenih vseh ${N} fotografij.`);
+      } else if (apiError) {
+        // AI failed on at least one photo — never show green "all sorted", even if every
+        // photo happens to already be sorted from a prior run. Report honestly.
+        setError(
+          sorted > 0
+            ? `Razvrščenih ${sorted} od ${N}; AI ni uspel pri vseh — poskusi znova ali jih povleci ročno.`
+            : vinErrorMessage(apiError),
+        );
+      } else {
+        setNotice(`Razvrščenih ${sorted} od ${N} — ostale povleci ročno v pravo vozilo.`);
+      }
     } finally {
       setAnalyzing(false);
     }
-  }, [photos]);
+  }, [photos, assign]);
 
   const reassign = useCallback((id: string, key: string) => {
     setAssign(prev => ({ ...prev, [id]: key }));
@@ -101,7 +131,7 @@ export default function VinSorter() {
   }, []);
 
   const reset = useCallback(() => {
-    setPhotos([]); setAssign({}); setExtraGroups([]); setAnalyzed(false); setError("");
+    setPhotos([]); setAssign({}); setExtraGroups([]); setAnalyzed(false); setError(""); setNotice("");
   }, []);
 
   // derive groups
@@ -147,6 +177,7 @@ export default function VinSorter() {
         <button onClick={addVehicle} style={ghostBtn}>＋ Dodaj vozilo ročno</button>
         {photos.length > 0 && <button onClick={reset} style={ghostBtn}>Počisti vse</button>}
         {error && <span style={{ color: "#a01f0a", fontSize: 13 }}>{error}</span>}
+        {!error && notice && <span style={{ color: "#15803d", fontSize: 13 }}>{notice}</span>}
       </div>
 
       {/* Car groups */}
@@ -192,6 +223,21 @@ function Thumbs({ photos, empty }: { photos: Photo[]; empty: string }) {
       ))}
     </div>
   );
+}
+
+// Maps the route's apiError reason to a plain-Slovene message for the inspector.
+function vinErrorMessage(reason: string): string {
+  switch (reason) {
+    case "credits":
+      return "AI trenutno ni na voljo: zmanjkalo je dobroimetja na računu. Fotografije niso bile razvrščene.";
+    case "auth":
+    case "no_api_key":
+      return "AI ni na voljo: težava z API ključem. Fotografije niso bile razvrščene.";
+    case "rate_limit":
+      return "Preveč zahtev naenkrat — počakaj nekaj sekund in poskusi znova.";
+    default:
+      return "AI trenutno ni dosegljiv — fotografije niso bile razvrščene. Poskusi znova.";
+  }
 }
 
 const ghostBtn: React.CSSProperties = { padding: "9px 14px", background: "#fff", color: "#374151", border: "1px solid #d7dee4", borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: "pointer" };

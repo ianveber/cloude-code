@@ -27,8 +27,16 @@ export const AUTOMATIONS: Automation[] = [
     name: "VIN sortirnik fotografij",
     description: "Prebere VIN iz vsake fotografije in razvrsti poškodbe po vozilih.",
     icon: "📷",
-    status: "demo",
+    status: "active",
     href: "/avtomatizacije/vin",
+  },
+  {
+    id: "constat",
+    name: "Constat — Opel / Citroën / Peugeot",
+    description: "PSA Joint Survey (RUA V3). Obdelava izvoz → Constat zapisnik.",
+    icon: "📋",
+    status: "demo",
+    href: "/avtomatizacije/constat",
   },
 ];
 

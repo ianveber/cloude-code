@@ -58,10 +58,12 @@ returns text[] language sql immutable as $$
   ];
 $$;
 
+-- Signup gate. OPEN to any email (the INSPECTUS team uses mixed domains) — see
+-- migrations/20260617130000_open_signup_gate.sql. Admin role still bootstraps only
+-- from allowed_emails() below. To re-tighten, restore the domain check here.
 create or replace function public.is_email_allowed(addr text)
 returns boolean language sql immutable as $$
-  select lower(addr) like '%@inspectus.si'
-      or lower(addr) = any (select lower(e) from unnest(public.allowed_emails()) e);
+  select true;
 $$;
 
 -- Auto-create the profile on signup + enforce the gate + bootstrap admins.

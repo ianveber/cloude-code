@@ -2,6 +2,16 @@ import { KNOWLEDGE } from "./knowledge";
 
 const apiKey = process.env.ANTHROPIC_API_KEY;
 
+// ── Per-task model selection (Ian's call, 2026-06-26) ───────────────────────
+// TEXT pipeline (validate / summarize / ask / filter) → Haiku 4.5: matched Opus on
+//   VLDR validation (100% recall, 0 false positives) at ~1/6 the cost; structured/analytical
+//   work it handles cleanly.
+// VISION (VIN OCR) → Opus 4.8: accuracy wins for VIN reading — the 2026-06-17 benchmark had
+//   Opus at 9/9 while cheaper models returned confidently-WRONG VINs (silent misfiling). The
+//   17-char VIN_RE guard below stays as a belt-and-braces check on top of that.
+const MODEL_TEXT = "claude-haiku-4-5";
+const MODEL_VISION = "claude-opus-4-8";
+
 // Anthropic API call helper — mirrors inspectus-vldr/api/_lib.mjs exactly.
 // Uses prompt-cached knowledge system block on every call.
 async function callClaude({
@@ -9,11 +19,13 @@ async function callClaude({
   user,
   expectJson = false,
   maxTokens = 1024,
+  model = MODEL_TEXT,
 }: {
   system: string;
   user: string;
   expectJson?: boolean;
   maxTokens?: number;
+  model?: string;
 }): Promise<Record<string, unknown>> {
   if (!apiKey) return { error: "no_api_key" };
 
@@ -32,7 +44,7 @@ async function callClaude({
         "anthropic-beta": "prompt-caching-2024-07-31",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
+        model,
         max_tokens: maxTokens,
         system: sys,
         messages: [{ role: "user", content: user }],
@@ -132,16 +144,37 @@ Pomen razredov: "Damage" = dejanska transportna poškodba; "Observation" = manj�
 
 // ---------------------------------------------------------------------------
 // VIN photo sorter (vision). Reads the VIN visible in a single damage photo.
-// Uses claude-opus-4-8 (best VIN-reading accuracy) with a structured output so
-// the response is clean JSON — no preamble. One call per image; the route runs
-// them with a small concurrency cap. Returns vin "" when none is legible.
+// Structured output so the response is clean JSON — no preamble. One call per
+// image; the route runs them with a small concurrency cap. Returns vin "" when
+// none is legible, and an `error` reason when the AI call itself failed (out of
+// credits, bad key, network) so the UI can say "AI unavailable" instead of
+// silently leaving every photo unsorted.
 // ---------------------------------------------------------------------------
 export type VinImage = { id: string; media_type: string; data: string };
+export type VinError = "no_api_key" | "credits" | "auth" | "rate_limit" | "api" | "network";
+export type VinResult = { id: string; vin: string; error?: VinError };
 
-export async function runVinExtract(img: VinImage): Promise<{ id: string; vin: string }> {
-  if (!apiKey) return { id: img.id, vin: "" };
+// A VIN is exactly 17 chars from A–Z (excluding I, O, Q) and 0–9. Rejecting
+// anything else turns a model misread (e.g. an 18-char hallucination) into a
+// safe "left unsorted for manual sorting" rather than a wrong-vehicle mis-file.
+const VIN_RE = /^[A-HJ-NPR-Z0-9]{17}$/;
+
+function classifyVinError(status: number, body: string): VinError {
+  const b = body.toLowerCase();
+  // Out-of-credits surfaces as 400/402 with a billing message; match a few wordings
+  // so a reworded API error still shows the tailored "zmanjkalo dobroimetja" banner.
+  if ((status === 400 || status === 402) && (b.includes("credit") || b.includes("insufficient") || b.includes("billing"))) return "credits";
+  if (status === 401 || status === 403) return "auth";
+  if (status === 429) return "rate_limit";
+  return "api";
+}
+
+export async function runVinExtract(img: VinImage): Promise<VinResult> {
+  if (!apiKey) return { id: img.id, vin: "", error: "no_api_key" };
+
+  let r: Response;
   try {
-    const r = await fetch("https://api.anthropic.com/v1/messages", {
+    r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "x-api-key": apiKey,
@@ -149,7 +182,7 @@ export async function runVinExtract(img: VinImage): Promise<{ id: string; vin: s
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-opus-4-8",
+        model: MODEL_VISION,
         max_tokens: 300,
         system: "Si pregledovalec vozil pri INSPECTUS. Z dane fotografije preberi VIN — 17-mestno identifikacijsko številko vozila — če je viden na tablici, nalepki, vetrobranskem steklu ali oznaki. NE ugibaj: če VIN ni jasno čitljiv, vrni found=false in prazen vin. VIN vsebuje samo velike črke (brez I, O, Q) in številke.",
         messages: [{
@@ -175,14 +208,33 @@ export async function runVinExtract(img: VinImage): Promise<{ id: string; vin: s
         },
       }),
     });
-    if (!r.ok) return { id: img.id, vin: "" };
-    const data = await r.json() as { content?: { text?: string }[] };
-    const text = data.content?.find(b => b.text)?.text ?? "";
-    let parsed: { found?: boolean; vin?: string } = {};
-    try { parsed = JSON.parse(text); } catch { return { id: img.id, vin: "" }; }
-    const vin = parsed.found && typeof parsed.vin === "string" ? parsed.vin.trim().toUpperCase() : "";
-    return { id: img.id, vin };
   } catch {
-    return { id: img.id, vin: "" };
+    return { id: img.id, vin: "", error: "network" };
   }
+
+  if (!r.ok) {
+    const body = await r.text().catch(() => "");
+    return { id: img.id, vin: "", error: classifyVinError(r.status, body) };
+  }
+
+  let data: { content?: { text?: string }[]; stop_reason?: string };
+  try {
+    data = await r.json() as { content?: { text?: string }[]; stop_reason?: string };
+  } catch {
+    return { id: img.id, vin: "", error: "api" };
+  }
+  const text = data.content?.find(b => b.text)?.text ?? "";
+  // Empty body, a truncation (max_tokens), or a refusal is an AI failure — NOT a clean
+  // "no VIN". Flag it so the inspector retries instead of assuming the photo had no VIN.
+  if (!text || data.stop_reason === "max_tokens" || data.stop_reason === "refusal") {
+    return { id: img.id, vin: "", error: "api" };
+  }
+  let parsed: { found?: boolean; vin?: string } = {};
+  // On a normal 200 the structured schema guarantees valid JSON; an unparseable body
+  // here is anomalous, so treat it as an AI failure rather than a silent clean miss.
+  try { parsed = JSON.parse(text); } catch { return { id: img.id, vin: "", error: "api" }; }
+  const raw = parsed.found && typeof parsed.vin === "string" ? parsed.vin.trim().toUpperCase() : "";
+  // Accept only well-formed VINs; a malformed read is treated as "no VIN" (safe).
+  const vin = VIN_RE.test(raw) ? raw : "";
+  return { id: img.id, vin };
 }

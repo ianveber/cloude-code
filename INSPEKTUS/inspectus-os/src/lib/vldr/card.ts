@@ -30,9 +30,13 @@ export function renderVLDRCard(vehicle, header = {}) {
   const date = header.date || new Date().toISOString().slice(0, 10);
   const els = [];
 
-  // Model + Serial No. (VIN)
+  // Model + Serial No. (VIN). White out BOTH the upper Model-row columns and the 11
+  // serial squares → one clean box; redraw Model + VIN on top, VIN lifted slightly
+  // (Ian, 2026-06-26: "remove the upper columns, one big square, move serial up").
+  els.push(whiteBox(8.9, 11.3, 41.2, 4.4));   // upper Model-row column dividers
   els.push(text(10, 13.4, vehicle.make_model, { size: 13, weight: 700 }));
-  els.push(text(10, 16.5, vehicle.vin,        { size: 12, weight: 700, mono: true }));
+  els.push(whiteBox(8.9, 15.6, 41.2, 4.1));   // serial squares
+  els.push(text(10, 16.9, vehicle.vin, { size: 12.5, weight: 700, mono: true }));
 
   // Damage codes — column-major fill across the 4 numbered columns
   vehicle.damages.slice(0, DMG_CAPACITY).forEach((d, i) => {
@@ -49,16 +53,21 @@ export function renderVLDRCard(vehicle, header = {}) {
   const remarks = buildRemarks(vehicle.damages, ": ");
   if (remarks) els.push(block(25, 67.4, 73, remarks, { size: 9.5 }));
 
+  // X under the SHIP icon — COLUMN 1 ONLY (Ian, 2026-06-26). Calibrated against the form.
+  els.push(center(36.2, 80.0, "X", { size: 13, weight: 900 }));
+
   // Bottom carrier / inspector block. Value-cell centres (the value column is subdivided finer than
   // the label column): Delivering 81.9 · Truck/Ship 83.85 · Sig 85.75 · Receiving 90.0 · Sig 95.15 · Date 97.3
-  els.push(text(44.5, 81.9,  header.delivering_party, { size: 9.5, weight: 700 }));
-  els.push(text(44.5, 83.85, header.transport_id,     { size: 9.5 }));            // Truck No./Ship = vessel
-  els.push(text(44.5, 90.0,  header.receiving_party,  { size: 9.5, weight: 700 }));
-  els.push(text(44.5, 97.3,  date, { size: 10, weight: 600 }));
+  // All inspector text in COLUMN 1 (Ian, 2026-06-26).
+  els.push(text(25, 81.9,  header.delivering_party, { size: 9.5, weight: 700 }));
+  els.push(text(25, 83.85, header.transport_id,     { size: 9.5 }));            // Truck No./Ship = vessel
+  els.push(text(25, 90.0,  header.receiving_party,  { size: 9.5, weight: 700 }));
+  els.push(text(25, 97.3,  date, { size: 10, weight: 600 }));
 
   // INSPECTUS logo + signature (extracted from PRINT VLDR.xlsx, image6) — mandatory on the VLDR.
-  els.push(img(45.5, 85.75, "/inspectus-signature.jpeg", 30));   // delivering carrier signature
-  els.push(img(45.5, 95.15, "/inspectus-signature.jpeg", 30));   // inspector signature
+  // Both Inspectus stamps in COLUMN 1 (Ian, 2026-06-26).
+  els.push(img(26, 85.75, "/inspectus-signature.jpeg", 30));   // delivering carrier signature
+  els.push(img(26, 95.15, "/inspectus-signature.jpeg", 30));   // inspector signature
 
   return `<div class="vldr-card" data-vin="${esc(vehicle.vin)}" style="position:relative;width:${FORM_W}px;height:${FORM_H}px;background:#fff;font-family:'Open Sans',Arial,sans-serif;color:#111;overflow:hidden;">
     <img src="/eu6546-form.png" alt="EU 6546" style="position:absolute;inset:0;width:100%;height:100%;display:block;">
@@ -90,6 +99,10 @@ function block(x, y, wPct, t, o = {}) {
 // image, left-aligned, vertically centred on y, fixed pixel height
 function img(x, y, src, hPx) {
   return `<img src="${src}" alt="" style="position:absolute;left:${x}%;top:${y}%;height:${hPx}px;transform:translateY(-50%);">`;
+}
+// opaque white rectangle — covers fixed form lines (e.g. the 11 serial squares)
+function whiteBox(x, y, wPct, hPct) {
+  return `<div style="position:absolute;left:${x}%;top:${y}%;width:${wPct}%;height:${hPct}%;background:#fff;"></div>`;
 }
 
 function fmtSev(s) {

@@ -1,6 +1,6 @@
 "use client";
 // @ts-nocheck
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import * as claude from "@/lib/vldr/claude-client";
 import { applyFilter } from "@/lib/vldr/filter";
 import { toVinFilajRows, buildRemarks } from "@/lib/vldr/transform";
@@ -49,7 +49,29 @@ function computeChatStats(vehicles: any[]) {
   };
 }
 
+// Deterministic "outcome of the run" — always works (no AI call), instant.
+function buildOutcome(s: any) {
+  const pct = (n: number, d: number) => (d ? Math.round((n / d) * 1000) / 10 : 0);
+  const cd = s.class_distribution || {};
+  return {
+    vehicles: s.vehicle_count,
+    damaged: s.vehicles_damaged,
+    damagedPct: pct(s.vehicles_damaged, s.vehicle_count),
+    remarks: s.vehicles_with_remarks,
+    total: s.total_damage_records,
+    damage: cd["Damage"] || 0,
+    observation: cd["Observation"] || 0,
+    noDamage: cd["No Damage Evidence"] || 0,
+    blank: cd["(blank)"] || 0,
+    sev: s.severity_histogram || { 1: 0, 2: 0, 3: 0 },
+    topCodes: (s.top_damage_codes || []).slice(0, 5).map((c: any) => `${c.code} (${c.count})`).join(", "),
+    topParts: (s.damaged_parts || []).slice(0, 5).map((p: any) => `${p.part} (${p.count})`).join(", "),
+  };
+}
+
 export default function ChatFilter({ vehicles, header, maxDamages }: Props) {
+  const stats = useMemo(() => computeChatStats(vehicles), [vehicles]);
+  const outcome = useMemo(() => buildOutcome(stats), [stats]);
   const [query, setQuery] = useState("");
   const [feedback, setFeedback] = useState("");
   const [answer, setAnswer] = useState("");
@@ -65,7 +87,7 @@ export default function ChatFilter({ vehicles, header, maxDamages }: Props) {
     setAnswer("");
     setFiltered(null);
 
-    const result = await claude.ask(q, computeChatStats(vehicles));
+    const result = await claude.ask(q, stats);
     setLoading(false);
 
     if (result.error) { setFeedback(`Napaka: ${result.error}`); return; }
@@ -90,8 +112,20 @@ export default function ChatFilter({ vehicles, header, maxDamages }: Props) {
   return (
     <div style={{ marginTop: 32, borderTop: "1px solid var(--border)", paddingTop: 20 }}>
       <div style={{ fontWeight: 700, fontSize: 15, color: "var(--navy-deep)", marginBottom: 10 }}>
-        Vprašaj po podatkih
+        Pregled & vprašanja
       </div>
+
+      {/* Outcome of the run — shown automatically, computed locally (no AI needed) */}
+      <div style={{ background: "#f7f9fb", border: "1px solid var(--border, #e0e4e8)", borderRadius: 10, padding: "14px 16px", marginBottom: 14, fontSize: 13.5, lineHeight: 1.7, color: "#333" }}>
+        <div style={{ fontWeight: 700, color: "var(--navy-deep)", marginBottom: 6 }}>📋 Pregled obdelave</div>
+        <div><b>{outcome.vehicles}</b> vozil obdelanih · <b>{outcome.damaged}</b> poškodovanih ({outcome.damagedPct} %) · <b>{outcome.remarks}</b> z opombami</div>
+        <div><b>{outcome.total}</b> zapisov poškodb — Damage: <b>{outcome.damage}</b>, Observation: <b>{outcome.observation}</b>, brez poškodbe: <b>{outcome.noDamage}</b>{outcome.blank ? <>, <span style={{ color: "#a01f0a" }}>brez razreda: {outcome.blank}</span></> : null}</div>
+        <div>Resnost — 1: <b>{outcome.sev[1]}</b> · 2: <b>{outcome.sev[2]}</b> · 3: <b>{outcome.sev[3]}</b></div>
+        {outcome.topCodes && <div>Najpogostejše kode: {outcome.topCodes}</div>}
+        {outcome.topParts && <div>Najbolj poškodovani deli: {outcome.topParts}</div>}
+        <div style={{ marginTop: 6, color: "#6b7280", fontSize: 12.5 }}>Spodaj lahko vprašaš karkoli o teh podatkih.</div>
+      </div>
+
       <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
         <input
           type="text"

@@ -26,6 +26,12 @@ export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isAuthRoute = path.startsWith("/prijava") || path.startsWith("/auth");
 
+  // API routes must never 302 to an HTML login page — that breaks fetch()/JSON parsing
+  // (e.g. if a session expires mid-use). Return a clean 401 the caller can handle. The
+  // route stays auth-gated; this just changes the FORM of the rejection, not whether.
+  if (!user && path.startsWith("/api")) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
   if (!user && !isAuthRoute) {
     const to = request.nextUrl.clone();
     to.pathname = "/prijava";
@@ -40,6 +46,8 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Run on everything except static assets and the favicon/logo.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|inspectus-logo.png|sample-survey-report.xlsx|eu6546-form.png|inspectus-signature.jpeg).*)"],
+  // Run on everything except Next internals and static assets (matched by extension, so
+  // any newly-added /public file is covered automatically). /api stays IN scope so the
+  // proxy can return a clean 401 JSON (not an HTML redirect) for unauthenticated calls.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|xlsx|txt|xml)$).*)"],
 };
