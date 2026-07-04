@@ -90,5 +90,8 @@ The warm Beehiiv list gets **first crack** at the 100 spots. Never fake the coun
 | `04-funnel-sales-system.md` | The no-leak funnel map, lead magnet, value ladder, the full **Slovenian email sequences (~13)**, checkout/retention, metrics |
 | `05-30-day-launch-plan.md` | The day-by-day Day 1–30 calendar (personal / app / email / build columns), weekly themes, assets, risks |
 | `06-iman-redteam.md` | The brutal honest critique — strengths, where it leaks, the 20% cut, the real expectations. **Read this second.** |
+| `07-lead-magnet-tim-7day.md` + `.pdf` | **KEEP #2** — Tim's free 7-day speed/explosiveness protocol (Slovenian). The `.pdf` is the athlete-facing file you hand out for the email opt-in. |
+| `08-launch-email-sequence.md` | **KEEP #4** — the 5 drop-in Slovenian Beehiiv launch emails (cart-open → story → objection → scarcity → close) + a "load into Beehiiv" quick-start. |
+| `09-team-marketing-protocol.md` | The Iman consulting session for your 5-person team: seats, one-A-per-row RACI, cadence, decision rights, dashboard, 30-day overlay. Fill in the names table at the top and hand it back for personalization. |
 
-*Reading order: this file → `06` (the honest cut) → then `04` and `05` when you're ready to execute. `01–03` are the deep reference.*
+*Reading order: this file → `06` (the honest cut) → `09` (assign your team) → then `04`, `05`, `07`, `08` when you execute. `01–03` are the deep reference.*
