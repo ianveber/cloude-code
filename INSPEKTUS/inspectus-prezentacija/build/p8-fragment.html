@@ -1,0 +1,103 @@
+<style>
+  /* ===== P8 · Pametni filter — pipeline ===== */
+  #page-8 .p8-chart { position:relative; height:112mm; margin-top:4mm; }
+  #page-8 .p8-n {
+    width:55mm; height:25mm;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:2.5mm 3.5mm; font-size:10pt;
+  }
+  #page-8 .p8-n .sub { margin-top:1.2mm; font-size:8pt; }
+  #page-8 .p8-num {
+    position:absolute; top:-3.1mm; left:-3.1mm;
+    width:6.4mm; height:6.4mm; border-radius:50%;
+    background:var(--navy); color:#fff;
+    border:0.7mm solid var(--bg);
+    font-size:9.5pt; font-weight:700; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #page-8 .p8-tray {
+    left:118mm; top:47mm; width:52mm; height:17mm;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:2.5mm 3.5mm;
+  }
+  #page-8 .p8-tray .sub { margin-top:1mm; font-size:8pt; }
+  #page-8 .p8-ghost { left:221mm; top:33mm; width:41mm; padding:2mm 3mm; font-size:9pt; }
+  #page-8 .p8-ghost .sub { margin-top:0.8mm; font-size:8pt; }
+  #page-8 .p8-warn { left:221mm; top:57mm; width:41mm; height:21mm; font-weight:600; }
+  #page-8 .p8-warn span { display:block; }
+  #page-8 .p8-warn span + span { border-top:1px solid #eacfc9; margin-top:1.5mm; padding-top:1.5mm; }
+  #page-8 .p8-lab {
+    position:absolute; font-size:8pt; color:var(--muted);
+    background:var(--bg); padding:0 1mm; line-height:1.2;
+  }
+  #page-8 .p8-legend { position:absolute; left:6mm; top:48mm; font-size:8.5pt; color:var(--muted); line-height:2; }
+  #page-8 .p8-legend i { display:inline-block; width:9mm; vertical-align:middle; margin-right:2.2mm; border-top:0.55mm solid var(--navy); }
+  #page-8 .p8-legend i.dash { border-top:0.45mm dashed var(--muted); }
+  #page-8 .p8-proof {
+    margin-top:5mm; background:var(--bg-soft);
+    border:1px solid var(--border); border-radius:10px;
+    padding:4mm 6mm;
+  }
+  #page-8 .p8-proof .main { font-size:11.5pt; font-weight:600; color:var(--navy-deep); }
+  #page-8 .p8-proof .small { font-size:9pt; color:var(--muted); margin-top:1.5mm; }
+</style>
+
+<div class="chart p8-chart">
+  <svg class="wire" viewBox="0 0 265 112" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowP8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3.4" markerHeight="3.4" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--navy)"/>
+      </marker>
+      <marker id="arrowP8m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+      </marker>
+    </defs>
+    <!-- main flow, row 1 -->
+    <line x1="58"  y1="14.5" x2="70.6"  y2="14.5" stroke="var(--navy)" stroke-width="0.5" marker-end="url(#arrowP8)"/>
+    <line x1="126" y1="14.5" x2="138.6" y2="14.5" stroke="var(--navy)" stroke-width="0.5" marker-end="url(#arrowP8)"/>
+    <line x1="194" y1="14.5" x2="206.6" y2="14.5" stroke="var(--navy)" stroke-width="0.5" marker-end="url(#arrowP8)"/>
+    <!-- 4 -> 5 -->
+    <line x1="214" y1="27" x2="214" y2="83.6" stroke="var(--navy)" stroke-width="0.5" marker-end="url(#arrowP8)"/>
+    <!-- row 2, right to left -->
+    <line x1="207" y1="96.5" x2="160.4" y2="96.5" stroke="var(--navy)" stroke-width="0.5" marker-end="url(#arrowP8)"/>
+    <line x1="105" y1="96.5" x2="58.4"  y2="96.5" stroke="var(--navy)" stroke-width="0.5" marker-end="url(#arrowP8)"/>
+    <!-- dashed exceptions -->
+    <line x1="160" y1="27" x2="152.4" y2="46.6" stroke="var(--muted)" stroke-width="0.4" stroke-dasharray="1.8 1.8" marker-end="url(#arrowP8m)"/>
+    <line x1="128" y1="84" x2="133.8" y2="64.4" stroke="var(--muted)" stroke-width="0.4" stroke-dasharray="1.8 1.8" marker-end="url(#arrowP8m)"/>
+    <line x1="241" y1="27" x2="241" y2="32.6" stroke="var(--muted)" stroke-width="0.4" stroke-dasharray="1.8 1.8" marker-end="url(#arrowP8m)"/>
+    <line x1="241" y1="84" x2="241" y2="78.4" stroke="var(--muted)" stroke-width="0.4" stroke-dasharray="1.8 1.8" marker-end="url(#arrowP8m)"/>
+  </svg>
+
+  <!-- row 1 -->
+  <div class="node p8-n" style="left:3mm;top:2mm;"><span class="p8-num">1</span><span>Zajem</span><span class="sub">vsaka fotografija s časom in vrstnim redom</span></div>
+  <div class="node p8-n" style="left:71mm;top:2mm;"><span class="p8-num">2</span><span>Prepoznava vrste fotografije</span><span class="sub">VIN tablica ali poškodba</span></div>
+  <div class="node node--ai p8-n" style="left:139mm;top:2mm;"><span class="p8-num">3</span><span>Branje VIN</span><span class="sub">AI vid + dvojna kontrola: 17 znakov, dovoljeni znaki</span></div>
+  <div class="node p8-n" style="left:207mm;top:2mm;"><span class="p8-num">4</span><span>Združevanje po vozilih</span><span class="sub">fotografija VIN odpre novo vozilo; poškodbe sledijo svojemu VIN-u</span></div>
+
+  <!-- row 2 -->
+  <div class="node p8-n" style="left:207mm;top:84mm;"><span class="p8-num">5</span><span>Preverjanje s seznamom ladje</span><span class="sub">vsak prebran VIN se primerja s seznamom razkladanja</span></div>
+  <div class="node p8-n" style="left:105mm;top:84mm;"><span class="p8-num">6</span><span>Ocena zanesljivosti</span><span class="sub">zanesljivo → samodejno · negotovo → predal »Nerazvrščeno«</span></div>
+  <div class="node p8-n" style="left:3mm;top:84mm;"><span class="p8-num">7</span><span>Zapis vozila</span><span class="sub">VIN + fotografije + podatki → poročila (VLDR, Constat)</span></div>
+
+  <!-- review tray (single bronze emphasis) -->
+  <div class="node node--vin p8-tray"><span>»Nerazvrščeno«</span><span class="sub">predal za ročni pregled — nič se ne izgubi</span></div>
+
+  <!-- side branches -->
+  <div class="node node--ghost p8-ghost"><span>Dva inšpektorja</span><span class="sub">ločena tokova, brez mešanja</span></div>
+  <div class="badge-warn p8-warn"><span>VIN ni na seznamu ladje → opozorilo</span><span>vozilo s seznama brez fotografij → opozorilo</span></div>
+
+  <!-- line labels -->
+  <div class="p8-lab" style="left:159mm;top:33.5mm;">zamegljen VIN</div>
+  <div class="p8-lab" style="left:135mm;top:72.5mm;">negotovo</div>
+
+  <!-- legend -->
+  <div class="p8-legend">
+    <div><i></i>samodejna pot</div>
+    <div><i class="dash"></i>izjema — v ročni pregled</div>
+  </div>
+</div>
+
+<div class="p8-proof">
+  <div class="main">Jedro filtra že deluje — preizkušeno na resničnih fotografijah vozil. AI je VIN pravilno prebral v 9 od 9 primerov.</div>
+  <div class="small">Dvojna kontrola: oblika VIN (17 znakov) in seznam ladje — filter nikoli ne ugiba.</div>
+</div>
