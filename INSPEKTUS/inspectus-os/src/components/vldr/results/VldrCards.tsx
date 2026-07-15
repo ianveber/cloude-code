@@ -28,7 +28,13 @@ export default function VldrCards({ vehicles, header }: Props) {
     if (!containerRef.current) return;
     setZip("…");
     try {
-      await downloadAllVldrZip(containerRef.current, (i: number, n: number) => setZip(`${i}/${n}`));
+      const res = await downloadAllVldrZip(containerRef.current, (i: number, n: number) => setZip(`${i}/${n}`));
+      if (res && res.failed > 0)
+        alert(`Izvoženih ${res.total - res.failed} od ${res.total} kartic. ${res.failed} kartic ni bilo mogoče izvoziti.`);
+    } catch (e) {
+      console.error("ZIP export failed", e);
+      const msg = e instanceof Error && e.message ? e.message : "Izvoz vseh kartic ni uspel. Poskusi znova ali prenesi posamezno kartico.";
+      alert(msg);
     } finally { setZip(""); }
   }
 

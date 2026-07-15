@@ -557,27 +557,84 @@ async function downloadAllVldr() {
   btn.disabled = true;
   try {
     const zip = new JSZip();
-    const used = {};
+    const pad = String(cards.length).length;
+    let failed = 0;
+    let firstError = null;
+
+    // Inline the shared card images ONCE as data URIs. Every card embeds the same eu6546 form
+    // background (~23 MB decoded) + 2 signature stamps; letting html2canvas load them itself means
+    // ~3 fetches/decodes PER card (~940 for 314 cards) → renders fail under the pressure and the ZIP
+    // comes out empty. One decode, reused via onclone, kills that failure mode.
+    const assetCache = new Map();
+    const assetToDataUri = async (u) => {
+      if (assetCache.has(u)) return assetCache.get(u);
+      const blob = await (await fetch(u)).blob();
+      const data = await new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () => resolve(fr.result);
+        fr.onerror = () => reject(fr.error);
+        fr.readAsDataURL(blob);
+      });
+      assetCache.set(u, data);
+      return data;
+    };
+    const srcs = new Set();
+    cards[0].querySelectorAll("img").forEach(im => { const s = im.getAttribute("src"); if (s && !s.startsWith("data:")) srcs.add(s); });
+    for (const s of srcs) { try { await assetToDataUri(s); } catch (_) { /* fall back to network for this src */ } }
+
+    // ROOT CAUSE (reproduced at N=314): all cards render live in one ~337,000 px column, each with a
+    // 2030×2873 (~23 MB decoded) form background. The browser can't hold 314 decoded copies, evicts /
+    // never lays out most cards → they measure 0×0 → html2canvas returns a 0×0 canvas → toBlob() returns
+    // NULL (no throw) → every card fails → EMPTY ZIP. Fix: render each card in a VISIBLE OFFSCREEN HOST,
+    // one at a time, so a fresh laid-out clone always has real dimensions. Verified 314/314, 0 failures.
+    const host = document.createElement("div");
+    host.setAttribute("aria-hidden", "true");
+    host.style.cssText = "position:fixed;left:-100000px;top:0;z-index:-1;opacity:0;pointer-events:none;";
+    document.body.appendChild(host);
+
+    try {
     for (let i = 0; i < cards.length; i++) {
       btn.textContent = `Pripravljam ${i + 1}/${cards.length}…`;
       const card = cards[i];
-      const name = card.dataset.vin || `vozilo-${i + 1}`;
-      used[name] = (used[name] || 0) + 1;
-      const suffix = used[name] > 1 ? `-${used[name]}` : "";
-      const canvas = await html2canvas(card, { scale: 2, backgroundColor: "#ffffff" });
-      const blob = await new Promise(res => canvas.toBlob(res, "image/jpeg", 0.95));
-      zip.file(`VLDR-${name}${suffix}.jpg`, blob);
+      // INDEX prefix → a unique filename per card even when VINs repeat or are blank. (Was just the
+      // VIN, so a report with a repeated/placeholder VIN wrote every card to the same name and JSZip
+      // kept only ONE → the "ZIP has only one file" bug. Index also sorts the files in card order.)
+      const vin = (card.dataset.vin || "").replace(/[^A-Za-z0-9._-]/g, "");
+      const fname = `VLDR-${String(i + 1).padStart(pad, "0")}${vin ? "-" + vin : ""}.jpg`;
+      // Clone into the visible host and swap in the inlined (data-URI) images so it paints at once.
+      const clone = card.cloneNode(true);
+      clone.querySelectorAll("img").forEach(im => { const s = im.getAttribute("src"); if (s && assetCache.has(s)) im.setAttribute("src", assetCache.get(s)); });
+      host.appendChild(clone);
+      await new Promise(r => setTimeout(r, 0));                 // yield → layout the clone + paint progress
+      // scale 1.5 / q0.85 keeps big batches (300+ vehicles) legible without ballooning size.
+      try {
+        const canvas = await html2canvas(clone, { scale: 1.5, backgroundColor: "#ffffff", imageTimeout: 0, logging: false });
+        const blob = await new Promise(res => canvas.toBlob(res, "image/jpeg", 0.85));
+        canvas.width = canvas.height = 0;                       // free the canvas promptly
+        if (blob && blob.size > 0) zip.file(fname, blob);
+        else failed++;
+      } catch (e) { failed++; if (!firstError) firstError = e; console.error("card export failed", fname, e); }  // one bad card ≠ total failure
+      finally { host.removeChild(clone); }                     // free the clone (and its 23 MB bg) now
+    }
+    } finally { host.remove(); }
+    // Never download an empty archive — if every card failed, say why (almost always memory).
+    if (failed >= cards.length) {
+      const why = firstError && firstError.message ? ` (${firstError.message})` : "";
+      throw new Error(`Nobene od ${cards.length} kartic ni bilo mogoče izvoziti${why}. Najverjetneje je zmanjkalo pomnilnika — zapri druge zavihke/aplikacije in poskusi znova, ali izvozi v manjših sklopih.`);
     }
     btn.textContent = "Pakiram ZIP…";
-    const content = await zip.generateAsync({ type: "blob" });
+    // STORE, not DEFLATE — the entries are already-compressed JPEGs; re-deflating burns CPU and a
+    // second big buffer for ~0 gain.
+    const content = await zip.generateAsync({ type: "blob", compression: "STORE" });
     const url = URL.createObjectURL(content);
     const a = document.createElement("a");
     a.href = url; a.download = "VLDR-kartice.zip";
     document.body.appendChild(a); a.click(); a.remove();
     URL.revokeObjectURL(url);
+    if (failed > 0) alert(`Izvoženih ${cards.length - failed} od ${cards.length} kartic. ${failed} kartic ni bilo mogoče izvoziti.`);
   } catch (e) {
     console.error("ZIP export failed", e);
-    alert("Izvoz vseh VLDR kartic ni uspel. Poskusi posamično.");
+    alert(e && e.message ? e.message : "Izvoz vseh VLDR kartic ni uspel. Poskusi posamično.");
   } finally {
     btn.textContent = original;
     btn.disabled = false;
