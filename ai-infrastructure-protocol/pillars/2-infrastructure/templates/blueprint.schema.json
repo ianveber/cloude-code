@@ -1,0 +1,194 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "blueprint.schema.json",
+  "title": "AI Infrastructure Protocol — blueprint (Gate 1 contract, to-be model + ranked backlog)",
+  "description": "Output of G1 BLUEPRINT. For EVERY process in company-scan.json it records a disposition (keep-human / augment-ai / fully-automate) under a default-to-automate rule, names the concrete artifact that delivers each augment/automate, and produces a build backlog ranked by impact × effort with an ai_involvement_score per item. Gate 1 validates .protocol/blueprint.json against this schema. Gate 1 green requires: every scanned process id present exactly once in dispositions[]; every 'keep-human' carrying a justification; every 'augment-ai'/'fully-automate' naming an artifact; and every artifact appearing as a backlog item with a rank and an ai_involvement_score.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "company",
+    "blueprint",
+    "dispositions",
+    "backlog",
+    "coverage",
+    "aiInvolvement"
+  ],
+  "properties": {
+    "company": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "scanRef"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "scanRef": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path/hash of the company-scan.json this blueprint was derived from. Ties the to-be model to the exact as-is map it answers."
+        }
+      }
+    },
+    "blueprint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["designedAt", "operator", "operatingModel"],
+      "properties": {
+        "designedAt": { "type": "string", "format": "date-time" },
+        "operator": { "type": "string", "minLength": 1 },
+        "operatingModel": {
+          "type": "string",
+          "minLength": 1,
+          "description": "One-paragraph narrative of the target AI operating model: what the company looks like once built, where humans sit, where AI runs the line."
+        }
+      }
+    },
+    "dispositions": {
+      "type": "array",
+      "minItems": 1,
+      "description": "One disposition per scanned process. Exactly one entry per processId in the scan — no gaps, no duplicates. This is the core decision surface of the whole product.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["processId", "processName", "disposition", "rationale"],
+        "properties": {
+          "processId": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "description": "Must match a process id from company-scan.json."
+          },
+          "processName": { "type": "string", "minLength": 1 },
+          "disposition": {
+            "type": "string",
+            "enum": ["keep-human", "augment-ai", "fully-automate"],
+            "description": "Default-to-automate rule: choose fully-automate unless a decision/judgement/relationship/liability reason forces augment-ai, and keep-human only when a documented constraint forbids AI entirely."
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Why this disposition. For keep-human this is a REQUIRED justification against the default (regulatory, relationship, safety, irreducible judgement) — 'we prefer a person' is not sufficient."
+          },
+          "humanOnlyReason": {
+            "type": "string",
+            "enum": ["regulatory-mandate", "legal-liability", "high-stakes-judgement", "trust-relationship", "physical-world", "not-yet-feasible"],
+            "description": "REQUIRED whenever disposition = keep-human. Encodes which exception to the automate-default applies. Absence on a keep-human is a Gate 1 red."
+          },
+          "artifacts": {
+            "type": "array",
+            "description": "The concrete thing(s) that deliver this disposition. REQUIRED (minItems 1) whenever disposition is augment-ai or fully-automate; empty/absent for keep-human. Each artifact id must also appear in backlog[].artifactId.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "kind", "name", "delivers"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "description": "Unique artifact slug." },
+                "kind": {
+                  "type": "string",
+                  "enum": ["agent", "automation", "app", "knowledge-base", "workflow", "integration"],
+                  "description": "What gets built. 'app' routes to G2 → Pillar ① (3day-protocol four-gate engine). 'agent'/'automation'/'workflow'/'integration'/'knowledge-base' route to G2 → Pillar ③ agent factory."
+                },
+                "name": { "type": "string", "minLength": 1 },
+                "delivers": { "type": "string", "minLength": 1, "description": "The outcome it produces in one line (e.g. 'auto-drafts and routes invoice approvals, escalates >€5k to a human')." },
+                "replacesSteps": {
+                  "type": "array",
+                  "description": "Which scan step orders this artifact absorbs (from the process's steps[].order). Makes the before/after auditable.",
+                  "items": { "type": "integer", "minimum": 1 }
+                },
+                "buildsOnSkill": {
+                  "type": "array",
+                  "description": "Bundled skills the operator composes to build this (e.g. 'agent-browser', 'composio-cli', 'supabase', 'whatsapp-ai-agent'). Reuse before build.",
+                  "items": { "type": "string", "minLength": 1 }
+                },
+                "dataSensitivity": {
+                  "type": "string",
+                  "enum": ["public", "internal", "confidential", "regulated-pii", "regulated-financial", "regulated-health"],
+                  "description": "Highest sensitivity of data this artifact touches (carried from scan). Drives how hard Pillar ⑤ Security must lean on it at G3."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "backlog": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The build backlog: one item per artifact named in dispositions[], ranked. G2 consumes this — items marked sprint:'this' are built first.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rank", "artifactId", "processId", "kind", "impact", "effort", "priorityScore", "ai_involvement_score", "sprint"],
+        "properties": {
+          "rank": { "type": "integer", "minimum": 1, "description": "1 = build first. Must be unique and dense (1..N) across the backlog." },
+          "artifactId": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "description": "Matches a dispositions[].artifacts[].id." },
+          "processId": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "kind": { "type": "string", "enum": ["agent", "automation", "app", "knowledge-base", "workflow", "integration"] },
+          "impact": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["score", "hoursSavedPerMonth"],
+            "description": "Impact is not a vibe. It is derived from scan volume × hours × pain severity. hoursSavedPerMonth must trace back to the scanned hours for this process.",
+            "properties": {
+              "score": { "type": "integer", "minimum": 1, "maximum": 5, "description": "1=marginal, 5=transformational. Anchored by hoursSavedPerMonth and pain severity, not gut." },
+              "hoursSavedPerMonth": { "type": "number", "minimum": 0 },
+              "eurSavedPerMonth": { "type": "number", "minimum": 0, "description": "hoursSavedPerMonth × loadedHourlyCost from the scan, if cost was captured. Feeds G4." }
+            }
+          },
+          "effort": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["score", "buildDays"],
+            "properties": {
+              "score": { "type": "integer", "minimum": 1, "maximum": 5, "description": "1=hours, 5=multi-week. Higher = more effort." },
+              "buildDays": { "type": "number", "minimum": 0 },
+              "blockers": { "type": "array", "items": { "type": "string" }, "description": "e.g. 'tool has no API', 'needs client OAuth', 'egress-blocked host'." }
+            }
+          },
+          "priorityScore": {
+            "type": "number",
+            "description": "Ranking key = impact.score / effort.score (higher = do first). Recorded explicitly so the rank order is reproducible and auditable, not asserted."
+          },
+          "ai_involvement_score": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "How much of this process AI runs once the artifact ships: 0 = purely human, 100 = zero-human-touch autonomous. fully-automate targets ≥80; augment-ai typically 40-79; keep-human items do not appear in the backlog. This is the objective-function metric the whole product optimizes and the headline number G4 sells."
+          },
+          "sprint": {
+            "type": "string",
+            "enum": ["this", "next", "later"],
+            "description": "'this' = build now (Gate 2 checks all 'this' items are built+registered+green). 'next'/'later' = staged."
+          },
+          "securityTier": {
+            "type": "string",
+            "enum": ["standard", "elevated", "critical"],
+            "description": "How hard Pillar ⑤ must lean on it at G3, derived from dataSensitivity + autonomy. 'critical' = regulated data and/or high autonomy."
+          }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Self-checking counts. Gate 1 cross-validates: dispositionsCount must equal the number of processes in the scan, and every augment/automate disposition must have produced a backlog item.",
+      "required": ["processesInScan", "dispositionsCount", "keepHumanCount", "augmentCount", "automateCount", "backlogItems"],
+      "properties": {
+        "processesInScan": { "type": "integer", "minimum": 1 },
+        "dispositionsCount": { "type": "integer", "minimum": 1 },
+        "keepHumanCount": { "type": "integer", "minimum": 0 },
+        "augmentCount": { "type": "integer", "minimum": 0 },
+        "automateCount": { "type": "integer", "minimum": 0 },
+        "backlogItems": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "aiInvolvement": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Rollup of the objective function. The before/after AI-involvement of the whole company — the single number the engagement is judged on and the thesis line G4 leads with.",
+      "required": ["asIsPercent", "toBePercent", "method"],
+      "properties": {
+        "asIsPercent": { "type": "integer", "minimum": 0, "maximum": 100, "description": "Weighted AI involvement across all processes today (usually near 0)." },
+        "toBePercent": { "type": "integer", "minimum": 0, "maximum": 100, "description": "Weighted AI involvement once the backlog ships. Weighted by process hours so it reflects where the work actually is, not process count." },
+        "method": { "type": "string", "minLength": 1, "description": "One line: how the weighting was computed (e.g. 'sum(process_hours × ai_involvement_score) / sum(process_hours)')." }
+      }
+    }
+  }
+}
