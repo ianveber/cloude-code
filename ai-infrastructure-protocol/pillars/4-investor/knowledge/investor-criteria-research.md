@@ -1,254 +1,317 @@
-# Investor-Readiness Criteria — Research Findings (2026)
+# Investor-Readiness Criteria — Research Findings (2025–2026)
 
-> Knowledge base for Pillar ④ (Investor-Readiness). This is the researched
-> evidence behind the DRAFT rubric in `../SKILL.md`. It becomes a knowledge PDF
-> (via `make-pdf`) in the delivered protocol. Findings are dated to 2026 sources;
-> numbers are public benchmarks, NOT Ian's own deal data — see the SKILL's
-> `AWAITING IAN'S DOCS` section.
+> Knowledge base for Pillar ④ (Investor-Readiness). This is the researched evidence
+> behind the rubric in `../SKILL.md`. It becomes a knowledge PDF (via `make-pdf`) in
+> the delivered protocol. Numbers are public benchmarks with a source and year on
+> each — they are NOT Ian's own deal data (see the SKILL's `AWAITING IAN'S DOCS`).
 
-Research date: 2026-07-17. All figures below carry a source; where a claim is a
-range or a median, that is the source's framing, not a smoothed guess.
+## §0 — How to read this (and verification status)
 
----
+Research dates: first pass 2026-07-17 (practitioner/blog tier); primary-source pass
+2026-07-17 via the deep-research harness (VC-firm and benchmark-survey tier).
 
-## §1 — How VCs evaluate startups in 2026 (the frame)
+**Source tiers** are marked on each number:
+- **[P]** Primary — a VC firm, benchmark survey, or institutional report (Bessemer,
+  a16z, High Alpha/OpenView, SaaS Capital, Benchmarkit, Point Nine, Atomico, YC,
+  CFA Institute). Trust these for the rubric bars.
+- **[S]** Secondary — practitioner/CFO-firm analysis of primary data (CFO Advisors,
+  CRV, Growth Unhinged, ICONIQ digests). Directionally reliable.
+- **[B]** Blog/aggregator — a single non-authoritative source; treated as a lead, not
+  a bar, and flagged where used.
 
-The foundational lens is unchanged — **Team, Product, Market, Traction** — but the
-bars moved:
+**Verification note (honest):** the deep-research harness's automated 3-vote
+adversarial verification pass did NOT complete — it hit a provider rate limit, so
+every claim returned `0-0` (zero votes cast, not "refuted"). The numbers below are
+therefore validated the older way: reputable primary sources, cross-referenced
+against each other and against in-distribution knowledge. Where two primaries
+disagree, both figures are shown. Do not treat any single **[B]** number as a bar.
 
-- **AI concentration raised the bar for everyone.** ~80% of venture capital is now
-  flowing into AI, so non-AI (and weak-AI) founders face a tighter market and higher
-  scrutiny on team quality and unit economics. [thevccorner, spectup]
-- **Diligence got slower and deeper.** What used to be a one-week diligence is now
-  one to two months: financial statements, market data, legal structure, technical
-  audits, plus reference calls with customers, industry experts, and prior
-  colleagues. A clean, complete data room is now a speed advantage. [thevccorner]
-- **Team carries the most weight early.** At pre-seed/seed the team often outweighs
-  the product — investors back founders they believe can navigate the unknown. For
-  AI companies specifically, the wanted shape is **deep AI expertise + domain/
-  commercial strength**: a lead engineer who has built end-to-end AI systems (or
-  published), paired with a co-founder who owns the target domain. [thevccorner]
-- **"What's your moat?" is a defensibility test, not a trivia question.** A strong
-  answer is mechanical and compounding, e.g. *"every transaction we process trains
-  our categorization model; we have 4M transactions; a new entrant starts at
-  zero."* [thevccorner]
-
-**Implication for the rubric:** Team (criterion 1) and Moat (5/7) are the two the
-package must make concrete, and the Moat answer must be a loop with a number.
-
-Sources: [The VC Corner — What Top VCs Look For 2026](https://www.thevccorner.com/p/what-top-vcs-look-for-2026-founder-playbook),
-[spectup — What Do VCs Look For](https://www.spectup.com/resource-hub/vc-expectations),
-[SignalX — VC Due Diligence Framework](https://signalx.ai/venture-capital-due-diligence/),
-[4Degrees — 2026 VC Due Diligence Checklist](https://www.4degrees.ai/blog/2025-venture-capital-due-diligence-checklist),
-[TechCon Global — 2026 VC Playbook, AI-First](https://techconglobal.com/the-2026-vc-playbook-how-investment-criteria-are-evolving-in-ai-first-startups/).
+**The through-line:** the market moved from "growth at all costs" to **efficient
+growth**. Investors in 2025–2026 demand a company prove capital efficiency (burn
+multiple, Rule of 40), not just growth — and for AI companies they additionally
+scrutinize gross margin (inference cost) and defensibility (is the moat a data loop
+or just model access?).
 
 ---
 
-## §2 — What makes an AI company defensible (the moat, correctly stated)
+## §1 — The evaluation frame (2025–2026)
 
-The consensus in 2026 is a sharp correction of the naïve "we have AI / we have data"
-claim:
+The lens is still **Team · Market · Product · Traction · Unit economics**, but the
+bars moved and the order of scrutiny shifted:
 
-- **Model access is NOT a moat.** AI compresses time-to-build, so a flashy feature
-  or access to a frontier model is quickly matched. VCs are actively *rethinking*
-  what a moat is because AI collapses build time. [Forbes/Majic, Valtorian]
-- **Proprietary *static* data is NOT a moat either.** "The data advantage myth":
-  owning a pile of data alone won't save you. [Value Add VC]
-- **The real moat is a proprietary DATA LOOP.** Defensibility comes from a feedback
-  loop where *every user action generates a better training signal → improves the
-  model → drives more usage.* Dynamic, compounding data from real workflows is the
-  actual moat. [Valtorian, percolator]
-- **Time is the meta-moat.** What unites durable moats is that they took *years of
-  real elapsed time to accumulate* — time that cannot be parallelized. A copycat with
-  the same model still can't buy the accrued cycles. [Forgent/Medium]
-- **Workflow depth + switching cost.** The more the product becomes part of how a
-  team operates — with human review, exceptions, and structured states — the harder
-  it is to rip out. Deep integration into mission-critical (especially regulated)
-  workflows creates real switching costs. [Valtorian, Codurance, Stanford Law]
-- **Domain specialization beats general-purpose.** AI built for a defined use case
-  (grid operators, architects, lawyers) embeds in ways that feel necessary and are
-  hard to copy. [Latitude Media]
-- **The 2026 shortlist of what still defends:** *workflow depth, proprietary data
-  loops, distribution, switching costs, and execution quality* — not model access.
-  [Valtorian]
+- **Efficient growth is the mandate.** 94% of Bessemer's Cloud 100 were projected
+  profitable by end-2025 [P — Bessemer Cloud 100 2025]. Efficiency is no longer a
+  late-stage concern; 56% of *seed* investors and 83% of Series C+ investors call the
+  **burn multiple** a critical evaluation metric [S — CFO Advisors 2025].
+- **Efficiency is priced, not just praised.** Companies that are efficient (burn <1×,
+  Rule of 40 ≥40) trade at **~2.3× the revenue multiple** of inefficient peers
+  [P — Bessemer Cloud 100 2025].
+- **"What's your moat?" is a defensibility test.** A strong answer is mechanical and
+  compounding: *"every transaction trains our model; we have N cycles; a new entrant
+  starts at zero."* Model access alone is not a moat (§6).
+- **AI concentration raised the bar for everyone.** The overwhelming share of venture
+  dollars now flows to AI, so non-AI and weak-AI companies face tighter scrutiny —
+  and AI companies face *new* scrutiny (margin, defensibility, AI-washing; §5–6).
 
-**Implication for the rubric:** Criterion 5/7 must, per agent, name the loop
-(signal → store → feedback → cycles), the switching cost (integration depth), and
-argue replicate-time from loop age. This is exactly what pillars ②③ instrument.
-
-Sources: [Valtorian — AI Moats in 2026](https://www.valtorian.com/blog/ai-moats-2026),
-[Forbes/Majic — VCs Rethink Startup Moats](https://www.forbes.com/sites/josipamajic/2026/03/31/vcs-rethink-startup-moats-as-ai-compresses-time-to-build/),
-[Value Add VC — The Data Advantage Myth](https://valueaddvc.com/blog/the-data-advantage-myth-why-proprietary-data-alone-wont-save-you),
-[percolator — Building Defensible Start-ups](https://percolator.substack.com/p/ai-moats-building-defensible-start),
-[Forgent — Defensibility in the Age of AI (2026)](https://forgent.medium.com/defensibility-in-the-age-of-ai-2026-81dc59566dc8),
-[Stanford Law — Defensible Moats for Vertical AI (PDF, 2026)](https://law.stanford.edu/wp-content/uploads/2026/06/Defensible-Moats-for-Vertical-AI-Application-Companies-in-a-New-Competitive-Landscape.pdf),
-[Latitude Media — Can startups still build a moat](https://www.latitudemedia.com/news/in-the-age-of-ai-can-startups-still-build-a-moat/),
-[Codurance — Durable Moats in the AI Era](https://www.codurance.com/publications/beyond-functionality-building-durable-moats-in-the-ai-era).
+**Rubric implication:** Team (crit 1) and Moat (crit 5/7) must be concrete, and the
+capital-efficiency criteria (crit 4) are now first-order, not a Series-B afterthought.
 
 ---
 
-## §3 — Unit-economics benchmarks (2026)
+## §2 — Unit-economics benchmarks, US (2025)
 
-The numbers that seed the DRAFT rubric's criterion 4. **These are the placeholders
-pending Ian's docs.**
+Seeds the rubric's criterion 4. Primary source is **Benchmarkit 2025** (Ray Rike's
+survey, ~1,000+ B2B SaaS companies), cross-checked against High Alpha and CFO firms.
 
-| Metric | Healthy / benchmark (2026) | Notes |
+| Metric | Benchmark | Source |
 |---|---|---|
-| **LTV:CAC** | ≥3:1 healthy; 3:1–5:1 typical; top quartile 5:1+ | B2B SaaS median **3.2:1**. By ACV: Enterprise (>$100K) 4.5:1, Mid-market ($15K–100K) 3.2:1, SMB (<$15K) 2.5:1. |
-| **CAC payback** | ≤12 months healthy | Median stretched to **18 months** (up from 14 in 2023, +29% in a year); 4th quartile past 24 months. |
-| **Cost to acquire $1 ARR** | — | Median SaaS now spends **~$2.00 to acquire $1 of new ARR** (up 14% since 2023). |
-| **Gross margin** | 70–85% healthy | Traditional SaaS clears **77–81%**. WARNING: LLM-native companies drop to **~52%** because inference cost drags margin — a live risk for AI companies. |
-| **NRR (net revenue retention)** | >100% | Above 100% with evidence it is *improving* is what Series B wants. |
-| **Rule of 40** | growth% + profit% > 40 | Rule-of-40 companies command a **129% valuation premium** in 2026 (vs 23% in 2022). |
-| **Burn multiple** | <1.5 | Series B expectation. |
-| **Churn** | <1.5%/mo SMB; <0.75%/mo mid-market/enterprise | Series B expectation. |
+| **New CAC ratio** (S&M $ per $1 new ARR) | **$2.00** (up 14% in 2024) | [P] Benchmarkit 2025 |
+| **Expansion CAC** ($ per $1 expansion ARR) | **$1.00** | [P] Benchmarkit 2025 |
+| **Median LTV:CAC** | **3.6 : 1** (classic healthy bar ≥3:1; top quartile 5:1+) | [P] Benchmarkit 2025 |
+| **CAC payback** | healthy **<15 months**; Series A **12–15 mo** (AI: 12–18 mo) | [S] SaaS Mag 2026; CFO Advisors 2026; CRV |
+| **Gross margin (traditional SaaS)** | **>75%** (75–85% healthy) | [S] CFO Advisors 2026; SaaS Mag 2026 |
+| **Gross margin (AI / LLM-native)** | **~45–65%** and climbing — see §5 | [P] Bessemer State of AI 2025; a16z |
+| **NRR (net revenue retention)** | **~101%** median (compressed); >100% wanted, *improving* is the tell | [P] Benchmarkit 2025 |
+| **Expansion as % of new ARR** | **~40%** | [P] Benchmarkit 2025 |
 
-**Implication:** the ~52% LLM-native gross-margin drag is a trap for the exact
-companies this protocol builds. Criterion 4 and the moat doc (§5, provider price
-shock) must show the company's margin math survives inference cost — or explain the
-architecture that keeps it high (caching, smaller models, on-prem, human-in-loop
-volume control).
-
-Sources: [Foundry CRO — LTV:CAC Benchmarks 2026](https://foundrycro.com/blog/ltv-cac-ratio-benchmarks-2026/),
-[Beancount.io — 2026 SaaS Metrics Stack](https://beancount.io/blog/2026/05/10/saas-metrics-founders-must-track-2026-ltv-cac-nrr-churn-cac-payback-benchmarks-guide),
-[RaiseReady — SaaS Unit Economics Bible 2026](https://www.raisereadybook.com/blog/the-saas-unit-economics-bible-the-complete-guide-for-founders.html),
-[Eagle Rock CFO — SaaS Benchmarks by Stage 2026](https://www.eaglerockcfo.com/blog/research/saas-finance-metrics-benchmarks),
-[Digital Applied — SaaS Unit Economics 2026](https://www.digitalapplied.com/blog/saas-unit-economics-2026-cac-ltv-payback-reference).
+The single most investor-legible AI metric is **revenue per employee** — see §5.
 
 ---
 
-## §4 — The AI-native operating-leverage story (revenue per employee)
+## §3 — Growth expectations by stage (the CAGR question)
 
-The single most investor-legible metric for a company this protocol builds:
+"CAGR by stage" for private startups = **ARR growth rate by ARR band.** Primary
+sources: SaaS Capital (1,000+ co survey), High Alpha/OpenView, Bessemer, Point Nine.
 
-- **AI-native firms lead on revenue per employee** — the defining 2026 metric.
-  [Forbes/Baier]
-- **Magnitude: $2–4M ARR per employee** for AI-native companies, roughly **4×** the
-  traditional-SaaS benchmark; some outliers far higher (Midjourney: ~$200M revenue /
-  ~11 people ≈ **$18M/employee**). Other sources frame it as **2–10×** traditional
-  SaaS. [nicktalwar, RiffOn]
-- **Why it happens — structural, not per-head heroics.** AI-native orgs run with
-  ~25% fewer people, flatter hierarchies, and higher valuation per employee. ~45% of
-  their headcount is engineering/science (vs ~36% at non-AI startups) — *not* because
-  they hire differently per role, but because the work that used to sit in sales,
-  ops, finance, and admin now happens *in the product*. [Forbes/Sviokla]
-- **The new thesis category:** sub-150 headcount + $100M+ ARR is "a genuinely new
-  category of investment thesis," and the moat is explicitly *"the product loop
-  itself"* — not patents, not static data, not exclusive distribution. [Charaka]
-
-**Implication:** this is the headline of `01-metrics-dashboard.md` and `00-thesis.md`.
-Pillar ②'s baseline (hours/errors per process, pre-AI) → pillar ③'s automation → the
-revenue-per-employee and cost-out delta IS the operating-leverage proof. It is the
-protocol's strongest natural claim because the build literally produces it.
-
-Sources: [Forbes/Baier — AI-Native Firms Lead in Revenue Per Employee](https://www.forbes.com/sites/paulbaier/2026/03/31/ai-native-firms-lead-in-revenue-per-employee/),
-[nicktalwar — $4M Revenue Per Employee](https://nicktalwar.substack.com/p/4m-revenue-per-employee-is-the-new),
-[RiffOn — 2–10× Higher Revenue Per Employee](https://riffon.com/insight/ins_bko640vxb1j3),
-[Charaka Notes — The $5M Employee / AI-Native Revenue Density](https://getmanthan.com/charaka-notes/ai-native-revenue-density/),
-[Forbes/Sviokla — AI-Native Firms Are Flatter, Leaner, More Valuable](https://www.forbes.com/sites/johnsviokla/2026/06/28/ai-native-firms-are-flatter-leaner-and-more-valuable-threat-or-opportunity/),
-[Valere — AI-Native Companies & Operating Leverage](https://www.valere.io/ai-native-companies-mid-market-operating-leverage/).
+- **Market median has compressed:** median private-B2B-SaaS ARR growth **25% in 2025**
+  (down from 30% in 2023); bootstrapped **23%** vs equity-backed **25%** [P — SaaS
+  Capital 2025]. "Efficient growth" replaced "growth at all costs."
+- **Growth scales down with size** (Bessemer's good/better/best ladder, $1M→$100M):
+  the bar is very high at small ARR and eases as you scale [P — Bessemer, Scaling to
+  $100M]. Early-stage venture-grade is roughly:
+  - **Seed → Series A:** Point Nine's 2025 AI-first napkin puts Series A at **2–3×
+    YoY** growth off **$0.5–2.5M ARR** [P — Point Nine 2025].
+  - Later bands step down from triple-digit to the ~25% median as ARR grows.
+- **Retention is a growth multiplier investors price:** moving NRR from the 90s into
+  the 100s adds **~5 percentage points** of growth; the top-NRR cohort grows **83%
+  above** the median [P — SaaS Capital 2025].
+- **AI-native cohort grows faster:** AI-natives grow **~3× faster** than traditional
+  SaaS at the same stage (with a margin trade-off, §5) [S — Growth Unhinged / High
+  Alpha 2025].
 
 ---
 
-## §5 — AI-specific technical due diligence (2026): the discount to avoid
+## §4 — ROI / capital-efficiency metrics (what "prove efficiency" means)
 
-For a company whose *whole pitch* is AI-run ops, this is where the package either
-earns a premium or takes a haircut. Buyers now test **four AI-vulnerability axes:**
-*model dependency, data moat, agentic substitution, talent concentration.*
-[Valutico]
+The efficiency bars investors now demand, **stage-calibrated**. Primary framing:
+Bessemer (Rule of X, Cloud 100); stage burn multiples: CFO Advisors on Sacks' metric.
 
-- **Governance is the overlooked gap, not the model.** "The AI risk in a portfolio
-  company is not in the model. It is in the human governance architecture that
-  standard technical diligence never examines." Buyers ask for a documented **Human
-  Authority Line** for every high-risk AI system, and which decisions are explicitly
-  **non-delegable to AI.** [Falkovia]
-- **Model dependency must be defended with artifacts, not assurances.** Sellers who
-  survive this show three things: (1) a documented **model-provider redundancy
-  plan**, (2) **gross-margin sensitivity tables under provider price shocks**, and
-  (3) evidence the features work. [Falkovia, Valutico]
-- **The haircut is real and non-negotiable.** Unaddressed regulatory, privacy, and
-  technical AI risk draws a **15–30% valuation discount**, applied *before* other
-  discounts stack. "Buyers do not negotiate vulnerability findings; they document
-  them and reduce the price." [Valutico]
-- **Regulatory clock — EU AI Act.** High-risk provisions begin applying in 2026,
-  with major requirements activating around **August 2026** — directly relevant to a
-  Slovenia/EU company (AIS's market). [Security Boulevard, governance-intelligence]
-- **Operational risk sources:** data quality, model behavior, prompts, and
-  third-party dependencies; limited visibility into training/decisions → compliance
-  exposure, vendor lock-in, instability. [Security Boulevard, accuknox]
+**Burn multiple** (net burn ÷ net new ARR — lower is better):
 
-**Implication:** Pillar ⑤ (G3) is not just internal hygiene — its evidence (least-
-privilege, RLS proofs, secret scanning, plus a Human Authority Line and a model-
-provider redundancy plan) is a *valuation lever*. Criterion 8 (Security posture) and
-the moat doc's AI-defenses section exist to convert §5 from a −15–30% haircut into a
-diligence-fast-track. The package must include the authority line and the margin-
-sensitivity-under-price-shock table by name.
-
-Sources: [Security Boulevard — AI Due Diligence Checklist 2026](https://securityboulevard.com/2026/04/ai-due-diligence-checklist-2026-how-to-avoid-ai-implementation-failures-security-risks-and-cost-overruns/),
-[Falkovia — The AI Risk Your Due Diligence Isn't Catching](https://falkovia.com/insights/ai-risk-due-diligence/),
-[Valutico — AI Vulnerability in M&A Due Diligence: 2026 Buyer's Framework](https://valutico.com/ai-vulnerability-in-ma-due-diligence-a-2026-buyers-framework/),
-[OneTrust — Responsible AI in 2026](https://www.onetrust.com/blog/responsible-ai-in-2026-a-3-step-guide-for-governance-that-scales/),
-[AccuKnox — AI Security & Governance Guide 2026](https://accuknox.com/blog/ai-security-and-governance-guide),
-[Governance Intelligence — AI & Compliance 2026](https://www.governance-intelligence.com/regulatory-compliance/how-ai-will-redefine-compliance-risk-and-governance-2026).
-
----
-
-## §6 — What an investor-ready data room contains (2026)
-
-Criterion structure and the `05-data-room-index.md` checklist come from here.
-
-- **Volume:** a well-prepared room is **50–70 documents** across **8 categories**:
-  corporate, financial, legal, IP, team, product/tech, cap table, tax. **Seed skews
-  40–50 docs; Series A needs 60–70.** [Peony, Papermark]
-- **By category (essentials):**
-  - *Corporate/Legal:* Certificate of Incorporation, bylaws, amendments,
-    Certificate of Good Standing, board minutes & consents, stockholder/voting
-    agreements.
-  - *Financials:* seed → pitch deck + basic financials + cap table + incorporation.
-    Series A adds GAAP statements, customer contracts, **12–24 months** of income
-    statement / balance sheet / cash-flow, revenue-stream and cost breakdown (so
-    investors see margins and burn), and a **12–18 month** forecast with clear
-    assumptions. *Not* a five-year fantasy model — Series A cares about near-term use
-    of funds. [Papermark, ascentcfo]
-  - *Cap table:* founders, option pool, investors, ownership %; clean Carta export
-    if used.
-  - *Team:* org chart, key-leader bios, roles this round funds, employment/contractor
-    agreements, and **IP assignments (PIIAs)** signed by every employee & contractor
-    (confirming the company owns the work).
-  - *Product/Tech:* product summary & roadmap, current stage (MVP/beta/launched),
-    what this round funds.
-  - *Pitch:* the core narrative — problem, solution, market, business model,
-    competition, team — crisp and data-backed.
-- **Hygiene that signals competence:** update monthly; version files with dates
-  (`2026-03_Financial_Model_v4.xlsx`, never `Financial Model FINAL.xlsx`); include a
-  master doc explaining the structure. [Papermark, Visible]
-
-**Implication:** `05-data-room-index.md` maps these 8 categories to *what this build
-already produces* (product/tech summary, architecture narrative, metrics, security
-evidence) vs. *what the founder/Ian must supply* (corporate, legal, cap table, tax).
-That split is the honest boundary of what the protocol can and cannot generate.
-
-Sources: [Peony — Startup Data Room Checklist (60-doc standard)](https://www.peony.ink/blog/startup-data-room-checklist),
-[Papermark — Ultimate Startup Data Room Checklist 2026](https://www.papermark.com/blog/startup-data-room-checklist),
-[Haven — Series A Data Room Checklist](https://www.usehaven.com/blog-posts/series-a-data-room-checklist),
-[Visible.vc — Startup Data Room](https://visible.vc/blog/startup-data-room/),
-[AscentCFO — Fundraising Data Room Checklist](https://ascentcfo.com/resources/what-should-be-in-our-fundraising-data-room-the-complete-startup-checklist/).
-
----
-
-## §7 — How this maps to the DRAFT rubric
-
-| Research § | Feeds rubric criterion | Key DRAFT bar it sets |
+| Stage | Benchmark burn multiple | Source |
 |---|---|---|
-| §1 (frame) | 1 Team, whole rubric | team = named operator + built system as proof |
-| §2 (moat) | 5 Moat, 7 AI-defensibility | ≥1 agent with described compounding loop |
-| §3 (economics) | 4 Unit economics | LTV:CAC ≥3:1, GM ≥70%, payback ≤12mo |
-| §4 (leverage) | 3 Traction, 4, 6 Scalability | revenue/employee headline; volume w/ flat headcount |
-| §5 (AI diligence) | 8 Security posture, 7 | G3 green on 100% artifacts + authority line + provider redundancy |
-| §6 (data room) | 05-data-room-index.md | 8 categories mapped: built vs. founder-supplied |
+| Pre-seed / Seed | **2.5–3.4×** (average) | [S] CFO Advisors 2025 |
+| Series A | **≤1.2×** (median ~1.2×) | [S] CFO Advisors 2025/2026 |
+| Growth | **~1.4×** | [S] CFO Advisors 2025 |
+| >$100M ARR | **≤1.0×** | [S] CFO Advisors 2025 |
 
-**Reminder of the boundary:** every number in §3, §4 is a *2026 public benchmark*, a
-starting placeholder. Ian's own investor documentation replaces these with his deal-
-tested bars, weights, stage calibration, and any AIS-specific criteria — at which
-point the `DRAFT-RUBRIC` banner comes off and this doc is re-issued as a knowledge
-PDF via `make-pdf`.
+**Rule of 40 → Rule of X:** growth% + FCF-margin% > 40 is still the line, but Bessemer
+now weights **growth ~2× vs FCF margin** in valuation (the "Rule of X"). The payoff is
+large: a company **>40%** trades near **9.4× revenue** vs **3.5×** for one below 20%
+[P — Bessemer, The Rule of X]. Efficient companies overall trade at **~2.3×** the
+multiple of inefficient peers [P — Bessemer Cloud 100 2025].
+
+**Payback / margin** roll up from §2: CAC payback <15mo, gross margin >75% (traditional)
+or the AI margin path in §5.
+
+---
+
+## §5 — The AI-native economics reality (the margin trap + the leverage story)
+
+This is the section that matters most for a company **this protocol builds**, because
+it is AI-run by design.
+
+**The gross-margin caveat (the trap):** AI/LLM-native companies do NOT hit the 80–90%
+cloud-era gross-margin ceiling, because inference/compute is a real COGS.
+- Bessemer pegs **LLM-native gross margins ~65%** vs the 80–90% cloud ceiling
+  [P — Bessemer State of AI 2025].
+- a16z's canonical framing: AI companies run **50–60% gross margins** vs 60–80%+ SaaS,
+  due to inference COGS, weaker scale economies, and thinner tech moats
+  [P — a16z, The New Business of AI].
+- But it is **climbing:** ICONIQ tracks AI-native GM **41% (2024) → 45% (2025) → 52%
+  projected (2026)**, with inference ~23% of revenue at the scaling stage
+  [S — ICONIQ via Tanay Jaipuria].
+- CRV notes AI-native companies get **extra burn-multiple scrutiny** because variable
+  inference cost inflates apparent software revenue [P — CRV investment criteria].
+
+**Rubric implication:** the rubric must NOT penalize an AI company for a 55–65% gross
+margin (that is normal), but it MUST demand the **margin-expansion path** (caching,
+smaller/distilled models, routing, on-prem, human-in-loop volume control) and a
+**margin-sensitivity table under a provider price shock** (§7). A flat "GM ≥75%" bar
+is wrong for this category.
+
+**The leverage story (the premium):** the offsetting, investor-legible upside is
+operating leverage — **revenue per employee.** AI-native firms lead on it; the build
+this protocol produces (hours removed, throughput added) is literally the proof. Frame
+the cost-taken-out delta as gross-margin lift + revenue/employee, the headline metric
+of the AI-native category.
+
+**The valuation premium is real and quantified (Europe):** AI companies carry a
+**~20% valuation premium at Seed/Series A, ~50% at Series B, and ~2.6× at Series C**
+[P — Atomico State of European Tech 2025, via Sifted].
+
+---
+
+## §6 — AI moat / defensibility, and AI-washing red flags
+
+**What is (and isn't) a moat** — the 2025–2026 consensus, corrected:
+- **Model access is NOT a moat.** AI compresses time-to-build, so a frontier-model
+  feature is matched fast. Durable AI companies defend on **memory/context, workflow
+  depth, and compounding data** [P — Bessemer State of AI 2025]; tech moats alone are
+  thin [P — a16z].
+- **Static proprietary data is NOT enough either.** The moat is a **data LOOP**: every
+  run captures a proprietary signal (corrections, exceptions, labeled outcomes) that
+  improves the next run; a new entrant starts at zero on the accrued cycles.
+- **Workflow depth + switching cost** and **domain specialization** are what make the
+  product hard to rip out.
+
+**AI-washing red flags** (the "unattractiveness" checklist — what makes investors run):
+- CFA Institute's 2025 report catalogues the diligence questions that expose AI-washing:
+  *what algorithms exactly, what training data, how is performance measured, who leads
+  AI* [P — CFA Institute 2025]. A company that can't answer crisply is a flag.
+- The **Builder.ai collapse** is the cautionary post-mortem: the fix is
+  **quantified automation-vs-human-input metrics, training-dataset traceability, and
+  third-party verification** of the proprietary AI [S — Vaultinum]. For a protocol
+  whose pitch is "AI-run," being able to *show* the automation ratio per process
+  (which the pillar-② scan literally measures) is the anti-AI-washing proof.
+
+**Rubric implication:** crit 5/7 must, per agent, name the loop (signal→store→feedback→
+cycles), the switching cost (integration depth), and argue replicate-time from loop
+age — and the package should pre-empt AI-washing with the measured automation ratio.
+
+---
+
+## §7 — AI technical due diligence: the discount to avoid
+
+For a company whose whole pitch is AI-run ops, DD is where the package earns a premium
+or takes a haircut. AI-specific DD items investors and acquirers now probe
+[P — Promise Legal 2026; Fast Data Science]:
+- **Training-data provenance & licensing** (litigation risk), **model ownership**,
+  **AI regulatory exposure**, **vendor/model dependencies**, contract protections.
+- Technical maturity: **model validation** (accuracy/precision/recall), **bias/ethics
+  audits**, **MLOps maturity** (versioning, deployment, monitoring).
+- **Governance, not the model, is the overlooked gap.** Sellers who survive show a
+  documented **Human Authority Line** (which decisions are non-delegable to AI), a
+  **model-provider redundancy plan**, and **gross-margin sensitivity under a provider
+  price shock**.
+- **EU AI Act** high-risk provisions phase in through 2026 — directly relevant to a
+  Slovenia/EU company (AIS's market). Governed, auditable AI is a diligence
+  fast-track, not overhead.
+
+**Rubric implication:** Pillar ⑤ (G3) evidence is a **valuation lever** — least-
+privilege, RLS proofs, secret scanning, plus the Human Authority Line and the
+provider-redundancy + margin-sensitivity artifacts. Criterion 8 exists to convert
+this section from a haircut into a premium.
+
+---
+
+## §8 — The investor-ready data room (due diligence contents)
+
+Criterion structure and `05-data-room-index.md` come from here. Primary source: the
+**YC Series A Diligence Checklist** (Jason Kwon, GC of YC Continuity, from hundreds of
+financings) [P]; stage-graded by Kruze Consulting [S]; volume/format by Peony [B].
+
+- **YC's canonical Series A contents:** corporate records, cap table, IP assignments,
+  material contracts, financials. YC states assembling this *before* the term sheet
+  cuts up to a week off closing [P — YC].
+- **Stage-graded** (Kruze): pre-seed/seed diligence is light (basic model, use of
+  funds, burn, legal basics); Series A adds GAAP statements, 12–24 months of P&L /
+  balance sheet / cash-flow, cohort churn, and a 12–18 month forecast; Series B expects
+  audit-readiness [S — Kruze].
+- **8 standard categories:** corporate · financial · legal/contracts · IP · team/HR ·
+  product/metrics · cap table · tax. **Missing IP assignments (PIIAs) is the #1 legal
+  defect** that stalls DD [B — Peony; corroborated by YC's emphasis on IP assignments].
+- **Volume** grows with stage (seed lighter, Series A fuller). *Caveat:* the specific
+  "60-document / 68% of failed deals / VCs spend 2–3 hours" figures come from a single
+  blog **[B]** and did not survive to verification — use the **structure**, not those
+  statistics, as a bar.
+- **Hygiene that signals competence:** update monthly; date-version files
+  (`2026-03_Financial_Model_v4.xlsx`, never `…FINAL.xlsx`); include a master index.
+
+**Rubric implication:** `05-data-room-index.md` maps the 8 categories to *what this
+build already produces* (product/tech summary, architecture narrative, metrics,
+security evidence, the AI automation-ratio) vs. *what the founder/Ian must supply*
+(corporate, legal, cap table, tax). That split is the honest boundary of the protocol.
+
+---
+
+## §9 — US vs Europe (the geography delta a Slovenian company faces)
+
+AIS builds EU companies, so the European bars matter more than the US ones.
+
+- **European capital is smaller and rounds are fewer-but-larger:** ~$44bn raised in
+  Europe in 2025; median seed/Series A round sizes climbed **23–25%**; US companies are
+  **2× as likely** to raise $50M+; AI captured **$14B in Europe vs $146B in the US**
+  [P — Atomico State of European Tech 2025].
+- **European round bars (Point Nine 2025 AI-first napkin, a European fund):**
+  - **Seed:** $0–1M ARR, **$5–15M pre-money**, **$1–4M** round.
+  - **Series A:** $0.5–2.5M ARR with **2–3× YoY** growth, **$25–75M pre-money**,
+    **$6–18M** round [P — Point Nine 2025].
+- **European valuations trail the US** by roughly **25–30% at every stage**; median
+  pre-seed/seed SaaS valuation ~**€5.1M**; ~**21% dilution** at seed
+  [B/S — Development Corporate 2025 — cross-check against Atomico before quoting].
+- **European KPI norms by ARR band:** Serena × HubSpot's 2025 survey (800+ European
+  SaaS) buckets growth/CAC/retention/headcount by ARR band (<$2M, $2–5M, $5–10M, >$10M)
+  [P — Serena × HubSpot 2025] — the European counterpart to High Alpha/Bessemer.
+
+**Rubric implication:** stage bars must carry a US/EU column (or default to EU for AIS
+engagements). The AI valuation premium (§5) is *European-sourced*, which is the good
+news for AIS-built AI companies.
+
+---
+
+## §10 — Mapping to the rubric (stage-calibrated)
+
+| Research § | Rubric criterion | The bar it sets |
+|---|---|---|
+| §1 frame | 1 Team, whole rubric | named operator + built system as proof; efficiency first-order |
+| §2 economics | 4 Unit economics | CAC $2.00/$1 ARR, LTV:CAC ≥3.6:1, payback <15mo |
+| §3 growth | 3 Traction | median 25%; Series A 2–3× YoY; NRR>100% adds ~5pp |
+| §4 efficiency | 4 + capital efficiency | burn multiple by stage (2.5–3.4× seed → ≤1.2× A); Rule of 40 ≥40 |
+| §5 AI economics | 4 + 6 Scalability | AI GM 45–65% (do not penalize) + margin-expansion path; revenue/employee headline; ~20% AI premium |
+| §6 moat + AI-washing | 5 Moat, 7 AI-defensibility | ≥1 agent with a described compounding loop; measured automation ratio |
+| §7 AI DD | 8 Security posture, 7 | G3 green 100% + Human Authority Line + provider redundancy + margin-sensitivity |
+| §8 data room | `05-data-room-index.md` | YC 8-category contents; built vs founder-supplied split |
+| §9 geography | all stage bars | EU bars (Point Nine/Atomico/Serena) as default for AIS |
+
+**The boundary (unchanged):** every number here is a 2025–2026 public benchmark — a
+calibrated placeholder. Ian's own investor documentation replaces these with his
+deal-tested bars, weights, stage/geography targeting, and any AIS-specific criteria;
+at that point the `DRAFT-RUBRIC` banner comes off and this doc re-issues as a PDF.
+
+---
+
+## Sources (primary tier first)
+
+**Primary [P]:**
+- Bessemer Venture Partners — Scaling to $100 Million; The Cloud 100 Benchmarks 2025;
+  The Rule of X; The State of AI 2025. bvp.com/atlas
+- a16z — The New Business of AI (gross-margin framework). a16z.com
+- High Alpha (successor to OpenView) — 2025 SaaS Benchmarks Report. highalpha.com
+- SaaS Capital — 2025 Private B2B SaaS Growth Rate Benchmarks. saas-capital.com
+- Benchmarkit (Ray Rike) — 2025 SaaS Performance Metrics. benchmarkit.ai
+- Point Nine — The AI-first SaaS Funding Napkin (2025). medium.com/point-nine-news
+- Atomico — State of European Tech 2025 (Investment Trends). stateofeuropeantech.com
+- Serena × HubSpot — European SaaS Benchmark 2025. offers.hubspot.com
+- Y Combinator — Series A Diligence Checklist (Jason Kwon). ycombinator.com/library
+- CFA Institute — AI Washing report (2025). rpc.cfainstitute.org
+- CRV — B2B SaaS AI Startup Investment Criteria. crv.com
+- Promise Legal — AI M&A Due Diligence Checklist (2026); Fast Data Science — AI DD.
+
+**Secondary [S]:** CFO Advisors (2025/2026 burn-multiple & Series A KPI benchmarks);
+Growth Unhinged / Kyle Poyar (2025 High Alpha analysis); ICONIQ via Tanay Jaipuria
+(AI gross-margin trend); SaaS Mag (2026 capital-efficiency roundup); Sifted (Atomico
+digest); Kruze Consulting (stage-graded DD checklist); Vaultinum (Builder.ai post-mortem).
+
+**Blog/aggregator [B] (leads, not bars):** Peony (60-doc data-room stats);
+Development Corporate (European valuation medians). Verify against a primary before quoting.

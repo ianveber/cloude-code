@@ -72,32 +72,43 @@ Three translations to get exactly right, because investors probe them hardest:
    labeled outcomes) that improves the next run — a signal a new entrant starts at
    zero on. In the package, name the loop explicitly for each agent: *what signal is
    captured, where it is stored, how it feeds back, how many cycles have accrued.*
-   (See research doc §2.)
+   Pre-empt AI-washing with the **measured automation ratio** the pillar-② scan
+   produces — being able to show it is the anti-Builder.ai proof. (Research §6.)
 
 2. **Cost-taken-out + throughput-added are the unit economics.** Pillar ② recorded a
    baseline: hours and error rates per process, before AI. Pillar ③ automated or
    augmented those processes. The delta is the unit-economics story — reframed as
    gross-margin lift, CAC-payback improvement, and **revenue-per-employee**, the
-   headline metric of the AI-native category (2–10× traditional SaaS; §4). Use the
-   `enotna-ekonomika` skill to model it, `vrednostno-cenovanje` to price the value
-   created, `revops` for the recurring-revenue mechanics.
+   headline metric of the AI-native category (Research §5). **Margin caveat that
+   makes or breaks credibility:** an AI-run company's gross margin is **~45–65%**,
+   not 80% — inference is a real COGS (a16z; Bessemer State of AI 2025). Do NOT claim
+   a SaaS-grade 75%+ margin you don't have; instead show the **margin-expansion path**
+   (caching, smaller/distilled models, routing, human-in-loop volume control) and the
+   ICONIQ trajectory (41%→45%→52%, 2024→2026). Use `enotna-ekonomika` to model it,
+   `vrednostno-cenovanje` to price the value created, `revops` for recurring mechanics.
 
 3. **AI-run ops are the scalability and defensibility.** A company where processes
    are dispositioned "automate" in the blueprint scales volume without scaling
-   headcount — the flatter-org, higher-valuation-per-employee thesis (§4). But
-   scalability without governance is a discount, not a premium: unaddressed AI
-   risk draws a 15–30% diligence haircut (§5). Pillar ⑤'s G3 evidence — least-
-   privilege, RLS proofs, human-authority line, model-provider redundancy — is what
-   turns "AI-run" from a risk flag into a moat.
+   headcount — the flatter-org, higher-valuation-per-employee thesis (Research §5),
+   and AI companies carry a real valuation premium (~20% Seed/Series A, ~50% Series B,
+   ~2.6× Series C in Europe — Atomico 2025). But scalability without governance is a
+   discount: AI DD tests model dependency, data provenance, and governance, and a
+   documented Human Authority Line + model-provider redundancy is what avoids the
+   haircut (Research §7). Pillar ⑤'s G3 evidence — least-privilege, RLS proofs,
+   human-authority line, provider redundancy — turns "AI-run" from a flag into a moat.
 
 ---
 
 ## DRAFT investor-readiness rubric
 
-> **DRAFT — pending Ian's docs.** Thresholds and weights below are seeded from 2026
-> benchmark research (see `knowledge/investor-criteria-research.md`), not from Ian's
-> own deal experience. Treat them as placeholders. The **structure** — one number/
-> artifact per criterion, no adjectives — is final; the **numbers** are provisional.
+> **DRAFT — pending Ian's docs.** Thresholds below are calibrated from 2025–2026
+> **primary-source** benchmarks (Bessemer, a16z, High Alpha, SaaS Capital, Benchmarkit,
+> Point Nine, Atomico, YC — see `knowledge/investor-criteria-research.md`), not from
+> Ian's own deal book. The automated adversarial verification of those numbers did not
+> complete (rate limit); they are validated by reputable-primary cross-reference
+> instead. Treat them as calibrated placeholders: the **structure** (one number/
+> artifact per criterion, no adjectives) is final; Ian's docs set the final **pass
+> bars, weights, and stage/geography targeting.**
 
 Every criterion scores **RED / AMBER / GREEN**, and the score cell MUST contain the
 resolving number or the artifact path — never a word like "strong". A criterion with
@@ -112,8 +123,9 @@ CRITERION            WHAT IT MUST ANSWER WITH          SOURCE ARTIFACT          
                      bottoms-up path to it              niche-research, blueprint   bottoms-up derivation
 3 Traction           real usage/revenue/retention       live metrics dashboard,     ≥1 hard metric trending
                      — a number, not a demo             artifacts.json usage logs   (revenue, active use, NRR)
-4 Unit economics     LTV:CAC, gross margin, payback,    enotna-ekonomika model      LTV:CAC ≥3:1, GM ≥70%,
-                     revenue/employee                   on scan baseline+build      payback ≤12mo (§3, §4)
+4 Unit economics     LTV:CAC, gross margin, payback,    enotna-ekonomika model      LTV:CAC ≥3:1 (median 3.6),
+                     revenue/employee                   on scan baseline+build      payback <15mo, GM ≥45%*
+                                                                                    (*AI-native; §2/§5)
 5 Moat               the data loop(s): signal, store,   artifacts.json per-agent    ≥1 agent with a described,
                      feedback, cycles accrued           loop description            measurable compounding loop
 6 Scalability        volume headroom without            blueprint dispositions,     ≥1 process proven to scale
@@ -123,6 +135,36 @@ CRITERION            WHAT IT MUST ANSWER WITH          SOURCE ARTIFACT          
 8 Security posture   the governance/authority proof     G3 gate evidence, CSO       G3 green on 100% of
                      that avoids the diligence haircut  checklist, authority line   registered artifacts (§5)
 ```
+
+### Stage & geography calibration (the bars are not one-size)
+
+The single bar above is the "is it venture-grade at all" floor. Investors judge
+against the company's **stage** and **geography**; default to the EU column for AIS
+engagements. From the primary-source research (§3, §4, §9):
+
+```
+METRIC                 PRE-SEED/SEED           SERIES A              SOURCE
+─────────────────────  ──────────────────────  ────────────────────  ─────────────────────
+ARR growth (YoY)       triple-digit off a       2–3× YoY off          Point Nine 2025,
+                       tiny base                 $0.5–2.5M ARR         SaaS Capital 2025
+                       (market median 25%)                            (median has compressed)
+Burn multiple          2.5–3.4× (avg)           ≤1.2× (median)        CFO Advisors 2025
+CAC payback            not yet load-bearing      <15mo (AI: 12–18mo)   Benchmarkit/CRV 2025-26
+Rule of 40             not yet                    approaching 40; >40 = Bessemer Rule of X
+                                                  ~9.4× rev multiple
+NRR                    directional               >100% (each +10pt      Benchmarkit 2025,
+                                                  ≈ +5pp growth)        SaaS Capital 2025
+Gross margin (AI)      45–55% ok if rising        45–65% + expansion    a16z; Bessemer;
+                                                  path shown            ICONIQ 41→45→52%
+EU round context       $5–15M pre, $1–4M round    $25–75M pre,          Point Nine 2025
+                                                  $6–18M round          (EU trails US ~25–30%)
+AI valuation premium   ~20% (Seed/A)              ~20% (Seed/A)         Atomico 2025
+```
+
+**Reading it:** a seed-stage AI company is NOT expected to hit Series-A efficiency —
+holding it to ≤1.2× burn or Rule-of-40 is wrong. Score each criterion against the
+company's actual stage/geography column, not the floor. Ian's docs finalize which
+stage AIS packages target by default.
 
 Scoring procedure:
 
@@ -246,11 +288,13 @@ banner until Ian's docs finalize the bars — a draft-green is honest about bein
 This pillar is a **scaffold**. The following are placeholders until Ian supplies his
 own investor documentation, and each is explicitly marked in the files above:
 
-1. **Rubric thresholds & weights.** The draft bars (LTV:CAC ≥3:1, GM ≥70%, payback
-   ≤12mo, etc.) come from 2026 public benchmarks, not Ian's deal book. Ian's docs
-   finalize: the actual pass bar per criterion, the relative weights, and any
-   criterion he adds/removes (e.g. a Slovenia/EU-specific market criterion, an
-   AIS-house "AI-involvement score" criterion).
+1. **Rubric weights & house bars.** The draft bars are now **primary-source
+   calibrated and stage/geography-tabled** (§2–§9 of the research doc) — LTV:CAC ≥3.6,
+   payback <15mo, burn 2.5–3.4× seed→≤1.2× A, AI GM 45–65%, EU premium ~20%. What
+   remains for Ian's docs is the **house layer only**: the relative *weights* across
+   the 8 criteria, which *stage* AIS packages target by default, and any criterion he
+   adds/removes (e.g. an AIS-house "AI-involvement score" criterion, a Slovenia/EU
+   market criterion). The *numbers* are researched; the *emphasis* is Ian's.
 2. **The house thesis template.** The `00-thesis.md` format is a first draft. Ian's
    positioning of AIS-built companies (what category, what "why now") replaces it.
 3. **The data-room standard AIS ships.** `05-data-room-index.md` uses the generic
