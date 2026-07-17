@@ -1,0 +1,10 @@
+{
+  "slug": "invoice-chaser",
+  "ranAt": "2026-07-17T16:17:33Z",
+  "inputs": "3 seeded overdue invoices (INV-2041 Kavarna Central €480, INV-2058 Studio Vibe €1250, INV-2063 Pekarna Sonce €95.50)",
+  "expected": "3 reminder drafts, each naming its customer + amount + asking for payment; 0 sends; cost under €0.50 cap",
+  "observed": "3 drafts in drafts/ (real Anthropic claude-sonnet-4-6 calls); each greets by company name, states invoice/amount/days-overdue, requests payment; 0 sends; cost €0.0091",
+  "loop": "VERIFY red on first pass (drafts did not name the customer) -> diagnosed -> fixed prompt -> re-VERIFY green (3/3). Factory loop exercised, not skipped.",
+  "guardrails": { "outwardGated": true, "sendCodePath": "none (structurally cannot send)", "costUnderCap": true, "leastPrivilege": true },
+  "result": "green"
+}

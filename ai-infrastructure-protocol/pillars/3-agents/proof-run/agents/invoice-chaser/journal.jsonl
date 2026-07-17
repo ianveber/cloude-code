@@ -1,0 +1,10 @@
+{"ts":"2026-07-17T16:15:07.445Z","step":"start","invoices":3,"model":"claude-sonnet-4-6","sendEnabled":false}
+{"ts":"2026-07-17T16:15:14.235Z","step":"draft","invoice":"INV-2041","to":"ana@kavarnacentral.si","bytes":634,"sent":false}
+{"ts":"2026-07-17T16:15:20.726Z","step":"draft","invoice":"INV-2058","to":"marko@studiovibe.si","bytes":598,"sent":false}
+{"ts":"2026-07-17T16:15:27.896Z","step":"draft","invoice":"INV-2063","to":"info@pekarnasonce.si","bytes":649,"sent":false}
+{"ts":"2026-07-17T16:15:27.897Z","step":"done","drafts":3,"sends":0,"costEur":0.0098}
+{"ts":"2026-07-17T16:16:50.875Z","step":"start","invoices":3,"model":"claude-sonnet-4-6","sendEnabled":false}
+{"ts":"2026-07-17T16:16:56.849Z","step":"draft","invoice":"INV-2041","to":"ana@kavarnacentral.si","bytes":590,"sent":false}
+{"ts":"2026-07-17T16:17:03.007Z","step":"draft","invoice":"INV-2058","to":"marko@studiovibe.si","bytes":590,"sent":false}
+{"ts":"2026-07-17T16:17:08.150Z","step":"draft","invoice":"INV-2063","to":"info@pekarnasonce.si","bytes":491,"sent":false}
+{"ts":"2026-07-17T16:17:08.150Z","step":"done","drafts":3,"sends":0,"costEur":0.0091}

@@ -1,0 +1,21 @@
+{
+  "slug": "invoice-chaser",
+  "blueprintRef": "BL-014",
+  "type": "integration-automation",
+  "trigger": "schedule: daily 08:00 Europe/Ljubljana (manual for this proof run)",
+  "inputs": "overdue invoices (id, amount, currency, dueDate, daysOverdue, customerName, customerEmail) — seeded from inputs/invoices.json; in production, Stripe read-only 'invoices where status=open AND due_date<today'",
+  "actions": [
+    "1. load overdue invoices",
+    "2. for each, draft a polite-but-firm Slovene payment-reminder email via Claude",
+    "3. write each draft to drafts/ for human approval (NO send)"
+  ],
+  "tools": ["anthropic:messages (draft text)", "gmail:draft (production output surface — NOT send)", "stripe:read (production input surface)"],
+  "outputs": "one reminder draft per invoice in drafts/<invoiceId>.txt + drafts/_manifest.json; production: Gmail Drafts + a log row",
+  "guardrails": {
+    "sends": "0 — the agent has NO send code path (least-privilege by construction)",
+    "costCap": "€0.50/run, max 25 invoices/run",
+    "leastPrivilege": "drafting only; stripe:read (not write); gmail:draft (not send)"
+  },
+  "hitl": ["send step: a named human reviews each draft and sends manually — the agent never sends"],
+  "verify": "given 3 seeded overdue invoices, produces exactly 3 drafts, each correctly naming its customer and its EUR amount and asking for payment, and performs 0 sends; cost under cap"
+}

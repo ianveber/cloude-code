@@ -1,0 +1,17 @@
+{
+  "gate": 3,
+  "pillar": "5-security",
+  "ranAt": "2026-07-17T16:19:16Z",
+  "reviewer": "independent security subagent (pillar-5 checklist)",
+  "artifact": "invoice-chaser",
+  "checks": {
+    "credentialScope": "pass — single Anthropic key, one destination (agent.mjs:22,31)",
+    "outwardGated": "pass — no send/pay/delete code path; terminal action is local file write",
+    "secretsNotEmbedded": "pass — key read from ~/.anthropic_key at runtime; 0 sk-ant hits in drafts/journal",
+    "costCapInCode": "pass — €0.50 cap enforced, fail-closed process.exit (agent.mjs:53)",
+    "loggingOn": "pass — timestamped JSONL trail (agent.mjs:23)",
+    "inputBounded": "pass — 25-invoice rate bound before use (agent.mjs:43); note: add zod before prod Stripe wiring"
+  },
+  "result": "green",
+  "residual": "non-blocking: add explicit input schema validator before production Stripe/Gmail wiring"
+}
