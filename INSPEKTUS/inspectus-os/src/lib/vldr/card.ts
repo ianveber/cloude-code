@@ -7,7 +7,9 @@ import { buildRemarks } from "./transform";
 //   • Model + Serial No. (VIN)
 //   • the 4 damage columns — Position Code (part), Damage Code (type), Severity Code — filled
 //     column-major (column 1 top→bottom, then 2, 3, 4); capacity 4 × 6 = 24 damages
-//   • Remarks (per the INSPECTUS rule — "Damage"-class entries omitted unless they carry a comment)
+//   • Remarks (per the INSPECTUS rule — ONLY damages that carry an inspector description are listed,
+//     as PART-TYPE code + that description; a damage with no description writes nothing at all and
+//     no CLASS word is ever printed; client, 2026-07-20)
 //   • Delivering / Receiving carrier, vessel name, date
 //   • the INSPECTUS logo + signature extracted from their PRINT VLDR (image6) — a mandatory part of
 //     the VLDR — placed in both Signature rows.
@@ -30,13 +32,18 @@ export function renderVLDRCard(vehicle, header = {}) {
   const date = header.date || new Date().toISOString().slice(0, 10);
   const els = [];
 
-  // Model + Serial No. (VIN). White out BOTH the upper Model-row columns and the 11
-  // serial squares → one clean box; redraw Model + VIN on top, VIN lifted slightly
-  // (Ian, 2026-06-26: "remove the upper columns, one big square, move serial up").
-  els.push(whiteBox(8.9, 11.3, 41.2, 4.4));   // upper Model-row column dividers
-  els.push(text(10, 13.4, vehicle.make_model, { size: 13, weight: 700 }));
-  els.push(whiteBox(8.9, 15.6, 41.2, 4.1));   // serial squares
-  els.push(text(10, 16.9, vehicle.vin, { size: 12.5, weight: 700, mono: true }));
+  // Model + Serial No. (VIN) — ONE unified box (the form's own cell, x8.67→49.11%, y11.76→18.0%,
+  // measured from the form) split by a horizontal divider into two EQUAL cells: model on top,
+  // serial below (Ian, 2026-07-06: "make them one big square, same size, joined by a horizontal
+  // line between model and serial"). Wipe the form's per-character serial squares first.
+  els.push(whiteBox(8.8, 11.5, 41.0, 6.9));
+  els.push(twoRowBox(8.7, 11.76, 40.4, 6.24, 0.5,
+    vehicle.make_model, vehicle.vin,
+    { size: 12.5, weight: 700 }, { size: 13.5, weight: 700, mono: true }));   // serial font larger (Ian, 2026-07-09)
+
+  // Location of Inspection — the header's location (e.g. PORT OF KOPER / PORT OF VENICE, entered in
+  // the header form) in column 1 of the Location-of-Inspection row (Ian, 2026-07-09).
+  els.push(text(27.5, 44.0, header.location, { size: 9, weight: 600 }));
 
   // Damage codes — column-major fill across the 4 numbered columns
   vehicle.damages.slice(0, DMG_CAPACITY).forEach((d, i) => {
@@ -49,25 +56,32 @@ export function renderVLDRCard(vehicle, header = {}) {
   if (vehicle.damages.length > DMG_CAPACITY)
     els.push(text(25, 64.6, `+${vehicle.damages.length - DMG_CAPACITY} poškodb v opombah`, { size: 8, color: "#555" }));
 
-  // Remarks (INSPECTUS rule applied inside buildRemarks)
+  // Remarks — wrap WITHIN the first Remarks cell (x24.31→43.28%, measured) so long text drops to
+  // new lines instead of crossing the vertical divider; stays inside the box (Ian, 2026-07-09).
   const remarks = buildRemarks(vehicle.damages, ": ");
-  if (remarks) els.push(block(25, 67.4, 73, remarks, { size: 9.5 }));
+  if (remarks) els.push(block(25, 66.4, 17.5, remarks, { size: 9 }));
 
-  // X under the SHIP icon — COLUMN 1 ONLY (Ian, 2026-06-26). Calibrated against the form.
-  els.push(center(36.2, 80.0, "X", { size: 13, weight: 900 }));
+  // X centred in the ship-icon cell (cell x33.79→38.55 → centre 36.17; mark-row centre ~79.8;
+  // measured from the form — Ian, 2026-07-09: put the X more in the centre of its box).
+  els.push(center(36.17, 79.8, "X", { size: 13, weight: 900 }));
 
-  // Bottom carrier / inspector block. Value-cell centres (the value column is subdivided finer than
-  // the label column): Delivering 81.9 · Truck/Ship 83.85 · Sig 85.75 · Receiving 90.0 · Sig 95.15 · Date 97.3
-  // All inspector text in COLUMN 1 (Ian, 2026-06-26).
-  els.push(text(25, 81.9,  header.delivering_party, { size: 9.5, weight: 700 }));
-  els.push(text(25, 83.85, header.transport_id,     { size: 9.5 }));            // Truck No./Ship = vessel
-  els.push(text(25, 90.0,  header.receiving_party,  { size: 9.5, weight: 700 }));
+  // Bottom carrier / inspector block — all in COLUMN 1 (Ian, 2026-06-26).
+  // Carrier names wrap WITHIN column 1 (cell x24.29→43.25%, measured) — width capped at 17% so a
+  // long name drops to a 2nd line rather than crossing the vertical divider (Ian, 2026-07-06:
+  // "do not let it cross any vertical line — paste it down under the horizontal line").
+  // transport_id (vessel) + date stay single-line.
+  // Delivering carrier, vessel, receiving carrier all in the SAME font — 8px/700 (Ian, 2026-07-09).
+  els.push(wrapCell(25, 80.95, 17, header.delivering_party, { size: 8, weight: 700, lh: 1.08 }));
+  els.push(text(25, 83.85, header.transport_id, { size: 8, weight: 700 }));   // Truck No./Ship = vessel
+  els.push(wrapCell(25, 88.75, 17, header.receiving_party, { size: 8, weight: 700, lh: 1.08 }));
   els.push(text(25, 97.3,  date, { size: 10, weight: 600 }));
 
   // INSPECTUS logo + signature (extracted from PRINT VLDR.xlsx, image6) — mandatory on the VLDR.
-  // Both Inspectus stamps in COLUMN 1 (Ian, 2026-06-26).
-  els.push(img(26, 85.75, "/inspectus-signature.jpeg", 30));   // delivering carrier signature
-  els.push(img(26, 95.15, "/inspectus-signature.jpeg", 30));   // inspector signature
+  // Top-anchored (NO translateY) so the html2canvas JPG export matches the live view, and
+  // dropped clear of the vessel name above (Ian, 2026-07-06: the logo was covering the ship
+  // name in the downloaded JPG). Both stamps in COLUMN 1.
+  els.push(imgTop(26, 84.9, "/inspectus-signature.jpeg", 26));   // delivering carrier signature
+  els.push(imgTop(26, 94.0, "/inspectus-signature.jpeg", 26));   // inspector signature
 
   return `<div class="vldr-card" data-vin="${esc(vehicle.vin)}" style="position:relative;width:${FORM_W}px;height:${FORM_H}px;background:#fff;font-family:'Open Sans',Arial,sans-serif;color:#111;overflow:hidden;">
     <img src="/eu6546-form.png" alt="EU 6546" style="position:absolute;inset:0;width:100%;height:100%;display:block;">
@@ -96,13 +110,36 @@ function block(x, y, wPct, t, o = {}) {
   if (!t) return "";
   return `<div style="${baseStyle(x, y, o)}width:${wPct}%;line-height:1.3;">${esc(t)}</div>`;
 }
-// image, left-aligned, vertically centred on y, fixed pixel height
-function img(x, y, src, hPx) {
-  return `<img src="${src}" alt="" style="position:absolute;left:${x}%;top:${y}%;height:${hPx}px;transform:translateY(-50%);">`;
+// image, left-aligned, TOP-anchored, fixed pixel height (no transform → the live DOM and the
+// html2canvas JPG export render it in the same place).
+function imgTop(x, y, src, hPx) {
+  return `<img src="${src}" alt="" style="position:absolute;left:${x}%;top:${y}%;height:${hPx}px;">`;
 }
 // opaque white rectangle — covers fixed form lines (e.g. the 11 serial squares)
 function whiteBox(x, y, wPct, hPct) {
   return `<div style="position:absolute;left:${x}%;top:${y}%;width:${wPct}%;height:${hPct}%;background:#fff;"></div>`;
+}
+// value vertically centred + left-padded inside a cell (no border of its own)
+function cellText(x, y, wPct, hPct, t, o = {}) {
+  const font = o.mono ? "ui-monospace,Menlo,Consolas,monospace" : "'Open Sans',Arial,sans-serif";
+  return `<div style="position:absolute;left:${x}%;top:${y}%;width:${wPct}%;height:${hPct}%;box-sizing:border-box;`
+    + `display:flex;align-items:center;padding-left:9px;font-family:${font};font-size:${o.size || 12}px;`
+    + `font-weight:${o.weight || 700};color:#111;white-space:nowrap;overflow:hidden;">${esc(t)}</div>`;
+}
+// one bordered box split by a horizontal divider into two equal cells (top value + bottom value)
+function twoRowBox(x, y, wPct, hPct, midFrac, top, bot, oTop = {}, oBot = {}) {
+  const midY = y + hPct * midFrac;
+  return `<div style="position:absolute;left:${x}%;top:${y}%;width:${wPct}%;height:${hPct}%;border:1.3px solid #111;box-sizing:border-box;background:#fff;"></div>`
+    + `<div style="position:absolute;left:${x}%;top:${midY}%;width:${wPct}%;height:0;border-top:1.3px solid #111;"></div>`
+    + cellText(x, y, wPct, hPct * midFrac, top, oTop)
+    + cellText(x, midY, wPct, hPct * (1 - midFrac), bot, oBot);
+}
+// top-anchored, left-aligned, wraps within wPct — keeps long text inside its column
+function wrapCell(x, y, wPct, t, o = {}) {
+  if (t === undefined || t === null || t === "") return "";
+  return `<div style="position:absolute;left:${x}%;top:${y}%;width:${wPct}%;`
+    + `font-family:'Open Sans',Arial,sans-serif;font-size:${o.size || 9}px;font-weight:${o.weight || 400};`
+    + `color:#111;line-height:${o.lh || 1.15};white-space:normal;overflow-wrap:break-word;">${esc(t)}</div>`;
 }
 
 function fmtSev(s) {
