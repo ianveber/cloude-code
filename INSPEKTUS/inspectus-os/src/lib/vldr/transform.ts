@@ -30,28 +30,32 @@ export function maxDamageCount(vehicles) {
 }
 
 // Aggregate REMARKS for a vehicle, per INSPECTUS convention (see VIN-FILAJ / VLDR-1).
-// INSPECTUS rule (Friday meeting + their approved VIN-FILAJ): the standalone CLASS "Damage"
-// must NEVER be written in column F. The damage is still listed via its PART-TYPE code +
-// the inspector's free-text COMMENT — only the literal classification word is dropped.
-// "No Damage Evidence" and "Observation" are written unchanged.
-//   single damage -> "{COMMENT, }{CLASS≠Damage}"  (falls back to "{PART}-{TYPE}" if that is empty)
-//                    e.g. "NO DAMAGE EVIDENCE", "OTTD", "12-12"
-//   multi damage  -> "{PART}-{TYPE}[ {COMMENT, }{CLASS≠Damage}]" joined by " / "
-//                    e.g. "03-09 NO DAMAGE EVIDENCE / 81-12 / 81-34 OBSERVATION"
+// INSPECTUS rule (client → Ian, 2026-07-20 — SUPERSEDES the 2026-07-16 "list the bare code" rule):
+// Remarks carry ONLY the inspector's free-text COMMENT (the description of the damage).
+//   • damage WITH a description  -> it is listed: PART-TYPE code + that description
+//   • damage WITHOUT description -> NOTHING is written for it — no code, no classification word
+// So no CLASS label ever reaches Remarks any more: not "Damage" (banned since the Friday meeting),
+// and no longer "No Damage Evidence" / "Observation" either — the client read those as bogus
+// descriptions ("under Remarks it says NO DAMAGE EVIDENCE"). A vehicle whose damages carry no
+// comments at all therefore gets an EMPTY Remarks cell. The damages themselves are unaffected —
+// they are still fully listed by code in the VLDR's 4 damage columns.
+//   single-damage vehicle -> "{COMMENT}"                       e.g. "DEEP CHIP"   ("" if no comment)
+//   multi-damage vehicle  -> "{PART}-{TYPE}{sep}{COMMENT}" for the commented damages only, " / "-joined
+//                            e.g. "03-04: STEVEDORE DAMAGE / 27-04: OTTD"
 // sep = " " for the VIN-FILAJ export, ": " for the on-card VLDR remarks box.
 
 export const SLOTS_PER_ROW = 7;  // fixed: 7 damage slots per row (matches PRINT VLDR template)
 
 export function buildRemarks(damages, sep = " ") {
-  const parts = damages.map(d => {
-    // Suppress only the standalone classification "Damage" (case-insensitive); keep comments + other classes.
-    const classLabel = String(d.class ?? "").trim().toLowerCase() === "damage" ? "" : d.class;
-    const descriptor = [d.comments, classLabel].filter(Boolean).join(", ");
-    return { code: `${d.part_code}-${d.type_code}`, descriptor };
-  });
-  const s = parts.length === 1
-    ? (parts[0].descriptor || parts[0].code)
-    : parts.map(p => p.descriptor ? `${p.code}${sep}${p.descriptor}` : p.code).join(" / ");
+  // Only damages carrying an inspector comment reach Remarks; the CLASS field is never printed.
+  const parts = damages
+    .map(d => ({ code: `${d.part_code}-${d.type_code}`, descriptor: String(d.comments ?? "").trim() }))
+    .filter(p => p.descriptor);
+  if (!parts.length) return "";
+  // A one-damage vehicle keeps the approved VIN-FILAJ look: the description alone, no code prefix.
+  const s = damages.length === 1
+    ? parts[0].descriptor
+    : parts.map(p => `${p.code}${sep}${p.descriptor}`).join(" / ");
   return s.toUpperCase();
 }
 

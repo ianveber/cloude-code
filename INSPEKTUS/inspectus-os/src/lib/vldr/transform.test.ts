@@ -38,37 +38,56 @@ test("groupByVin keeps CLASS/COMMENTS/SEVERITY bound per damage", () => {
   expect(d55.severity).toBe(1);
 });
 
-test("buildRemarks: single damage drops the standalone CLASS 'Damage' (descriptor only)", () => {
+test("buildRemarks: single damage with a description = the description alone", () => {
   const xyz = groupByVin(ROWS, COLUMN_MAP).find(v => v.vin === "XYZ");
   expect(buildRemarks(xyz.damages, " ")).toBe("DEEP CHIP");
 });
 
-test("buildRemarks: multi damage = code-prefixed, joined, uppercased", () => {
+// --- INSPECTUS rule (client → Ian, 2026-07-20 — supersedes the 2026-07-16 "list the bare code"):
+//     Remarks carry ONLY the inspector's description. Damage + description → it is listed;
+//     damage with no description → nothing at all. No CLASS word ever reaches Remarks —
+//     not "Damage", and no longer "No Damage Evidence" / "Observation" either.
+test("buildRemarks: multi damage with NO descriptions is empty (no class labels, no codes)", () => {
   const abc = groupByVin(ROWS, COLUMN_MAP).find(v => v.vin === "ABC");
-  expect(buildRemarks(abc.damages, " ")).toBe("03-12 OBSERVATION / 55-12 NO DAMAGE EVIDENCE");
-  expect(buildRemarks(abc.damages, ": ")).toBe("03-12: OBSERVATION / 55-12: NO DAMAGE EVIDENCE");
+  expect(buildRemarks(abc.damages, " ")).toBe("");
+  expect(buildRemarks(abc.damages, ": ")).toBe("");
 });
 
-// --- INSPECTUS rule (their approved VIN-FILAJ + Friday meeting): column F must NEVER contain
-//     the standalone CLASS "Damage". The damage stays listed (code + inspector comment); only
-//     the word is dropped. "No Damage Evidence" and "Observation" are left unchanged.
-test("buildRemarks: single Damage with no comment falls back to the code (never empty, never 'DAMAGE')", () => {
+test("buildRemarks: multi damage = code + description, joined, uppercased", () => {
+  const damages = [
+    { part_code: "03", type_code: "04", severity: 5, class: "Damage", comments: "stevedore damage" },
+    { part_code: "27", type_code: "04", severity: 3, class: "Damage", comments: "OTTD" }
+  ];
+  expect(buildRemarks(damages, " ")).toBe("03-04 STEVEDORE DAMAGE / 27-04 OTTD");
+  expect(buildRemarks(damages, ": ")).toBe("03-04: STEVEDORE DAMAGE / 27-04: OTTD");
+});
+
+test("buildRemarks: single Damage with no description writes NOTHING (not the code)", () => {
   const damages = [{ part_code: "12", type_code: "12", severity: 3, class: "Damage", comments: "" }];
-  expect(buildRemarks(damages, " ")).toBe("12-12");
+  expect(buildRemarks(damages, " ")).toBe("");
 });
 
-test("buildRemarks: single Damage with a comment shows the comment, drops the word", () => {
+test("buildRemarks: single Damage with a description shows it, drops the word 'Damage'", () => {
   const damages = [{ part_code: "12", type_code: "34", severity: 1, class: "Damage", comments: "OTTD" }];
   expect(buildRemarks(damages, " ")).toBe("OTTD");
 });
 
-test("buildRemarks: multi with a Damage record keeps the code, drops the word", () => {
+test("buildRemarks: only the described damages are listed — the rest are silent", () => {
   const damages = [
     { part_code: "03", type_code: "09", severity: 3, class: "No Damage Evidence", comments: "" },
     { part_code: "81", type_code: "12", severity: 2, class: "Damage", comments: "" },
+    { part_code: "81", type_code: "34", severity: 1, class: "Observation", comments: "scuffed on deck" }
+  ];
+  expect(buildRemarks(damages, " ")).toBe("81-34 SCUFFED ON DECK");
+});
+
+test("buildRemarks: a class-only damage never prints its class label", () => {
+  const damages = [
+    { part_code: "03", type_code: "09", severity: 3, class: "No Damage Evidence", comments: "" },
     { part_code: "81", type_code: "34", severity: 1, class: "Observation", comments: "" }
   ];
-  expect(buildRemarks(damages, " ")).toBe("03-09 NO DAMAGE EVIDENCE / 81-12 / 81-34 OBSERVATION");
+  expect(buildRemarks(damages, " ")).toBe("");
+  expect(buildRemarks([damages[0]], " ")).toBe("");
 });
 
 test("buildRemarks: all-Damage vehicle keeps inspector comments, drops every 'Damage' label", () => {
@@ -98,8 +117,10 @@ test("toVinFilajRows lays damages out horizontally with aggregate remark in slot
   expect(abc["PART 1"]).toBe("03");
   expect(abc["TYPE 1"]).toBe("12");
   expect(abc["PART 2"]).toBe("55");
-  expect(abc["COMMENTS 1"]).toBe("03-12 OBSERVATION / 55-12 NO DAMAGE EVIDENCE");
+  expect(abc["COMMENTS 1"]).toBe("");   // ABC's damages carry no inspector description (2026-07-20 rule)
   expect(abc["COMMENTS 2"]).toBe("");
+  const xyz = rows.find(r => r["VIN"] === "XYZ");
+  expect(xyz["COMMENTS 1"]).toBe("DEEP CHIP");   // described damage → aggregate lands in slot 1
 });
 
 test("toVinFilajAOA matches the real 'prepare for report' layout", () => {
@@ -118,7 +139,7 @@ test("toVinFilajAOA matches the real 'prepare for report' layout", () => {
   const abcRow = aoa.find(r => r && r[1] === "ABC");
   expect(abcRow[0]).toBe("FORD TRANSIT");
   expect(abcRow[2]).toBe("03");          // PART 1
-  expect(abcRow[5]).toBe("03-12 OBSERVATION / 55-12 NO DAMAGE EVIDENCE"); // COMMENTS 1 = aggregate
+  expect(abcRow[5]).toBe("");            // COMMENTS 1 = aggregate (empty: no descriptions on ABC)
   expect(abcRow[6]).toBe("55");          // PART 2
 });
 
