@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import * as claude from "@/lib/vldr/claude-client";
 import { applyFilter } from "@/lib/vldr/filter";
+import { aiErrorMessage } from "@/lib/ai-error";
 import { toVinFilajRows, buildRemarks } from "@/lib/vldr/transform";
 import { renderVLDRCard } from "@/lib/vldr/card";
 import type { Header } from "@/hooks/useVldrPipeline";
@@ -90,7 +91,7 @@ export default function ChatFilter({ vehicles, header, maxDamages }: Props) {
     const result = await claude.ask(q, stats);
     setLoading(false);
 
-    if (result.error) { setFeedback(`Napaka: ${result.error}`); return; }
+    if (result.error) { setFeedback("⚠️ Vprašanje ni uspelo: " + aiErrorMessage(result.error) + ". Poskusi znova."); return; }
     const j = result.json ?? {};
 
     // Analytical answer branch (aggregate / % / part-name questions)
@@ -119,7 +120,7 @@ export default function ChatFilter({ vehicles, header, maxDamages }: Props) {
       <div style={{ background: "#f7f9fb", border: "1px solid var(--border, #e0e4e8)", borderRadius: 10, padding: "14px 16px", marginBottom: 14, fontSize: 13.5, lineHeight: 1.7, color: "#333" }}>
         <div style={{ fontWeight: 700, color: "var(--navy-deep)", marginBottom: 6 }}>📋 Pregled obdelave</div>
         <div><b>{outcome.vehicles}</b> vozil obdelanih · <b>{outcome.damaged}</b> poškodovanih ({outcome.damagedPct} %) · <b>{outcome.remarks}</b> z opombami</div>
-        <div><b>{outcome.total}</b> zapisov poškodb — Damage: <b>{outcome.damage}</b>, Observation: <b>{outcome.observation}</b>, brez poškodbe: <b>{outcome.noDamage}</b>{outcome.blank ? <>, <span style={{ color: "#a01f0a" }}>brez razreda: {outcome.blank}</span></> : null}</div>
+        <div><b>{outcome.total}</b> zapisov poškodb — Poškodbe (Damage): <b>{outcome.damage}</b>, Opažanja (Observation): <b>{outcome.observation}</b>, brez poškodbe: <b>{outcome.noDamage}</b>{outcome.blank ? <>, <span style={{ color: "#a01f0a" }}>brez razreda: {outcome.blank}</span></> : null}</div>
         <div>Resnost — 1: <b>{outcome.sev[1]}</b> · 2: <b>{outcome.sev[2]}</b> · 3: <b>{outcome.sev[3]}</b></div>
         {outcome.topCodes && <div>Najpogostejše kode: {outcome.topCodes}</div>}
         {outcome.topParts && <div>Najbolj poškodovani deli: {outcome.topParts}</div>}

@@ -23,7 +23,7 @@ export default function VinFilajTable({ vehicles, maxDamages, header }: Props) {
     <div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
         <div style={{ fontSize: 13, color: "#6b7280" }}>
-          {vehicles.length} vozil · {maxDamages} max poškodb · list &quot;prepare for report&quot;
+          {vehicles.length} vozil · {maxDamages} max poškodb · zavihek »prepare for report«
         </div>
         <button
           onClick={() => downloadVinFilaj(vehicles, header)}

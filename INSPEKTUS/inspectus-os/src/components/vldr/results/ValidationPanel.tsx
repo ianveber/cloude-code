@@ -1,5 +1,7 @@
 "use client";
 
+import { aiErrorMessage } from "@/lib/ai-error";
+
 interface Issue {
   kind?: string;
   vin?: string;
@@ -19,7 +21,7 @@ export default function ValidationPanel({ validation }: Props) {
   if (validation.error) {
     return (
       <div style={{ color: "#b45309", fontSize: 14 }}>
-        AI validacija ni dosegljiva: {validation.error}. VIN-FILAJ in VLDR še vedno delujeta.
+        AI validacija ni dosegljiva: {aiErrorMessage(validation.error)}. VIN-FILAJ in VLDR še vedno delujeta.
       </div>
     );
   }

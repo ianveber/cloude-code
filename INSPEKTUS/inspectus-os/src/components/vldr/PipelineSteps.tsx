@@ -4,7 +4,7 @@ const PIPELINE_STEPS = [
   { id: "parse",    label: "Branje Excel datoteke (SURVEY REPORT)" },
   { id: "urejanje", label: "Pregled in urejanje podatkov" },
   { id: "group",    label: "Združevanje po VIN" },
-  { id: "vinfilaj", label: "Priprava VIN-FILAJ (prepare for report)" },
+  { id: "vinfilaj", label: "Priprava VIN-FILAJ" },
   { id: "vldr",     label: "Generiranje VLDR kartic" },
   { id: "validate", label: "AI validacija (dodatno)" },
   { id: "summary",  label: "Izvršilni povzetek (dodatno)" },

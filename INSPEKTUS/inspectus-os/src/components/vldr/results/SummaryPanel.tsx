@@ -1,5 +1,7 @@
 "use client";
 
+import { aiErrorMessage } from "@/lib/ai-error";
+
 interface Props {
   summary: any;
 }
@@ -11,7 +13,7 @@ export default function SummaryPanel({ summary }: Props) {
   if (summary.error) {
     return (
       <div style={{ color: "#b45309", fontSize: 14 }}>
-        Povzetek trenutno ni dosegljiv: {summary.error}.
+        Povzetek trenutno ni dosegljiv: {aiErrorMessage(summary.error)}.
       </div>
     );
   }
