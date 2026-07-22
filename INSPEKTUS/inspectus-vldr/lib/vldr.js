@@ -6,9 +6,9 @@ import { buildRemarks } from "/lib/transform.js";
 //   • Model + Serial No. (VIN) — one clean bordered box per value
 //   • the 4 damage columns — Position Code (part), Damage Code (type), Severity Code — filled
 //     column-major (column 1 top→bottom, then 2, 3, 4); capacity 4 × 6 = 24 damages
-//   • Remarks (per the INSPECTUS rule — ONLY damages that carry an inspector description are listed,
-//     as PART-TYPE code + that description; a damage with no description writes nothing at all and
-//     no CLASS word is ever printed; client, 2026-07-20)
+//   • Remarks (per the INSPECTUS rule — a damage is listed when it has a COMMENT and/or a CLASS
+//     other than the bare word "Damage"; "Observation" / "No Damage Evidence" are kept, a
+//     "Damage" with no comment writes nothing at all; client, 2026-07-22)
 //   • Delivering / Receiving carrier (wrapped in-column), vessel name, date — all COLUMN 1
 //   • the INSPECTUS logo + signature extracted from their PRINT VLDR (image6) — a mandatory part of
 //     the VLDR — placed in both Signature rows, clear of the vessel name.

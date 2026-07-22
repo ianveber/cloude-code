@@ -30,29 +30,35 @@ export function maxDamageCount(vehicles) {
 }
 
 // Aggregate REMARKS for a vehicle, per INSPECTUS convention (see VIN-FILAJ / VLDR-1).
-// INSPECTUS rule (client → Ian, 2026-07-20 — SUPERSEDES the 2026-07-16 "list the bare code" rule):
-// Remarks carry ONLY the inspector's free-text COMMENT (the description of the damage).
-//   • damage WITH a description  -> it is listed: PART-TYPE code + that description
-//   • damage WITHOUT description -> NOTHING is written for it — no code, no classification word
-// So no CLASS label ever reaches Remarks any more: not "Damage" (banned since the Friday meeting),
-// and no longer "No Damage Evidence" / "Observation" either — the client read those as bogus
-// descriptions ("under Remarks it says NO DAMAGE EVIDENCE"). A vehicle whose damages carry no
-// comments at all therefore gets an EMPTY Remarks cell. The damages themselves are unaffected —
-// they are still fully listed by code in the VLDR's 4 damage columns.
-//   single-damage vehicle -> "{COMMENT}"                       e.g. "DEEP CHIP"   ("" if no comment)
-//   multi-damage vehicle  -> "{PART}-{TYPE}{sep}{COMMENT}" for the commented damages only, " / "-joined
-//                            e.g. "03-04: STEVEDORE DAMAGE / 27-04: OTTD"
+// INSPECTUS rule (client → Ian, 2026-07-22 — CORRECTS the 2026-07-20 over-removal: that build
+// wrongly stripped "Observation" / "No Damage Evidence" too, and the client relies on both).
+// A damage reaches Remarks when it has something to say — an inspector COMMENT and/or a CLASS
+// that is not the bare word "Damage":
+//   • the standalone CLASS "Damage" is NEVER printed (banned since the Friday meeting)
+//   • "Observation" and "No Damage Evidence" ARE printed — the client wants them back (2026-07-22)
+//   • a damage whose only class is "Damage" with no comment writes NOTHING (no code, no word) —
+//     this is the one part of the 2026-07-20 change that stays (client's phone request that day)
+// descriptor = "{COMMENT, }{CLASS≠Damage}"; a Damage-with-no-comment therefore has an empty
+// descriptor and is dropped entirely, while every other damage is listed.
+//   single-damage vehicle -> "{descriptor}"        e.g. "OBSERVATION", "DEEP CHIP"  ("" if none)
+//   multi-damage vehicle  -> "{PART}-{TYPE}{sep}{descriptor}" for the described damages, " / "-joined
+//                            e.g. "03-09: NO DAMAGE EVIDENCE / 81-34: OBSERVATION"
 // sep = " " for the VIN-FILAJ export, ": " for the on-card VLDR remarks box.
 
 export const SLOTS_PER_ROW = 7;  // fixed: 7 damage slots per row (matches PRINT VLDR template)
 
 export function buildRemarks(damages, sep = " ") {
-  // Only damages carrying an inspector comment reach Remarks; the CLASS field is never printed.
   const parts = damages
-    .map(d => ({ code: `${d.part_code}-${d.type_code}`, descriptor: String(d.comments ?? "").trim() }))
-    .filter(p => p.descriptor);
+    .map(d => {
+      // Suppress ONLY the standalone class "Damage" (case-insensitive); keep every comment and
+      // every other class ("Observation", "No Damage Evidence", …).
+      const classLabel = String(d.class ?? "").trim().toLowerCase() === "damage" ? "" : String(d.class ?? "").trim();
+      const descriptor = [String(d.comments ?? "").trim(), classLabel].filter(Boolean).join(", ");
+      return { code: `${d.part_code}-${d.type_code}`, descriptor };
+    })
+    .filter(p => p.descriptor);   // a "Damage" with no comment has nothing to say → not listed
   if (!parts.length) return "";
-  // A one-damage vehicle keeps the approved VIN-FILAJ look: the description alone, no code prefix.
+  // A one-damage vehicle keeps the approved VIN-FILAJ look: the descriptor alone, no code prefix.
   const s = damages.length === 1
     ? parts[0].descriptor
     : parts.map(p => `${p.code}${sep}${p.descriptor}`).join(" / ");
