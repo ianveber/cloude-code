@@ -114,9 +114,30 @@ The protocol is delivered as **knowledge (PDFs) + skills**:
 - **`skills/`** — the executable Claude Code skills (this build copied 36 of Ian's
   existing skills, mapped to pillars, plus the new pillar skills). These are what the
   operator runs.
-- **`pillars/`** — each pillar's own SKILL.md governing its phase.
+- **`pillars/`** — each pillar's own SKILL.md governing its phase, **plus a
+  `RUNBOOK.md`** giving exact step-by-step procedures for every part that is NOT
+  hands-free (operator ops + client actions), each step wired to the specific skill
+  that powers it.
+- **`DELIVERY-MAP.md`** — the "who does what" map: per pillar, what the engine
+  automates vs what the operator drives vs what the client must do — plus the master
+  *"what we need from you"* client checklist and the agent-autonomy trust ladder.
+  This is what you price and put in a proposal.
+
+## Hands-free vs. guided — the honest model
+
+The engine automates the heavy synthesis, code, and adversarial review. Three things
+always need a human, and each now has a solid runbook so nobody guesses: **access**
+(the client connects their systems), **discovery** (the scan must *see* the company),
+and **trust** (any real-world agent action is approved before it runs). Delivery is
+**done-for-you**: AIS runs the engine; the client grants access and approves at gates.
+Start any engagement by reading `DELIVERY-MAP.md`, then each pillar's `RUNBOOK.md` as
+you reach its gate.
 
 ## Pillar → skill map
+
+> The full, gate-first routing table lives in **`SKILLS-MANIFEST.md`** (132 skills mapped
+> to *"at this gate/step, fire this skill"*, plus the 44-lens advisor review board and the
+> deliverable/meta skills). The table below is the summary.
 
 | Pillar | New skill | Draws on (copied skills) |
 |---|---|---|
