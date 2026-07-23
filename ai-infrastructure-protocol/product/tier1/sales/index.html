@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI-Native in 90 — Protocol Toolkit</title>
+<!--
+  Self-serve product page (English) for the licensed digital product: the AI Infrastructure Protocol as a course + toolkit.
+  FILL BEFORE SELLING: [PRODUCT-NAME], [PRICE], [BUY-URL] (Lemonsqueezy/Gumroad checkout). See GO-LIVE.md.
+  Print to PDF: open in browser -> Print -> Save as PDF (A4).
+-->
+<style>
+  :root{
+    --ink:#14181f;--ink-soft:#3a414d;--muted:#6b7280;--line:#e7e3dc;
+    --bg:#ffffff;--paper:#faf8f4;--gold:#b08453;--gold-deep:#8a6236;--good:#2f9e6f;
+    --shadow:0 1px 2px rgba(20,24,31,.04),0 12px 40px rgba(20,24,31,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--paper);line-height:1.55;-webkit-font-smoothing:antialiased;font-feature-settings:"kern","liga","tnum"}
+  .sheet{max-width:860px;margin:0 auto;background:var(--bg);box-shadow:var(--shadow)}
+  .pad{padding:56px 64px}
+  @media(max-width:640px){.pad{padding:36px 26px}}
+  .top{display:flex;align-items:center;justify-content:space-between;padding:22px 64px;border-bottom:1px solid var(--line)}
+  @media(max-width:640px){.top{padding:18px 26px}}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:.14em;font-size:14px}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(176,132,83,.14)}
+  .tag{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-deep);font-weight:700;margin-bottom:20px}
+  h1{font-size:40px;line-height:1.1;letter-spacing:-.02em;font-weight:800;margin-bottom:20px;max-width:16ch}
+  @media(max-width:640px){h1{font-size:29px}}
+  h1 .u{color:var(--gold-deep)}
+  .sub{font-size:18px;color:var(--ink-soft);max-width:54ch;margin-bottom:26px}
+  .wedge{border-left:3px solid var(--gold);padding:14px 20px;background:var(--paper);border-radius:0 10px 10px 0;font-size:15.5px;color:var(--ink);max-width:62ch;font-style:italic}
+  section{border-top:1px solid var(--line)}
+  .kicker{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:18px}
+  h2{font-size:23px;letter-spacing:-.01em;font-weight:800;margin-bottom:14px}
+  .gap{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+  @media(max-width:640px){.gap{grid-template-columns:1fr}}
+  .gapcard{border:1px solid var(--line);border-radius:12px;padding:18px 20px;background:#fff}
+  .gapcard h4{font-size:15px;font-weight:700;margin-bottom:6px}
+  .gapcard p{font-size:13.5px;color:var(--muted)}
+  .gapcard ul{margin:8px 0 0 16px;font-size:13.5px;color:var(--ink-soft)}
+  .gapcard li{margin-bottom:3px}
+  .third{background:var(--ink);color:#fff;border-radius:12px;padding:20px 22px;font-size:16px;font-weight:600}
+  .third b{color:#e9c893}
+  .gates{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+  .gate{display:flex;gap:18px;padding:16px 4px;border-bottom:1px dashed var(--line)}
+  .gate:last-child{border-bottom:0}
+  .gnum{flex:0 0 auto;width:44px;height:44px;border-radius:11px;background:linear-gradient(160deg,#1b2029,#0d1116);color:#e9c893;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
+  .gbody h4{font-size:16px;font-weight:700;margin-bottom:3px}
+  .gbody h4 .badge{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-deep);border:1px solid var(--gold);border-radius:20px;padding:2px 8px;margin-left:8px;vertical-align:middle;font-weight:700}
+  .gbody p{font-size:14px;color:var(--ink-soft)}
+  .proof{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:640px){.proof{grid-template-columns:1fr 1fr}}
+  .stat{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--paper)}
+  .stat .big{font-size:22px;font-weight:800;letter-spacing:-.01em;margin-bottom:4px}
+  .stat .big .good{color:var(--good)}
+  .stat p{font-size:12.5px;color:var(--muted);line-height:1.4}
+  .offerwrap{background:var(--ink);color:#eef0f3;border-radius:16px;overflow:hidden}
+  .offerwrap .pad2{padding:34px 40px}
+  @media(max-width:640px){.offerwrap .pad2{padding:26px 24px}}
+  .offerwrap .kicker{color:#9aa3b2}
+  .offerwrap h2{color:#fff}
+  .price{font-size:44px;font-weight:800;letter-spacing:-.02em;color:#e9c893;margin:6px 0}
+  .incl{margin:16px 0 4px;font-size:14px;color:#c7ccd6}
+  .incl li{margin-bottom:6px;list-style:none;padding-left:22px;position:relative}
+  .incl li::before{content:"✓";position:absolute;left:0;color:#e9c893;font-weight:800}
+  .honest{border:1.5px solid var(--gold);border-radius:14px;padding:22px 24px;background:linear-gradient(180deg,#fff,var(--paper))}
+  .honest .big{font-size:18px;font-weight:800;letter-spacing:-.01em;margin-bottom:10px}
+  .honest p{font-size:14.5px;color:var(--ink-soft);max-width:64ch}
+  .cta{text-align:center;padding:44px 64px 48px}
+  @media(max-width:640px){.cta{padding:34px 26px 40px}}
+  .cta h2{font-size:26px;margin-bottom:8px}
+  .cta p{color:var(--muted);margin-bottom:22px}
+  .btn{display:inline-block;background:var(--ink);color:#fff;text-decoration:none;font-weight:700;font-size:16px;letter-spacing:.01em;padding:16px 34px;border-radius:12px;box-shadow:0 10px 30px rgba(20,24,31,.18)}
+  .btn .arw{color:#e9c893;margin-left:8px}
+  .contact{margin-top:18px;font-size:13.5px;color:var(--muted)}
+  .contact a{color:var(--gold-deep);text-decoration:none;font-weight:600}
+  footer{border-top:1px solid var(--line);padding:20px 64px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)}
+  @media(max-width:640px){footer{padding:18px 26px;flex-direction:column;gap:8px;text-align:center}}
+  @media print{body{background:#fff}.sheet{box-shadow:none;max-width:100%}.offerwrap,.third,.gnum{-webkit-print-color-adjust:exact;print-color-adjust:exact}section,.gate,.stat{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="top">
+    <div class="brand"><span class="dot"></span>AIS</div>
+    <div class="tag">The AI-Native Protocol · Self-serve</div>
+  </div>
+
+  <!-- HERO -->
+  <div class="pad">
+    <div class="eyebrow">[PRODUCT-NAME] · Course + Toolkit</div>
+    <h1>Become AI-native in <span class="u">90 days</span>.</h1>
+    <p class="sub">Run most — or all — of your company's computer work through AI you build yourself, gate by gate, with the same protocol AIS uses on paid engagements.</p>
+    <div class="wedge">This isn't a pile of prompts. It's the operating protocol: scan your whole company, build the agents and automations that run it, secure them, and make the result investor-ready.</div>
+  </div>
+
+  <!-- WHAT YOU GET -->
+  <section class="pad">
+    <div class="kicker">What you get</div>
+    <h2>A course that teaches it, and a toolkit that runs it.</h2>
+    <div class="gap">
+      <div class="gapcard">
+        <h4>The Course — 6 knowledge PDFs</h4>
+        <p>The full methodology, lesson by lesson:</p>
+        <ul>
+          <li>Operating manual (how the 5 gates work)</li>
+          <li>Infrastructure scan &amp; blueprint</li>
+          <li>The agent factory</li>
+          <li>The security standard</li>
+          <li>Investor-readiness + the researched criteria (28 primary sources)</li>
+        </ul>
+      </div>
+      <div class="gapcard">
+        <h4>The Toolkit — Claude Code skills</h4>
+        <p>The runnable protocol you install into your own Claude Code:</p>
+        <ul>
+          <li>PROTOCOL.md — the spine (G0 → G4)</li>
+          <li>5 pillar skills + step-by-step RUNBOOKs</li>
+          <li>The author's own build skills</li>
+          <li>A companion-skills map to the open ecosystem it plugs into</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE 5 GATES -->
+  <section class="pad">
+    <div class="kicker">The method — 5 gates in 90 days</div>
+    <h2>A gated protocol, not improvisation.</h2>
+    <div class="gates">
+      <div class="gate"><div class="gnum">G0</div><div class="gbody"><h4>Scan</h4><p>AI scans your whole company — every process, tool, and repeatable computer task — and maps as-is → to-be.</p></div></div>
+      <div class="gate"><div class="gnum">G1</div><div class="gbody"><h4>Blueprint</h4><p>The build plan: which agents, automations, and systems, in what order, and how the business should run on them.</p></div></div>
+      <div class="gate"><div class="gnum">G2</div><div class="gbody"><h4>Build</h4><p>The agent factory. Everything that can be automated with AI, gets built — with a build → verify → ship loop.</p></div></div>
+      <div class="gate"><div class="gnum">G3</div><div class="gbody"><h4>Secure <span class="badge">A gate, not an afterthought</span></h4><p>Least-privilege, no data exposure, no API abuse. Verified against 8 evidence-backed controls before anything goes live.</p></div></div>
+      <div class="gate"><div class="gnum">G4</div><div class="gbody"><h4>Investor-ready <span class="badge">Category of one</span></h4><p>Package the infrastructure the way investors actually evaluate companies — so they say "I need a stake in this."</p></div></div>
+    </div>
+  </section>
+
+  <!-- PROOF -->
+  <section class="pad">
+    <div class="kicker">Proven on a real company before it was sold</div>
+    <h2>Working systems, not promises.</h2>
+    <div class="proof">
+      <div class="stat"><div class="big">47% <span class="good">→ 69%</span></div><p>AI-readiness of a real company after scan + build</p></div>
+      <div class="stat"><div class="big">Live</div><p>Invoice-chaser agent running in production</p></div>
+      <div class="stat"><div class="big">Live</div><p>Multi-tenant portal with proven data isolation</p></div>
+      <div class="stat"><div class="big">4 / 5</div><p>Gates executed end-to-end on a live company</p></div>
+    </div>
+  </section>
+
+  <!-- HONEST -->
+  <section class="pad">
+    <div class="kicker">The honest part</div>
+    <div class="honest">
+      <div class="big">Guided DIY — not a magic button.</div>
+      <p>AI does the hands-on building. You own the three things it can't: <b>access</b> (keys, logins), <b>discovery</b> (what your business really does), and <b>trust</b> (approving what goes live). The RUNBOOKs make those frictionless — but they're yours. Anyone selling "AI runs your whole company while you sleep, zero involvement" is selling a fantasy. This sells you the real thing.</p>
+    </div>
+  </section>
+
+  <!-- OFFER -->
+  <section class="pad">
+    <div class="offerwrap">
+      <div class="pad2">
+        <div class="kicker">Get it now</div>
+        <h2>The full protocol, yours to run.</h2>
+        <div class="price">[PRICE]</div>
+        <ul class="incl">
+          <li>All 6 course PDFs + the complete Claude Code toolkit</li>
+          <li>Single-company license — build unlimited internal systems</li>
+          <li>Free updates on this version (incl. the Pillar 4 finalization)</li>
+          <li>Keep everything you build — the agents and infrastructure are yours</li>
+        </ul>
+        <p style="font-size:12.5px;color:#9aa3b2;margin-top:14px">Requires Claude Code + basic terminal comfort. Prefer no terminal? The Hosted edition is coming — ask to be notified.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta">
+    <h2>Own the protocol.</h2>
+    <p>Instant download. Install it into your Claude Code and run your first company scan in 20 minutes.</p>
+    <a class="btn" href="[BUY-URL]">Buy &amp; download <span class="arw">→</span></a>
+    <div class="contact">Questions? <a href="mailto:ian@ais-slovenia.si">ian@ais-slovenia.si</a> · <a href="https://ais-slovenia.si">ais-slovenia.si</a></div>
+  </div>
+
+  <footer>
+    <span>AIS · The AI-Native Protocol</span>
+    <span>ais-slovenia.si</span>
+  </footer>
+
+</div>
+</body>
+</html>
