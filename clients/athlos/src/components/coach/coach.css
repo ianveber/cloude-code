@@ -1,0 +1,465 @@
+/* Coach — ATHLOS dark + green. Tokens from globals.css. */
+
+.coach-page {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+}
+
+.coach-boot {
+  min-height: 60vh;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.coach-eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* ── Onboarding ─────────────────────────────────────────────────────────── */
+.coach-onboard {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 56px 24px 96px;
+}
+.coach-title {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(32px, 6vw, 52px);
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  margin: 14px 0 12px;
+}
+.coach-sub {
+  color: var(--text-2);
+  font-size: 16px;
+  line-height: 1.55;
+  margin: 0 0 36px;
+  max-width: 52ch;
+}
+.coach-field {
+  margin-bottom: 22px;
+  flex: 1;
+}
+.coach-field label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 9px;
+}
+.coach-opt {
+  color: var(--muted-2);
+  letter-spacing: 0.08em;
+  text-transform: none;
+}
+.coach-field input {
+  width: 100%;
+  padding: 13px 15px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.coach-field input:focus {
+  border-color: var(--accent);
+  background: var(--surface-2);
+}
+.coach-row {
+  display: flex;
+  gap: 14px;
+}
+.coach-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.coach-chips button {
+  padding: 9px 15px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  font-family: var(--body);
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.coach-chips button:hover {
+  border-color: var(--border-2);
+  color: var(--text);
+}
+.coach-chips button.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+  font-weight: 600;
+}
+.coach-cta {
+  width: 100%;
+  margin-top: 12px;
+  padding: 17px 24px;
+  border-radius: 14px;
+  border: 0;
+  background: var(--accent);
+  color: #000;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+}
+.coach-cta:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+.coach-cta:disabled {
+  opacity: 0.32;
+  cursor: not-allowed;
+}
+
+/* ── Chat shell ─────────────────────────────────────────────────────────── */
+.coach-shell {
+  max-width: 860px;
+  margin: 0 auto;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px;
+}
+.coach-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 26px 0 18px;
+  border-bottom: 1px solid var(--border);
+}
+.coach-name {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 26px;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  margin: 7px 0 5px;
+}
+.coach-meta {
+  color: var(--muted);
+  font-size: 13px;
+}
+.coach-memory-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 15px;
+  border-radius: 999px;
+  border: 1px solid var(--border-2);
+  background: var(--surface);
+  color: var(--text-2);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.coach-memory-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+.coach-badge {
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #000;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 10px;
+}
+
+/* ── Memory panel ───────────────────────────────────────────────────────── */
+.coach-memory {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  padding: 20px;
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.coach-memory h4 {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 11px;
+}
+.coach-memory ul {
+  margin: 0;
+  padding-left: 17px;
+  color: var(--text-2);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+.coach-memory li {
+  margin-bottom: 6px;
+}
+.coach-date {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted-2);
+  margin-right: 6px;
+}
+.coach-empty {
+  color: var(--muted-2);
+  font-size: 13.5px;
+  margin: 0;
+}
+
+/* ── Messages ───────────────────────────────────────────────────────────── */
+.coach-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 0;
+  scrollbar-width: thin;
+}
+.coach-starters {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 32px 0;
+}
+.coach-starters button {
+  padding: 12px 17px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  font-family: var(--body);
+  font-size: 14.5px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+.coach-starters button:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+.coach-msg {
+  margin-bottom: 22px;
+  max-width: 100%;
+}
+.coach-msg.user {
+  margin-left: auto;
+  max-width: 78%;
+  padding: 13px 17px;
+  border-radius: 16px 16px 4px 16px;
+  background: var(--accent);
+  color: #000;
+}
+.coach-msg.user .coach-p {
+  margin: 0;
+  font-weight: 500;
+}
+.coach-msg.assistant {
+  padding: 20px 22px;
+  border-radius: 4px 16px 16px 16px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+}
+.coach-p {
+  margin: 0 0 11px;
+  line-height: 1.62;
+  font-size: 15px;
+}
+.coach-p:last-child {
+  margin-bottom: 0;
+}
+.coach-h1,
+.coach-h2 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  color: var(--text);
+  margin: 20px 0 11px;
+}
+.coach-h3,
+.coach-h4 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14.5px;
+  color: var(--accent);
+  margin: 17px 0 8px;
+}
+.coach-list {
+  margin: 0 0 12px;
+  padding-left: 20px;
+  line-height: 1.62;
+  font-size: 15px;
+}
+.coach-list li {
+  margin-bottom: 5px;
+}
+.coach-hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 18px 0;
+}
+.coach-msg code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--surface-3);
+  color: var(--accent);
+}
+.coach-msg strong {
+  color: var(--text);
+  font-weight: 650;
+}
+
+/* Tables carry the training plans — they must stay readable and never break layout. */
+.coach-table-wrap {
+  overflow-x: auto;
+  margin: 0 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.coach-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  min-width: 460px;
+}
+.coach-table th {
+  text-align: left;
+  padding: 11px 13px;
+  background: var(--surface-2);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+}
+.coach-table td {
+  padding: 11px 13px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.5;
+}
+.coach-table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* ── Typing + errors ────────────────────────────────────────────────────── */
+.coach-typing {
+  display: flex;
+  gap: 5px;
+  padding: 3px 0;
+}
+.coach-typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: coach-bounce 1.3s ease-in-out infinite;
+}
+.coach-typing span:nth-child(2) {
+  animation-delay: 0.16s;
+}
+.coach-typing span:nth-child(3) {
+  animation-delay: 0.32s;
+}
+@keyframes coach-bounce {
+  0%, 60%, 100% { opacity: 0.25; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .coach-typing span { animation: none; opacity: 0.6; }
+  .coach-cta:hover:not(:disabled) { transform: none; }
+}
+.coach-error {
+  padding: 13px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 90, 90, 0.35);
+  background: rgba(255, 90, 90, 0.08);
+  color: #ff9d9d;
+  font-size: 14px;
+}
+
+/* ── Composer ───────────────────────────────────────────────────────────── */
+.coach-composer {
+  display: flex;
+  gap: 10px;
+  padding: 16px 0 22px;
+  border-top: 1px solid var(--border);
+}
+.coach-composer input {
+  flex: 1;
+  padding: 15px 18px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.coach-composer input:focus {
+  border-color: var(--accent);
+}
+.coach-composer button {
+  padding: 15px 26px;
+  border-radius: 14px;
+  border: 0;
+  background: var(--accent);
+  color: #000;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.coach-composer button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .coach-memory { grid-template-columns: 1fr; }
+  .coach-row { flex-direction: column; gap: 0; }
+  .coach-msg.user { max-width: 88%; }
+  .coach-head { flex-direction: column; }
+}

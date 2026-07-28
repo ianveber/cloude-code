@@ -2,199 +2,189 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "dashboard",
-      "runtimeExecutable": "bun",
+      "name": "jarvis-cockpit",
+      "runtimeExecutable": "node",
       "runtimeArgs": [
-        "server.mjs"
+        "jarvis-cockpit/bridge.mjs"
       ],
-      "port": 8766
+      "port": 4599
     },
     {
-      "name": "ethospheres",
-      "runtimeExecutable": "bun",
+      "name": "elementum",
+      "runtimeExecutable": "node",
       "runtimeArgs": [
-        "server.mjs"
+        "/Users/ianveber/Desktop/Cloude CODE/clients/elementum/_preview-server.mjs"
       ],
-      "env": {
-        "PORT": "8767"
-      },
-      "port": 8767
+      "port": 8821
     },
     {
-      "name": "context-library",
-      "runtimeExecutable": "bun",
+      "name": "grafy-refresh",
+      "runtimeExecutable": "node",
       "runtimeArgs": [
-        "server.mjs"
+        "/Users/ianveber/Desktop/Cloude CODE/clients/grafy/refresh/_preview-server.mjs"
       ],
-      "env": {
-        "PORT": "8768"
-      },
-      "port": 8768
+      "port": 4317
     },
     {
       "name": "athlos-chatbot",
       "runtimeExecutable": "bun",
       "runtimeArgs": [
-        "athlos-chatbot/server.mjs"
+        "/Users/ianveber/Desktop/Cloude CODE/athlos-chatbot/server.mjs"
       ],
       "port": 8010
     },
     {
-      "name": "ais-walk",
-      "runtimeExecutable": "bun",
+      "name": "athlos-greek",
+      "runtimeExecutable": "npm",
       "runtimeArgs": [
-        "ais-slovenia-copy/server.mjs"
+        "--prefix",
+        "/Users/ianveber/builds/agreek",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5179",
+        "--strictPort"
       ],
-      "env": {
-        "PORT": "8769"
-      },
-      "port": 8769
+      "port": 5179,
+      "autoPort": false
     },
     {
-      "name": "ais-os",
-      "runtimeExecutable": "sh",
+      "name": "athlos-dev",
+      "runtimeExecutable": "npm",
       "runtimeArgs": [
-        "-c",
-        "cd ais-os && bun run dev"
+        "--prefix",
+        "/private/tmp/athlos-app2/athlos-main",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5180",
+        "--strictPort"
       ],
-      "port": 3010
-    },
-    {
-      "name": "ais-fresh",
-      "runtimeExecutable": "bun",
-      "runtimeArgs": [
-        "ais-fresh/server.mjs"
-      ],
-      "env": {
-        "PORT": "8770"
-      },
-      "port": 8770
-    },
-    {
-      "name": "space-station",
-      "runtimeExecutable": "sh",
-      "runtimeArgs": [
-        "-c",
-        "cd space-station-website && bun run dev"
-      ],
-      "port": 3013
-    },
-    {
-      "name": "ais-walk-frames",
-      "runtimeExecutable": "bun",
-      "runtimeArgs": [
-        "ais-walk-frames/server.mjs"
-      ],
-      "env": {
-        "PORT": "8771"
-      },
-      "port": 8771
-    },
-    {
-      "name": "ais-site",
-      "runtimeExecutable": "sh",
-      "runtimeArgs": [
-        "-c",
-        "cd ais-site && ANTHROPIC_API_KEY=$(cat ~/.anthropic_key) bun run dev"
-      ],
-      "port": 3014
-    },
-    {
-      "name": "ais-mirror",
-      "runtimeExecutable": "bun",
-      "runtimeArgs": [
-        "ais-slovenia-mirror/server.mjs"
-      ],
-      "env": {
-        "PORT": "8772"
-      },
-      "port": 8772
-    },
-    {
-      "name": "inspectus-demo",
-      "runtimeExecutable": "bun",
-      "runtimeArgs": [
-        "inspectus-demo/server.mjs"
-      ],
-      "env": {
-        "PORT": "8775"
-      },
-      "port": 8775
-    },
-    {
-      "name": "hermes-os",
-      "runtimeExecutable": "bun",
-      "runtimeArgs": [
-        "server.mjs"
-      ],
-      "env": {
-        "PORT": "8776"
-      },
-      "port": 8776
-    },
-    {
-      "name": "athlos",
-      "runtimeExecutable": "sh",
-      "runtimeArgs": [
-        "-c",
-        "cd clients/athlos && bun run dev"
-      ],
-      "port": 3001
-    },
-    {
-      "name": "athlos-landing",
-      "runtimeExecutable": "sh",
-      "runtimeArgs": [
-        "-c",
-        "cd clients/athlos-landing && node serve.js"
-      ],
-      "port": 8766
-    },
-    {
-      "name": "grafy",
-      "runtimeExecutable": "bun",
-      "runtimeArgs": [
-        "clients/grafy/server.mjs"
-      ],
-      "env": {
-        "PORT": "8781"
-      },
-      "port": 8781
+      "port": 5180
     },
     {
       "name": "inspectus-os",
-      "runtimeExecutable": "sh",
+      "runtimeExecutable": "npm",
       "runtimeArgs": [
-        "-c",
-        "cd INSPEKTUS/inspectus-os && bun run dev"
+        "--prefix",
+        "/Users/ianveber/Desktop/Cloude CODE/INSPEKTUS/inspectus-os",
+        "run",
+        "dev"
       ],
       "port": 3020
     },
     {
-      "name": "agentic-os",
-      "runtimeExecutable": "sh",
+      "name": "constat-builder",
+      "runtimeExecutable": "node",
       "runtimeArgs": [
-        "-c",
-        "cd /Users/ianveber/agentic-os && exec node_modules/.bin/next dev -p 3030"
+        "/Users/ianveber/Desktop/Cloude CODE/INSPEKTUS/constat-builder/_server.mjs"
+      ],
+      "port": 4318
+    },
+    {
+      "name": "vldr-cal",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "/tmp/vldr-cal-harness/_server.mjs"
+      ],
+      "port": 4319
+    },
+    {
+      "name": "inspectus-tmp",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "/tmp/inspectus-os",
+        "run",
+        "dev"
+      ],
+      "port": 3025
+    },
+    {
+      "name": "picikato",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "/Users/ianveber/Desktop/Cloude CODE/picikato/_preview-server.mjs"
+      ],
+      "port": 8830
+    },
+    {
+      "name": "heva",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "/Users/ianveber/Desktop/Cloude CODE/heva/_preview-server.mjs"
+      ],
+      "port": 4321
+    },
+    {
+      "name": "heva-refresh",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "/Users/ianveber/Desktop/Cloude CODE/heva/refresh/_preview-server.mjs"
+      ],
+      "port": 4320
+    },
+    {
+      "name": "herminaviolina",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "/tmp/herminaviolina",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5186",
+        "--strictPort"
+      ],
+      "port": 5186
+    },
+    {
+      "name": "ais-portal",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "/Users/ianveber/builds/ais-portal",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "3030"
       ],
       "port": 3030
     },
     {
-      "name": "tajnsekveber",
-      "runtimeExecutable": "bun",
+      "name": "protocol-hosted",
+      "runtimeExecutable": "npm",
       "runtimeArgs": [
-        "-e",
-        "Bun.serve({port:8782,async fetch(req){const p=new URL(req.url).pathname;const f=Bun.file('tajnsekveber'+(p==='/'?'/index.html':p));return await f.exists()?new Response(f):new Response('Not found',{status:404})}});console.log('tajnsekveber on 8782')"
+        "--prefix",
+        "/Users/ianveber/protocol-hosted",
+        "run",
+        "dev"
       ],
-      "port": 8782
+      "port": 3000
     },
     {
-      "name": "inspectus-vldr",
-      "runtimeExecutable": "bun",
+      "name": "athlos-app",
+      "runtimeExecutable": "npm",
       "runtimeArgs": [
-        "INSPEKTUS/_vldr-dev-server.mjs"
+        "--prefix",
+        "/Users/ianveber/Desktop/Cloude CODE/clients/athlos",
+        "run",
+        "dev"
       ],
-      "port": 8812
+      "port": 3001
+    },
+    {
+      "name": "harvest-demo",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-lc",
+        "cd '/Users/ianveber/Desktop/Cloude CODE/clients/harvest-hub/demo' && DEMO_SAMPLES=1 ANTHROPIC_API_KEY=$(tr -d '[:space:]' < ~/.anthropic_key) node server.mjs"
+      ],
+      "port": 8020
     }
   ]
 }
