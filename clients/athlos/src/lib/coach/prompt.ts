@@ -83,21 +83,19 @@ export function memoryBlock(profile: CoachProfile | null): string {
   )}\n</athlete_data>`;
 }
 
-type SystemBlock = {
-  type: "text";
-  text: string;
-  cache_control?: { type: "ephemeral" };
-};
-
 /**
- * Assemble the system prompt.
+ * Assemble the system instruction (one string — Gemini takes a single
+ * systemInstruction, not Anthropic's array of cache-controlled blocks).
  *
- * Cache discipline (see prompt-caching rules): the brain is large and byte-identical
- * across every request, so it goes FIRST as one cacheable block. The per-athlete
- * memory changes every session and therefore must come AFTER the breakpoint —
- * putting it earlier would invalidate the ~22K-token brain cache on every request.
+ * Cache discipline still matters, and the ordering rule is unchanged: Gemini's
+ * implicit caching keys on the request PREFIX, so the large byte-identical brain
+ * goes FIRST and the per-athlete memory (different every session) goes LAST.
+ * Reversing them would break the cache hit on every single request.
+ *
+ * The brain is ~22K tokens, comfortably over gemini-3.5-flash's 4,096-token
+ * implicit-cache threshold, so this caches automatically with nothing to manage.
  */
-export function buildSystemBlocks(profile: CoachProfile | null): SystemBlock[] {
+export function buildSystemInstruction(profile: CoachProfile | null): string {
   const b = loadBrain();
 
   const brain = `# COACH BRAIN — Tim Drenovc complete knowledge base
@@ -132,14 +130,10 @@ ${b["speed-protocols.md"]}
 End of brain. The Coach persona + hard rules follow below.
 ═══════════════════════════════════════════════════════════════`;
 
-  const blocks: SystemBlock[] = [
-    // Breakpoint sits on the last stable block, so brain + persona cache together.
-    { type: "text", text: brain },
-    { type: "text", text: b["system-prompt.md"], cache_control: { type: "ephemeral" } },
-  ];
-
+  // Stable prefix (brain + persona) first, volatile per-athlete memory last.
+  const parts = [brain, b["system-prompt.md"]];
   const mem = memoryBlock(profile);
-  if (mem) blocks.push({ type: "text", text: mem });
+  if (mem) parts.push(mem);
 
-  return blocks;
+  return parts.join("\n\n");
 }

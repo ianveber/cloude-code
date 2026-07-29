@@ -1,7 +1,7 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI, ApiError, FinishReason } from "@google/genai";
 import { z } from "zod";
 import { NextResponse } from "next/server";
-import { buildSystemBlocks } from "@/lib/coach/prompt";
+import { buildSystemInstruction } from "@/lib/coach/prompt";
 import { splitReply, stripMarkers } from "@/lib/coach/parse";
 import {
   applyTurn,
@@ -18,11 +18,8 @@ import type { CoachProfile } from "@/lib/coach/types";
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
-const MODEL = "claude-opus-4-8";
-const MAX_TOKENS = 16000;
-// Interactive chat: `medium` keeps turns responsive. Raise to "high" if plan quality
-// matters more than latency — it is the single lever worth tuning here.
-const EFFORT = "medium" as const;
+const MODEL = "gemini-3.5-flash";
+const MAX_OUTPUT_TOKENS = 16000;
 
 const bodySchema = z.object({
   messages: z
@@ -42,12 +39,6 @@ const bodySchema = z.object({
 const encoder = new TextEncoder();
 const event = (obj: unknown) => encoder.encode(JSON.stringify(obj) + "\n");
 
-function loadApiKey(): string {
-  const key = process.env.ANTHROPIC_API_KEY?.trim();
-  if (!key) throw new Error("ANTHROPIC_API_KEY ni nastavljen.");
-  return key;
-}
-
 export async function POST(request: Request) {
   let payload: unknown;
   try {
@@ -65,12 +56,10 @@ export async function POST(request: Request) {
   }
   const { messages, profileId } = parsed.data;
 
-  let apiKey: string;
-  try {
-    apiKey = loadApiKey();
-  } catch (e) {
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
+  if (!apiKey) {
     return NextResponse.json(
-      { ok: false, error: "Coach trenutno ni na voljo.", detail: String((e as Error).message) },
+      { ok: false, error: "Coach trenutno ni na voljo.", detail: "GEMINI_API_KEY ni nastavljen." },
       { status: 503 }
     );
   }
@@ -87,9 +76,9 @@ export async function POST(request: Request) {
     profile = normalizeProfile(parsed.data.profile); // degrade to the client's copy
   }
 
-  let system;
+  let systemInstruction: string;
   try {
-    system = buildSystemBlocks(profile);
+    systemInstruction = buildSystemInstruction(profile);
   } catch (e) {
     // The brain failed to load. Refuse rather than let Coach invent exercises.
     console.error("Coach brain load failed:", e);
@@ -99,7 +88,14 @@ export async function POST(request: Request) {
     );
   }
 
-  const client = new Anthropic({ apiKey });
+  const ai = new GoogleGenAI({ apiKey });
+
+  // Gemini's roles are 'user' | 'model' — there is no 'assistant'. Sending the
+  // Anthropic-style role silently yields a malformed turn, so map it explicitly.
+  const contents = messages.map((m) => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.content }],
+  }));
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -107,32 +103,56 @@ export async function POST(request: Request) {
       let sent = "";
 
       try {
-        const mstream = client.messages.stream({
+        const result = await ai.models.generateContentStream({
           model: MODEL,
-          max_tokens: MAX_TOKENS,
-          thinking: { type: "adaptive" },
-          output_config: { effort: EFFORT },
-          system,
-          messages,
+          contents,
+          config: { systemInstruction, maxOutputTokens: MAX_OUTPUT_TOKENS },
         });
 
-        mstream.on("text", (delta) => {
-          raw += delta;
-          // Markers ([[PLAN]], <NOTE>, <PROPOSE>) arrive mid-stream and must never
-          // reach the athlete. stripMarkers drops a dangling marker through to the
-          // end of the buffer, so re-sanitizing the whole accumulation each tick
-          // naturally withholds a half-arrived marker instead of leaking it.
-          const clean = stripMarkers(raw);
-          if (clean.startsWith(sent) && clean.length > sent.length) {
-            controller.enqueue(event({ type: "delta", v: clean.slice(sent.length) }));
-            sent = clean;
+        let finishReason: FinishReason | undefined;
+        let cachedTokens = 0;
+        let totalTokens = 0;
+
+        for await (const chunk of result) {
+          const delta = chunk.text;
+          if (delta) {
+            raw += delta;
+            // Markers ([[PLAN]], <NOTE>, <PROPOSE>) arrive mid-stream and must never
+            // reach the athlete. stripMarkers drops a dangling marker through to the
+            // end of the buffer, so re-sanitizing the whole accumulation each tick
+            // naturally withholds a half-arrived marker instead of leaking it.
+            const clean = stripMarkers(raw);
+            if (clean.startsWith(sent) && clean.length > sent.length) {
+              controller.enqueue(event({ type: "delta", v: clean.slice(sent.length) }));
+              sent = clean;
+            }
           }
-          // If clean no longer extends `sent` (a marker just closed and text was
-          // removed behind us), emit nothing — the final `done` carries the truth.
-        });
+          const fr = chunk.candidates?.[0]?.finishReason;
+          if (fr) finishReason = fr;
+          if (chunk.usageMetadata) {
+            cachedTokens = chunk.usageMetadata.cachedContentTokenCount ?? cachedTokens;
+            totalTokens = chunk.usageMetadata.totalTokenCount ?? totalTokens;
+          }
+        }
 
-        const final = await mstream.finalMessage();
-        const truncated = final.stop_reason === "max_tokens";
+        // A safety block ends the stream with EMPTY content rather than an error —
+        // without this branch it is indistinguishable from a silent failure.
+        if (!raw.trim()) {
+          const blocked =
+            finishReason === FinishReason.SAFETY || finishReason === FinishReason.RECITATION;
+          controller.enqueue(
+            event({
+              type: "error",
+              error: blocked
+                ? "Odgovor je bil blokiran s strani varnostnega filtra. Preoblikuj vprašanje."
+                : "Coach ni vrnil odgovora. Poskusi znova.",
+              detail: String(finishReason ?? "brez razloga"),
+            })
+          );
+          return;
+        }
+
+        const truncated = finishReason === FinishReason.MAX_TOKENS;
         const { text, plan, proposals, notes } = splitReply(raw);
 
         let nextProfile = profile;
@@ -157,6 +177,14 @@ export async function POST(request: Request) {
           );
         }
 
+        // cachedContentTokenCount is the only way to confirm implicit caching is
+        // actually hitting — if it stays 0 across turns, the ~22K brain is being
+        // re-billed every request and the prefix ordering has drifted.
+        console.log(
+          `[coach] ${profile?.name ?? "anon"} · ${totalTokens} tok · cached ${cachedTokens}` +
+            `${plan ? " · plan saved" : ""}${notes.length ? ` · ${notes.length} note` : ""}`
+        );
+
         controller.enqueue(
           event({
             type: "done",
@@ -168,7 +196,7 @@ export async function POST(request: Request) {
         );
       } catch (e) {
         console.error("Coach stream error:", e);
-        const detail = e instanceof Anthropic.APIError ? `${e.status}` : "";
+        const detail = e instanceof ApiError ? `${e.status}` : "";
         controller.enqueue(
           event({
             type: "error",
