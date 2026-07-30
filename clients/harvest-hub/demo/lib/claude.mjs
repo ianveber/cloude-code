@@ -9,8 +9,10 @@ const API = "https://api.anthropic.com/v1/messages";
 
 // Text pairing is structural — Sonnet handles it. Vision reads degraded Canon scans,
 // where accuracy decides the demo, so it gets the premium tier.
-export const MODEL_TEXT = "claude-sonnet-4-6";
-export const MODEL_VISION = "claude-opus-4-8";
+// Overridable by env so a model can be swapped and re-scored against truth.json without a code
+// change — the client owns this after handover and will outlive any model we pick today.
+export const MODEL_TEXT = process.env.MODEL_TEXT || "claude-sonnet-4-6";
+export const MODEL_VISION = process.env.MODEL_VISION || "claude-opus-4-8";
 
 function apiKey() {
   return process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY || null;
@@ -79,9 +81,21 @@ export function imageBlocks(base64Png, instruction) {
 const PRICES = {
   "claude-sonnet-4-6": { in: 3, out: 15 },
   "claude-opus-4-8": { in: 5, out: 25 },
+  "claude-haiku-4-5": { in: 1, out: 5 },
 };
+
+/**
+ * Cached tokens are NOT billed at the full input rate — a cache read is ~0.1× and a cache write
+ * ~1.25×. Counting reads at 1.0× (as this did) overstates the cost of exactly the token class the
+ * system prompt is designed to produce, and the overstatement grows as caching works better.
+ * Every figure quoted to the client rests on this function, so it prices the three classes apart.
+ */
+const CACHE_READ = 0.1, CACHE_WRITE = 1.25;
 export function costUsd(model, usage = {}) {
   const p = PRICES[model] || PRICES["claude-sonnet-4-6"];
-  const i = (usage.input_tokens || 0) + (usage.cache_read_input_tokens || 0);
-  return (i / 1e6) * p.in + ((usage.output_tokens || 0) / 1e6) * p.out;
+  const fresh = usage.input_tokens || 0;
+  const read = usage.cache_read_input_tokens || 0;
+  const write = usage.cache_creation_input_tokens || 0;
+  return ((fresh + read * CACHE_READ + write * CACHE_WRITE) / 1e6) * p.in
+    + ((usage.output_tokens || 0) / 1e6) * p.out;
 }
