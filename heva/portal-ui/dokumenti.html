@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arhiv - Heva — RAZGLEDNA 2 · Dokumenti</title>
+<style>
+  :root{
+    --bg:#F4F7F7; --surface:#FFFFFF; --surface-2:#F8FBFB;
+    --teal:#12ADAB; --teal-deep:#0E7E77; --teal-tint:#E6F7F6; --teal-tint-2:#F1FAFA; --teal-soft:#C7EAE8;
+    --ink:#0E2A2B; --text:#33484A; --text-2:#6B8082; --text-3:#9AAEAF;
+    --border:#E7EEEE; --border-2:#EFF4F4;
+    --amber:#E8A33D; --amber-tint:#FBF1DF; --amber-soft:#F0DCB6;
+    --shadow-sm:0 1px 2px rgba(14,42,43,.04), 0 1px 3px rgba(14,42,43,.05);
+    --shadow:0 1px 2px rgba(14,42,43,.04), 0 8px 24px rgba(14,42,43,.06);
+    --r:16px; --r-sm:12px;
+    --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter,system-ui,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);
+    font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+  svg{display:block}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--teal-soft)}
+
+  /* ── Top bar ─────────────────────────────── */
+  .topbar{height:64px;background:rgba(244,247,247,.85);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 24px;position:sticky;top:0;z-index:30}
+  .tb-logo{height:23px;width:auto;margin-right:6px}
+  .tnav{display:flex;align-items:center;gap:3px}
+  .tnav a{font-size:13.5px;font-weight:600;color:var(--text-2);padding:8px 13px;border-radius:10px;transition:.12s}
+  .tnav a:hover{background:var(--surface);color:var(--ink)}
+  .tnav a.active{background:var(--teal-tint);color:var(--teal-deep)}
+  .top-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .aaa{display:flex;align-items:center;gap:1px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:2px}
+  .aaa button{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;color:var(--text-2);font-weight:700;line-height:1;transition:.12s}
+  .aaa button:hover{background:var(--surface-2);color:var(--teal-deep)}
+  .aaa .a1{font-size:11px}.aaa .a2{font-size:13px}.aaa .a3{font-size:15px}
+  .user{display:flex;align-items:center;gap:9px}
+  .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--teal) 0%,var(--teal-deep) 100%);
+    color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+  .user .uname{font-size:13px;font-weight:600;color:var(--ink);line-height:1.15}
+  .user .ulogout{font-size:11.5px;color:var(--text-3)}
+  .user .ulogout:hover{color:var(--teal-deep)}
+
+  /* ── Sub header ──────────────────────────── */
+  .subhead{display:flex;align-items:center;gap:14px;padding:16px 30px 0;max-width:1240px;margin:0 auto;width:100%;flex-wrap:wrap}
+  .crumb{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:750;color:var(--ink);letter-spacing:-.02em;min-width:0;flex-wrap:wrap}
+  .crumb .sep{color:var(--text-3);font-weight:400}
+  .crumb .home{color:var(--teal-deep)}
+  .crumb .cur{color:var(--ink)}
+  .crumb a:hover{color:var(--teal)}
+  .subhead .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .view-toggle{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--text-2);
+    background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 13px}
+  .view-toggle:hover{border-color:var(--teal-soft);color:var(--teal-deep)}
+
+  /* ── Body ────────────────────────────────── */
+  .body{display:grid;grid-template-columns:266px 1fr;gap:22px;max-width:1240px;margin:0 auto;width:100%;padding:18px 30px 40px}
+
+  /* Folder tree */
+  .tree-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-sm);padding:14px 12px;align-self:start;position:sticky;top:80px}
+  .tree-label{font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;padding:2px 10px 8px}
+  .tree a{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:9px;font-size:13.5px;color:var(--text);cursor:pointer;transition:.1s}
+  .tree a .tic{color:var(--amber);flex:none}
+  .tree a.sys .tic{color:var(--text-3)}
+  .tree a:hover{background:var(--surface-2)}
+  .tree a.active{background:var(--teal-tint);color:var(--teal-deep);font-weight:650}
+  .tree a.active .tic{color:var(--teal-deep)}
+  .tree a.lvl2{padding-left:26px;font-size:13px;color:var(--text-2)}
+  .tree a.lvl2 .tic{width:14px;height:14px}
+
+  /* Files panel */
+  .files{min-width:0}
+  .toolbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .tool{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 13px;border-radius:10px;
+    border:1px solid var(--border);background:var(--surface);font-size:13px;font-weight:600;color:var(--text-2);transition:.12s}
+  .tool:hover{border-color:var(--teal-soft);color:var(--teal-deep)}
+  .tool.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+  .tool.primary:hover{background:#0FA09E}
+  .tool.icon{width:38px;padding:0;justify-content:center}
+  .fsearch{margin-left:auto;position:relative;display:flex;align-items:center;min-width:200px}
+  .fsearch .ic{position:absolute;left:12px;color:var(--text-3)}
+  .fsearch input{width:100%;height:38px;border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:0 12px 0 38px;font-size:13.5px;color:var(--ink);font-family:inherit}
+  .fsearch input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-tint)}
+
+  .table{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-sm);overflow:hidden}
+  .thead{display:grid;grid-template-columns:1fr 130px 150px 108px;gap:12px;padding:12px 18px;
+    font-size:11.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}
+  .row{display:grid;grid-template-columns:1fr 130px 150px 108px;gap:12px;align-items:center;padding:13px 18px;border-top:1px solid var(--border-2);transition:.1s}
+  .row:first-of-type{border-top:none}
+  .row:hover{background:var(--surface-2)}
+  .rc-name{display:flex;align-items:center;gap:13px;min-width:0;cursor:pointer}
+  .rc-ic{width:40px;height:40px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center}
+  .rc-ic.folder{background:var(--amber-tint);color:var(--amber)}
+  .rc-ic.sys{background:var(--surface-2);color:var(--text-3)}
+  .rc-ic.file{background:var(--teal-tint);color:var(--teal-deep)}
+  .rc-nm{min-width:0}
+  .rc-nm .n{font-size:14.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rc-nm .s{font-size:12px;color:var(--text-3)}
+  .rc-nm .s.tag{color:var(--text-3)}
+  .rc-size,.rc-date{font-size:13px;color:var(--text-2)}
+  .rc-date{color:var(--text-3)}
+  .rc-act{display:flex;justify-content:flex-end;gap:6px}
+  .rc-act a{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);
+    display:flex;align-items:center;justify-content:center;color:var(--text-2);transition:.12s}
+  .rc-act a:hover{background:var(--teal);border-color:var(--teal);color:#fff}
+  .row.hidden{display:none}
+
+  /* Storage */
+  .storage{margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-sm);padding:15px 18px}
+  .storage .st-top{display:flex;align-items:center;justify-content:space-between;font-size:13px;margin-bottom:9px}
+  .storage .st-top .l{font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .storage .st-top .r{color:var(--text-2)}
+  .bar{height:8px;border-radius:99px;background:var(--surface-2);border:1px solid var(--border-2);overflow:hidden}
+  .bar span{display:block;height:100%;width:3.1%;background:linear-gradient(90deg,var(--teal) 0%,var(--teal-deep) 100%);border-radius:99px}
+
+  .foot{text-align:center;font-size:12px;color:var(--text-3);padding:8px 0 28px}
+  .foot a{color:var(--text-2)}
+
+  @media(max-width:880px){
+    .body{grid-template-columns:1fr;padding:16px 16px 30px}
+    .tree-card{position:static}
+    .tnav,.tb-logo{display:none}
+    .thead{display:none}
+    .row{grid-template-columns:1fr auto;gap:8px}
+    .rc-size,.rc-date{display:none}
+    .subhead{padding:14px 16px 0}
+  }
+</style>
+<link rel="stylesheet" href="ui.css">
+</head>
+<body>
+  <!-- Top bar -->
+  <div class="topbar">
+    <a href="objekti.html"><img class="tb-logo" src="assets/logo-nav.png" alt="Arhiv - Heva"></a>
+    <nav class="tnav">
+      <a href="objekti.html" class="active">Moji objekti</a>
+      <!-- Manager-only. Removed for residents at boot — RLS would refuse
+           these anyway, but a resident shouldn't be shown a door that
+           doesn't open. -->
+      <a href="objekti.html?v=uporabniki" data-mgr-only>Uporabniki</a>
+      <a href="objekti.html?v=dnevnik" data-mgr-only>Dnevnik dostopov</a>
+    </nav>
+    <div class="top-actions">
+      <div class="aaa" role="group" aria-label="Velikost besedila">
+        <button class="a1" title="Zmanjšaj besedilo" onclick="setFont(-1)">A</button>
+        <button class="a2" title="Ponastavi velikost besedila" onclick="setFont(0)">A</button>
+        <button class="a3" title="Povečaj besedilo" onclick="setFont(1)">A</button>
+      </div>
+      <div class="user">
+        <div class="avatar" id="avatar"></div>
+        <div>
+          <div class="uname" id="uname"></div>
+          <a class="ulogout" href="#" onclick="event.preventDefault();signOut()">Odjava</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sub header / breadcrumb -->
+  <div class="subhead">
+    <div class="crumb" id="crumb"></div>
+    <div class="right">
+      <button class="view-toggle" id="viewToggle">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span id="viewToggleLabel">Uporabnikov pogled</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+    <aside class="tree-card">
+      <div class="tree-label">Trenutna mapa</div>
+      <nav class="tree" id="tree"></nav>
+    </aside>
+
+    <div class="files">
+      <div id="resBanner"></div>
+      <div class="toolbar" id="toolbar"></div>
+
+      <div class="table">
+        <div class="thead"><span>Ime</span><span>Velikost</span><span>Datum</span><span style="text-align:right">Podrobno</span></div>
+        <div id="rows"></div>
+      </div>
+
+      <div class="storage">
+        <div class="st-top">
+          <span class="l"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="6" rx="1.6"/><rect x="3" y="13" width="18" height="6" rx="1.6"/><path d="M7 8h.01M7 16h.01"/></svg>Zasedenost prostora</span>
+          <span class="r" id="stText"></span>
+        </div>
+        <div class="bar"><span id="stBar"></span></div>
+      </div>
+
+      <div class="foot">
+        Podpora: <a href="mailto:info@heva.si">info@heva.si</a> · Arhiv Heva © 2026
+        &nbsp;·&nbsp; <span class="proto-note"><b>Predogled</b> · vzorčni dokumenti</span>
+      </div>
+    </div>
+  </div>
+
+<script src="vendor/supabase.js"></script>
+<script src="ui.js"></script>
+<script src="live.js"></script>
+<script>
+(async () => {
+  const HEVA = await loadHeva();
+  if (!HEVA) return;
+  initFontScale(15);
+
+  const I = {
+    folder: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/></svg>',
+    file:   '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5h5"/><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/></svg>',
+    dl:     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/></svg>',
+    eye:    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
+    up:     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg>',
+    newf:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M12 11v5M9.5 13.5h5"/></svg>',
+    zip:    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/></svg>',
+    disk:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="6" rx="1.6"/><rect x="3" y="13" width="18" height="6" rx="1.6"/><path d="M7 8h.01M7 16h.01"/></svg>',
+    srch:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>',
+    lock:   '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>'
+  };
+
+  const params = new URLSearchParams(location.search);
+
+  // An unknown or forbidden slug falls back to the first object this user can
+  // actually see — never a hard-coded one, or a resident of any building other
+  // than RAZGLEDNA 2 would land on `undefined`. RLS has already filtered the
+  // list, so "not in HEVA.objekti" and "not allowed" are the same thing here.
+  const objekt = HEVA.bySlug(params.get('o') || '') || HEVA.objekti[0];
+  if (!objekt) {
+    document.querySelector('.body').innerHTML =
+      '<div class="empty">Za vaš račun ni dodeljenega nobenega objekta.<br>' +
+      'Obrnite se na upravitelja: <a href="mailto:info@heva.si">info@heva.si</a></div>';
+    document.getElementById('crumb').textContent = 'Moji objekti';
+    return;
+  }
+
+  let openFolder = null;      // null = folder listing, else the folder object
+  let resident   = !HEVA.user.isManager;  // real role; the toggle only *adds* to this
+  let q          = '';
+
+  // Hide manager-only chrome from residents.
+  if (!HEVA.user.isManager) {
+    document.querySelectorAll('[data-mgr-only]').forEach(el => el.remove());
+    document.getElementById('viewToggle').remove();
+  }
+
+  document.getElementById('uname').textContent  = HEVA.user.name;
+  document.getElementById('avatar').textContent = HEVA.user.initials;
+  document.title = `Arhiv - Heva — ${objekt.name} · Dokumenti`;
+
+  const totalMb = objekt.folders.reduce((a, f) => a + f.mb, 0);
+
+  /* ── Breadcrumb ─────────────────────────────────────────────────── */
+  function renderCrumb() {
+    const c = document.getElementById('crumb');
+    c.innerHTML =
+      `<img class="obj-photo" src="assets/objekti/${objekt.slug}.jpg" alt="" onerror="this.remove()">` +
+      `<a class="home" href="objekti.html">Moji objekti</a><span class="sep">›</span>` +
+      (openFolder
+        ? `<a class="home" data-root="1">${objekt.name}</a><span class="sep">›</span><span class="cur">${openFolder.name}</span>`
+        : `<span class="cur">${objekt.name}</span>`);
+    const r = c.querySelector('[data-root]');
+    if (r) r.onclick = () => { openFolder = null; q = ''; renderAll(); };
+  }
+
+  /* ── Folder tree ────────────────────────────────────────────────── */
+  function renderTree() {
+    const t = document.getElementById('tree');
+    t.innerHTML = objekt.folders.map(f => `
+      <a data-f="${f.name}" class="${openFolder && openFolder.name === f.name ? 'active' : ''}">
+        <span class="tic">${I.folder}</span>${f.name}
+      </a>
+      ${openFolder && openFolder.name === f.name
+        ? f.files.map(x => `<a class="lvl2" data-file="${encodeURIComponent(x.name)}"><span class="tic">${I.file}</span>${x.name}</a>`).join('')
+        : ''}`).join('');
+
+    t.querySelectorAll('[data-f]').forEach(a => a.onclick = () => {
+      openFolder = objekt.folders.find(f => f.name === a.dataset.f);
+      q = ''; renderAll();
+    });
+    t.querySelectorAll('[data-file]').forEach(a => a.onclick = () => {
+      openFile(decodeURIComponent(a.dataset.file));
+    });
+  }
+
+  /* ── Toolbar ────────────────────────────────────────────────────── */
+  function renderToolbar() {
+    const tb = document.getElementById('toolbar');
+    const manager = !resident;
+    tb.innerHTML = `
+      ${manager ? `<button class="tool primary" id="tUpload">${I.up}Naloži dokument</button>
+                   <button class="tool" id="tNew">${I.newf}Tvori mapo</button>` : ''}
+      <button class="tool icon" id="tZip" title="Shrani vse (ZIP)">${I.zip}</button>
+      <button class="tool icon" id="tDisk" title="Razpoložljiv prostor">${I.disk}</button>
+      <div class="fsearch">
+        <span class="ic">${I.srch}</span>
+        <input id="q" type="text" placeholder="Išči" value="${q.replace(/"/g,'&quot;')}">
+      </div>`;
+
+    const up = document.getElementById('tUpload');
+    if (up) up.onclick = () => modal('Naloži dokument',
+      `<p>V pravi različici se datoteka naloži v <b>zasebno shrambo</b> in se zabeleži v dnevnik.</p>
+       <p style="color:var(--text-2);font-size:13px">Cilj: <b>${objekt.name}</b>${openFolder ? ' › ' + openFolder.name : ''}</p>`,
+      [{ label: 'Prekliči' }, { label: 'Izberi datoteko', primary: true,
+         onClick: () => toast('Nalaganje ni na voljo v predogledu', 'Deluje po priklopu na bazo') }]);
+
+    const nf = document.getElementById('tNew');
+    if (nf) nf.onclick = () => modal('Tvori mapo',
+      `<p>Nova mapa znotraj <b>${objekt.name}</b>${openFolder ? ' › ' + openFolder.name : ''}.</p>`,
+      [{ label: 'Prekliči' }, { label: 'Ustvari', primary: true,
+         onClick: () => toast('Ustvarjanje map ni na voljo v predogledu') }]);
+
+    document.getElementById('tZip').onclick = () => {
+      const n = openFolder ? openFolder.files.length : objekt.folders.reduce((a,f)=>a+f.files.length,0);
+      toast(`Priprava ZIP · ${n} dokumentov`, openFolder ? openFolder.name : objekt.name);
+    };
+    document.getElementById('tDisk').onclick = () => modal('Zasedenost prostora',
+      `<dl class="dl">
+         <dt>Ta objekt</dt><dd>${fmtSize(totalMb)}</dd>
+         <dt>Map</dt><dd>${objekt.folders.length}</dd>
+         <dt>Dokumentov</dt><dd>${objekt.folders.reduce((a,f)=>a+f.files.length,0)}</dd>
+         <dt>Kvota</dt><dd>${HEVA.storage.totalMiB.toLocaleString('sl-SI')} MiB</dd>
+       </dl>`);
+
+    document.getElementById('q').oninput = e => { q = e.target.value.trim().toLowerCase(); renderRows(); };
+  }
+
+  /* ── Resident-view banner ─────────────────────────────────────────
+     Only shown to a MANAGER previewing the resident view. An actual
+     resident doesn't need to be told they're a resident. */
+  function renderBanner() {
+    const previewing = HEVA.user.isManager && resident;
+    document.getElementById('resBanner').innerHTML = previewing
+      ? `<div class="res-banner">${I.lock}
+           <span>Uporabnikov pogled — tako vidi arhiv stanovalec: samo svoj objekt, brez urejanja.
+           Omejitev velja v bazi, ne le v vmesniku.</span>
+         </div>`
+      : '';
+    const lbl = document.getElementById('viewToggleLabel');   // removed for residents
+    if (lbl) lbl.textContent = resident ? 'Nazaj na pogled upravitelja' : 'Uporabnikov pogled';
+  }
+
+  /* ── Rows ───────────────────────────────────────────────────────── */
+  function renderRows() {
+    const host = document.getElementById('rows');
+    const items = openFolder
+      ? openFolder.files.filter(f => !q || f.name.toLowerCase().includes(q))
+          .map(f => ({ kind: 'file', name: f.name, sub: f.type.toUpperCase(), mb: f.mb, date: f.date }))
+      : objekt.folders.filter(f => !q || f.name.toLowerCase().includes(q))
+          .map(f => ({ kind: 'folder', name: f.name, sub: `Mapa · ${f.files.length} dokumentov`, mb: f.mb, date: f.date }));
+
+    if (!items.length) { host.innerHTML = '<div class="empty">Ni zadetkov.</div>'; return; }
+
+    host.innerHTML = items.map(it => `
+      <div class="row" data-name="${encodeURIComponent(it.name)}" data-kind="${it.kind}">
+        <div class="rc-name">
+          <div class="rc-ic ${it.kind === 'folder' ? 'folder' : 'file'}">${it.kind === 'folder' ? I.folder : I.file}</div>
+          <div class="rc-nm"><div class="n">${it.name}</div><div class="s">${it.sub}</div></div>
+        </div>
+        <div class="rc-size">${fmtSize(it.mb)}</div>
+        <div class="rc-date">${it.date}</div>
+        <div class="rc-act">
+          <a data-act="open" title="${it.kind === 'folder' ? 'Odpri' : 'Predogled'}">${it.kind === 'folder' ? I.folder : I.eye}</a>
+          <a data-act="dl" title="Prenesi">${I.dl}</a>
+        </div>
+      </div>`).join('');
+
+    host.querySelectorAll('.row').forEach(row => {
+      const name = decodeURIComponent(row.dataset.name);
+      const isFolder = row.dataset.kind === 'folder';
+      const open = () => isFolder
+        ? (openFolder = objekt.folders.find(f => f.name === name), q = '', renderAll())
+        : openFile(name);
+      row.querySelector('.rc-name').onclick = open;
+      row.querySelector('[data-act="open"]').onclick = open;
+      row.querySelector('[data-act="dl"]').onclick = async e => {
+        e.stopPropagation();
+        if (isFolder) { toast(`Priprava ZIP · ${name}`); return; }
+        await download(openFolder.files.find(f => f.name === name));
+      };
+    });
+  }
+
+  // A real signed URL, plus an audit-log row. If the file was never
+  // uploaded, say so plainly rather than handing over a dead link.
+  async function download(f) {
+    if (!f) return;
+    await logAccess(f, objekt, 'download');
+    const url = await signedUrl(f.storage_path, 60);
+    if (url) { window.open(url, '_blank', 'noopener'); toast(`Prenos · ${f.name}`, 'Povezava velja 60 sekund'); }
+    else toast('Dokument še ni prenesen iz Chamila', 'Zapis obstaja, datoteka še ni naložena');
+  }
+
+  function openFile(name) {
+    const f = (openFolder ? openFolder.files : objekt.folders.flatMap(x => x.files))
+              .find(x => x.name === name);
+    if (!f) return;
+    logAccess(f, objekt, 'view');
+    modal(f.name, `<dl class="dl">
+        <dt>Objekt</dt><dd>${objekt.name}</dd>
+        <dt>Mapa</dt><dd>${(openFolder && openFolder.name) || '—'}</dd>
+        <dt>Velikost</dt><dd>${fmtSize(f.mb)}</dd>
+        <dt>Datum</dt><dd>${f.date}</dd>
+        <dt>Vrsta</dt><dd>${f.type.toUpperCase()}</dd>
+      </dl>
+      <p style="margin-top:14px;color:var(--text-2);font-size:13px">
+        V pravi različici se dokument odpre prek povezave z veljavnostjo ~60 sekund,
+        ogled pa se zabeleži v dnevnik dostopov.</p>`,
+      [{ label: 'Zapri' }, { label: 'Prenesi', primary: true,
+         onClick: () => download(f) }]);
+  }
+
+  /* ── Storage ────────────────────────────────────────────────────── */
+  function renderStorage() {
+    const pct = Math.min(100, (totalMb / HEVA.storage.totalMiB) * 100);
+    document.getElementById('stText').textContent =
+      `${totalMb.toFixed(2).replace('.', ',')} MiB od ${HEVA.storage.totalMiB} MiB · ${pct.toFixed(1).replace('.', ',')} %`;
+    document.getElementById('stBar').style.width = Math.max(0.6, pct) + '%';
+  }
+
+  const vt = document.getElementById('viewToggle');   // absent for residents
+  if (vt) vt.onclick = () => {
+    resident = !resident;
+    renderAll();
+    toast(resident ? 'Uporabnikov pogled' : 'Pogled upravitelja',
+          resident ? 'Samo svoj objekt, brez urejanja' : 'Poln dostop');
+  };
+
+  function renderAll() { renderCrumb(); renderTree(); renderToolbar(); renderBanner(); renderRows(); renderStorage(); }
+  renderAll();
+})();
+</script>
+</body>
+</html>
