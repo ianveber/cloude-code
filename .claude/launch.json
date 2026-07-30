@@ -182,7 +182,7 @@
       "runtimeExecutable": "bash",
       "runtimeArgs": [
         "-lc",
-        "cd '/Users/ianveber/Desktop/Cloude CODE/clients/harvest-hub/demo' && DEMO_SAMPLES=1 ANTHROPIC_API_KEY=$(tr -d '[:space:]' < ~/.anthropic_key) node server.mjs"
+        "cd '/Users/ianveber/Desktop/Cloude CODE/clients/harvest-hub/demo' && ANTHROPIC_API_KEY=$(tr -d '[:space:]' < ~/.anthropic_key) node server.mjs"
       ],
       "port": 8020
     }
