@@ -1,0 +1,9 @@
+{
+  "name": "heva-preview",
+  "private": true,
+  "type": "module",
+  "description": "Static Heva site + passcode gate for private preview. Delete this file, middleware.js and vercel.json before publishing to www.heva.si.",
+  "dependencies": {
+    "@vercel/functions": "^3.7.6"
+  }
+}
