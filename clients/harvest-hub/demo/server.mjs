@@ -56,8 +56,53 @@ function serveStatic(req, res) {
   });
 }
 
+/* ── local-only guard ─────────────────────────────────────────────────────────
+ * Binding to loopback is not on its own enough. A page the operator visits can
+ * still reach this server by DNS rebinding: the attacker's hostname is made to
+ * resolve to 127.0.0.1, so the browser considers the request same-origin and
+ * never runs a CORS preflight. What the rebound request cannot hide is the Host
+ * header — it still carries the attacker's hostname. Checking Host closes that
+ * hole; checking Origin closes the ordinary cross-site case. Applied to every
+ * route, because /api/register serves personal data too.
+ */
+const LOOPBACK_HOSTS = new Set([`localhost:${PORT}`, `127.0.0.1:${PORT}`, `[::1]:${PORT}`]);
+const LOOPBACK_ORIGINS = new Set([...LOOPBACK_HOSTS].map((h) => `http://${h}`));
+const isLocal = (req) =>
+  LOOPBACK_HOSTS.has(req.headers.host || "") &&
+  (!req.headers.origin || LOOPBACK_ORIGINS.has(req.headers.origin));
+
+/* ── spend guards on the one paid route ───────────────────────────────────────
+ * Deliberately generous: a 15-file folder drop is ~11 calls and a whole meeting
+ * costs about $0.25. These exist to stop a runaway loop, not to ration the demo.
+ */
+const MAX_CALLS_PER_MIN = 60;
+const MAX_USD_PER_RUN = 5;
+let callTimes = [];
+let spentUsd = 0;
+
+function spendBlock() {
+  const now = Date.now();
+  callTimes = callTimes.filter((t) => now - t < 60_000);
+  if (spentUsd >= MAX_USD_PER_RUN) return "cost_ceiling";
+  if (callTimes.length >= MAX_CALLS_PER_MIN) return "rate_limit";
+  callTimes.push(now);
+  return null;
+}
+
 const server = http.createServer(async (req, res) => {
+  if (!isLocal(req)) {
+    res.writeHead(403, { "content-type": "text/plain; charset=utf-8" });
+    res.end("forbidden — local requests only");
+    return;
+  }
   if (req.url === "/api/extract" && req.method === "POST") {
+    const blocked = spendBlock();
+    if (blocked) {
+      console.warn(`  refused /api/extract — ${blocked} (spent $${spentUsd.toFixed(4)})`);
+      res.writeHead(429, { "content-type": "application/json" });
+      res.end(JSON.stringify({ error: blocked }));
+      return;
+    }
     let body = "";
     req.on("data", (c) => { body += c; if (body.length > 40e6) req.destroy(); });
     req.on("end", async () => {
@@ -70,9 +115,10 @@ const server = http.createServer(async (req, res) => {
           model: vision ? MODEL_VISION : MODEL_TEXT,
           maxTokens: 3000,
         });
+        const cost = r.error ? 0 : costUsd(vision ? MODEL_VISION : MODEL_TEXT, r.usage);
+        spentUsd += cost;
         res.writeHead(r.error ? 502 : 200, { "content-type": "application/json" });
-        res.end(JSON.stringify(r.error ? { error: r.error }
-          : { data: r.json, cost: costUsd(vision ? MODEL_VISION : MODEL_TEXT, r.usage) }));
+        res.end(JSON.stringify(r.error ? { error: r.error } : { data: r.json, cost }));
       } catch (e) {
         res.writeHead(400, { "content-type": "application/json" });
         res.end(JSON.stringify({ error: "bad_request", detail: String(e) }));

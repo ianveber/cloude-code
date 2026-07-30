@@ -96,11 +96,13 @@ Verified in-browser, end to end, on `2 - Otroci_eden otrok.pdf`:
 `DEMO_SAMPLES=1` exposes `/samples/*` for driving the flow without a file picker. **Dev only** —
 never enable on a deployed instance, it would publish real personal data over HTTP.
 
-### The scan path — CLOSED 2026-07-30
+### The scan path — works, and here is exactly how far that has been proven
 
-Previously the open risk on this build. **Now verified end to end in a real browser**: all three
-scanned documents dropped together, read from the page image, **22.6 s, no stall, no timeout, zero
-console errors**.
+An earlier version of this section said the risk was CLOSED, on the strength of one clean run. That
+was over-claimed and the next run disproved it — recorded here because the failure is instructive.
+
+**What is proven:** all three scanned documents dropped together read from the page image in
+**22.6 s**, no stall, zero console errors. Repeated since.
 
 - `2 - Primer Merkur_dva otroka` → **2 kontrolna lista** (children fan out on a scan too)
 - `3 - Primer Otroci - več produktov` → 1 kontrolni list
@@ -108,15 +110,26 @@ console errors**.
 
 36/42 fields filled, 9 flagged. The `/api/extract` vision calls returned 200.
 
-**The condition that matters is `document.hidden === false`** — not which browser. Browsers pause
-canvas rasterisation in a background tab and `pdf.js` `render()` then never settles (verified: stalls
-at scale 1.0 and with `OffscreenCanvas`). The earlier note assumed the automation pane was always
-hidden; it is not — `document.visibilityState` reads `visible`, the render settles, and the path
-works. Keep the tab in front during the meeting and the scans read.
+**`document.hidden === false` is necessary but NOT sufficient — that was the mistake.** A visible tab
+was assumed to guarantee the render settles. It does not. Measured the same day: the Kolektivno scan
+read in ~6 s **on its own**, and in a *mixed* packet — where an earlier document's request is still
+in flight and competing for the main thread — the same scan lost the 20-second race and fell to
+*za ročni pregled*, with the tab visible throughout and no error anywhere. One API call fired where
+three documents were dropped.
 
-The 20-second race and the plain-Slovene message
-("Za skenirane dokumente naj bo to okno v ospredju") remain as the guard for a genuinely
-backgrounded tab.
+**Fix: the race is now 60 s, not 20 s.** It is a safety net against a genuinely frozen rasteriser,
+not a performance budget, and a longer net is strictly more permissive — nothing that passed at 20 s
+can fail at 60 s. The identical mixed packet that failed then completes in 10 s with the gate green
+and nothing in manual review.
+
+Still true: browsers pause canvas rasterisation in a background tab and `pdf.js` `render()` then
+never settles (verified: stalls at scale 1.0 and with `OffscreenCanvas`). Keep the window in front.
+The plain-Slovene message ("Za skenirane dokumente naj bo to okno v ospredju") remains the guard.
+
+**The honest status: this path is a race, not a guarantee.** It has been made much wider, but the
+underlying serialisation problem — renders competing with in-flight requests — is not fixed. The
+real fix is to serialise page rendering against the read queue, and that is production work, not a
+demo-day change.
 
 ## Files
 

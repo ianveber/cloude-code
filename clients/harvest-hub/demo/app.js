@@ -252,9 +252,14 @@ async function renderImage(file) {
     canvasContext: cv.getContext("2d"), viewport: vp,
     annotationMode: pdfjs.AnnotationMode.DISABLE,
   });
+  // 60s, not 20s. This is a safety net against a genuinely frozen rasteriser, not a performance
+  // budget. Measured 2026-07-30: the same scan reads in ~6s on its own but lost a 20s race inside
+  // a mixed packet, where an earlier document's request is still in flight and competing for the
+  // main thread — so it fell to "za ročni pregled" despite the tab being visible. A longer net is
+  // strictly more permissive: nothing that passed at 20s can fail at 60s.
   const outcome = await Promise.race([
     task.promise.then(() => "ok"),
-    new Promise((r) => setTimeout(() => r("stalled"), 20000)),
+    new Promise((r) => setTimeout(() => r("stalled"), 60000)),
   ]);
   if (outcome === "stalled") {
     try { task.cancel(); } catch {}
