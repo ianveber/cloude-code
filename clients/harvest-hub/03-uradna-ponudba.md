@@ -127,8 +127,15 @@ podpisa. Povratna informacija iz eDOKUMENTOV ni potrebna.
 > odpravi. Razlika je 3.100 €.
 
 **Mesečne naročnine ni.** Rešitev deluje na vaši infrastrukturi. Strošek delovanja (AI + gostovanje)
-je **~80–110 € mesečno** in ga poravnate neposredno ponudnikom — pri vašem obsegu je to **manj kot
-0,40 € na obdelano ponudbo**.
+poravnate neposredno ponudnikom in znaša **15–25 € mesečno** — pri vašem obsegu je to **manj kot
+0,07 € na obdelano ponudbo**.
+
+To ni ocena, ampak meritev. 30. 7. 2026 smo porabo izmerili na vaših vzorčnih ponudbah: **1,2 centa**
+na dokument po besedilni poti in **2,8 centa** po vizualni. Pri 400 ponudbah mesečno in vašem
+dejanskem deležu skeniranih dokumentov (~10 na mesec) znese AI **2–16 €**, gostovanje **5–8 €**.
+Zgornja meja 25 € vključuje rezervo za rast obsega in za evropski profil obdelave. Razpon je odvisen
+od tega, koliko dokumentov iz posamezne pošiljke se dejansko bere — obseg branja pisno potrdimo ob
+zaključku Faze 0.
 
 Pri 400 ponudbah mesečno vas različica A stane **1,85 € na ponudbo v prvem letu**, različica B
 **2,50 €**. Od drugega leta ostane le strošek delovanja. Za izračun dobe vračila potrebujemo en sam

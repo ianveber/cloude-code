@@ -1,0 +1,131 @@
+# Popravek jamstev 1 in 2 — predlog besedila
+
+**Interno. Za Iana.** Pripravljeno 30. 7. 2026, po ugotovitvi iz vrat G4/PREGLED.
+
+Popravek je **brezplačen do podpisa** in drag po njem. Ponudba je bila poslana 26. 7.; če je še ni
+podpisal nihče, gre za dopolnitev, ne za spremembo pogodbe.
+
+---
+
+## Zakaj sploh
+
+Jamstvo 1 pravi dobesedno:
+
+> »Kot pravilno se šteje tudi polje, ki ga sistem sam označi kot negotovo in usmeri v pregled — to
+> je lastnost zasnove, ne napaka.«
+
+Nikjer v ponudbi ni **zgornje meje deleža označenih polj**. Iz tega sledi: sistem, ki označi
+*vsako* polje, doseže 100 % in prestane prevzemni test, od katerega je odvisnih zadnjih 30 %
+vrednosti — naročnik pa še vedno vse prepiše na roko. **Jamstvo je izpolnljivo z ničelno
+avtomatizacijo.**
+
+Jamstvo 2 to poslabša z dveh strani:
+
+> »Podatek pod dogovorjenim pragom zanesljivosti se v vaša sistema ne zapiše.«
+
+1. **Praga ni in ga ni mogoče izračunati.** Gradnja proizvaja *izvor* podatka (`ponudba` /
+   `pravilo` / `register`), ne ocene zanesljivosti. To sta dve različni stvari: izvor pove, *od kod*
+   vrednost je, ne *kako verjetno je pravilna*.
+2. **Najvarnejša izvedba Jamstva 2 je označiti več** — kar neposredno napihne rezultat Jamstva 1.
+   Jamstvi vlečeta isti vzvod v nasprotni smeri.
+
+Tveganje ni v prvi vrsti finančno. Je ugledno: lahko prestaneš test, dobiš plačilo in ne dostaviš
+ničesar. Prva referenca v panogi tega ne prenese.
+
+---
+
+## Popravek A — zgornja meja deleža označenih polj *(nujno)*
+
+Doda se **drugi, neodvisni prag** k istemu prevzemnemu testu. Oba morata biti dosežena.
+
+> **Dopolnitev 1. točke (Natančnost).** Poleg praga natančnosti na prevzemnem testu velja tudi
+> **zgornja meja deleža polj, ki jih sistem usmeri v pregled: največ [X] % vseh polj.** Prevzemni
+> test je opravljen le, če sta dosežena **oba** praga hkrati. Če je dosežen prag natančnosti,
+> presežena pa meja pregleda, se šteje, da prag ni dosežen, in veljajo popravni cikli iz iste točke.
+
+Brez tega člena vsa druga jamstva ne pomenijo nič.
+
+## Popravek B — Jamstvo 2 dobi mehanizem ali resnično besedilo *(nujno, izbira med dvema)*
+
+**B1 — poštena preubeseditev (brezplačna, priporočena za zdaj).** Opiše, kar sistem res počne:
+
+> **2 · Brez tihih napak.** V vaša sistema se samodejno zapišejo **samo vrednosti, prebrane
+> neposredno z dokumenta**. Vsaka vrednost, ki je izpeljana iz pravila, prevzeta iz drugega
+> razdelka ali pridobljena iz zunanje evidence, se **označi in usmeri v pregled** — ne zapiše se
+> brez človekove potrditve. Vsaka zapisana vrednost nosi zabeležen izvor. Kadar sodelavec podatek
+> ročno sprosti, je to odločitev naročnika in se zabeleži v revizijsko sled.
+
+**B2 — zgraditi resnično oceno zanesljivosti.** Novo delo, ni v fiksni ceni, in do Faze 0 ni
+merljivo. Če se zanj odločimo, mora imeti zapisan prag in način merjenja, sicer smo spet tam, kjer
+smo zdaj.
+
+**Priporočilo: B1 zdaj, B2 kot možna razširitev po Fazi 0.** B1 je resnična, preverljiva in jo
+gradnja že izpolnjuje.
+
+## Popravek C — imenovalec prevzemnega testa *(nujno, poceni)*
+
+22,9 % celic v današnji meritvi po zasnovi ne more biti napačnih (`zavarovalnica` je konstanta,
+drugi zastopnik je vedno prazen). To ne pomeni, da je meritev napačna — pomeni, da je **prag treba
+vezati na polja, ki ločujejo**.
+
+> **Dopolnitev.** Nabor polj, na katerem se meri natančnost, se ob zaključku Faze 0 pisno zaključi.
+> Iz merjenja so izvzeta polja s konstantno vrednostjo in polja, ki so v celotnem vzorcu prazna.
+
+## Popravek D — delež ponudb brez človekovega posega *(Ianova poslovna odločitev)*
+
+Popravki A–C zaprejo luknjo. **D je edini, ki obljubi vrednost**, in edini, ki nosi resnično
+tveganje za AIS:
+
+> **Dopolnitev.** Na istem prevzemnem testu jamčimo, da se **najmanj [Y] % ponudb** obdela **brez
+> vsakršnega človekovega posega** — torej nobeno polje ni usmerjeno v pregled.
+
+To je številka, ki jo bo direktor slišal in si jo zapomnil. Je tudi edina, ki lahko pogodbo dejansko
+podre. **Ne predlagam je brez podatka iz razdelka spodaj.**
+
+---
+
+## Česa ne vemo — in brez česar [X] in [Y] nista številki, ampak ugibanje
+
+Glej naslednji razdelek v pogovoru. Na kratko: **ne poznamo dejanske sestave njihovega mesečnega
+prometa**, predvsem deleža skeniranih dokumentov. Vzorec 15 datotek je bil izbran, da pokaže **eno
+od vsake vrste**, ne da pokaže **pogostost**. Delež 3/15 = 20 % skeniranih je zato branje frekvence
+iz vzorca, ki frekvenca ni.
+
+---
+
+## Popravek E — strošek delovanja *(v korist naročnika, pošlji takoj)*
+
+Ponudba pravi **~80–110 € mesečno** in »manj kot 0,40 € na obdelano ponudbo«. Izmerjeno 30. 7. 2026
+na njihovih vzorčnih ponudbah je resnica **približno desetkrat nižja**.
+
+| | Ponudba (26. 7.) | Izmerjeno (30. 7.) |
+|---|---|---|
+| AI | 40–50 € | **2–16 €** |
+| Gostovanje | 30–60 € | **5–8 €** |
+| **Skupaj** | **80–110 €** | **15–25 €** |
+| Na ponudbo | < 0,40 € | **< 0,07 €** |
+
+Kaj se je spremenilo:
+
+1. **Delež skeniranih dokumentov.** Načrt je predpostavljal 20 % (3 od 15 vzorcev). Vzorec je bil
+   izbran, da pokaže **eno od vsake vrste**, ne pogostosti. Njihov dejanski podatek: ~10 skeniranih
+   na mesec, torej **2–3 %**. Vizualna pot stane 2,8 centa na dokument, besedilna 1,2 centa.
+2. **Gostovanje ne potrebuje ne upravljane baze ne objektne shrambe.** Ponudba že določa, da arhiv
+   gre »na strežnik po vaši obstoječi konvenciji« in da rešitev teče na njihovi infrastrukturi —
+   objektna shramba torej odpade po zasnovi. Pri ~2.800 dokumentih na mesec zadošča majhen strežnik
+   v EU z vgrajeno bazo.
+3. **Cenovna funkcija je bila napačna.** Predpomnjene žetone je štela po polni ceni. Popravljeno;
+   učinek je majhen, ker se predpomnjenje pri tej velikosti poziva sploh ne sproži.
+
+**To je čista korist v pogajanju.** Njihov strošek delovanja je desetkrat nižji, kot smo zapisali,
+in številka je izmerjena na njihovih dokumentih. Pošlji jo sam, preden jo izračunajo oni.
+
+---
+
+## Kaj poslati in kdaj
+
+Popravki A, B1 in C so **dopolnitev v korist naročnika** — zaostrujejo naše obveznosti, ne njihovih.
+Pošljejo se lahko kot kratek dodatek k ponudbi, brez ponovnega pogajanja o ceni, najbolje **hkrati z
+vprašanjem o sestavi prometa**, ker brez odgovora [X] ostane prazen.
+
+Popravek D počaka na ta odgovor.
