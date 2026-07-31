@@ -33,6 +33,14 @@ function parseJson(text) {
  * @param {number}  [o.maxTokens]
  */
 export async function callClaude({ system, user, model = MODEL_TEXT, maxTokens = 2048 }) {
+  // Second provider, same contract. Dispatching on the model id keeps every call site — the
+  // server, the harness, the renderer — unaware that there is more than one vendor. This is the
+  // whole of the vendor-independence claim, and it is one branch.
+  if (/^mistral/i.test(model)) {
+    const { callMistral } = await import("./mistral.mjs");
+    return callMistral({ system, user, model, maxTokens });
+  }
+
   const key = apiKey();
   if (!key) return { error: "no_api_key" };
 
@@ -82,6 +90,11 @@ const PRICES = {
   "claude-sonnet-4-6": { in: 3, out: 15 },
   "claude-opus-4-8": { in: 5, out: 25 },
   "claude-haiku-4-5": { in: 1, out: 5 },
+  // Mistral — list prices as published July 2026. VERIFY against Mistral's own pricing page
+  // before any figure from these reaches the client; they came from secondary sources.
+  "mistral-small-latest": { in: 0.1, out: 0.3 },
+  "mistral-medium-latest": { in: 0.4, out: 2 },
+  "mistral-large-latest": { in: 0.5, out: 1.5 },
 };
 
 /**
