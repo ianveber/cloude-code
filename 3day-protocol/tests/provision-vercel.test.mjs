@@ -69,6 +69,22 @@ test('assertNoGitConnection passes when project.link is null', () => {
   assert.doesNotThrow(() => v(exec).assertNoGitConnection('demo'));
 });
 
+test('assertNoGitConnection passes when the link key is ABSENT', () => {
+  // Verified live 2026-08-01: an unconnected project omits `link` entirely
+  // rather than sending null. Absent and null must behave identically.
+  const exec = spyExec([{ stdout: JSON.stringify({ name: 'demo', id: 'prj_x' }) }]);
+  assert.doesNotThrow(() => v(exec).assertNoGitConnection('demo'));
+});
+
+test('inspect uses `vercel api`, not `project inspect --json`', () => {
+  // `vercel project inspect` has no --json flag on 54.5.0 (it errors), and its
+  // human output never mentions the git connection. This regression test pins
+  // the working call so the broken one cannot come back.
+  const exec = spyExec([{ stdout: JSON.stringify({ name: 'demo' }) }]);
+  v(exec).inspect('demo');
+  assert.deepEqual(exec.calls[0].args, ['api', '/v9/projects/demo']);
+});
+
 test('assertNoGitConnection THROWS when a git repo is attached', () => {
   // A connected repo means Vercel can build from a push, bypassing deploy-guard.
   const exec = spyExec([
@@ -120,4 +136,35 @@ test('projectName rejects names that are not URL-safe', () => {
 test('whoami returns the authenticated scope', () => {
   const exec = spyExec([{ stdout: 'ianveber-4538\n' }]);
   assert.equal(v(exec).whoami(), 'ianveber-4538');
+});
+
+test('removeProject confirms the prompt on stdin', () => {
+  // --non-interactive does NOT suppress the prompt; it still asks, and with no
+  // TTY it reads empty, defaults to N, and exits 0 having deleted nothing.
+  const exec = spyExec([
+    { stdout: JSON.stringify({ name: 'demo' }) }, // pre-check: exists
+    { stdout: 'Removed' },                        // rm
+    { throws: true, stderr: 'not found' },        // post-check: gone
+  ]);
+  v(exec).removeProject('demo');
+  assert.deepEqual(exec.calls[1].args, ['project', 'rm', 'demo']);
+  assert.equal(exec.calls[1].input, 'y\n', 'confirmation must be fed on stdin');
+});
+
+test('removeProject THROWS when rm exits 0 but the project survives', () => {
+  // The exact false success observed live: exit 0, nothing deleted.
+  const exec = spyExec([
+    { stdout: JSON.stringify({ name: 'demo' }) }, // exists
+    { stdout: '' },                               // rm "succeeds"
+    { stdout: JSON.stringify({ name: 'demo' }) }, // still there
+  ]);
+  assert.throws(
+    () => v(exec).removeProject('demo'),
+    (e) => e instanceof VercelError && /still exists/i.test(e.message),
+  );
+});
+
+test('removeProject treats an already-absent project as success', () => {
+  const exec = spyExec([{ throws: true, stderr: 'Error: Project not found' }]);
+  assert.equal(v(exec).removeProject('demo').alreadyGone, true);
 });

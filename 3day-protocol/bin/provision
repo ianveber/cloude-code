@@ -172,6 +172,17 @@ async function cmdApply(runDir) {
 
   const ref = m.supabase.ref;
 
+  // ── wait for the database to actually answer ──────────────────────────────
+  // A project returns COMING_UP for a minute or two after creation, and any
+  // query against it dies with an unhelpful 500. Provisioning is not done when
+  // the create call returns.
+  if (!m.healthyAt) {
+    process.stdout.write('· waiting for the database to come up…');
+    await client.waitUntilHealthy(ref, { onTick: () => process.stdout.write('.') });
+    process.stdout.write(' ready\n');
+    m = manifest.writeManifest(runDir, { healthyAt: new Date().toISOString() });
+  }
+
   // ── schema ────────────────────────────────────────────────────────────────
   const schemaFile = path.join(runDir, 'supabase', 'schema.sql');
   if (fs.existsSync(schemaFile) && !m.schemaAppliedAt) {
@@ -227,6 +238,53 @@ async function cmdApply(runDir) {
   );
 }
 
+/**
+ * Destroy everything this run created. Deliberately awkward: two flags, and
+ * --project must match the manifest's own slug. The guards make it impossible
+ * to reach a project the factory did not create; this makes it hard to reach
+ * the WRONG factory project by fat-finger.
+ */
+async function cmdTeardown(runDir, argv) {
+  const { supa, vercel, manifest } = await libs();
+  const m = manifest.readManifest(runDir);
+  if (!m) fail('nothing to tear down — no provision manifest here');
+
+  const confirmed = argv.includes('--yes');
+  const named = argv[argv.indexOf('--project') + 1];
+  if (!confirmed || argv.indexOf('--project') === -1) {
+    fail(
+      `teardown is deliberate: rerun with --yes --project ${m.slug}\n` +
+        `  this DESTROYS Supabase ${m.supabase?.ref || '(none)'} and Vercel ${m.vercel?.name || '(none)'}`,
+      2,
+    );
+  }
+  if (named !== m.slug) {
+    fail(`--project "${named}" does not match this run's project "${m.slug}" — refusing`, 2);
+  }
+
+  if (m.supabase?.ref && !m.supabaseDeletedAt) {
+    process.stdout.write(`· deleting Supabase ${m.supabase.ref}…\n`);
+    try {
+      // assertOwned inside the client is what makes this safe.
+      await supa.createClient({ token: supa.resolveToken() }).deleteProject(m.supabase.ref);
+    } catch (e) {
+      // Already gone is success — teardown must be re-runnable after a
+      // partial failure, which is exactly how the first live run ended.
+      // Supabase reports an already-deleted project as 400 "Resource has been
+      // removed", not 404 — matching only on 404 leaves teardown unable to finish.
+      if (!/404|not found|has been removed/i.test(e.message)) throw e;
+      process.stdout.write('  (already gone)\n');
+    }
+    manifest.writeManifest(runDir, { supabaseDeletedAt: new Date().toISOString() });
+  }
+  if (m.vercel?.name) {
+    process.stdout.write(`· deleting Vercel ${m.vercel.name}…\n`);
+    vercel.createVercel().removeProject(m.vercel.name);
+  }
+  manifest.writeManifest(runDir, { tornDownAt: new Date().toISOString() });
+  process.stdout.write('✅ torn down\n');
+}
+
 async function main() {
   const [cmd, dirArg] = process.argv.slice(2);
   if (!cmd || ['-h', '--help', 'help'].includes(cmd)) {
@@ -234,7 +292,8 @@ async function main() {
       'usage: provision <plan|apply|status> <runDir>\n\n' +
         '  plan    show what would happen — no side effects\n' +
         '  apply   create the backend — resumable, never destructive\n' +
-        '  status  print the provision manifest\n',
+        '  status  print the provision manifest\n' +
+        '  teardown --yes --project <slug>   DESTROY what this run created\n',
     );
     process.exit(0);
   }
@@ -246,6 +305,7 @@ async function main() {
     if (cmd === 'plan') return await cmdPlan(runDir);
     if (cmd === 'apply') return await cmdApply(runDir);
     if (cmd === 'status') return await cmdStatus(runDir);
+    if (cmd === 'teardown') return await cmdTeardown(runDir, process.argv.slice(2));
     fail(`unknown command "${cmd}"`);
   } catch (e) {
     // A GuardViolation is a refusal, not a crash — distinct exit code.

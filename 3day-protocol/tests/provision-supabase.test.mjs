@@ -200,3 +200,61 @@ test('an API error surfaces status and body rather than being swallowed', async 
 test('the client refuses to construct without a token', () => {
   assert.throws(() => createClient({ token: '', fetchImpl: spyFetch() }), /token/i);
 });
+
+// ── waitUntilHealthy — the bug the first live run found ──────────────────────
+
+test('waitUntilHealthy polls until ACTIVE_HEALTHY', async () => {
+  const reg = tmpRegistry();
+  recordOwned(OURS, { registry: reg, project: 'demo' });
+  const statuses = ['COMING_UP', 'COMING_UP', 'ACTIVE_HEALTHY'];
+  let i = 0;
+  const fetchImpl = async () => ({
+    ok: true, status: 200,
+    json: async () => ({ ref: OURS, status: statuses[i++] }),
+    text: async () => '',
+  });
+  const c = client(fetchImpl, reg);
+  const p = await c.waitUntilHealthy(OURS, { sleep: async () => {}, intervalMs: 0 });
+  assert.equal(p.status, 'ACTIVE_HEALTHY');
+  assert.equal(i, 3, 'polled until healthy');
+});
+
+test('waitUntilHealthy fails fast on a terminal status instead of burning the timeout', async () => {
+  const reg = tmpRegistry();
+  recordOwned(OURS, { registry: reg, project: 'demo' });
+  const fetchImpl = async () => ({
+    ok: true, status: 200,
+    json: async () => ({ ref: OURS, status: 'INACTIVE' }),
+    text: async () => '',
+  });
+  await assert.rejects(
+    () => client(fetchImpl, reg).waitUntilHealthy(OURS, { sleep: async () => {} }),
+    /terminal status INACTIVE/,
+  );
+});
+
+test('waitUntilHealthy on a DENIED ref throws before polling', async () => {
+  const f = spyFetch();
+  await assert.rejects(() => client(f, tmpRegistry()).waitUntilHealthy(DENIED), GuardViolation);
+  assert.equal(f.calls.length, 0);
+});
+
+test('deleteProject on a DENIED ref throws and issues NO request', async () => {
+  const f = spyFetch();
+  await assert.rejects(() => client(f, tmpRegistry()).deleteProject(DENIED), GuardViolation);
+  assert.equal(f.calls.length, 0, 'the live client portal must be undeletable by this tool');
+});
+
+test('deleteProject on an UNKNOWN ref throws and issues NO request', async () => {
+  const f = spyFetch();
+  await assert.rejects(() => client(f, tmpRegistry()).deleteProject(UNKNOWN), GuardViolation);
+  assert.equal(f.calls.length, 0);
+});
+
+test('BENIGN TWIN: deleteProject on an owned ref issues DELETE', async () => {
+  const reg = tmpRegistry();
+  recordOwned(OURS, { registry: reg, project: 'demo' });
+  const f = spyFetch({ status: 200, body: {} });
+  await client(f, reg).deleteProject(OURS);
+  assert.equal(f.calls[0].method, 'DELETE');
+});

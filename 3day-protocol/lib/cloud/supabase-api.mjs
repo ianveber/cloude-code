@@ -113,6 +113,38 @@ export function createClient({
       return project;
     },
 
+    /**
+     * Block until the database can actually answer queries.
+     *
+     * A freshly created project returns COMING_UP for a minute or two, and any
+     * query against it fails with a 500 "ipv6 address is not defined" — an
+     * error message that says nothing about the real cause. Observed live on
+     * 2026-08-01: create returned, the very next call died on exactly this.
+     * Provisioning is not complete when the API returns; it is complete when
+     * the project says ACTIVE_HEALTHY.
+     */
+    async waitUntilHealthy(ref, { timeoutMs = 300_000, intervalMs = 5_000, sleep, onTick } = {}) {
+      assertOwned(ref, { registry });
+      const nap = sleep ?? ((ms) => new Promise((r) => setTimeout(r, ms)));
+      const deadline = Date.now() + timeoutMs;
+      let last = null;
+
+      while (Date.now() < deadline) {
+        const project = await request('GET', `/v1/projects/${ref}`);
+        last = project?.status;
+        if (last === 'ACTIVE_HEALTHY') return project;
+        if (last === 'INACTIVE' || String(last).includes('FAILED')) {
+          throw new Error(`project ${ref} reached terminal status ${last} — it will not become healthy`);
+        }
+        if (onTick) onTick(last);
+        await nap(intervalMs);
+      }
+      throw new Error(
+        `project ${ref} was still "${last}" after ${Math.round(timeoutMs / 1000)}s. ` +
+          `Nothing is lost — re-run \`provision apply\` to continue from here.`,
+      );
+    },
+
     /** Destructive. Guarded. */
     async runSql(ref, query) {
       assertOwned(ref, { registry });
@@ -123,6 +155,17 @@ export function createClient({
     async getApiKeys(ref) {
       assertOwned(ref, { registry });
       return request('GET', `/v1/projects/${ref}/api-keys?reveal=true`);
+    },
+
+    /**
+     * DESTRUCTIVE AND IRREVERSIBLE. Guarded by assertOwned, which means a ref
+     * in DENY_REFS can never reach it and neither can a project the factory
+     * did not create. Callers must confirm with a human first — nothing in
+     * this file does that for them.
+     */
+    async deleteProject(ref) {
+      assertOwned(ref, { registry });
+      return request('DELETE', `/v1/projects/${ref}`);
     },
 
     async getAuthConfig(ref) {

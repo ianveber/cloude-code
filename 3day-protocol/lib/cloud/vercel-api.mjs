@@ -76,13 +76,24 @@ export function createVercel({ execImpl = defaultExec } = {}) {
       }
     },
 
+    /**
+     * Machine-readable project record.
+     *
+     * Uses `vercel api` rather than `vercel project inspect`: inspect has NO
+     * --json flag (verified on 54.5.0 — it errors "unknown or unexpected
+     * option") and its human output does not report the git connection at all.
+     * `vercel api` returns the raw REST object, which does.
+     *
+     * Note: `link` is ABSENT from the payload when no repository is connected,
+     * not null. Callers must treat absent and null identically.
+     */
     inspect(name) {
       assertName(name);
-      const out = run(['project', 'inspect', name, '--json']);
+      const out = run(['api', `/v9/projects/${name}`]);
       try {
         return JSON.parse(out);
       } catch {
-        throw new VercelError(`could not parse \`vercel project inspect ${name} --json\` output`);
+        throw new VercelError(`could not parse \`vercel api /v9/projects/${name}\` output`);
       }
     },
 
@@ -102,6 +113,45 @@ export function createVercel({ execImpl = defaultExec } = {}) {
         );
       }
       return true;
+    },
+
+    /**
+     * DESTRUCTIVE. Removes the Vercel project, then PROVES it is gone.
+     *
+     * Two traps here, both found by a live run on 2026-08-01:
+     *   1. `project rm` has no --yes (that errors), and --non-interactive does
+     *      NOT suppress the confirmation prompt — it still asks, reads an empty
+     *      answer with no TTY, defaults to "N", and EXITS 0 having deleted
+     *      nothing. A zero exit code from this command means nothing on its own.
+     *   2. Therefore the only trustworthy signal is a follow-up read. We delete,
+     *      then confirm absence. Never report a destructive act as done on the
+     *      strength of an exit code.
+     */
+    removeProject(name) {
+      assertName(name);
+      const gone = () => {
+        try {
+          this.inspect(name);
+          return false;
+        } catch {
+          return true; // no longer readable == removed
+        }
+      };
+      if (gone()) return { name, removed: false, alreadyGone: true };
+
+      try {
+        run(['project', 'rm', name], { input: 'y\n' });
+      } catch (e) {
+        if (!/not found|does not exist|no such/i.test(e.stderr || e.message || '')) throw e;
+      }
+
+      if (!gone()) {
+        throw new VercelError(
+          `\`vercel project rm ${name}\` returned without error but the project still exists. ` +
+            `Do not treat this as removed — delete it in the dashboard and investigate.`,
+        );
+      }
+      return { name, removed: true };
     },
 
     /** Non-interactive by construction — --yes so it can never block on a prompt. */
