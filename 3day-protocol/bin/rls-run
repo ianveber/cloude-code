@@ -1,0 +1,109 @@
+#!/usr/bin/env node
+/**
+ * rls-run — PACK-OWNED RLS runner. Gate 2 calls this; the app cannot replace it.
+ *
+ * Two jobs, both of which must stay on this side of the fence:
+ *   1. analyse the suite without running it (coverage, twins, RLS actually on)
+ *   2. execute the app's .sql cases against the provisioned project and decide
+ *      pass/fail from the DATABASE's response, not from anything the app printed
+ *
+ * The app contributes only case files. It does not contribute the runner, the
+ * arithmetic, or the verdict.
+ *
+ * Prints a single JSON object to stdout. Gate 2 parses that — which is safe
+ * precisely because this file lives in the pack, not in the run directory.
+ *
+ *   rls-run <runDir> [--analyse-only]
+ */
+
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+
+const PACK_ROOT = path.resolve(__dirname, '..');
+const url = (p) => require('url').pathToFileURL(p).href;
+
+function emit(obj) {
+  process.stdout.write(JSON.stringify(obj, null, 2) + '\n');
+  process.exit(obj.ok ? 0 : 1);
+}
+
+async function main() {
+  const runDir = path.resolve(process.argv[2] || '.');
+  const analyseOnly = process.argv.includes('--analyse-only');
+
+  const { analyseRlsSuite } = await import(url(path.join(PACK_ROOT, 'lib', 'rls-integrity.mjs')));
+  const analysis = analyseRlsSuite(runDir);
+
+  if (!analysis.ok) {
+    return emit({ stage: 'analysis', ...analysis, ok: false });
+  }
+  if (analyseOnly) {
+    return emit({ stage: 'analysis', ...analysis, executed: [], ok: true });
+  }
+
+  // Execution needs a provisioned project. Absence is RED, not a skip: a suite
+  // that was never run proves nothing, and reporting that as a pass is the
+  // exact failure this gate exists to prevent.
+  const manifestPath = path.join(runDir, '.protocol', 'provision.json');
+  let ref = null;
+  try {
+    ref = JSON.parse(fs.readFileSync(manifestPath, 'utf8'))?.supabase?.ref ?? null;
+  } catch {
+    /* handled below */
+  }
+  if (!ref) {
+    return emit({
+      stage: 'execute',
+      ...analysis,
+      ok: false, // AFTER the spread: analysis.ok is true here and would win
+      findings: [
+        `RLS: ${analysis.caseCount} case(s) present but no provisioned project to run them against ` +
+          `(no supabase.ref in .protocol/provision.json). Run \`provision apply\` first — ` +
+          `an unrun suite cannot make a gate green.`,
+      ],
+    });
+  }
+
+  const supa = await import(url(path.join(PACK_ROOT, 'lib', 'cloud', 'supabase-api.mjs')));
+  const client = supa.createClient({ token: supa.resolveToken() });
+
+  const testsDir = path.join(runDir, 'supabase', 'tests');
+  const fixtures = fs.existsSync(path.join(testsDir, 'fixtures.sql'))
+    ? fs.readFileSync(path.join(testsDir, 'fixtures.sql'), 'utf8')
+    : '';
+  const casesDir = path.join(testsDir, 'cases');
+  const cases = fs.readdirSync(casesDir).filter((f) => f.endsWith('.sql')).sort();
+
+  const results = [];
+  for (const name of cases) {
+    const body = fs.readFileSync(path.join(casesDir, name), 'utf8');
+    // Each case is isolated: same known state in, nothing left behind.
+    const sql = `begin;\n${fixtures}\n${body}\nrollback;`;
+    try {
+      await client.runSql(ref, sql);
+      results.push({ case: name, pass: true });
+    } catch (e) {
+      results.push({ case: name, pass: false, error: String(e.message).slice(0, 300) });
+    }
+  }
+
+  const failed = results.filter((r) => !r.pass);
+  emit({
+    ok: failed.length === 0,
+    stage: 'execute',
+    ref,
+    tables: analysis.tables,
+    total: results.length,
+    passed: results.length - failed.length,
+    failed: failed.length,
+    results,
+    findings: failed.map((f) => `RLS: case ${f.case} FAILED — ${f.error}`),
+  });
+}
+
+main().catch((e) => {
+  process.stdout.write(JSON.stringify({ ok: false, stage: 'error', findings: [`RLS: ${e.message}`] }) + '\n');
+  process.exit(1);
+});

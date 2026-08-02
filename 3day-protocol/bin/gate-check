@@ -638,6 +638,55 @@ function parseTapCounts(outText) {
 
 /** Check 1 — RLS via `supabase test db`. Returns {finding, summary, output}. */
 function runRlsCheck(runDir) {
+  // F3 — PREFERRED PATH: the pack owns the runner and the arithmetic.
+  //
+  // When the app ships `supabase/tests/cases/`, Gate 2 delegates to
+  // bin/rls-run, which lives HERE, in the pack. The app contributes only .sql
+  // case files: data, never code. It cannot supply the runner and it cannot
+  // supply the verdict.
+  //
+  // The rejected design was to execute `<runDir>/supabase/tests/run.sh` and
+  // parse its stdout. That script sits inside the app under test and is
+  // written by the agent being judged — a four-line shell script printing
+  // "All tests successful" would have been the entire security verdict.
+  //
+  // Parsing rls-run's stdout IS safe, and the difference is the whole point:
+  // that binary is ours and the app cannot replace it.
+  if (fs.existsSync(path.join(runDir, 'supabase', 'tests', 'cases'))) {
+    const packRunner = path.join(PACK_BIN, 'rls-run');
+    const res = spawnSync(process.execPath, [packRunner, runDir], {
+      cwd: runDir,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 600000,
+    });
+    const raw = `$ rls-run ${runDir}\n${res.stdout || ''}${res.stderr || ''}`;
+    let report;
+    try {
+      report = JSON.parse(res.stdout);
+    } catch {
+      return {
+        finding:
+          'RLS: the pack runner produced no parseable report — treat as red and inspect ' +
+          '.protocol/evidence/gate2-rls.txt.',
+        summary: null,
+        output: raw,
+      };
+    }
+    if (!report.ok) {
+      return {
+        finding: (report.findings && report.findings[0]) || 'RLS: suite failed.',
+        summary: null,
+        output: raw,
+      };
+    }
+    return {
+      finding: null,
+      summary: { total: report.total ?? report.caseCount ?? 0, failed: report.failed ?? 0 },
+      output: raw,
+    };
+  }
+
   const res = spawnSync('supabase', ['test', 'db'], {
     cwd: runDir,
     encoding: 'utf8',
