@@ -39,11 +39,33 @@ ničesar. Prva referenca v panogi tega ne prenese.
 Doda se **drugi, neodvisni prag** k istemu prevzemnemu testu. Oba morata biti dosežena.
 
 > **Dopolnitev 1. točke (Natančnost).** Poleg praga natančnosti na prevzemnem testu velja tudi
-> **zgornja meja deleža polj, ki jih sistem usmeri v pregled: največ [X] % vseh polj.** Prevzemni
-> test je opravljen le, če sta dosežena **oba** praga hkrati. Če je dosežen prag natančnosti,
-> presežena pa meja pregleda, se šteje, da prag ni dosežen, in veljajo popravni cikli iz iste točke.
+> **zgornja meja deleža polj, ki jih sistem usmeri v pregled: največ [X] % polj z vsebino.**
+> Polja, ki na ponudbi nimajo vrednosti, se v ta delež ne štejejo. Prevzemni test je opravljen le,
+> če sta dosežena **oba** praga hkrati. Če je dosežen prag natančnosti, presežena pa meja pregleda,
+> se šteje, da prag ni dosežen, in veljajo popravni cikli iz iste točke.
 
 Brez tega člena vsa druga jamstva ne pomenijo nič.
+
+**[X] ni več prazen — izmerjeno 30. 7. 2026** (`demo/scripts/measure-confidence.mjs`, dvojno branje
+vseh 11 vzorčnih ponudb z dvema različnima modeloma):
+
+| | |
+|---|---|
+| Polj skupaj | 154 |
+| Od tega praznih (na ponudbi jih ni) | 24 |
+| **Polj z vsebino** | **130** |
+| Zapisano samodejno | **101 (77,7 %)** |
+| V pregled sodelavcu | **29 (22,3 %)** |
+
+**Predlog: [X] = 30 %**, z izmerjenih 22,3 % kot dokazom in ~8 odstotnimi točkami rezerve.
+
+Dve opombi, ki ju je treba povedati ob številki:
+
+1. **Meritev je brez registra zastopnikov.** Največji posamični delež označenih polj je prav
+   številka zastopnika — ta se ob naloženem registru razreši sama. Z registrom bi bil delež
+   bistveno nižji. **Končni [X] nastavimo po meritvi z registrom, v Fazi 0.**
+2. **Merjeno na 11 kuriranih vzorcih, ne na prometu.** Vzorci so bili izbrani, da pokažejo eno od
+   vsake vrste — ne pogostosti. Prava številka pride s prevzemnega testa na 100 ponudbah.
 
 ## Popravek B — Jamstvo 2 dobi mehanizem ali resnično besedilo *(nujno, izbira med dvema)*
 
@@ -55,12 +77,34 @@ Brez tega člena vsa druga jamstva ne pomenijo nič.
 > brez človekove potrditve. Vsaka zapisana vrednost nosi zabeležen izvor. Kadar sodelavec podatek
 > ročno sprosti, je to odločitev naročnika in se zabeleži v revizijsko sled.
 
-**B2 — zgraditi resnično oceno zanesljivosti.** Novo delo, ni v fiksni ceni, in do Faze 0 ni
-merljivo. Če se zanj odločimo, mora imeti zapisan prag in način merjenja, sicer smo spet tam, kjer
-smo zdaj.
+**B2 — resnična ocena zanesljivosti. ZGRAJENA IN IZMERJENA 30. 7. 2026.** Ta možnost ni več
+hipotetična, zato je zdaj **priporočena namesto B1**:
 
-**Priporočilo: B1 zdaj, B2 kot možna razširitev po Fazi 0.** B1 je resnična, preverljiva in jo
-gradnja že izpolnjuje.
+> **2 · Brez tihih napak.** Vsak podatek dobi oceno zanesljivosti, sestavljeno iz treh preverljivih
+> znakov: (a) dokument prebereta **dve neodvisni bralni poti** in se njuna rezultata primerjata polje
+> po polju, (b) preveri se, ali se vrednost **dobesedno pojavi v dokumentu**, in (c) upošteva se
+> izvor podatka — prebran z dokumenta, izpeljan po pravilu ali pridobljen iz vašega registra.
+> Podatek pod dogovorjenim pragom se **v vaša sistema ne zapiše**, ampak gre v pregled sodelavca.
+> Prag potrdimo ob zaključku Faze 0. Kadar sodelavec podatek ročno sprosti, je to odločitev
+> naročnika in se zabeleži v revizijsko sled.
+
+Zakaj to zdrži, česar »ocena zanesljivosti« sicer ne bi:
+
+- **Ni številka, ki si jo model izmisli o sebi.** Samoocena modela ni umerjena in je ni mogoče
+  revidirati — na vprašanje »zakaj 0,83?« ni odgovora. Vsi trije znaki so opazljivi in jih je mogoče
+  rekonstruirati iz dokumenta.
+- **Štiri stopnje namesto ocene 0–1.** Ocena vabi k pragu, ki ga nihče ne zna zagovarjati. Stopnje
+  ustrezajo odločitvi, ki jo stranka dejansko sprejme: zapiši ali daj človeku.
+- **Dokazano, da loči.** Ker je natančnost 157/157, v vzorcu ni napak, ki bi jih signal lahko ujel —
+  mehanizem, preverjen samo na takih podatkih, ni ovrgljiv. Napake so zato vbrizgane v testu
+  (`scripts/test-confidence.mjs`, 23 preverb): izmišljena vrednost, razhajanje med branjema,
+  vrednost iz pravila. Vsaka mora znižati stopnjo.
+- **Na najtežjem dokumentu se je že izkazalo.** Pri skeniranem primeru z dvema otrokoma sta se
+  branji razšli prav pri naslovu zavarovalca — to je znana past prelomljenih naslovov. Produkcijska
+  pot ga prebere pravilno; signal je razliko pokazal, namesto da bi jo skril.
+
+**Cena:** dvojno branje stane 0,0234 USD na dokument. Pri 400 ponudbah mesečno je to pod 10 € —
+znotraj razpona iz popravka E.
 
 ## Popravek C — imenovalec prevzemnega testa *(nujno, poceni)*
 
