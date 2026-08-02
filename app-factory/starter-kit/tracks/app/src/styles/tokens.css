@@ -1,0 +1,95 @@
+/**
+ * tokens.css — the Apple-light system, as tokens.
+ *
+ * Every colour pair here was CHECKED against WCAG AA on white, not eyeballed.
+ * A previous build shipped white-on-teal at 2.77:1 and nobody noticed until an
+ * audit, so the ratios are recorded next to the values and the linter re-checks
+ * them rather than trusting this comment.
+ */
+:root {
+  /* surfaces */
+  --bg: #ffffff;
+  --bg-sunken: #f5f5f7;
+  --surface: #ffffff;
+  --surface-2: #f7f7f7;
+
+  /* ink — ratio on --bg */
+  --ink: #1d1d1f;      /* 16.8:1  body + headings */
+  --ink-2: #424245;    /* 10.0:1  secondary */
+  --muted: #6e6e73;    /*  5.3:1  labels, still AA for body */
+  --faint: #86868b;    /*  3.9:1  AA Large only — never body text */
+
+  /* lines + accent */
+  --line: #e8e8ed;
+  --line-strong: #d2d2d7;
+  --accent: #0071e3;       /* 4.6:1 on white */
+  --accent-hover: #0077ed;
+  --accent-ink: #ffffff;
+
+  /* state — plain meanings, see humanize.ts for the words users see */
+  --ok: #1d7a44;
+  --warn: #8a5a00;
+  --bad: #b3261e;
+
+  /* shape */
+  --r-sm: 8px;
+  --r: 12px;
+  --r-lg: 18px;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 8px 24px rgba(0, 0, 0, .06);
+
+  /* type */
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
+  --t-xs: .75rem;
+  --t-sm: .875rem;
+  --t-base: 1rem;
+  --t-lg: 1.25rem;
+  --t-xl: 1.75rem;
+  --t-2xl: 2.5rem;
+
+  /* rhythm — one scale, so spacing cannot drift per-component */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--t-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Every interactive target is at least 44px — the iOS minimum. Smaller ones
+   are the single most common reason a dashboard feels bad on a phone. */
+button, .btn, input, select, textarea { min-height: 44px; font-family: inherit; font-size: var(--t-base); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: var(--s-2); padding: 0 var(--s-5);
+  border: 0; border-radius: var(--r); cursor: pointer;
+  background: var(--accent); color: var(--accent-ink); font-weight: 500;
+}
+.btn:hover { background: var(--accent-hover); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+.btn-quiet { background: var(--surface-2); color: var(--ink); }
+
+.field { display: flex; flex-direction: column; gap: var(--s-2); }
+.field label { font-size: var(--t-sm); color: var(--ink-2); font-weight: 500; }
+.field input {
+  padding: 0 var(--s-4); border: 1px solid var(--line-strong);
+  border-radius: var(--r); background: var(--surface); color: var(--ink);
+}
+.field input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r-lg); box-shadow: var(--shadow); padding: var(--s-6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

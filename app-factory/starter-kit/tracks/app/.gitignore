@@ -1,0 +1,15 @@
+# Secrets. .env.local holds real keys and MUST stay untracked — the secret scan
+# treats gitignored files as unable to leak, so this line is load-bearing.
+.env
+.env.local
+.env*.local
+
+node_modules/
+.next/
+out/
+build/
+dist/
+.vercel/
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
