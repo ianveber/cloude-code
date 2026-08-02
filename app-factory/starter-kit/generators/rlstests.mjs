@@ -73,8 +73,12 @@ function casesFor(table, tenancy) {
       ...asUser(USERS.alice),
       `  select count(*) into n from public.${t};`,
       `  if n < 1 then`,
+      // The format string carries one placeholder, so RAISE needs exactly one
+      // argument. Omitting it is a compile-time error in PL/pgSQL ("too few
+      // parameters specified for RAISE") — which fails the case for a reason
+      // unrelated to the policy it is meant to probe.
       `    raise exception '${t} FAIL: the owner cannot see their own row (got % rows). ` +
-        `The denial test above is therefore meaningless — it would pass on a table nobody can read.';`,
+        `The denial test above is therefore meaningless — it would pass on a table nobody can read.', n;`,
       `  end if;`,
       `  raise notice '${t} pass: owner reads own rows (%)', n;`,
     ]),
@@ -97,19 +101,38 @@ function casesFor(table, tenancy) {
     });
 
     // ── N3: bob cannot write into alice's scope. ────────────────────────────
+    // The insert must supply every required column, and the handler must catch
+    // ONLY the RLS error.
+    //
+    // ⚠️ Both halves were wrong in the first live version, and a mutation test
+    // caught it: with `when others`, a NOT NULL violation on an unrelated
+    // column was swallowed and reported as "blocked by RLS". The case passed
+    // with RLS *entirely disabled on the table*. A security test that reports
+    // green on an open table is worse than no test at all.
+    //
+    // insufficient_privilege (SQLSTATE 42501) is exactly what a row-level
+    // security violation raises, and nothing else here should raise it.
+    const required = (table.columns ?? []).filter((c) => c.notNull && !c.default && !c.primaryKey);
+    const cols =
+      tenancy.model === 'owner'
+        ? [tenancy.ownerColumn, ...required.map((c) => c.name)]
+        : [tenancy.tenantFk, ...required.map((c) => c.name)];
+    const vals =
+      tenancy.model === 'owner'
+        ? [`'${USERS.alice}'`, ...required.map(fixtureValue)]
+        : [`(select id from public.${tenancy.tenantTable} limit 1)`, ...required.map(fixtureValue)];
+
     negatives.push({
       id: `${t}-cross-user-write-denied`,
       sql: block(`${t}: cross-user write`, [
         ...asUser(USERS.bob),
         `  blocked := false;`,
         `  begin`,
-        tenancy.model === 'owner'
-          ? `    insert into public.${t} (${tenancy.ownerColumn}) values ('${USERS.alice}');`
-          : `    insert into public.${t} (${tenancy.tenantFk}) select id from public.${tenancy.tenantTable} limit 1;`,
-        `  exception when insufficient_privilege or others then blocked := true;`,
+        `    insert into public.${t} (${cols.join(', ')}) values (${vals.join(', ')});`,
+        `  exception when insufficient_privilege then blocked := true;`,
         `  end;`,
         `  if not blocked then`,
-        `    raise exception '${t} FAIL: a user wrote a row scoped to someone else';`,
+        `    raise exception '${t} FAIL: a user wrote a row scoped to someone else — RLS did not stop the insert';`,
         `  end if;`,
         `  raise notice '${t} pass: cross-user write refused';`,
       ]),
@@ -184,16 +207,44 @@ function buildFixtures(data) {
   }
 
   for (const t of data.tables) {
+    // Every NOT NULL column without a default must be supplied, or the insert
+    // dies on a constraint and every case for the table fails for a reason
+    // that has nothing to do with RLS. Found by the first live run: a spec
+    // column `body text not null` made all 8 cases fail identically.
+    const extra = (t.columns ?? []).filter((c) => c.notNull && !c.default && !c.primaryKey);
+    const cols = [];
+    const vals = [];
+
     if (tenancy.model === 'owner') {
-      lines.push(`insert into public.${t.name} (${tenancy.ownerColumn}) values ('${USERS.alice}');`);
+      cols.push(tenancy.ownerColumn);
+      vals.push(`'${USERS.alice}'`);
     } else if (tenancy.model === 'tenant') {
-      lines.push(
-        `insert into public.${t.name} (${tenancy.tenantFk}) values ('33333333-3333-3333-3333-333333333333');`,
-      );
-    } else {
-      lines.push(`insert into public.${t.name} default values;`);
+      cols.push(tenancy.tenantFk);
+      vals.push(`'33333333-3333-3333-3333-333333333333'`);
     }
+    for (const c of extra) {
+      cols.push(c.name);
+      vals.push(fixtureValue(c));
+    }
+
+    lines.push(
+      cols.length
+        ? `insert into public.${t.name} (${cols.join(', ')}) values (${vals.join(', ')});`
+        : `insert into public.${t.name} default values;`,
+    );
   }
 
   return lines.join('\n') + '\n';
+}
+
+/** A plausible value for a required column, chosen by declared type. */
+function fixtureValue(column) {
+  const type = String(column.type || '').toLowerCase();
+  if (/^(int|bigint|smallint|numeric|decimal|real|double)/.test(type)) return '1';
+  if (/^bool/.test(type)) return 'false';
+  if (/^(timestamptz|timestamp|date)/.test(type)) return 'now()';
+  if (/^uuid/.test(type)) return 'gen_random_uuid()';
+  if (/^jsonb?$/.test(type)) return `'{}'::jsonb`;
+  // Text and everything else: a value that is obviously a fixture in output.
+  return `'fixture-${column.name}'`;
 }

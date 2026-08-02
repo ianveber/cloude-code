@@ -1,0 +1,98 @@
+#!/usr/bin/env node
+/**
+ * rls-verify — run the generated RLS suite against a REAL Supabase project.
+ *
+ * This is the Docker replacement. It is not a compromise: the container path
+ * proves policies against a 58-line hand-written stub of Supabase's auth
+ * schema, while this proves them against the actual platform, with the real
+ * auth schema, the real GRANTs and the real PostgREST roles.
+ *
+ * Isolation: every case runs as
+ *     begin;  <fixtures>  <case>  rollback;
+ * so each one starts from the same known state and leaves nothing behind. The
+ * target is the app's OWN freshly-provisioned project, which holds no real
+ * data — destructive negative tests are safe there and nowhere else.
+ *
+ * A case "passes" by NOT raising. Each generated case raises an exception with
+ * a specific message when the policy it probes is wrong, so a green run means
+ * every probe was attempted and none of them found a hole. A case that fails to
+ * execute at all is a FAILURE, never a skip — the one thing this must never do
+ * is report success because it did nothing.
+ *
+ *   rls-verify <runDir> [--keep]
+ */
+
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+
+function fail(msg, code = 1) {
+  process.stderr.write(`rls-verify: ${msg}\n`);
+  process.exit(code);
+}
+
+async function main() {
+  const runDir = path.resolve(process.argv[2] || '.');
+  const packRoot = path.resolve(__dirname, '..', '..', '..', '3day-protocol');
+  const url = (f) => require('url').pathToFileURL(path.join(packRoot, 'lib', 'cloud', f)).href;
+  const supa = await import(url('supabase-api.mjs'));
+  const { readManifest } = await import(url('manifest.mjs'));
+
+  const m = readManifest(runDir);
+  if (!m?.supabase?.ref) fail(`no provisioned project for ${runDir} — run \`provision apply\` first`);
+  const ref = m.supabase.ref;
+
+  const testsDir = path.join(runDir, 'supabase', 'tests');
+  const fixtures = path.join(testsDir, 'fixtures.sql');
+  const casesDir = path.join(testsDir, 'cases');
+  if (!fs.existsSync(fixtures)) fail(`no fixtures at ${fixtures}`);
+  if (!fs.existsSync(casesDir)) fail(`no cases directory at ${casesDir}`);
+
+  const cases = fs.readdirSync(casesDir).filter((f) => f.endsWith('.sql')).sort();
+  if (cases.length === 0) {
+    // A suite that runs nothing must never report success.
+    fail('the cases directory is empty — a suite that proves nothing is a failure, not a pass', 1);
+  }
+
+  const client = supa.createClient({ token: supa.resolveToken() });
+  const fixtureSql = fs.readFileSync(fixtures, 'utf8');
+
+  process.stdout.write(`TAP version 13\n1..${cases.length}\n`);
+  let passed = 0;
+  const failures = [];
+
+  for (let i = 0; i < cases.length; i++) {
+    const name = cases[i];
+    const caseSql = fs.readFileSync(path.join(casesDir, name), 'utf8');
+    // Fixtures are re-applied inside each transaction so cases cannot affect
+    // one another, and the rollback guarantees nothing survives.
+    const sql = `begin;\n${fixtureSql}\n${caseSql}\nrollback;`;
+    try {
+      await client.runSql(ref, sql);
+      process.stdout.write(`ok ${i + 1} - ${name}\n`);
+      passed++;
+    } catch (e) {
+      const detail = String(e.message).replace(/\n/g, ' ').slice(0, 300);
+      process.stdout.write(`not ok ${i + 1} - ${name}\n  ---\n  error: ${detail}\n  ...\n`);
+      failures.push({ name, detail });
+    }
+  }
+
+  process.stdout.write(`# tests ${cases.length}\n# pass ${passed}\n# fail ${failures.length}\n`);
+
+  const evidence = path.join(runDir, '.protocol', 'evidence');
+  fs.mkdirSync(evidence, { recursive: true });
+  fs.writeFileSync(
+    path.join(evidence, 'rls-verify.json'),
+    JSON.stringify({ ref, total: cases.length, passed, failures, ts: new Date().toISOString() }, null, 2) + '\n',
+  );
+
+  if (failures.length) {
+    process.stderr.write(`\n${failures.length} RLS case(s) FAILED — do not ship this schema.\n`);
+    process.exit(1);
+  }
+  process.stdout.write(`\n✅ RLS proven against the live project ${ref}: ${passed}/${cases.length}\n`);
+}
+
+main().catch((e) => fail(e.message, e.exitCode || 1));

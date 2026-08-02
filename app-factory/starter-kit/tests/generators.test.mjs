@@ -181,3 +181,85 @@ test('a suite with zero denials is refused', () => {
     /at least one table/,
   );
 });
+
+// ── fixtures must actually be insertable ─────────────────────────────────────
+// Found by the first live run: a spec column `body text not null` made all 8
+// cases fail identically on a not-null violation, with nothing to do with RLS.
+
+test('fixtures supply every NOT NULL column that has no default', () => {
+  const { files } = generateRlsTests({
+    data: {
+      tenancy: { model: 'owner', ownerColumn: 'user_id' },
+      tables: [{
+        name: 'note',
+        columns: [
+          { name: 'body', type: 'text', notNull: true },
+          { name: 'rank', type: 'int', notNull: true },
+          { name: 'done', type: 'boolean', notNull: true },
+          { name: 'optional', type: 'text' },
+          { name: 'has_default', type: 'text', notNull: true, default: `'x'` },
+        ],
+      }],
+    },
+  });
+  const insert = files['fixtures.sql'].split('\n').find((l) => l.startsWith('insert into public.note'));
+  assert.ok(insert.includes('body'), 'required text column must be supplied');
+  assert.ok(insert.includes('rank'), 'required int column must be supplied');
+  assert.ok(insert.includes('done'), 'required bool column must be supplied');
+  assert.ok(!insert.includes('optional'), 'nullable column need not be supplied');
+  assert.ok(!insert.includes('has_default'), 'a column with a default need not be supplied');
+});
+
+test('fixture values match column type', () => {
+  const { files } = generateRlsTests({
+    data: {
+      tenancy: { model: 'shared' },
+      tables: [{
+        name: 'thing',
+        columns: [
+          { name: 'n', type: 'integer', notNull: true },
+          { name: 'b', type: 'boolean', notNull: true },
+          { name: 'j', type: 'jsonb', notNull: true },
+        ],
+      }],
+    },
+  });
+  const insert = files['fixtures.sql'].split('\n').find((l) => l.startsWith('insert into public.thing'));
+  assert.match(insert, /\b1\b/, 'integer gets a number, not a quoted string');
+  assert.match(insert, /false/);
+  assert.match(insert, /'\{\}'::jsonb/);
+});
+
+test('every RAISE format string has as many arguments as placeholders', () => {
+  // "too few parameters specified for RAISE" is a PL/pgSQL COMPILE error, so it
+  // fails the case for a reason unrelated to the policy under test. Found live.
+  const { files } = generateRlsTests(ownerSpec());
+  for (const [name, sql] of Object.entries(files)) {
+    if (!name.startsWith('cases/')) continue;
+    for (const line of sql.split('\n')) {
+      const m = line.match(/raise (?:exception|notice) '((?:[^']|'')*)'(.*)$/);
+      if (!m) continue;
+      // %% is a literal percent and takes no argument.
+      const placeholders = (m[1].replace(/%%/g, '').match(/%/g) || []).length;
+      const args = m[2].split(',').filter((s) => s.replace(/[;\s]/g, '').length).length;
+      assert.equal(placeholders, args, `${name}: ${placeholders} placeholder(s) but ${args} arg(s) — ${line.trim()}`);
+    }
+  }
+});
+
+test('the cross-user write case catches ONLY the RLS error, never `others`', () => {
+  // A mutation test caught this live: `when others` swallowed a NOT NULL
+  // violation and reported it as "blocked by RLS", so the case passed with RLS
+  // entirely DISABLED on the table. Catching broadly is how a security suite
+  // signs off on an open database.
+  const { files } = generateRlsTests(ownerSpec());
+  const sql = files['cases/note-04-note-cross-user-write-denied.sql'];
+  assert.match(sql, /exception when insufficient_privilege then/);
+  assert.doesNotMatch(sql, /\bor others\b/, 'a broad handler makes this test meaningless');
+});
+
+test('the cross-user write insert supplies required columns, so it cannot die on a constraint', () => {
+  const { files } = generateRlsTests(ownerSpec());
+  const sql = files['cases/note-04-note-cross-user-write-denied.sql'];
+  assert.match(sql, /insert into public\.note \(user_id, body\)/, 'must include the NOT NULL column');
+});
