@@ -183,7 +183,11 @@ function fakeBin(opts = {}) {
   if (opts.supabase) put('supabase', opts.supabase);
   if (opts.gitleaks) put('gitleaks', opts.gitleaks);
   if (opts.npx) put('npx', opts.npx);
-  if (opts.git) fs.symlinkSync(GIT_BIN, path.join(bin, 'git'));
+  // git is ALWAYS on the stub PATH. Every run project has a repo (P0 requires
+  // it) and gate freshness is computed from git HEAD, so a PATH without git
+  // makes gitHead() return null — which since F4 correctly renders every green
+  // gate stale. Omitting it modelled a run project that cannot exist.
+  fs.symlinkSync(GIT_BIN, path.join(bin, 'git'));
   return bin;
 }
 
@@ -469,9 +473,11 @@ test('gate 3: a STALE green gate 2 does NOT count', () => {
 
 test('gate 3: refuses without a production URL (spec deployUrl or --url)', () => {
   const dir = initProject();
+  gitify(dir); // a real gate-2 green records HEAD; without one it is stale (F4)
   writeGate(dir, 2, {
     status: 'green',
     ts: new Date().toISOString(),
+    head: git(['rev-parse', 'HEAD'], dir),
     rls: { total: 12, passed: 12, failed: 0 },
     evidence: ['.protocol/evidence/gate2-rls.txt'],
   });
@@ -485,9 +491,14 @@ test('gate 3: refuses without a production URL (spec deployUrl or --url)', () =>
 
 function gate3Fixture(extraSpec = {}) {
   const dir = initProject();
+  // gitify FIRST: a real gate-2 green records git HEAD, and since F4 a green
+  // with no recorded head is stale (freshness unproven). gitify's .gitignore
+  // excludes .protocol/, so writing the spec afterwards does not dirty the tree.
+  gitify(dir);
   writeGate(dir, 2, {
     status: 'green',
     ts: new Date().toISOString(),
+    head: git(['rev-parse', 'HEAD'], dir),
     rls: { total: 12, passed: 12, failed: 0 },
     secrets: { tool: 'built-in regex scan', findings: 0 },
     inputValidation: { warnings: 0 },
@@ -662,7 +673,10 @@ test('gate 3: a hand-edited bare-green gate 2 (no rls/evidence) is REJECTED, not
   try {
     const r = await runAsync(['3', '--url', url], dir, { env: envWithPath(fakeBin({})) });
     assert.notEqual(r.code, 0, out(r));
-    assert.match(out(r), /verification evidence|hand-edited/i);
+    // Since F4 a bare hand-edit is caught by the missing head (freshness
+    // unproven) before the evidence check runs. Both are correct rejections of
+    // the same forgery — the test's point is that it is never honored.
+    assert.match(out(r), /verification evidence|hand-edited|freshness unproven/i);
     assert.equal(readGate(dir, 3).status, 'red');
     assert.ok(!fs.existsSync(path.join(dir, 'SHIP-REPORT.md')), 'no report on rejected precondition');
   } finally {
@@ -676,6 +690,20 @@ test('gate 3: playwright smoke FAILED drives Gate 3 RED (covers the smoke.ok===f
   // and a fake npx whose `playwright test` exits 1 → smoke.ok === false → RED.
   fs.mkdirSync(path.join(dir, 'tests'), { recursive: true });
   fs.writeFileSync(path.join(dir, 'tests', 'smoke.spec.ts'), '// smoke spec (stub)\n');
+  // Commit it: an uncommitted file dirties the tree, which correctly makes
+  // gate 2 stale and would stop Gate 3 before it ever reaches the smoke run.
+  // A real run commits early and often for exactly this reason.
+  git(['add', '-A'], dir);
+  git(['commit', '-qm', 'add smoke spec'], dir);
+  writeGate(dir, 2, {
+    status: 'green',
+    ts: new Date().toISOString(),
+    head: git(['rev-parse', 'HEAD'], dir),
+    rls: { total: 12, passed: 12, failed: 0 },
+    secrets: { tool: 'built-in regex scan', findings: 0 },
+    inputValidation: { warnings: 0 },
+    evidence: ['.protocol/evidence/gate2-rls.txt'],
+  });
   const bin = fakeBin({ npx: NPX_PLAYWRIGHT_FAIL });
   const { srv, url } = await routeServer({
     '/': { status: 200, body: 'home' },

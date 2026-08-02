@@ -41,6 +41,14 @@ function initProject() {
   const dir = tmp();
   const r = run(['init', dir], dir);
   assert.equal(r.code, 0, out(r));
+  // A run project ALWAYS has git: P0 requires it (SKILL.md), gates record HEAD
+  // for freshness, and since F4 a gate whose freshness cannot be proven fails
+  // closed. Fixtures without git were encoding a hole rather than reality.
+  execFileSync('git', ['init', '-q'], { cwd: dir });
+  execFileSync('git', ['config', 'user.email', 'fixture@test.local'], { cwd: dir });
+  execFileSync('git', ['config', 'user.name', 'Fixture'], { cwd: dir });
+  execFileSync('git', ['add', '-A'], { cwd: dir });
+  execFileSync('git', ['commit', '-qm', 'fixture: initial'], { cwd: dir });
   return dir;
 }
 

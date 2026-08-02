@@ -176,7 +176,13 @@ function effectiveGate(runDir, n) {
   if (status === 'green' && gate && gate.head) {
     const head = gitHead(runDir);
     if (head === null) {
-      detail = 'freshness unproven (git unreadable)';
+      // F4: git unreadable means freshness CANNOT be checked. Previously this
+      // recorded a detail string and left the gate green — so a run project
+      // with no git repo held a green gate that could never go stale, and
+      // deploys stayed unblocked no matter how far the code drifted.
+      // Unprovable freshness must fail closed, not open.
+      effective = 'stale';
+      detail = 'freshness unproven (no readable git repo) — run `git init` and commit';
     } else if (head !== gate.head) {
       effective = 'stale';
       detail = `green at ${gate.head.slice(0, 8)}, HEAD now ${head.slice(0, 8)}`;
@@ -185,7 +191,11 @@ function effectiveGate(runDir, n) {
       detail = 'working tree dirty since green';
     }
   } else if (status === 'green' && (!gate || !gate.head)) {
-    detail = 'no head recorded — freshness unproven';
+    // F4: a green with no recorded head has nothing to compare against. That is
+    // also the shape a hand-edited gate file takes, so treating it as green
+    // would make forging one trivial.
+    effective = 'stale';
+    detail = 'no head recorded — freshness unproven; re-run the gate';
   } else if (status === 'green' || status === 'red') {
     detail = '';
   }
