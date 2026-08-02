@@ -28,6 +28,7 @@ import { classify, DOC, DOC_LABEL } from "./lib/classify.js";
 import { checkPacket } from "./lib/gate.js";
 import { buildPayload, payloadFilename } from "./lib/edokumenti.js";
 import { newRun, noteDoc, summary, ROI_KORAKI, roiSummary, PONUDB_NA_MESEC } from "./lib/runstats.js";
+import { klpConfidence } from "./lib/confidence.js";
 
 pdfjs.GlobalWorkerOptions.workerSrc = "./vendor/pdf.worker.mjs";
 
@@ -70,13 +71,27 @@ const LABELS = {
  * provenance into wallpaper and leave the amber flags nothing to stand out against, so the
  * everyday "Iz ponudbe" renders as a dot plus muted text and the exceptions keep the colour.
  */
-function badge(cell) {
-  if (cell.state === "UNMAPPED" || (cell.source === "register" && !cell.value))
-    return { cls: "check", text: "Potrebujem register", attn: true };
-  if (!cell.value) return { cls: "", text: "", attn: false };
-  if (cell.source === "pravilo") return { cls: "check", text: "Za potrditev", attn: true };
-  if (cell.source === "register") return { cls: "ok", text: "Iz registra", attn: false };
-  return { cls: "ok", text: "Iz ponudbe", attn: false, quiet: true };
+function badge(cell, c) {
+  // Driven by the reliability tier, not by provenance alone. The visual grammar is unchanged —
+  // the everyday case stays the quietest mark on the card — but what decides the colour is now
+  // whether the value would be WRITTEN or handed to a person, which is the decision the client
+  // actually makes. The reason rides along as a tooltip so the amber ones can be explained
+  // without adding a fourth column.
+  if (!c) {   // no signal computed (older path) — fall back to provenance
+    if (cell.state === "UNMAPPED") return { cls: "check", text: "Potrebujem register", attn: true };
+    if (!cell.value) return { cls: "", text: "", attn: false };
+    return { cls: "ok", text: "Iz ponudbe", attn: false, quiet: true };
+  }
+  if (c.razlogKode === "prazno") return { cls: "", text: "", attn: false };
+  if (c.razlogKode === "potrebuje_register")
+    return { cls: "check", text: "Potrebujem register", attn: true, why: c.razlog };
+  if (c.agreement === "razhajanje")
+    return { cls: "check", text: "Branji se razhajata", attn: true, why: c.razlog };
+  if (c.tier === "nizka")
+    return { cls: "check", text: "Za potrditev", attn: true, why: c.razlog };
+  if (cell.source === "register")
+    return { cls: "ok", text: "Iz registra", attn: false, why: c.razlog };
+  return { cls: "ok", text: "Iz ponudbe", attn: false, quiet: true, why: c.razlog };
 }
 
 /**
@@ -88,6 +103,27 @@ function badge(cell) {
  * and the log is the one panel that stays on a shared screen for the whole meeting. The packet
  * list keeps the full filename, because that is the row the client has to identify.
  */
+/**
+ * Recompute the reliability signal for one entry. Called after the read AND again after the
+ * register is loaded: the register fills the agent number, which changes that field's tier, and
+ * the tags, the counters and the payload have to move together or the card contradicts itself.
+ *
+ * The two reads fan out independently, so pair them by the insured's name rather than by index.
+ */
+function computeConf(e) {
+  const pair = (cells) => {
+    if (!e.outB || !e.outB.length) return null;
+    const want = cells["zavarovanec.ime_priimek"]?.value || "";
+    return e.outB.find((c) => (c["zavarovanec.ime_priimek"]?.value || "") === want) || e.outB[0];
+  };
+  e.conf = (e.outputs || []).map((cells) =>
+    klpConfidence({ cells, secondCells: pair(cells), layout: e.layout, fields: KLP_FIELDS }));
+  e.confNepoimenovan = e.nepoimenovan
+    ? klpConfidence({ cells: e.nepoimenovan, secondCells: e.nepoimenovanB || null,
+        layout: e.layout, fields: KLP_FIELDS })
+    : null;
+}
+
 function safeName(f) {
   const s = String(f ?? "");
   const ext = /\.pdf$/i.test(s) ? s.slice(-4) : "";
@@ -273,14 +309,15 @@ async function renderImage(file) {
 
 /* ── the KLP card (unchanged behaviour) ──────────────────────────────────── */
 
-function fieldRows(cells) {
+function fieldRows(cells, conf) {
   return KLP_FIELDS.map((f) => {
     const c = cells[f] || { value: null, source: null };
-    const b = badge(c);
+    const b = badge(c, conf?.fields?.[f]);
+    const title = b.why ? ` title="${esc(b.why)}"` : "";
     return `<div class="row${b.attn ? " attn" : ""}">
       <div class="k">${LABELS[f]}</div>
       <div class="v${c.value ? "" : " empty"}">${c.value ? esc(c.value) : "—"}</div>
-      <div>${b.text ? `<span class="tag ${b.cls}${b.quiet ? " quiet" : ""}">${b.text}</span>` : ""}</div>
+      <div>${b.text ? `<span class="tag ${b.cls}${b.quiet ? " quiet" : ""}"${title}>${b.text}</span>` : ""}</div>
     </div>`;
   }).join("");
 }
@@ -295,7 +332,7 @@ function registerBanner() {
     </div></div>`;
 }
 
-function renderKlp(cells, idx, scanned, gi, docName) {
+function renderKlp(cells, idx, scanned, gi, docName, conf) {
   const needsReg = cells["zastopnik_1.stevilka"]?.state === "UNMAPPED";
 
   /**
@@ -336,7 +373,7 @@ function renderKlp(cells, idx, scanned, gi, docName) {
     ${scanned ? `<p class="muted">Dokument nima besedila — prebran s slike. Ročne opombe na dokumentu so prezrte.</p>` : ""}
     ${banners}
     <div class="split">
-      <div>${fieldRows(cells)}</div>
+      <div>${fieldRows(cells, conf)}</div>
       <div>
         <iframe title="Kontrolni list" loading="lazy" srcdoc="${esc(klpHtml(cells, { screen: true }))}"></iframe>
         <div style="margin-top:10px;display:flex;gap:8px">
@@ -367,7 +404,7 @@ function renderNepoimenovan(e, docName) {
       Tega ne ugibam — dokument gre v ročni pregled. Spodaj je vse, kar sem iz njega prebral.</div>
     </div>
     ${needsReg ? registerBanner() : ""}
-    <div>${fieldRows(cells)}</div>
+    <div>${fieldRows(cells, e.confNepoimenovan)}</div>
   </div>`;
 }
 
@@ -385,7 +422,8 @@ function renderResults() {
     const docName = many ? e.name : null;
     if (e.outputs.length) {
       e.outputs.forEach((cells, i) =>
-        html.push(renderKlp(cells, e.outputs.length > 1 ? i + 1 : 0, e.scanned, gi++, docName)));
+        html.push(renderKlp(cells, e.outputs.length > 1 ? i + 1 : 0, e.scanned, gi++, docName,
+          e.conf?.[i])));
     } else if (e.nepoimenovan) {
       html.push(renderNepoimenovan(e, docName));
     }
@@ -502,11 +540,19 @@ function renderStats() {
   if (!entries.length) { statsCard.classList.add("hide"); return; }
   const s = summary(currentRun());
   const rocno = s.neprepoznanih + s.neuspelih + s.neberljivih;
+  // The reliability signal, aggregated. This — not "fields filled" — is the number the guarantee
+  // turns on: how much the robot writes without help, and how much it hands back. Empty fields are
+  // excluded from the denominator; a ponudba with no second agent is not work for anyone.
+  const conf = entries.flatMap((e) => [...(e.conf || []), ...(e.confNepoimenovan ? [e.confNepoimenovan] : [])]);
+  const zaPis = conf.reduce((a, c) => a + c.writable, 0);
+  const vPregled = conf.reduce((a, c) => a + c.flagged.length, 0);
+  const nosilna = conf.reduce((a, c) => a + c.bearing, 0);
+
   const tiles = [
     [s.dokumentov, `${sklon(s.dokumentov, DOKUMENT)} v paketu`, ""],
     [s.kontrolnihListov, sklon(s.kontrolnihListov, LIST), ""],
-    [s.poljSkupaj ? `${s.poljIzpolnjenih}/${s.poljSkupaj}` : "—", "polj izpolnjenih", ""],
-    [s.poljZaPotrditev, `${sklon(s.poljZaPotrditev, POLJE)} za potrditev`, " attn"],
+    [nosilna ? `${zaPis}/${nosilna}` : "—", "zapišem samodejno", ""],
+    [vPregled, `${sklon(vPregled, POLJE)} v pregled`, " attn"],
     ...(rocno ? [[rocno, "za ročni pregled", " bad"]] : []),
     [`${s.sekund.toLocaleString("sl-SI")} s`, "porabljenega časa", ""],
   ];
@@ -785,15 +831,23 @@ async function handle(fileList) {
       if (stale()) return;
       const ctrl = new AbortController();
       inFlight = ctrl;
-      const r = await fetch("/api/extract", {
+      const post = (b) => fetch("/api/extract", {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify(body), signal: ctrl.signal,
-      });
-      const j = await r.json();
+        body: JSON.stringify(b), signal: ctrl.signal,
+      }).then((res) => res.json());
+
+      // Two independent readings of the same page, IN PARALLEL — so the wall clock is the slower
+      // of the two, not their sum. The second one is best effort: if it fails, the reliability
+      // signal degrades to single-read honestly rather than failing the document.
+      const [j, j2] = await Promise.all([
+        post(body),
+        post({ ...body, second: true }).catch(() => null),
+      ]);
       if (inFlight === ctrl) inFlight = null;
       if (stale()) return;
       if (j.error) throw new Error("EXTRACT_FAILED");
       const raw = j.data;
+      const rawB = j2 && !j2.error ? j2.data : null;
 
       // A scan could not be fingerprinted by text. Now that it has been read, it can say what it
       // is — and if it does not read as an offer, it goes to a human rather than being forced.
@@ -820,6 +874,14 @@ async function handle(fileList) {
       // Nobody named as insured: no kontrolni list exists to produce. Keep what WAS read so the
       // card can show it, but it is never counted as a produced list.
       e.nepoimenovan = e.outputs.length ? null : reResolve(holderCells(raw, { register }));
+
+      // Keep the second reading ON THE ENTRY. The register button re-resolves the agent number
+      // later and the signal must be recomputed against the same pair — otherwise the closing beat
+      // fills the numbers while the tags still say "Potrebujem register".
+      const outB = rawB ? toKlp(rawB, { register }).map(reResolve) : null;
+      e.outB = outB;
+      e.nepoimenovanB = rawB && !outB?.length ? reResolve(holderCells(rawB, { register })) : null;
+      computeConf(e);
       e.faza = "prebrano";
       logLine(e.outputs.length
         ? `${safeName(e.name)} — prebrano, ${e.outputs.length} ${sklon(e.outputs.length, LIST)}.`
@@ -947,6 +1009,11 @@ document.addEventListener("click", async (e) => {
     for (const en of entries) {
       en.outputs = en.outputs.map(reResolve);
       if (en.nepoimenovan) en.nepoimenovan = reResolve(en.nepoimenovan);
+      // The second reading needs the same treatment, or the pair goes out of step and every
+      // agreed field would suddenly read as a disagreement.
+      if (en.outB) en.outB = en.outB.map(reResolve);
+      if (en.nepoimenovanB) en.nepoimenovanB = reResolve(en.nepoimenovanB);
+      computeConf(en);
     }
     renderResults(); renderStats(); renderRoi();
 

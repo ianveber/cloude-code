@@ -14,6 +14,12 @@ const API = "https://api.anthropic.com/v1/messages";
 export const MODEL_TEXT = process.env.MODEL_TEXT || "claude-sonnet-4-6";
 export const MODEL_VISION = process.env.MODEL_VISION || "claude-opus-4-8";
 
+// The second reader, for the reliability signal. Deliberately a DIFFERENT model on both tracks —
+// two runs of the same model largely agree with themselves and would prove nothing. Both were
+// scored at 157/157 against truth.json, so neither is the weak one.
+export const MODEL_TEXT_B = process.env.MODEL_TEXT_B || "claude-haiku-4-5";
+export const MODEL_VISION_B = process.env.MODEL_VISION_B || "claude-sonnet-4-6";
+
 function apiKey() {
   return process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY || null;
 }

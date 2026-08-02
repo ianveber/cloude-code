@@ -15,7 +15,8 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { callClaude, MODEL_TEXT, MODEL_VISION, imageBlocks, costUsd } from "./lib/claude.mjs";
+import { callClaude, MODEL_TEXT, MODEL_VISION, MODEL_TEXT_B, MODEL_VISION_B, imageBlocks, costUsd }
+  from "./lib/claude.mjs";
 import { SYSTEM, SCHEMA_HINT, buildUserPrompt } from "./lib/extract.js";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
@@ -107,15 +108,19 @@ const server = http.createServer(async (req, res) => {
     req.on("data", (c) => { body += c; if (body.length > 40e6) req.destroy(); });
     req.on("end", async () => {
       try {
-        const { layout, imageBase64 } = JSON.parse(body);
+        // `second: true` asks for the independent second reading that feeds the reliability
+        // signal. Same prompt, same page, deliberately a different model.
+        const { layout, imageBase64, second } = JSON.parse(body);
         const vision = !!imageBase64;
+        const model = vision ? (second ? MODEL_VISION_B : MODEL_VISION)
+                             : (second ? MODEL_TEXT_B : MODEL_TEXT);
         const r = await callClaude({
           system: SYSTEM,
           user: vision ? imageBlocks(imageBase64, VISION_INSTRUCTION) : buildUserPrompt(layout),
-          model: vision ? MODEL_VISION : MODEL_TEXT,
+          model,
           maxTokens: 3000,
         });
-        const cost = r.error ? 0 : costUsd(vision ? MODEL_VISION : MODEL_TEXT, r.usage);
+        const cost = r.error ? 0 : costUsd(model, r.usage);
         spentUsd += cost;
         res.writeHead(r.error ? 502 : 200, { "content-type": "application/json" });
         res.end(JSON.stringify(r.error ? { error: r.error } : { data: r.json, cost }));

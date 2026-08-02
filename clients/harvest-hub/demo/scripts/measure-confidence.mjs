@@ -1,7 +1,7 @@
 /**
  * measure-confidence.mjs — what the reliability signal actually does on the client's documents.
  *
- * Reads every sample twice with two different models, scores each field with lib/confidence.mjs,
+ * Reads every sample twice with two different models, scores each field with lib/confidence.js,
  * and reports the tier distribution, the flag rate, and every disagreement between the two reads.
  *
  * The flag rate is the number the guarantee addendum needs: Jamstvo 1 counts a flagged field as
@@ -20,7 +20,7 @@ import { callClaude, imageBlocks, costUsd } from "../lib/claude.mjs";
 import { SYSTEM, SCHEMA_HINT, buildUserPrompt, toKlp, KLP_FIELDS } from "../lib/extract.js";
 import { restoreLayout, itemsFromTextContent, serializeRows, pageCharCount, VISION_THRESHOLD }
   from "../lib/layout.js";
-import { klpConfidence, PISNI_PRAG, TIERS } from "../lib/confidence.mjs";
+import { klpConfidence, PISNI_PRAG, TIERS } from "../lib/confidence.js";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");

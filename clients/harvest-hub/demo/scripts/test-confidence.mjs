@@ -13,7 +13,7 @@
 
 import assert from "node:assert/strict";
 import { fieldConfidence, appearsInSource, jeZaPisanje, klpConfidence, PISNI_PRAG }
-  from "../lib/confidence.mjs";
+  from "../lib/confidence.js";
 
 let pass = 0;
 const fail = [];
