@@ -16,7 +16,11 @@ import { spawnSync, execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const GUARD = '/Users/ianveber/Desktop/Cloude CODE/3day-protocol/bin/deploy-guard';
+import { fileURLToPath } from 'node:url';
+
+// Relative to this file — an absolute path makes a copied pack test the
+// original instead of itself.
+const GUARD = path.join(path.dirname(path.dirname(fileURLToPath(import.meta.url))), 'bin', 'deploy-guard');
 const SPIKE = '/Users/ianveber/builds/spike';
 const NOLINK = '/Users/ianveber/builds/spike-nolink';
 

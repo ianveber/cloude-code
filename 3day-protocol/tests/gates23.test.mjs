@@ -16,7 +16,12 @@ import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
 
-const PACK = '/Users/ianveber/Desktop/Cloude CODE/3day-protocol';
+import { fileURLToPath } from 'node:url';
+
+// Resolved relative to THIS file, never hardcoded: an absolute path means a
+// copy of the pack silently tests the ORIGINAL rather than itself, so the
+// suite passes while proving nothing about the code you actually have.
+const PACK = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const GC = path.join(PACK, 'bin', 'gate-check');
 const GIT_BIN = execFileSync('which', ['git'], { encoding: 'utf8' }).trim();
 
