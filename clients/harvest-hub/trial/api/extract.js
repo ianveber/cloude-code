@@ -96,23 +96,40 @@ function spendBlock() {
   return null;
 }
 
-/* ── key hygiene ──────────────────────────────────────────────────────────────
- * callClaude returns { error, detail } on failure, where `detail` is the provider's own
- * response text. We never forward it. Not because Anthropic is known to echo the key —
- * it is not — but because "the upstream error body is safe to relay" is an assumption
- * about someone else's code that would have to stay true forever, on every status code,
- * for a key that guards a client's GDPR Article 9 workload.
+/* ── what may appear in a log line ────────────────────────────────────────────
  *
- * The client gets a short code we chose. The detail goes to the server log only, with any
- * literal occurrence of the key scrubbed on the way out.
+ * PROVIDER FAILURES ARE DESCRIBED, NEVER QUOTED.
+ *
+ * This used to scrub API keys out of the provider's error text and log the rest. Scrubbing keys
+ * is the easy half; the strings being scrubbed were full of personal data:
+ *
+ *   detail — the provider's raw HTTP error body. Whether it ever echoes the submitted document is
+ *            an assumption about someone else's error formatting, across every status code.
+ *   raw    — the MODEL'S OWN OUTPUT when it fails to parse as JSON. That is not a maybe. The
+ *            model's output IS the extracted fields, so a parse failure wrote a real person's
+ *            name, address and date of birth into the hosting provider's log retention, on a
+ *            workload that carries Article 9 health data. Nothing raised an error; the run just
+ *            left a trace of the client's customer behind, outliving the request that made it.
+ *
+ * The same trap is in V8 itself: a JSON.parse message quotes the input it choked on
+ * (`Unexpected token 'T', "{"ime": Testni Vzo"... is not valid JSON`), and here the input is the
+ * document. Error MESSAGES are therefore treated as payload everywhere in this file; error names
+ * and stack frames are not.
+ *
+ * The client still receives only a short code we chose — never the upstream body — because
+ * "someone else's error text is safe to relay" is an assumption that would have to hold forever,
+ * on every status code, for a key that guards this workload.
+ *
+ * What actually helps at 2am is the shape of a failure, not its contents: which provider code,
+ * how long the body was, whether it looked like JSON. All three are derivable without quoting a
+ * single character.
  */
-function scrub(s) {
-  let out = String(s ?? "");
-  for (const k of [process.env.ANTHROPIC_API_KEY, process.env.CLAUDE_API_KEY]) {
-    if (k && k.length > 8) out = out.split(k).join("[kljuc]");
-  }
-  // and anything that merely looks like one, in case it arrived by another route
-  return out.replace(/sk-[A-Za-z0-9_\-]{8,}/g, "[kljuc]").slice(0, 400);
+function describeFailure(s) {
+  const t = String(s ?? "");
+  if (!t) return "prazno";
+  const head = t.trimStart()[0];
+  const shape = head === "{" || head === "[" ? "JSON" : head === "<" ? "HTML/XML" : "besedilo";
+  return `${shape}, ${t.length} znakov (vsebina ni zabeležena)`;
 }
 
 /** Vercel usually pre-parses a JSON body; fall back to the stream when it has not. */
@@ -153,7 +170,10 @@ export default async function handler(req, res) {
   try {
     body = await readJsonBody(req);
   } catch (e) {
-    console.warn(`/api/extract bad body — ${scrub(e?.message)}`);
+    // NOT e.message. V8 quotes the offending input inside it — measured:
+    //   Unexpected token 'T', "{"ime": Testni Vzo"... is not valid JSON
+    // and the input here is the document. The error's class is all we need.
+    console.warn(`/api/extract bad body — ${e?.name || "Error"} (vsebina ni zabeležena)`);
     return send(res, 400, { error: "bad_request" });
   }
 
@@ -177,13 +197,17 @@ export default async function handler(req, res) {
       maxTokens: 3000,
     });
   } catch (e) {
-    console.error(`/api/extract threw — ${scrub(e?.stack || e)}`);
+    // The stack FRAMES are file:line and safe; the first line of a stack is the message, which
+    // is not (see the bad-body catch above). Keep the frames, drop the message.
+    const frames = String(e?.stack || "").split("\n").filter((l) => /^\s+at /.test(l))
+      .slice(0, 4).map((l) => l.trim()).join(" | ");
+    console.error(`/api/extract threw — ${e?.name || "Error"}${frames ? ` @ ${frames}` : ""}`);
     return send(res, 502, { error: "upstream" });
   }
 
   if (r?.error) {
-    // log the provider's own words (scrubbed), return only our own
-    console.warn(`/api/extract ${r.error} — ${scrub(r.detail || r.raw || "")}`);
+    // describe the provider's response, never quote it — see describeFailure()
+    console.warn(`/api/extract ${r.error} — ${describeFailure(r.detail || r.raw)}`);
     return send(res, 502, { error: String(r.error).slice(0, 40) });
   }
 

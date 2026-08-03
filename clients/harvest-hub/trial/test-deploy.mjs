@@ -1,7 +1,11 @@
 /**
- * test-csp.mjs — the hosted Content-Security-Policy must still allow the KLP preview to fit.
+ * test-deploy.mjs — the deployment settings that are load-bearing, and silent when wrong.
  *
- *   node test-csp.mjs
+ *   node test-deploy.mjs
+ *
+ * Two unrelated things live here for one reason: both are single lines of vercel.json that break
+ * something important without raising an error. The CSP crops documents; the region moves personal
+ * data to another continent. Neither shows up in a log.
  *
  * WHY THIS TEST EXISTS. The KLP preview is an `about:srcdoc` iframe, and a srcdoc frame inherits
  * the PARENT page's CSP. Inside it, lib/klp.js ships one inline <script> (FIT_SCRIPT) that scales
@@ -33,7 +37,7 @@ const ok = (cond, label, detail = "") => {
   else { fail++; console.log(`  ✗ ${label}${detail ? `\n      ${detail}` : ""}`); }
 };
 
-console.log("\n  CSP vs. the KLP preview\n");
+console.log("\n  deployment settings that fail quietly\n");
 
 /* ── the inline script, straight out of the module that ships it ───────── */
 
@@ -84,6 +88,21 @@ const connect = csp.split(";").map((d) => d.trim()).find((d) => d.startsWith("co
 ok(connect && !/https?:\/\//.test(connect),
   "connect-src names no external origin",
   `connect-src is: ${connect} — an external host here means documents go somewhere the DPA does not name`);
+
+/* ── where the function runs ────────────────────────────────────────────
+ * The DPA names the countries the client's data is processed in, and the client signs it. With no
+ * `regions` key Vercel picks its own default — which was iad1, Washington DC, measured on the
+ * first live deploy of this trial while the edge header still said fra1. The document text was
+ * crossing to the United States and the response header read `fra1::iad1`, where only the first
+ * half is the edge that received the request. Read the second half.
+ *
+ * Removing this line does not fail a build, does not log, and quietly falsifies a signed
+ * contract. Hence a test.
+ */
+ok(Array.isArray(vercel.regions) && vercel.regions.length === 1 && vercel.regions[0] === "fra1",
+  "the function is pinned to fra1 (Frankfurt), matching the DPA",
+  `regions is ${JSON.stringify(vercel.regions)} — with no pin Vercel defaults to iad1 (US) and ` +
+  `the transfer clause in 06-pogodba-obdelava-ocenjevanje.md becomes untrue`);
 
 console.log(`\n  ${pass} passed, ${fail} failed\n`);
 process.exit(fail ? 1 : 0);

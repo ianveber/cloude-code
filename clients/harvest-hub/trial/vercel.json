@@ -3,6 +3,7 @@
   "framework": null,
   "buildCommand": null,
   "outputDirectory": ".",
+  "regions": ["fra1"],
   "functions": {
     "api/extract.js": {
       "maxDuration": 60
