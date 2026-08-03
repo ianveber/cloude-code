@@ -18,7 +18,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { pageCharCount } from "../lib/layout.js";
-import { classify, DOC, DOC_LABEL } from "../lib/classify.js";
+import { classify, DOC, DOC_LABEL, SIG } from "../lib/classify.js";
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dir, "..");
@@ -261,10 +261,10 @@ ok(CLASSES.every((k) => typeof DOC_LABEL[k] === "string" && DOC_LABEL[k].length 
    && Object.keys(DOC_LABEL).length === CLASSES.length,
    `every class has a label and there are no orphan labels (${CLASSES.length})`);
 
-const SIGNALS = [
-  "po besedilu dokumenta", "po besedilu in imenu datoteke",
-  "dokument nima besedila", "besedilo ne ustreza nobenemu znanemu dokumentu",
-];
+// Read from the module, not copied: this asserts that a signal is always one of the FIXED
+// phrases (so no document text can be interpolated into it), which is the actual guarantee.
+// A hand-kept duplicate only asserts that someone updated two files in step.
+const SIGNALS = Object.values(SIG);
 {
   const produced = new Set();
   for (const f of files) produced.add(classify({ filename: f, ...texts[f] }).signal);
@@ -273,6 +273,30 @@ const SIGNALS = [
   ok([...produced].every((s) => SIGNALS.includes(s)),
      `every signal produced comes from the fixed set of ${SIGNALS.length} phrases (no document text can leak into it)`);
   ok(produced.size >= 3, `${produced.size} distinct signals exercised`);
+}
+
+/* ── the label may not call a born-digital document a scan ───────────────
+ *
+ * NEBRANO is chosen by CHARACTER COUNT against VISION_THRESHOLD, not by detecting a scan — a
+ * browser cannot detect a scan. So a born-digital document with a thin first page lands in
+ * NEBRANO too, and is then transmitted to the server as an IMAGE of the whole page rather than as
+ * extracted text. That is the case with the largest privacy consequence, and it is exactly the
+ * case where the screen used to say "Skeniran" and "dokument nima besedila" about a file the user
+ * knows perfectly well is neither.
+ *
+ * The margin is not theoretical: the client's smallest born-digital document measures 535
+ * characters against a threshold of 500 (protokol/G0-posnetek-procesa.md §4). One shorter name
+ * and a real KLP takes the image path.
+ */
+{
+  const label = DOC_LABEL[DOC.NEBRANO];
+  const sig = classify({ filename: "KLP.pdf", text: "Kontrolni list", chars: 12 }).signal;
+  ok(!/skenir/i.test(label),
+    `the label for an unreadable page does not claim the document is a scan ("${label}")`);
+  ok(!/nima besedila/i.test(sig),
+    `nor does the signal claim there is no text at all ("${sig}")`);
+  ok(/besedil/i.test(label),
+    `it names the actual condition — too little text ("${label}")`);
 }
 
 // the UI rule: no technical word may reach the screen

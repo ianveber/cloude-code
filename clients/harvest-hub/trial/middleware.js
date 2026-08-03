@@ -233,6 +233,7 @@ const SHELL = (title, body) => `<!doctype html>
   .err{margin:0 0 18px;padding:11px 13px;border-radius:12px;text-align:left;
        background:#fff1f0;color:#b3261e;font-size:14px}
   .foot{margin:22px 0 0;font-size:13px;color:var(--dim)}
+  .tih{color:#a1a1a8}
 </style>
 </head>
 <body>
@@ -278,18 +279,33 @@ function jsonResponse(payload, status) {
 const MESECI_RODILNIK = ['januarja', 'februarja', 'marca', 'aprila', 'maja', 'junija',
   'julija', 'avgusta', 'septembra', 'oktobra', 'novembra', 'decembra'];
 
+const ljubljana = (t, opts) =>
+  new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Ljubljana', ...opts }).format(t);
+
+/**
+ * The last usable DAY, plus the exact moment it shuts. Both, deliberately.
+ *
+ * The day alone is ambiguous in the one way that matters. TRIAL_ENDS=`2026-08-17` (a bare date,
+ * midnight UTC) and TRIAL_ENDS=`2026-08-17T22:00:00Z` (midnight Ljubljana) render the SAME last
+ * day — "17. avgusta 2026" — while the first shuts the trial at 02:00 that morning and the second
+ * at the end of it. Nearly a full day of a fourteen-day trial, invisible on the page, and no way
+ * to tell which one is deployed since neither `vercel env ls` nor `vercel env pull` will show you
+ * the value.
+ *
+ * Printing the closing instant removes the ambiguity for the reader and for whoever deployed it.
+ */
 function lastDayText(endsAt) {
   if (!endsAt) return null;
   const last = new Date(endsAt - 1000);
   try {
-    // Ljubljana, not UTC: at 22:00Z the two are already on different days, which is exactly the
-    // moment this trial ends.
-    const [d, m, y] = new Intl.DateTimeFormat('en-GB', {
-      day: 'numeric', month: 'numeric', year: 'numeric', timeZone: 'Europe/Ljubljana',
-    }).format(last).split('/').map(Number);
-    return `${d}. ${MESECI_RODILNIK[m - 1]} ${y}`;
+    const [d, m, y] = ljubljana(last, { day: 'numeric', month: 'numeric', year: 'numeric' })
+      .split('/').map(Number);
+    const clock = ljubljana(new Date(endsAt), { hour: '2-digit', minute: '2-digit', hour12: false });
+    const [cd, cm] = ljubljana(new Date(endsAt), { day: 'numeric', month: 'numeric' })
+      .split('/').map(Number);
+    return { day: `${d}. ${MESECI_RODILNIK[m - 1]} ${y}`, shuts: `${cd}. ${cm}. ob ${clock}` };
   } catch {
-    return last.toISOString().slice(0, 10);
+    return { day: last.toISOString().slice(0, 10), shuts: new Date(endsAt).toISOString() };
   }
 }
 
@@ -309,7 +325,8 @@ function gatePage({ target = '/', error = '', status = 401, endsAt = null } = {}
       <button type="submit">Odpri</button>
     </form>
     <p class="foot">Kodo vnesete samo enkrat — brskalnik si jo zapomni do konca preizkusa.${
-      last ? `<br>Preizkus je odprt do vključno <strong>${escapeHtml(last)}</strong>.` : ''
+      last ? `<br>Preizkus je odprt do vključno <strong>${escapeHtml(last.day)}</strong>` +
+             ` <span class="tih">(zapre se ${escapeHtml(last.shuts)})</span>.` : ''
     }</p>`
     ),
     status

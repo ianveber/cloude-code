@@ -281,9 +281,20 @@ Vseh 15 priloženih vzorcev je bilo izmerjenih neposredno (`PyMuPDF`, 30. 7. 202
 | 14 | 8 – Business box | 3 | 3.554 | wkhtmltopdf + iTextSharp 5.1.2 | besedilo |
 | **15** | **9 – Kolektivno Zdravje** | 2 | **21** | **Canon iR-ADV C3320** | **slika + rokopis** |
 
-**12 od 15 ima uporaben besedilni sloj, 3 ga nimajo [M].** Razmik med najslabšim digitalnim
-dokumentom (535 znakov) in najboljšim skeniranim (132) je **štirikraten**, zato je razvrščanje po
-pragu števila znakov trdno, ne mejno. *(Prikaz uporablja prag 500 — `demo/lib/layout.js`.)*
+**12 od 15 ima uporaben besedilni sloj, 3 ga nimajo [M].**
+
+> **Popravek (3. 8. 2026).** Prejšnja različica tega odstavka je trdila, da je razvrščanje »trdno,
+> ne mejno«, ker je razmik med najslabšim digitalnim dokumentom (535 znakov) in najboljšim
+> skeniranim (132) štirikraten. **To je napačna primerjava.** Razvrščanje ne primerja obeh skupin
+> med sabo — vsak dokument primerja s **pragom 500 znakov** (`demo/lib/layout.js`). Merodajen je
+> torej razmik med 535 in 500, kar je **7 %, ne štirikratnik**.
+>
+> Posledica: **»KLP — en zastopnik« je 35 znakov nad pragom.** Isti dokument s krajšim imenom,
+> krajšim naslovom ali enim praznim poljem pade pod prag in se ne prebere iz besedila, temveč iz
+> **slike celotne prve strani** — ki nosi tudi podpise, žige in ročne opombe. Za Fazo 1 to pomeni
+> dvoje: prag je treba določiti z meritvijo na večjem vzorcu, ne prevzeti, in pot s sliko mora biti
+> v pogodbi opisana kot **pot za dokumente brez uporabnega besedilnega sloja**, ne kot »pot za
+> skenirane dokumente« (glej Aneks 1, A3(b)).
 
 Manjše odstopanje od tehnične priloge: `02-ponudba-prenos-zero.md` navaja 78 in 164 znakov za
 dokumenta 8 in 9. Naša meritev je 65 in 132, ker **ne šteje presledkov**. Sklep je isti; številke v

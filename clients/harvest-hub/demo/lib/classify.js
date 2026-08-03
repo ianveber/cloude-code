@@ -8,10 +8,18 @@
  *
  * THREE DESIGN DECISIONS, all of them about not lying.
  *
- * 1. A scan is not classified. Below VISION_THRESHOLD there is no text to fingerprint, so we
- *    return NEBRANO ("preberem s slike") and let the reading step decide. Guessing the class of
- *    a page we cannot read would be the single easiest way to put a wrong document in the wrong
- *    folder — and it would look right on screen.
+ * 1. A page with too little text is not classified. The test is a CHARACTER COUNT against
+ *    VISION_THRESHOLD — not "is this a scan", which a browser cannot tell. Below it there is not
+ *    enough text to fingerprint, so we return NEBRANO and let the reading step work from the page
+ *    image. Guessing the class of a page we cannot read would be the single easiest way to put a
+ *    wrong document in the wrong folder — and it would look right on screen.
+ *
+ *    In practice these are scans, but not only: a born-digital document with a thin first page
+ *    lands here too, and is then transmitted as an IMAGE of the page. The label must therefore
+ *    not say "Skeniran" — it would be telling the user something false about their own file, in
+ *    the one case where the privacy consequence is largest. The client's smallest born-digital
+ *    document measures 535 characters against a threshold of 500 (protokol/G0-posnetek-procesa.md
+ *    §4), so this is a 7% margin, not a comfortable one.
  *
  * 2. The filename can only RAISE confidence, never decide. A bonus is added to a class only if
  *    the TEXT already scored for that class. So a 545 notice saved under a KLP filename is still
@@ -46,14 +54,17 @@ export const DOC_LABEL = {
   klp: "Kontrolni list",
   privolitvena: "Privolitvena izjava",
   neznano: "Ne prepoznam — za ročni pregled",
-  nebrano: "Skeniran — preberem s slike",
+  nebrano: "Brez besedilnega sloja — preberem s slike",
 };
 
-/** Screen-facing too: a short phrase naming what decided it. Never carries a document value. */
-const SIG = {
+/** Screen-facing too: a short phrase naming what decided it. Never carries a document value.
+ *  Exported so tests can assert "the signal is one of THESE" without keeping a second copy of the
+ *  strings — the copy is what breaks when a phrase is corrected, which is exactly when you least
+ *  want a red test to be about bookkeeping rather than about behaviour. */
+export const SIG = {
   BESEDILO: "po besedilu dokumenta",
   BESEDILO_IME: "po besedilu in imenu datoteke",
-  BREZ_BESEDILA: "dokument nima besedila",
+  BREZ_BESEDILA: "na strani ni dovolj besedila za prepoznavo",
   NIC: "besedilo ne ustreza nobenemu znanemu dokumentu",
 };
 

@@ -175,7 +175,25 @@ await withEnv({ TRIAL_PASSCODE: PASS, TRIAL_ENDS: "2026-08-17T22:00:00Z" }, asyn
   ok(shown === "17. avgusta 2026",
     "…and names the LAST USABLE day, in the genitive Slovene the sentence needs",
     `shows "${shown}" — want "17. avgusta 2026" (18 Aug would be the cut-off, "avgust" the wrong case)`);
-  ok(!/18\.\s*avgust/.test(html), "…and does not show the day after the end");
+  ok(/zapre se 18\. 8\. ob 00:00/.test(html),
+    "…and the exact closing moment, so the deployed value is unambiguous",
+    (html.match(/\(zapre se [^)]*\)/) || ["(not shown)"])[0]);
+});
+
+/* ── 5b · the ambiguity the closing moment exists to remove ──────────────
+ * A bare date and a midnight-Ljubljana timestamp print the SAME last day while shutting nearly a
+ * day apart. If the page showed only the day, these two would be indistinguishable from outside —
+ * which is exactly the state this trial was in until it was measured. */
+await withEnv({ TRIAL_PASSCODE: PASS, TRIAL_ENDS: "2026-08-17" }, async () => {
+  const html = await (await middleware(req("/"))).text();
+  const day = (html.match(/<strong>([^<]*)<\/strong>/) || [])[1];
+  const shuts = (html.match(/\(zapre se ([^)]*)\)/) || [])[1];
+  ok(day === "17. avgusta 2026",
+    "a BARE date shows the same last day as the timestamped one…", `shows "${day}"`);
+  ok(shuts === "17. 8. ob 02:00",
+    "…but a different closing moment — 02:00 that morning, not the end of the day",
+    `shows "${shuts}" — if this ever reads the same as the timestamped case, the page has stopped ` +
+    `distinguishing them and a whole day of the trial can vanish unnoticed`);
 
   // 22:00Z is already the next day in Ljubljana. Formatting in UTC would print 18 Aug here, so
   // this pins the timezone rather than the arithmetic.

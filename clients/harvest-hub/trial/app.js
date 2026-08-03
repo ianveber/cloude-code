@@ -348,7 +348,7 @@ function hostedNotice() {
   el.className = "banner info";
   el.innerHTML = `<span>🌐</span><div>
       <div class="t">To je preizkusna različica na našem strežniku</div>
-      <div class="muted">Besedilo strani (pri skeniranih dokumentih slika strani) potuje na naš
+      <div class="muted">Besedilo strani (pri dokumentih brez besedilnega sloja slika strani) potuje na naš
       strežnik in naprej v storitev za branje. Pri nas se ne shrani nič — ne dokument, ne prebrani
       podatki. Storitev za branje jih lahko po svojih pogojih zadrži krajši čas za nadzor zlorab.
       Preden sem pošljete resnične ponudbe strank, mora biti podpisana pogodba o obdelavi osebnih
@@ -693,7 +693,10 @@ const SCOPE_DOES = [
    * contains health data, that difference is not a nuance.
    */
   "Datoteke same ostanejo na vašem računalniku — kot datoteke se nikamor ne naložijo. "
-  + "Za branje se posreduje besedilo strani, pri skeniranih dokumentih pa slika strani. "
+  + "Za branje se posreduje besedilo strani, pri dokumentih brez uporabnega besedilnega sloja "
+  + "pa slika prve strani. Katero pot uporabi, odloči število znakov na prvi strani (prag 500), "
+  + "ne to, ali je dokument skeniran — tako je lahko po sliki obravnavan tudi digitalno izdelan "
+  + "dokument z malo besedila. "
   + "Ta predstavitev ne shrani ničesar; kje in pod čigavim računom branje teče v produkciji, "
   + "pisno potrdimo v Fazi 0.",
 ];

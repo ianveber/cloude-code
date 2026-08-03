@@ -43,8 +43,16 @@ uredi z ločeno pogodbo pred Fazo 1.
 5(d) in 5(e) osnovne pogodbe uporablja naslednje; točke 5(a), 5(c) in 5(f) ostanejo nespremenjene.
 
 (b) Dokument se **ne naloži** na strežnik. Bere se v brskalniku sodelavca upravljavca; na strežnik
-obdelovalca potuje **izluščeno besedilo prve strani**, pri skeniranem dokumentu pa **izrisana
-slika prve strani**. Datoteka sama ostane na napravi sodelavca. Povezava je šifrirana (TLS).
+obdelovalca potuje **izluščeno besedilo prve strani**, pri dokumentu **brez uporabnega besedilnega
+sloja** pa **izrisana slika prve strani**. Datoteka sama ostane na napravi sodelavca. Povezava je
+šifrirana (TLS).
+
+Katero od obeh poti uporabi, določi brskalnik sam, in sicer **glede na število znakov, ki jih
+izlušči s prve strani (prag 500 znakov)** — ne glede na to, ali je dokument skeniran. Praviloma gre
+za skenirane dokumente, **ni pa izključeno, da se tako obravnava tudi digitalno izdelan dokument z
+malo besedila**; v tem primeru na strežnik potuje slika celotne prve strani. Pogodbenici to
+izrecno ugotavljata, ker slika strani lahko vsebuje tudi elemente, ki jih izluščeno besedilo ne bi
+(podpisi, žigi, ročne opombe).
 
 (d) Obdelovalec **ne vzpostavi podatkovne baze in ne shrani ničesar**: ne dokumenta, ne besedila,
 ne slike, ne prebranih podatkov. Strežniška funkcija podatek obdela v okviru posameznega zahtevka
