@@ -23,7 +23,7 @@ DEMO="../demo"
 [ -d "$DEMO" ] || { echo "  ✗ $DEMO not found" >&2; exit 1; }
 
 echo "  · clearing previously assembled files"
-rm -rf lib vendor index.html app.js
+rm -rf lib vendor vzorec index.html app.js
 
 echo "  · copying the client"
 cp "$DEMO/index.html" "$DEMO/app.js" .
@@ -36,6 +36,20 @@ done
 
 echo "  · copying server-side modules (used by api/extract.js)"
 cp "$DEMO/lib/claude.mjs" "$DEMO/lib/mistral.mjs" lib/
+
+# The synthetic documents the page offers for download. These are the ONLY documents anyone may
+# put through the hosted trial before the DPA amendment is signed, so a build that quietly ships
+# without them leaves a dead link exactly where somebody is deciding whether to reach for a real
+# client offer instead. Missing → refuse.
+echo "  · copying the sample documents offered in the page"
+mkdir -p vzorec
+for f in Vzorcna-ponudba.pdf Vzorcni-register.csv; do
+  if [ ! -f "$DEMO/vzorec/$f" ]; then
+    echo "    ✗ $DEMO/vzorec/$f is missing — index.html offers it for download. REFUSING." >&2
+    exit 1
+  fi
+  cp "$DEMO/vzorec/$f" vzorec/
+done
 
 # /vendor/ is not a directory in the demo — server.mjs rewrites it onto
 # node_modules/pdfjs-dist/build. Static hosting has no such rewrite, so the two files the browser
@@ -75,9 +89,37 @@ else
   if [ -z "$PAT" ]; then
     echo "    ✗ the deny-list is empty — REFUSING" >&2; BAD=1
   elif grep -rlE "$PAT" --include="*.js" --include="*.mjs" \
-         --include="*.html" --include="*.json" . 2>/dev/null | grep -v node_modules | grep -q .; then
+         --include="*.html" --include="*.json" --include="*.csv" --include="*.txt" \
+         . 2>/dev/null | grep -v node_modules | grep -q .; then
     echo "    ✗ a real client name appears in the assembled output — REFUSING" >&2; BAD=1
   fi
+
+  # The line above reads text. The page also offers a PDF, and a PDF hides its text inside
+  # compressed streams where grep cannot see it — so a real client offer dropped into vzorec/ by
+  # mistake would sail through every check above and be served, by us, for download.
+  #
+  # pdf-text.mjs sees through that, using the same pdfjs the app reads documents with. NOT
+  # pdftotext: an earlier version of this check piped `pdftotext … | grep` on a machine without
+  # poppler, discarded stderr, and pronounced the file clean having read nothing at all. A guard
+  # with an optional dependency reports success when the dependency is absent.
+  #
+  # An unreadable document is not a clean one, so any failure here REFUSES. This is the single
+  # file on the deployment that we actively invite people to click.
+  for pdf in vzorec/*.pdf; do
+    [ -e "$pdf" ] || continue
+    if ! TXT=$(node pdf-text.mjs "$pdf" 2>&1); then
+      echo "    ✗ could not read inside $pdf — REFUSING" >&2
+      echo "      $TXT" >&2
+      BAD=1
+      continue
+    fi
+    if printf '%s' "$TXT" | grep -qE "$PAT"; then
+      echo "    ✗ a real client name appears INSIDE $pdf — REFUSING" >&2; BAD=1
+    elif ! printf '%s' "$TXT" | grep -qi "VZOR"; then
+      # Every sample we ship says so on its face. A PDF that does not is not one of ours.
+      echo "    ✗ $pdf is not marked as a sample (no 'VZOR...' on the page) — REFUSING" >&2; BAD=1
+    fi
+  done
 fi
 if grep -rlE "sk-ant-api03-[A-Za-z0-9_-]{20}" . 2>/dev/null | grep -v node_modules | grep -q .; then
   echo "    ✗ an API key appears in the assembled output — REFUSING" >&2; BAD=1

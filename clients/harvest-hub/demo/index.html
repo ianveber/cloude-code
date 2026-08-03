@@ -97,6 +97,11 @@
   .linky{appearance:none;border:0;background:none;color:var(--blue);font:inherit;
          font-size:14px;padding:0;cursor:pointer}
   .linky:hover{text-decoration:underline}
+  /* the sample-document line under the drop zone — present, never competing with it */
+  #vzorecLine{margin:10px 2px 0;font-size:13px;color:var(--dim)}
+  #vzorecLine a{color:var(--blue);text-decoration:none}
+  #vzorecLine a:hover{text-decoration:underline}
+  #vzorecLine .vzorecNote{display:block;margin-top:2px;color:var(--dim2);font-size:12px}
 
   /* packet list — one line per document in the drop.
      The whole LIST is the grid and each row is display:contents, so the three columns are shared
@@ -183,6 +188,20 @@
     <input type="file" id="file" accept="application/pdf" multiple>
     <input type="file" id="folder" webkitdirectory directory multiple>
   </div>
+
+  <!-- The test document travels WITH the app.
+       Before the DPA amendment is signed, real client offers must not be uploaded here — so the
+       only way anyone can try this is if a safe document is within reach at the moment they want
+       to try it. Emailing it separately guarantees somebody reaches for a real one instead. Both
+       files are invented: the labels are Merkur's (the classifier fingerprints them), every value
+       is made up. `download` is what makes the browser save rather than open the PDF inline. -->
+  <p id="vzorecLine">
+    Nimate ponudbe pri roki?
+    <a href="vzorec/Vzorcna-ponudba.pdf" download>Prenesite vzorčno ponudbo</a>
+    in jo povlecite sem &middot;
+    <a href="vzorec/Vzorcni-register.csv" download>vzorčni register zastopnikov</a>
+    <span class="vzorecNote">izmišljeni podatki — varno za preizkus</span>
+  </p>
 
   <div class="card hide" id="statusCard">
     <div class="status" id="status"><span class="spin"></span><span>Berem dokument…</span></div>

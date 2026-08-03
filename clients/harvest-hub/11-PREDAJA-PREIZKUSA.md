@@ -11,7 +11,8 @@ zgodi na koncu, in kaj moraš urediti **preden** kdor koli naloži resnično pon
 |---|---|
 | **Naslov** | https://harvest-hub-preizkus.vercel.app |
 | **Koda za vstop** | v `~/ais-client-data/harvest-hub/preizkus-dostop.txt` |
-| **Konec preizkusa** | **17. 8. 2026** — po tem se dostop zapre sam |
+| **Poteka** | **4. 8. – 17. 8. 2026** (14 dni) — po tem se dostop zapre sam |
+| **Vzorčni dokument** | v sami aplikaciji, pod poljem za nalaganje |
 
 > Kode v tem zapisu namenoma ni. Repozitorij je javen, koda pa je edino, kar preizkus varuje —
 > zapisana tukaj bi vrata odprla vsem. Živi ob podatkih stranke, zunaj repozitorija:
@@ -26,13 +27,22 @@ ne kaže nobena javna povezava.
 14 dni:
 
 ```bash
-cd "/Users/ianveber/Desktop/Cloude CODE/clients/harvest-hub/trial" && printf '2026-08-24' | vercel env add TRIAL_ENDS production --force && vercel deploy --prod --yes
+cd "/Users/ianveber/Desktop/Cloude CODE/clients/harvest-hub/trial" && vercel env rm TRIAL_ENDS production --yes; echo "2026-08-24T22:00:00Z" | vercel env add TRIAL_ENDS production && vercel deploy --prod --yes
 ```
+
+**Vedno preveri, kaj je dejansko nastavljeno** — vstopna stran izpiše svoj zadnji dan sama:
+
+```bash
+curl -s https://harvest-hub-preizkus.vercel.app/ | grep -o "Preizkus je odprt do vključno [^<]*"
+```
+
+Ne zanašaj se na `vercel env ls` ali `vercel env pull`: prvi pokaže samo, da spremenljivka
+obstaja, drugi pa za vse šifrirane vrednosti izpiše prazno. Edini zanesljiv vir je stran sama.
 
 Zapreti ga takoj (npr. če se dogovorita drugače):
 
 ```bash
-cd "/Users/ianveber/Desktop/Cloude CODE/clients/harvest-hub/trial" && printf '2026-08-03' | vercel env add TRIAL_ENDS production --force && vercel deploy --prod --yes
+cd "/Users/ianveber/Desktop/Cloude CODE/clients/harvest-hub/trial" && vercel env rm TRIAL_ENDS production --yes; echo "2020-01-01T00:00:00Z" | vercel env add TRIAL_ENDS production && vercel deploy --prod --yes
 ```
 
 ---
@@ -48,7 +58,8 @@ aneks ni podpisan, imaš pogodbo, ki opisuje nekaj drugega, kot se dejansko doga
 zdravstvenimi podatki po 9. členu je to slabše kot nič.
 
 > Do podpisa jim preizkus lahko izročiš samo z izrecnim navodilom, naj vanj nalagajo **izmišljene
-> ali anonimizirane** dokumente. Vzorčni dokument za to je priložen (spodaj).
+> ali anonimizirane** dokumente. Vzorčna ponudba je za to vgrajena v samo stran, pod poljem za
+> nalaganje — ni je treba pripenjati in je ne morejo zgrešiti.
 
 **2 · Zgornja meja porabe pri Anthropicu.** Vgrajena omejitev v strežniku velja za posamezen
 strežniški proces, ne za preizkus kot celoto — ustavi podivjano zanko, ni pa strop. Strop nastavi
@@ -70,13 +81,15 @@ zahtevo predložiš.
 > Deluje tako, da ponudbo (ali celo mapo) povlečete na stran. Kontrolni list se izpolni sam,
 > zraven pa piše, kateri podatek je prebran iz ponudbe in kateri potrebuje vašo potrditev.
 >
-> Preizkus je odprt do **17. 8. 2026**, potem se zapre sam.
+> Preizkus je odprt do **17. 8. 2026**, potem se zapre sam. Datum piše tudi na vstopni strani.
 >
 > Dvoje vas prosim, da veste vnaprej:
 >
-> 1. **Priložen je vzorčni dokument z izmišljenimi podatki.** Dokler ne podpiševa priloženega
->    aneksa k pogodbi o obdelavi osebnih podatkov, vas prosim, da nalagate ta vzorec in ne
->    resničnih ponudb strank. Aneks pošiljam v priponki — gre za eno stran.
+> 1. **Vzorčni dokument je kar v aplikaciji** — pod poljem za nalaganje piše »Nimate ponudbe pri
+>    roki?«, kliknete *Prenesite vzorčno ponudbo* in jo povlečete nazaj na stran. Podatki v njej
+>    so izmišljeni. Dokler ne podpiševa priloženega aneksa k pogodbi o obdelavi osebnih podatkov,
+>    vas prosim, da uporabljate ta vzorec in ne resničnih ponudb strank. Aneks je v priponki —
+>    ena stran.
 > 2. **Nič se ne shrani.** Ne dokument, ne prebrani podatki. To pomeni tudi, da po koncu
 >    preizkusa ni ničesar za izbrisati — in da preizkus ne beleži, kdo je kaj delal.
 >
@@ -85,7 +98,8 @@ zahtevo predložiš.
 > Lep pozdrav,
 > Anej
 
-Priloge: `Vzorcna-ponudba.pdf`, `10-aneks-1-gostovani-preizkus.md`
+Priloga: `10-aneks-1-gostovani-preizkus.md`
+(vzorčno ponudbo prenesejo iz same aplikacije — ni treba pripenjati)
 
 ---
 
@@ -95,8 +109,9 @@ Vrstni red je namenoma tak: najprej kaj zna, potem kje neha.
 
 | | Kaj naredijo | Kaj morajo videti |
 |---|---|---|
-| 1 | Povlečejo eno ponudbo | Izpolnjen kontrolni list, ob vsakem podatku oznaka izvora. Miška nad oznako pove, zakaj je taka. |
-| 2 | Kliknejo *Naloži register zastopnikov* in naložijo svoj seznam (CSV, dva stolpca) | Številka zastopnika se izpolni, oznaka se spremeni v *Iz registra*. Seznam ostane v brskalniku. |
+| 0 | Kliknejo *Prenesite vzorčno ponudbo* pod poljem za nalaganje | Prenese se `Vzorcna-ponudba.pdf` z izmišljenimi podatki — edini dokument, ki ga smejo uporabiti pred podpisom aneksa. |
+| 1 | Povlečejo to ponudbo nazaj na stran | Izpolnjen kontrolni list, ob vsakem podatku oznaka izvora. Miška nad oznako pove, zakaj je taka. |
+| 2 | Kliknejo *Naloži register zastopnikov* in naložijo svoj seznam (CSV, dva stolpca) — ali vzorčnega s strani | Številka zastopnika se izpolni, oznaka se spremeni v *Iz registra*. Seznam ostane v brskalniku. |
 | 3 | Povlečejo cel paket naenkrat | Seznam paketa se izriše **prej** kot karkoli drugega — nič se ne more tiho preskočiti. |
 | 4 | Povlečejo paket **brez** 545. člena | ⚠️ *Paket zadržan*. Kontrola, ki ustavi. |
 | 5 | Povlečejo kolektivno polico | *Kontrolnega lista ne izpolnim* — zavarovanci niso poimensko navedeni. Brez predogleda, brez gumbov. |
@@ -123,7 +138,7 @@ Tri vprašanja, ki odločijo o Fazi 1 — ne »vam je bilo všeč«:
 
 ---
 
-## Kaj se zgodi 17. 8.
+## Kaj se zgodi 18. 8.
 
 Dostop se zapre sam — tudi tistim, ki so kodo že vnesli. Strežnik odgovori z zavrnitvijo in
 kratkim pojasnilom v slovenščini. **Ni ročnega koraka in ne moreš pozabiti.**
@@ -159,7 +174,7 @@ Povej vnaprej, ne ko vprašajo:
 
 | Simptom | Kaj je | Kaj narediti |
 |---|---|---|
-| »Preizkus je zaključen« pred 17. 8. | `TRIAL_ENDS` je napačen ali neberljiv — vrata se v tem primeru **zaprejo**, ne odprejo | Nastavi datum znova (ukaz zgoraj) |
+| »Preizkus je zaključen« pred 18. 8. | `TRIAL_ENDS` je napačen ali neberljiv — vrata se v tem primeru **zaprejo**, ne odprejo | Nastavi datum znova (ukaz zgoraj) |
 | Stran zahteva kodo, čeprav so jo vnesli | Piškotek je potekel ali drug brskalnik | Vnesejo znova |
 | Branje se ne konča | Ključ ali strop porabe pri Anthropicu | `vercel logs harvest-hub-preizkus` |
 | Vse je jantarno | Register ni naložen | Kliknejo *Naloži register zastopnikov* |

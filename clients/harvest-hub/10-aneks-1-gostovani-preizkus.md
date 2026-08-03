@@ -21,10 +21,16 @@ predhodnega pisnega soglasja izrecno prepoveduje.
 
 **A1 · Predmet in trajanje aneksa.** Aneks ureja obdelavo prek spletne različice prikaza
 (»preizkus«), dostopne na naslovu **https://harvest-hub-preizkus.vercel.app**. Preizkus traja
-**14 dni, do vključno [datum konca]**. Po tem datumu se dostop **zapre samodejno**: strežnik od
-tega dne vsem zahtevkom odgovori z zavrnitvijo, tudi tistim, ki so kodo za vstop že vnesli.
-Zaprtje ni odvisno od ročnega ukrepa obdelovalca. Upravljavec lahko preizkus kadar koli prej
+**14 dni, od 4. avgusta 2026 do vključno 17. avgusta 2026**. Po tem se dostop **zapre samodejno**:
+strežnik vsem zahtevkom odgovori z zavrnitvijo, tudi tistim, ki so kodo za vstop že vnesli.
+Zaprtje ni odvisno od ročnega ukrepa obdelovalca. Datum, do katerega je preizkus odprt, je izpisan
+na vstopni strani, tako da ga lahko upravljavec kadar koli preveri sam. Upravljavec lahko preizkus kadar koli prej
 pisno prekine; s tem nastopi 9. točka osnovne pogodbe.
+
+**A1a · Vzorčni dokument.** Na strani preizkusa je za prenos na voljo **vzorčna ponudba z
+izmišljenimi podatki** in vzorčni seznam zastopnikov. Namenjena sta preizkušanju brez osebnih
+podatkov. Do podpisa tega aneksa upravljavec v preizkus nalaga **izključno ta vzorčna dokumenta**
+ali lastne anonimizirane dokumente, ne pa resničnih ponudb strank.
 
 **A2 · Kdo sme dostopati.** Dostop je zaščiten s kodo za vstop, ki jo obdelovalec izroči
 kontaktni osebi upravljavca. Upravljavec kodo posreduje **samo svojim pooblaščenim sodelavcem**

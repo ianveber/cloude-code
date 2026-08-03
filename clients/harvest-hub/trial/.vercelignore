@@ -1,0 +1,4 @@
+node_modules
+test-*.mjs
+pdf-text.mjs
+build.sh

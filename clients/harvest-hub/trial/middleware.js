@@ -87,11 +87,29 @@ function readCookie(request, name) {
 }
 
 /* Only ever redirect back to a path on this same site. Without this check a
-   crafted link could bounce someone to another domain after they log in. */
+   crafted link could bounce someone to another domain after they log in.
+
+   Rejecting `//` alone is not enough. Browsers normalise a BACKSLASH after the
+   leading slash to the same thing, so `/\evil.test` is fetched as `//evil.test`
+   — an off-site redirect that starts with a single '/' and passes any check
+   looking only for '//'. Found by test-gate.mjs, which asserts all three forms.
+
+   So rather than enumerate the tricks, resolve the target the way a browser
+   would and keep it only if it stayed on this origin. Anything else goes to '/'. */
 function safeTarget(raw) {
-  if (typeof raw !== 'string') return '/';
-  if (!raw.startsWith('/') || raw.startsWith('//')) return '/';
-  return raw;
+  if (typeof raw !== 'string' || !raw.startsWith('/')) return '/';
+  if (raw.startsWith('//') || raw.startsWith('/\\')) return '/';
+  // Backslashes anywhere in the authority position are treated as slashes by
+  // browsers; there is no legitimate use for one in a path we generate.
+  if (raw.includes('\\')) return '/';
+  let u;
+  try {
+    u = new URL(raw, 'https://placeholder.invalid');
+  } catch {
+    return '/';
+  }
+  if (u.origin !== 'https://placeholder.invalid') return '/';
+  return u.pathname + u.search;
 }
 
 const escapeHtml = (s) =>
@@ -118,7 +136,24 @@ const DENY = [
   /^\/api\/(?!extract$)/, // only /api/extract exists
   /^\/(\.|node_modules\/|scripts\/|out\/)/,
   /(truth\.json|register-zastopnikov\.json)$/i,
-  /\.(pdf|md|sh|env|log|lock)$/i,
+  /\.(md|sh|env|log|lock)$/i,
+  // Every .mjs at the root is ours, not the browser's: the test suites and pdf-text.mjs. The
+  // browser's own modules live under lib/ and vendor/ and are untouched by this.
+  /^\/[^/]+\.mjs$/i,
+  /**
+   * PDFs are denied EVERYWHERE EXCEPT /vzorec/.
+   *
+   * The blanket `\.pdf$` rule that used to be here was right when nothing on the deployment was
+   * a PDF. The page now offers a sample ponudba for download — which is the only document anyone
+   * may put through the trial before the DPA amendment is signed — and the blanket rule 404'd it,
+   * turning the one safe path into a dead link and leaving a real client offer as the easiest
+   * thing to reach for instead.
+   *
+   * /vzorec/ is an allowlisted directory: build.sh copies exactly two named files into it and
+   * refuses if either is missing, reads inside the PDF with pdf-text.mjs, and rejects it unless
+   * it is free of client names AND marked as a sample on its face.
+   */
+  /^(?!\/vzorec\/)[^?]*\.pdf$/i,
 ];
 const denied = (pathname) => DENY.some((re) => re.test(pathname));
 
@@ -222,7 +257,44 @@ function jsonResponse(payload, status) {
   });
 }
 
-function gatePage({ target = '/', error = '', status = 401 } = {}) {
+/**
+ * The trial's last day, in Slovene, for the reader — and for whoever deployed it.
+ *
+ * TRIAL_ENDS is the single setting that decides whether this thing ever closes, and an unset one
+ * fails OPEN: trialClock() returns { ended: false } and the trial runs forever. That is the one
+ * failure in this file that produces no error, no log line and no visible difference on the day
+ * it matters. `vercel env ls` shows only that a variable exists, and `vercel env pull` writes an
+ * empty placeholder for every encrypted value — so neither can tell you what was actually stored.
+ *
+ * Printing it on the gate page turns an invisible setting into one anybody can read from outside
+ * with a single request, before handing the code to a client. It is also simply what the reader
+ * wants to know, and what Aneks 1 (A1) promises them in writing.
+ *
+ * TRIAL_ENDS is the first moment the trial is OFF, so the last usable day is the day before it.
+ */
+/* Genitive, because the phrase is "do … 17. avgusta", not "do … 17. avgust". Intl gives the
+   nominative ('avgust') and there is no option that fixes it, so the twelve words are written
+   out. Cheaper than being wrong on a page a client reads. */
+const MESECI_RODILNIK = ['januarja', 'februarja', 'marca', 'aprila', 'maja', 'junija',
+  'julija', 'avgusta', 'septembra', 'oktobra', 'novembra', 'decembra'];
+
+function lastDayText(endsAt) {
+  if (!endsAt) return null;
+  const last = new Date(endsAt - 1000);
+  try {
+    // Ljubljana, not UTC: at 22:00Z the two are already on different days, which is exactly the
+    // moment this trial ends.
+    const [d, m, y] = new Intl.DateTimeFormat('en-GB', {
+      day: 'numeric', month: 'numeric', year: 'numeric', timeZone: 'Europe/Ljubljana',
+    }).format(last).split('/').map(Number);
+    return `${d}. ${MESECI_RODILNIK[m - 1]} ${y}`;
+  } catch {
+    return last.toISOString().slice(0, 10);
+  }
+}
+
+function gatePage({ target = '/', error = '', status = 401, endsAt = null } = {}) {
+  const last = lastDayText(endsAt);
   return htmlResponse(
     SHELL(
       'Prenos dokumentacije — AIS',
@@ -236,7 +308,9 @@ function gatePage({ target = '/', error = '', status = 401 } = {}) {
              autocapitalize="off" autocorrect="off" spellcheck="false" autofocus required>
       <button type="submit">Odpri</button>
     </form>
-    <p class="foot">Kodo vnesete samo enkrat — brskalnik si jo zapomni do konca preizkusa.</p>`
+    <p class="foot">Kodo vnesete samo enkrat — brskalnik si jo zapomni do konca preizkusa.${
+      last ? `<br>Preizkus je odprt do vključno <strong>${escapeHtml(last)}</strong>.` : ''
+    }</p>`
     ),
     status
   );
@@ -275,7 +349,10 @@ export default async function middleware(request) {
 
   // The clock outranks the cookie: when the trial is over it is over for
   // everybody, including someone still holding a valid one.
-  if (trialClock().ended) {
+  // Read the clock ONCE per request. Two separate reads could straddle the expiry moment and
+  // hand out a cookie for a trial that had just closed.
+  const clock = trialClock();
+  if (clock.ended) {
     return isApi ? jsonResponse({ error: 'preizkus_zakljucen' }, 410) : endedPage();
   }
 
@@ -283,7 +360,8 @@ export default async function middleware(request) {
   if (!passcode) {
     return isApi
       ? jsonResponse({ error: 'zaklenjeno' }, 503)
-      : gatePage({ error: 'Stran trenutno ni na voljo. Obrnite se na AIS.', status: 503 });
+      : gatePage({ error: 'Stran trenutno ni na voljo. Obrnite se na AIS.', status: 503,
+                   endsAt: clock.endsAt });
   }
 
   const expected = await token(passcode);
@@ -313,7 +391,7 @@ export default async function middleware(request) {
     }
 
     if (safeEqual(await token(given), expected)) {
-      const maxAge = cookieMaxAge(trialClock().endsAt);
+      const maxAge = cookieMaxAge(clock.endsAt);
       return new Response(null, {
         status: 303, // 303 so the browser follows with GET, not another POST
         headers: {
@@ -324,8 +402,9 @@ export default async function middleware(request) {
       });
     }
 
-    return gatePage({ target, error: 'Koda ni pravilna. Poskusite znova.', status: 401 });
+    return gatePage({ target, error: 'Koda ni pravilna. Poskusite znova.', status: 401,
+                      endsAt: clock.endsAt });
   }
 
-  return gatePage({ target: path + url.search });
+  return gatePage({ target: path + url.search, endsAt: clock.endsAt });
 }
