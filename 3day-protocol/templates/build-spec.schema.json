@@ -95,7 +95,6 @@
       "type": "object",
       "description": "Gate 0 provisioning checklist. Script-verifiable items carry checked:true/false (fill via `gate-check doctor`); human-attest items carry attested:true/false.",
       "required": [
-        "docker",
         "supabaseCli",
         "vercelCli",
         "node",
@@ -106,9 +105,8 @@
       "properties": {
         "docker": {
           "type": "object",
-          "required": ["checked"],
-          "properties": { "checked": { "const": true } },
-          "description": "Docker running — Gate 2 (supabase test db) cannot run without it."
+          "properties": { "checked": { "type": "boolean" } },
+          "description": "Informational, NOT required. Docker was deferred 2026-08-01: Gate 2 proves RLS against the app's own provisioned Supabase project, which is stronger than a container plus a hand-written stub of Supabase's auth schema. Previously this demanded checked:true, which made Gate 0 unpassable without attesting to a daemon that `gate-check doctor` itself reports as optional — and `gate-check init` writes checked:false, so the tool's own scaffold failed its own gate. Record the real state here; never write true to get past the gate."
         },
         "supabaseCli": {
           "type": "object",

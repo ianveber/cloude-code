@@ -465,7 +465,14 @@ function cmdGate0() {
     head: gitHead(runDir),
     evidence: [
       `spec.json conforms to build-spec.schema.json (project: ${spec.project})`,
-      `provisioning checklist complete: docker, supabaseCli, vercelCli, node checked; claudePlan, supabaseRef, vercelAccount attested`,
+      `provisioning checklist complete: supabaseCli, vercelCli, node checked; claudePlan, supabaseRef, vercelAccount attested`,
+      // Report docker's REAL state rather than asserting it was checked. It is
+      // informational since the 2026-08-01 deferral (Gate 2 proves RLS against
+      // the provisioned project), and the old line claimed a check that the
+      // schema no longer requires and the run may never have made.
+      `docker: ${spec.provisioning?.docker?.checked === true
+        ? 'running'
+        : 'not running — optional; Gate 2 proves RLS against the provisioned project'}`,
     ],
   });
   process.stdout.write(`GATE 0 GREEN — spec valid, provisioning checklist complete.\n`);

@@ -308,7 +308,13 @@ test('gate 0: missing spec.json goes RED', () => {
   assert.match(out(r), /spec\.json/);
 });
 
-test('gate 0: unchecked docker provisioning item goes RED naming provisioning.docker', () => {
+// Docker was deferred 2026-08-01: Gate 2 proves RLS against the app's own
+// provisioned Supabase project, which is stronger than a container plus a
+// hand-written stub of Supabase's auth schema. This test previously asserted the
+// opposite. Demanding checked:true made Gate 0 unpassable without attesting to a
+// daemon `gate-check doctor` itself calls optional — and `gate-check init` writes
+// checked:false, so the tool's own scaffold failed its own gate.
+test('gate 0: unchecked docker is GREEN — docker is informational since the deferral', () => {
   const dir = initProject();
   writeSpec(
     dir,
@@ -317,8 +323,28 @@ test('gate 0: unchecked docker provisioning item goes RED naming provisioning.do
     })
   );
   const r = run(['0'], dir);
+  assert.equal(r.code, 0);
+  assert.equal(readGate(dir, 0).status, 'green');
+  // The evidence must record the REAL state. The old line asserted "docker …
+  // checked" unconditionally, which is the false-success class this project has
+  // already been burned by five times.
+  assert.match(JSON.stringify(readGate(dir, 0).evidence), /docker: not running/);
+});
+
+// Positive twin for the test above: relaxing docker must not have relaxed the
+// items that are still genuinely required. Without this, "docker is optional"
+// and "the provisioning block is unenforced" look identical from the outside.
+test('gate 0: docker being optional did NOT make the other machine-checked items optional', () => {
+  const dir = initProject();
+  writeSpec(
+    dir,
+    validSpec((s) => {
+      s.provisioning.supabaseCli.checked = false;
+    })
+  );
+  const r = run(['0'], dir);
   assert.notEqual(r.code, 0);
-  assert.match(out(r), /provisioning\.docker\.checked/);
+  assert.match(out(r), /provisioning\.supabaseCli\.checked/);
   assert.equal(readGate(dir, 0).status, 'red');
 });
 
