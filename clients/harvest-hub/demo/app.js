@@ -1326,3 +1326,4 @@ function reResolve(cells) {
 hostedNotice();
 renderRoiInputs();
 renderRoi();
+

@@ -88,8 +88,13 @@ else
   PAT=$(grep -vE '^\s*(#|$)' "$DENY" | paste -sd'|' -)
   if [ -z "$PAT" ]; then
     echo "    ✗ the deny-list is empty — REFUSING" >&2; BAD=1
-  elif grep -rlE "$PAT" --include="*.js" --include="*.mjs" \
+  # -i, and not optional. A real client's email sat in a committed file for hours in ALL CAPS —
+  # which is how it appeared on their own form — and every case-SENSITIVE check walked straight
+  # past it, including this one. Documents carry names in whatever case the person typed, so a
+  # deny-list that matches only one case is a deny-list that mostly does not match.
+  elif grep -rlEi "$PAT" --include="*.js" --include="*.mjs" \
          --include="*.html" --include="*.json" --include="*.csv" --include="*.txt" \
+         --include="*.md" \
          . 2>/dev/null | grep -v node_modules | grep -q .; then
     echo "    ✗ a real client name appears in the assembled output — REFUSING" >&2; BAD=1
   fi
@@ -113,7 +118,7 @@ else
       BAD=1
       continue
     fi
-    if printf '%s' "$TXT" | grep -qE "$PAT"; then
+    if printf '%s' "$TXT" | grep -qEi "$PAT"; then
       echo "    ✗ a real client name appears INSIDE $pdf — REFUSING" >&2; BAD=1
     elif ! printf '%s' "$TXT" | grep -qi "VZOR"; then
       # Every sample we ship says so on its face. A PDF that does not is not one of ours.

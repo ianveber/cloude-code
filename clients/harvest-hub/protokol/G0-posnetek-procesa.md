@@ -351,7 +351,7 @@ Najdena mimogrede, med merjenjem. Niso očitek — so tisto, kar bo robot ujel i
 | Najdeno | Kje | Zakaj šteje |
 |---|---|---|
 | `info@harvest.si` proti `info@harvesthub.si` | 545. člen proti Privolitveni izjavi | dve različni domeni v dveh obrazcih iste družbe |
-| `IGOR.PLETERSKI @GMAIL.COM` — presledek pred `@` | KLP (dva zastopnika) | e-naslov v tej obliki ni veljaven; nastal je ob vnosu |
+| `IME.PRIIMEK @GMAIL.COM` — presledek pred `@` | KLP (dva zastopnika) | e-naslov v tej obliki ni veljaven; nastal je ob vnosu |
 | e-naslov, zapisan v celoti z velikimi črkami | 6 – Zdravstveno | e-naslovi prihajajo v mešani pisavi; normalizacija je nujna |
 | Rdeč rokopisni pripis »Doba napišeš 1 leto« ob natisnjenem »15 let« | 8 – dva otroka (skenirano) | vizualni model prebere oboje; brez ločevanja natisnjeno/pripis lahko izbere napačno |
 
