@@ -1,0 +1,19 @@
+# Brainstorming visual-companion mockups (local, not for git)
+.superpowers/
+.gstack/
+
+# Real client personal data — NEVER commit. This repo is PUBLIC.
+# Insurance/inspection source documents contain tax numbers, birth dates,
+# ID numbers and GDPR Art. 9 health data belonging to real people.
+clients/*/materiali/
+clients/*/demo/out/
+**/materiali/
+# Ground-truth / fixture files hold the SAME personal data as the source PDFs,
+# in structured machine-readable form. Never commit these either.
+**/truth.json
+**/*.truth.json
+clients/*/demo/register-zastopnikov.json
+node_modules/
+
+# Playwright MCP scratch output (screenshots, snapshots, test fixtures)
+.playwright-mcp/
