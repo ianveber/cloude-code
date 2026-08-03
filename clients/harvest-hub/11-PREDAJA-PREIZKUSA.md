@@ -150,8 +150,11 @@ Po koncu jim po aneksu (A6) pisno potrdiš, da pri tebi ni ničesar za izbrisati
 odstranjena. Odstranitev:
 
 ```bash
-vercel remove harvest-hub-preizkus --yes
+vercel remove harvest-hub-preizkus --yes && vercel project rm harvest-hub-preizkus --yes
 ```
+
+`vercel remove` odstrani samo namestitve — projekt in njegove nastavitve (vključno s kodo za
+vstop) ostanejo, dokler ne odstraniš še projekta.
 
 ---
 
@@ -182,5 +185,12 @@ Povej vnaprej, ne ko vprašajo:
 Stanje kadar koli:
 
 ```bash
-cd "/Users/ianveber/Desktop/Cloude CODE/clients/harvest-hub/trial" && node test-deploy.mjs && node test-logs.mjs
+cd "/Users/ianveber/Desktop/Cloude CODE/clients/harvest-hub/trial" && node test-deploy.mjs && node test-logs.mjs && node test-gate.mjs
+```
+
+**Pred vsakim commitom** (repozitorij je javen — enkrat je vanj že ušel resničen e-naslov
+zastopnika, ker je bil zapisan z velikimi črkami in so ga vse preverbe brez `-i` spregledale):
+
+```bash
+cd "/Users/ianveber/Desktop/Cloude CODE/clients/harvest-hub" && ./scan-personal-data.sh
 ```
