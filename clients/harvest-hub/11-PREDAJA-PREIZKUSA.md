@@ -90,8 +90,10 @@ zahtevo predložiš.
 >    so izmišljeni. Dokler ne podpiševa priloženega aneksa k pogodbi o obdelavi osebnih podatkov,
 >    vas prosim, da uporabljate ta vzorec in ne resničnih ponudb strank. Aneks je v priponki —
 >    ena stran.
-> 2. **Nič se ne shrani.** Ne dokument, ne prebrani podatki. To pomeni tudi, da po koncu
->    preizkusa ni ničesar za izbrisati — in da preizkus ne beleži, kdo je kaj delal.
+> 2. **Pri nas se ne shrani nič** — ne dokument, ne prebrani podatki. To pomeni tudi dvoje: po
+>    koncu preizkusa pri nas ni ničesar za izbrisati, in preizkus **ne beleži, kdo je kaj delal**.
+>    Ker teče na gostovanem strežniku, gostitelj vodi svoj tehnični dnevnik zahtevkov (čas,
+>    naslov strani, status) — brez vsebine dokumentov. Vse to je opisano v aneksu.
 >
 > Zanima me predvsem, kje se moti in kaj manjka. Tisto, kar najdete, popravimo sproti.
 >
@@ -132,8 +134,9 @@ minute, primerjava se izriše sama.
 Tri vprašanja, ki odločijo o Fazi 1 — ne »vam je bilo všeč«:
 
 1. **Kateri podatek je prebral narobe?** Vsak konkreten primer je vreden več kot splošen vtis.
-2. **Katerega dokumenta ni prepoznal?** Danes prepozna pet vrst; vse ostalo pošteno pove, da ne
-   pozna. Kar naštejejo, je seznam za Fazo 1.
+2. **Katerega dokumenta ni prepoznal?** Danes prepozna **štiri** vrste — Ponudba, 545. člen,
+   Kontrolni list, Privolitvena izjava; vse ostalo pošteno pove, da ne pozna. Kar naštejejo, je
+   seznam za Fazo 1.
 3. **Kaj v kontrolnem listu manjka?** Polja so povzeta po njihovem obrazcu, poimenovanja so naša.
 
 ---
@@ -162,8 +165,9 @@ vstop) ostanejo, dokler ne odstraniš še projekta.
 
 Povej vnaprej, ne ko vprašajo:
 
-- **Ne shrani ničesar.** Zato tudi ni sledi, kdo je kaj delal. To je odločitev, ne pomanjkljivost
-  — a v produkciji bo sled potrebna.
+- **Pri nas se ne shrani nič.** Zato tudi ni sledi, kdo je kaj delal. To je odločitev, ne
+  pomanjkljivost — a v produkciji bo sled potrebna. Gostitelj vodi svoj dnevnik zahtevkov (čas,
+  naslov, status), brez vsebine dokumentov.
 - **Ena skupna koda**, ne uporabniški računi.
 - **Ni povezave z eDOKUMENTI ali zavarovalniškim programom.** Izvoz je predlog strukture, ki ga
   predajo svojemu dobavitelju; poimenovanja polj potrdite skupaj v Fazi 0.
