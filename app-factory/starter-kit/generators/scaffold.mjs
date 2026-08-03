@@ -43,6 +43,40 @@ function walk(dir, base = dir, out = []) {
   return out;
 }
 
+/**
+ * `.gitignore` is MERGED, never replaced.
+ *
+ * `gate-check init` writes `.protocol/` into it before the scaffolder ever runs,
+ * and the template writes the app's ignores (node_modules, .env.local, .next).
+ * Neither file is complete on its own, and a plain overwrite silently drops
+ * whichever ran first — which is exactly what happened on the first real app:
+ * the scaffolder erased `.protocol/`, and the next `git add -A` would have
+ * committed the build spec, gate results and journal into history, dirtying the
+ * tree on every subsequent gate write and breaking staleness detection.
+ *
+ * Adding `.gitignore` to SEED would be WORSE than the bug: on a fresh run the
+ * existing file holds only `.protocol/`, so SEED would skip it and the app would
+ * never get `.env.local` ignored — and the secret scan treats gitignored files
+ * as unable to leak, so that line is load-bearing.
+ */
+function mergeGitignore(dest, templateBody) {
+  if (!fs.existsSync(dest)) return templateBody;
+
+  const existing = fs.readFileSync(dest, 'utf8');
+  const rule = (l) => {
+    const t = l.trim();
+    return t && !t.startsWith('#') ? t : null;
+  };
+  const have = new Set(existing.split('\n').map(rule).filter(Boolean));
+  const missing = templateBody.split('\n').filter((l) => {
+    const r = rule(l);
+    return r && !have.has(r);
+  });
+
+  if (missing.length === 0) return existing;
+  return `${existing.replace(/\n*$/, '')}\n\n# ── added by scaffold ──\n${missing.join('\n')}\n`;
+}
+
 function substitute(text, vars) {
   return text.replace(/\{\{([A-Z_]+)\}\}/g, (whole, key) => {
     if (!(key in vars)) {
@@ -80,7 +114,8 @@ export function scaffold(spec, outDir, { force = false } = {}) {
       continue;
     }
 
-    const body = substitute(fs.readFileSync(src, 'utf8'), vars);
+    let body = substitute(fs.readFileSync(src, 'utf8'), vars);
+    if (relOut === '.gitignore') body = mergeGitignore(dest, body);
     fs.mkdirSync(path.dirname(dest), { recursive: true });
     fs.writeFileSync(dest, body);
     written.push(relOut);
