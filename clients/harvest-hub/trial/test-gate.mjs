@@ -206,6 +206,49 @@ await withEnv({ TRIAL_PASSCODE: PASS, TRIAL_ENDS: "2026-08-17" }, async () => {
   });
 });
 
+/* ── 5c · the trial has a START, not only an end ─────────────────────────
+ *
+ * "Fourteen days from tomorrow" was, for a while, only an end date, and the gate was open the day
+ * the code was handed over. A client clicking on the day they received the email would have spent
+ * one of their fourteen days before the window the amendment names had opened, and nothing on the
+ * page or in the contract would have shown it. An agreed period has two ends.
+ */
+await withEnv({ TRIAL_PASSCODE: PASS, TRIAL_STARTS: "2099-01-01T00:00:00Z",
+                TRIAL_ENDS: "2099-02-01T00:00:00Z" }, async () => {
+  const r = await middleware(req("/"));
+  const html = await r.text();
+  ok(r.status === 425, "before the start day the page answers 425 Too Early", `got ${r.status}`);
+  ok(/se še ni začel/.test(html), "…and says the trial has not started");
+  ok(!/zaključen/.test(html), "…and does NOT say it has ended — the opposite of the truth");
+  ok(!/type=\"password\"/.test(html), "…and offers no passcode box, which would just be confusing");
+
+  // A valid cookie must not sneak past the start either.
+  const withCookie = await middleware(req("/", { cookie: GOOD }));
+  ok(withCookie.status === 425, "…and a valid cookie does not get in early", `got ${withCookie.status}`);
+
+  const api = await middleware(req("/api/extract", { method: "POST", cookie: GOOD }));
+  ok(api.status === 425, "…nor does the API", `got ${api.status}`);
+  ok((await api.text()).includes("preizkus_se_ni_zacel"), "…with its own code, not the ended one");
+});
+
+await withEnv({ TRIAL_PASSCODE: PASS, TRIAL_STARTS: "2020-01-01T00:00:00Z",
+                TRIAL_ENDS: "2026-08-17T22:00:00Z" }, async () => {
+  const r = await middleware(req("/"));
+  const html = await r.text();
+  ok(r.status === 401, "once started, the ordinary gate is back", `got ${r.status}`);
+  ok(/Preizkus je odprt od <strong>1\. januarja 2020<\/strong> do vključno/.test(html),
+    "…and the gate page states the whole window, not just the end",
+    (html.match(/Preizkus je odprt[^.]*\./) || ["(not found)"])[0]);
+});
+
+// Ended beats not-started: a deployment misconfigured into both states must close, not reopen.
+await withEnv({ TRIAL_PASSCODE: PASS, TRIAL_STARTS: "2099-01-01T00:00:00Z",
+                TRIAL_ENDS: "2020-01-01T00:00:00Z" }, async () => {
+  const r = await middleware(req("/", { cookie: GOOD }));
+  ok(r.status === 410, "with both dates wrong, ENDED wins — it closes rather than reopens",
+    `got ${r.status}`);
+});
+
 /* ── 6 · the two fail-open shapes ──────────────────────────────────────── */
 await withEnv({ TRIAL_PASSCODE: PASS, TRIAL_ENDS: undefined }, async () => {
   const r = await middleware(req("/"));
@@ -221,6 +264,18 @@ await withEnv({ TRIAL_PASSCODE: PASS, TRIAL_ENDS: "kdaj-pa-ze" }, async () => {
   const r = await middleware(req("/", { cookie: GOOD }));
   ok(r.status === 410, "an unreadable TRIAL_ENDS locks the trial rather than opening it",
     `got ${r.status} — fail-closed is the whole point`);
+});
+
+/* The two ends fail in OPPOSITE directions, on purpose. Overrunning the agreed end means
+ * processing personal data without a basis, so a bad end date locks. A bad START date only risks
+ * letting someone in early, and locking a paying prospect out of a working trial over a typo is
+ * the worse outcome — so it is ignored and logged. This asserts the asymmetry is deliberate. */
+await withEnv({ TRIAL_PASSCODE: PASS, TRIAL_STARTS: "kdaj-pa-ze",
+                TRIAL_ENDS: "2099-01-01T00:00:00Z" }, async () => {
+  const r = await middleware(req("/"));
+  ok(r.status === 401,
+    "an unreadable TRIAL_STARTS is ignored, not treated as 'never starts'",
+    `got ${r.status} — a typo in the start date must not lock the client out of a live trial`);
 });
 
 await withEnv({ TRIAL_PASSCODE: undefined, SITE_PASSCODE: undefined, TRIAL_ENDS: "2099-01-01" },

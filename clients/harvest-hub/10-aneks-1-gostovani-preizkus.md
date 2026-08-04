@@ -21,16 +21,37 @@ predhodnega pisnega soglasja izrecno prepoveduje.
 
 **A1 · Predmet in trajanje aneksa.** Aneks ureja obdelavo prek spletne različice prikaza
 (»preizkus«), dostopne na naslovu **https://harvest-hub-preizkus.vercel.app**. Preizkus traja
-**14 dni, od 4. avgusta 2026 do vključno 17. avgusta 2026**. Po tem se dostop **zapre samodejno**:
+**14 dni, od 5. avgusta 2026 do vključno 18. avgusta 2026**. Po tem se dostop **zapre samodejno**:
 strežnik vsem zahtevkom odgovori z zavrnitvijo, tudi tistim, ki so kodo za vstop že vnesli.
-Zaprtje ni odvisno od ročnega ukrepa obdelovalca. Datum, do katerega je preizkus odprt, je izpisan
-na vstopni strani, tako da ga lahko upravljavec kadar koli preveri sam. Upravljavec lahko preizkus kadar koli prej
-pisno prekine; s tem nastopi 9. točka osnovne pogodbe.
+Zaprtje ni odvisno od ročnega ukrepa obdelovalca. Enako velja za začetek: pred 5. avgustom 2026
+stran ni dostopna, tudi z veljavno kodo ne, da se dogovorjenih 14 dni ne skrajša. Obe meji sta
+izpisani na vstopni strani, tako da ju upravljavec kadar koli preveri sam. Upravljavec lahko
+preizkus kadar koli prej pisno prekine; s tem nastopi 9. točka osnovne pogodbe.
 
 **A1a · Vzorčni dokument.** Na strani preizkusa je za prenos na voljo **vzorčna ponudba z
 izmišljenimi podatki** in vzorčni seznam zastopnikov. Namenjena sta preizkušanju brez osebnih
 podatkov. Do podpisa tega aneksa upravljavec v preizkus nalaga **izključno ta vzorčna dokumenta**
 ali lastne anonimizirane dokumente, ne pa resničnih ponudb strank.
+
+**A1b · Merjenje prihranjenega časa.** Namen preizkusa ni le pokazati, da branje deluje, temveč
+**izmeriti, koliko časa upravljavcu prihrani**. Preizkus zato v brskalniku vodi števec: koliko
+pregledov je bilo opravljenih, koliko ponudb prebranih in koliko strojnega časa je za to porabil.
+V povezavi z minutami ročnega postopka, ki jih vpiše upravljavec sam, iz tega izračuna skupni
+prihranek.
+
+Pogodbenici izrecno ugotavljata:
+
+- Števec vsebuje **izključno števila in čas**. Ne vsebuje dokumentov, ne prebranih podatkov, ne
+  imen datotek, ne nobene vrednosti iz dokumenta.
+- Hrani se **v brskalniku upravljavčevega sodelavca, na njegovi napravi**. Do obdelovalca ne pride
+  in zanj ni vmesnika, ki bi ga sprejel; točka A3(d) zato ostane v celoti veljavna.
+- Vezan je na posamezen brskalnik in napravo. Vsak sodelavec ima svojega, brisanje podatkov strani
+  ga izbriše.
+- Minute ročnega postopka so **ocena upravljavca**, strojni čas je merjen. Obdelovalec ne vnaša
+  svoje ocene.
+
+Upravljavec lahko povzetek kadar koli izpiše z gumbom v aplikaciji in ga posreduje obdelovalcu.
+Posredovanje je prostovoljno.
 
 **A2 · Kdo sme dostopati.** Dostop je zaščiten s kodo za vstop, ki jo obdelovalec izroči
 kontaktni osebi upravljavca. Upravljavec kodo posreduje **samo svojim pooblaščenim sodelavcem**

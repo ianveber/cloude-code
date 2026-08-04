@@ -11,7 +11,7 @@ zgodi na koncu, in kaj moraš urediti **preden** kdor koli naloži resnično pon
 |---|---|
 | **Naslov** | https://harvest-hub-preizkus.vercel.app |
 | **Koda za vstop** | v `~/ais-client-data/harvest-hub/preizkus-dostop.txt` |
-| **Poteka** | **4. 8. – 17. 8. 2026** (14 dni) — po tem se dostop zapre sam |
+| **Poteka** | **5. 8. – 18. 8. 2026** (14 dni). Pred 5. 8. je stran zaprta, po 18. 8. se zapre sama. |
 | **Vzorčni dokument** | v sami aplikaciji, pod poljem za nalaganje |
 
 > Kode v tem zapisu namenoma ni. Repozitorij je javen, koda pa je edino, kar preizkus varuje —
@@ -27,14 +27,17 @@ ne kaže nobena javna povezava.
 14 dni:
 
 ```bash
-cd "/Users/ianveber/Desktop/Cloude CODE/clients/harvest-hub/trial" && vercel env rm TRIAL_ENDS production --yes; echo "2026-08-24T22:00:00Z" | vercel env add TRIAL_ENDS production && vercel deploy --prod --yes
+cd "/Users/ianveber/Desktop/Cloude CODE/clients/harvest-hub/trial" && vercel env rm TRIAL_ENDS production --yes; echo "2026-08-25T22:00:00Z" | vercel env add TRIAL_ENDS production && vercel deploy --prod --yes
 ```
 
-**Vedno preveri, kaj je dejansko nastavljeno** — vstopna stran izpiše svoj zadnji dan sama:
+**Vedno preveri, kaj je dejansko nastavljeno** — vstopna stran izpiše obe meji sama:
 
 ```bash
-curl -s https://harvest-hub-preizkus.vercel.app/ | grep -o "Preizkus je odprt do vključno [^<]*"
+curl -s https://harvest-hub-preizkus.vercel.app/ | grep -o "Preizkus je odprt[^.]*"
 ```
+
+Datum začetka je `TRIAL_STARTS`, konca `TRIAL_ENDS`. Oba sta trenutek, ne dan: `TRIAL_STARTS` je
+prvi trenutek, ko je odprto, `TRIAL_ENDS` prvi trenutek, ko ni več.
 
 Ne zanašaj se na `vercel env ls` ali `vercel env pull`: prvi pokaže samo, da spremenljivka
 obstaja, drugi pa za vse šifrirane vrednosti izpiše prazno. Edini zanesljiv vir je stran sama.
@@ -80,24 +83,41 @@ Zadeva: **Preizkusna različica: avtomatizacija prenosa dokumentacije**
 > **https://harvest-hub-preizkus.vercel.app**, koda za vstop je **[vstavi kodo]**. Vnesete jo samo
 > enkrat, potem si jo brskalnik zapomni.
 >
+> Odprta bo **od jutri, 5. 8., do vključno 18. 8. 2026**. Štirinajst dni teče od jutri, zato danes
+> še ne boste mogli noter, in tudi zadnji dan vam ne vzamemo. Obe meji pišeta na vstopni strani.
+>
 > Ponudbo ali celo mapo povlečete na stran in kontrolni list se izpolni sam. Ob vsakem podatku
 > piše, ali je prebran iz ponudbe ali čaka na vašo potrditev.
 >
-> Odprto je do **17. 8. 2026**, potem se zapre samo. Datum piše tudi na vstopni strani.
+> **Dvoje bi vas prosil, da spremljate teh štirinajst dni.**
 >
-> Dvoje, preden začnete.
+> Prvo je, kje se moti. Vsak konkreten primer, kjer je podatek prebral narobe ali dokumenta ni
+> prepoznal, je za nas več vreden kot splošen vtis. Kar najdete, popravimo sproti, še med
+> preizkusom.
 >
-> Vzorčno ponudbo najdete kar v aplikaciji. Pod poljem za nalaganje piše »Nimate ponudbe pri
-> roki?«, kliknete *Prenesite vzorčno ponudbo* in jo povlečete nazaj na stran. Podatki v njej so
-> izmišljeni. Prosim, da do podpisa priloženega aneksa k pogodbi o obdelavi osebnih podatkov
-> uporabljate ta vzorec in ne resničnih ponudb strank. Aneks je v priponki, ena stran.
+> Drugo je čas. Cela stvar obstaja zato, da vam ga prihrani, in edina številka, ki to zares pove,
+> je vaša. V panelu »Koliko časa to vzame danes?« vpišete, koliko minut vam posamezna ponudba
+> vzame ročno danes: prevzem iz e-pošte, shranjevanje, preverjanje popolnosti, prepis v
+> eDOKUMENTE, prepis istih podatkov v Zavarovalniški program, izpolnitev kontrolnega lista in
+> privolitvene izjave. Vpišete enkrat. Od tam naprej se v kartici »Prihranek v tem preizkusu«
+> sešteva, koliko ste prihranili, čez vse, kar ste dali skozi. Ob koncu kliknete »Kopiraj
+> povzetek« in mi ga pošljete. To je številka, ki jo bova gledala, ko se bova pogovarjala o
+> nadaljevanju, in raje jo imam vašo kot svojo.
 >
-> Pri nas se ne shrani nič, ne dokument ne prebrani podatki. Po koncu preizkusa pri nas torej ni
-> ničesar za izbrisati, hkrati pa preizkus tudi ne beleži, kdo je kaj delal. Ker teče na gostovanem
-> strežniku, gostitelj vodi svoj tehnični dnevnik zahtevkov (čas, naslov strani, status), brez
-> vsebine dokumentov. Vse to piše v aneksu.
+> Če se izkaže, da je prihranek majhen ali da je stroj kje celo počasnejši od vas, mi to prav tako
+> povejte. Takrat je smiselno gledati, kje se da še kaj skrajšati, ne pa iskati lepšo številko.
 >
-> Najbolj me zanima, kje se moti in kaj manjka. Kar najdete, popravimo sproti.
+> Dvoje pa še, da veste vnaprej:
+>
+> 1. **Vzorčni dokument je kar v aplikaciji.** Pod poljem za nalaganje piše »Nimate ponudbe pri
+>    roki?«, kliknete *Prenesite vzorčno ponudbo* in jo povlečete nazaj na stran. Podatki v njej
+>    so izmišljeni. Dokler ne podpiševa priloženega aneksa k pogodbi o obdelavi osebnih podatkov,
+>    vas prosim, da uporabljate ta vzorec in ne resničnih ponudb strank. Aneks je v priponki, ena
+>    stran.
+> 2. **Pri nas se ne shrani nič**, ne dokument ne prebrani podatki. Števec prihranka teče v vašem
+>    brskalniku, na vaši napravi, in vsebuje samo števila in čas. K nam ne pride, dokler mi ga sami
+>    ne pošljete. Ker preizkus teče na gostovanem strežniku, gostitelj vodi svoj tehnični dnevnik
+>    zahtevkov (čas, naslov strani, status), brez vsebine dokumentov. Vse to piše v aneksu.
 >
 > Lep pozdrav,
 > Anej
@@ -143,7 +163,7 @@ Tri vprašanja, ki odločijo o Fazi 1 — ne »vam je bilo všeč«:
 
 ---
 
-## Kaj se zgodi 18. 8.
+## Kaj se zgodi 19. 8.
 
 Dostop se zapre sam — tudi tistim, ki so kodo že vnesli. Strežnik odgovori z zavrnitvijo in
 kratkim pojasnilom v slovenščini. **Ni ročnega koraka in ne moreš pozabiti.**
@@ -183,7 +203,7 @@ Povej vnaprej, ne ko vprašajo:
 
 | Simptom | Kaj je | Kaj narediti |
 |---|---|---|
-| »Preizkus je zaključen« pred 18. 8. | `TRIAL_ENDS` je napačen ali neberljiv — vrata se v tem primeru **zaprejo**, ne odprejo | Nastavi datum znova (ukaz zgoraj) |
+| »Preizkus je zaključen« pred 19. 8. | `TRIAL_ENDS` je napačen ali neberljiv — vrata se v tem primeru **zaprejo**, ne odprejo | Nastavi datum znova (ukaz zgoraj) |
 | Stran zahteva kodo, čeprav so jo vnesli | Piškotek je potekel ali drug brskalnik | Vnesejo znova |
 | Branje se ne konča | Ključ ali strop porabe pri Anthropicu | `vercel logs harvest-hub-preizkus` |
 | Vse je jantarno | Register ni naložen | Kliknejo *Naloži register zastopnikov* |

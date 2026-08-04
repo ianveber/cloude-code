@@ -28,6 +28,7 @@ import { classify, DOC, DOC_LABEL } from "./lib/classify.js";
 import { checkPacket } from "./lib/gate.js";
 import { buildPayload, payloadFilename } from "./lib/edokumenti.js";
 import { newRun, noteDoc, summary, ROI_KORAKI, roiSummary, PONUDB_NA_MESEC } from "./lib/runstats.js";
+import * as dnevnik from "./lib/dnevnik.js";
 import { klpConfidence } from "./lib/confidence.js";
 
 pdfjs.GlobalWorkerOptions.workerSrc = "./vendor/pdf.worker.mjs";
@@ -188,6 +189,11 @@ const skipNote = (n) => sklon(n, [
 ]);
 // "razdeljen na N …" — the adjective has to agree with the noun, so they travel together
 const PREBRANA_PONUDBA = ["prebrano ponudbo", "prebrani ponudbi", "prebrane ponudbe", "prebranih ponudb"];
+// Nominative forms — these are stat-tile labels, not the object of "razdeljen na". The adjective
+// travels WITH the noun: "prebranih" is genitive plural and agrees only with "ponudb", so pairing
+// a fixed adjective with a declined noun produces "prebranih ponudba".
+const PREGLED = ["pregled", "pregleda", "pregledi", "pregledov"];
+const PREBRANA_PONUDBA_N = ["prebrana ponudba", "prebrani ponudbi", "prebrane ponudbe", "prebranih ponudb"];
 /** Decimals take the genitive singular in Slovene: 2,1 ure — but 2 uri and 5 ur. */
 const ure = (n) => (Number.isInteger(n) ? sklon(n, ["ura", "uri", "ure", "ur"]) : "ure");
 
@@ -593,11 +599,21 @@ function renderStats() {
   statsEl.innerHTML = tiles
     .map(([n, l, cls]) => `<div class="stat${cls}"><div class="n">${esc(n)}</div><div class="l">${esc(l)}</div></div>`)
     .join("");
+  /**
+   * The old wording was "nič ni shranjeno od prej", and it stopped being true the moment the
+   * trial started keeping a running tally. What is kept is counts and seconds, in this browser,
+   * and it never reaches our server — so the line now says that instead of a flat denial it can
+   * no longer support. The distinction (nothing on OUR side; a counter on YOURS) is the same one
+   * Aneks 1 A3(d) draws, and the screen must not contradict the contract.
+   */
+  const kept = dnevnik.naVoljo()
+    ? "Te številke so iz tega pregleda. Za skupni prihranek se v vašem brskalniku vodi le "
+      + "števec pregledov in časa; vsebina dokumentov se nikjer ne hrani."
+    : "Te številke so iz tega pregleda; nič ni shranjeno od prej.";
   statsNote.textContent = s.skeniranih
     ? `Od tega ${s.besedilnih} ${sklon(s.besedilnih, DOKUMENT)} z besedilnim slojem in `
-      + `${s.skeniranih} brez njega — prebrani s slike strani. `
-      + "Vse številke so iz tega pregleda; nič ni shranjeno od prej."
-    : "Vse številke so iz tega pregleda — nič ni shranjeno od prej.";
+      + `${s.skeniranih} brez njega — prebrani s slike strani. ` + kept
+    : kept;
   statsCard.classList.remove("hide");
 }
 
@@ -627,6 +643,56 @@ function downloadPayload() {
 /* ── ROI capture — time only, never money ────────────────────────────────── */
 
 const roiMinutes = {};
+
+/** Their stated manual minutes per offer: the six ROI steps added up, or 0 if untouched. */
+function rocnoMinutNaPonudbo() {
+  return roiSummary({ minutePoKoraku: roiMinutes }).rocnoMinutNaPonudbo;
+}
+
+/**
+ * The running total for the whole trial.
+ *
+ * The per-run panel answers "how fast was that one". This answers the question the fourteen days
+ * exist to answer, which is the only one that decides Faza 1: across everything you actually put
+ * through it, how much time did this come to. The client reads the number out; we do not.
+ *
+ * Hidden entirely until there is something to show, and it shows the machine time even before
+ * they have stated their manual minutes — the measured half is ours, the estimate is theirs.
+ */
+function renderPrihranek() {
+  const card = $("#prihranekCard");
+  if (!card) return;
+  const p = dnevnik.povzetek();
+  if (!dnevnik.naVoljo() || p.pregledov === 0) { card.classList.add("hide"); return; }
+
+  const n = (v, d = 1) => Number(v).toLocaleString("sl-SI", { maximumFractionDigits: d });
+  const tiles = [
+    [n(p.pregledov, 0), sklon(p.pregledov, PREGLED)],
+    [n(p.ponudb, 0), sklon(p.ponudb, PREBRANA_PONUDBA_N)],
+    [`${n(p.strojnoMinut, 1)} min`, "strojnega časa"],
+  ];
+  if (p.prihranjenoMinut !== null) {
+    tiles.push([`${n(p.rocnoMinut, 0)} min`, "ročno po vaši oceni"]);
+  }
+
+  $("#prihranekStats").innerHTML = tiles
+    .map(([v, l]) => `<div class="stat"><div class="n">${esc(v)}</div><div class="l">${esc(l)}</div></div>`)
+    .join("");
+
+  $("#prihranekBig").innerHTML = p.prihranjenoMinut === null
+    ? `<span class="muted">Vpišite minute v panelu <em>Koliko časa to vzame danes?</em> in
+       skupni prihranek se izračuna sam.</span>`
+    : p.prihranjenoMinut < 0
+      ? `V tem preizkusu ste <strong>izgubili ${n(Math.abs(p.prihranjenoMinut))} min</strong>
+         <span class="muted">— stroj je bil počasnejši od vašega ročnega postopka. Povejte nam,
+         to je pomemben podatek.</span>`
+      : `V tem preizkusu prihranjeno <strong>${n(p.prihranjenoMinut)} min</strong>
+         <span class="muted">(${n(p.prihranjenoUr)} h)</span>`;
+
+  $("#prihranekObdobje").textContent = p.zacetek
+    ? `Od ${p.zacetek} do ${p.zadnji}.` : "";
+  card.classList.remove("hide");
+}
 
 function renderRoiInputs() {
   $("#roiSteps").innerHTML = ROI_KORAKI.map((k) => `
@@ -943,6 +1009,17 @@ async function handle(fileList) {
   if (packetResult.razlog) logLine(`Popolnost paketa: ${packetResult.razlog}`);
 
   renderStats(); renderResults(); renderRoi();
+
+  /* One review, recorded. Counts and seconds only — see lib/dnevnik.js for why that limit is the
+     whole design. This is what turns fourteen days of use into a number the client can read out
+     to us at the end, instead of an impression. */
+  dnevnik.zabelezi({
+    ponudb: entries.filter((e) => e.klas === DOC.PONUDBA && e.faza === "prebrano").length,
+    strojnoSekund: summary(currentRun()).sekund,
+    rocnoMinutNaPonudbo: rocnoMinutNaPonudbo(),
+  });
+  renderPrihranek();
+
   if (entries.some((e) => e.outputs.length)) exportCard.classList.remove("hide");
 
   const listov = entries.reduce((n, e) => n + e.outputs.length, 0);
@@ -1310,6 +1387,10 @@ $("#roiSteps").addEventListener("input", (e) => {
   const id = e.target?.dataset?.roi;
   if (!id) return;
   roiMinutes[id] = e.target.value;
+  // Keep the trial tally's standing estimate in step, so the total appears the moment they
+  // finish typing rather than after the next packet.
+  dnevnik.nastaviRocno(rocnoMinutNaPonudbo());
+  renderPrihranek();
   renderRoi();
 });
 
@@ -1323,7 +1404,34 @@ function reResolve(cells) {
   return c;
 }
 
+/* ── the trial tally: copy out, start over ─────────────────────────────── */
+
+$("#prihranekKopiraj")?.addEventListener("click", async (e) => {
+  const btn = e.currentTarget;
+  const txt = dnevnik.besedilo();
+  try {
+    await navigator.clipboard.writeText(txt);
+    btn.textContent = "Kopirano";
+  } catch {
+    // clipboard needs a secure context and permission; falling back to a download means the
+    // client still gets the number out rather than a button that silently did nothing
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([txt], { type: "text/plain;charset=utf-8" }));
+    a.download = "prihranek-preizkus.txt";
+    document.body.appendChild(a); a.click(); a.remove();
+    btn.textContent = "Preneseno";
+  }
+  setTimeout(() => { btn.textContent = "Kopiraj povzetek"; }, 2400);
+});
+
+$("#prihranekPonastavi")?.addEventListener("click", () => {
+  if (!confirm("Števec prihranka se izbriše in šteti začnemo znova. Nadaljujem?")) return;
+  dnevnik.pocisti();
+  renderPrihranek();
+});
+
 hostedNotice();
 renderRoiInputs();
 renderRoi();
+renderPrihranek();
 

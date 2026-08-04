@@ -30,7 +30,7 @@ cp "$DEMO/index.html" "$DEMO/app.js" .
 
 echo "  · copying browser modules"
 mkdir -p lib
-for m in layout extract klp classify gate edokumenti runstats confidence; do
+for m in layout extract klp classify gate edokumenti runstats confidence dnevnik; do
   cp "$DEMO/lib/$m.js" lib/
 done
 

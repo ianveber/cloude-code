@@ -158,7 +158,7 @@
        border-radius:10px;width:100%;text-align:right;background:#fff;color:var(--ink)}
   .roi input:focus{outline:2px solid #0071e355;border-color:var(--blue)}
   .roiout{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
-  .roiout .big{font-size:17px;font-weight:600;letter-spacing:-.01em}
+  .roiout .big,#prihranekBig{font-size:17px;font-weight:600;letter-spacing:-.01em}
 
   .footrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 16px;padding:0 2px}
 
@@ -248,7 +248,26 @@
   <div class="card hide" id="statsCard">
     <h3>Ta pregled v številkah</h3>
     <div class="stats" id="stats"></div>
-    <p class="muted" style="margin:14px 0 0" id="statsNote">Vse številke so iz tega pregleda — nič ni shranjeno od prej.</p>
+    <p class="muted" style="margin:14px 0 0" id="statsNote">Te številke so iz tega pregleda.</p>
+  </div>
+
+  <!-- The running total for the whole trial. This is the number the fourteen days exist to
+       produce: not how fast one review was, but what the client actually saved across everything
+       they put through it. Filled by renderPrihranek(); hidden until there is something in it. -->
+  <div class="card hide" id="prihranekCard">
+    <h3>Prihranek v tem preizkusu</h3>
+    <div class="stats" id="prihranekStats"></div>
+    <p class="big" style="margin:16px 0 0" id="prihranekBig"></p>
+    <p class="muted" style="margin:6px 0 0" id="prihranekObdobje"></p>
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" id="prihranekKopiraj">Kopiraj povzetek</button>
+      <button class="btn ghost" id="prihranekPonastavi">Začni znova</button>
+    </div>
+    <p class="muted" style="margin:10px 0 0">
+      Števec teče v tem brskalniku in na tem računalniku. K nam ne pride nič — ne dokument,
+      ne prebrani podatki, ne ta števec. Kolega na svojem računalniku ima svojega.
+      Ročni čas je vaša ocena iz panela spodaj, strojni čas je izmerjen.
+    </p>
   </div>
 
   <div class="card hide" id="exportCard">

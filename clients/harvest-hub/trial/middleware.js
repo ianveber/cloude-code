@@ -33,6 +33,13 @@
    -----------
      TRIAL_PASSCODE   required. Missing → everyone is locked out (never opened).
                       SITE_PASSCODE is accepted as a fallback name.
+     TRIAL_STARTS     optional ISO date/time. Before it, every request gets a
+                      plain "the trial has not started yet" page (425) — the
+                      code is right, the window is not open. Unset or
+                      unparseable → no start restriction (logged). This exists
+                      so "14 days from the 4th" is not merely an end date with
+                      the door already open.
+
      TRIAL_ENDS       optional ISO date/time, e.g. 2026-08-17 or
                       2026-08-17T22:00:00Z. This is the first moment the trial
                       is OFF: a bare date means midnight UTC that morning, so
@@ -158,21 +165,44 @@ const DENY = [
 const denied = (pathname) => DENY.some((re) => re.test(pathname));
 
 /* ── the trial clock ─────────────────────────────────────────────────────────
- * Returns { ended, endsAt }. An unparseable TRIAL_ENDS is treated as ended:
- * a trial that stops a day early is a phone call, a trial that quietly runs on
- * past its agreed end is processing personal data without a basis for it.
+ * Returns { started, ended, startsAt, endsAt }.
+ *
+ * THE END is the strict one. An unparseable TRIAL_ENDS is treated as ended: a trial that stops a
+ * day early is a phone call, a trial that quietly runs on past its agreed end is processing
+ * personal data without a basis for it.
+ *
+ * THE START exists because "fourteen days from tomorrow" was, for a while, only an end date.
+ * The gate was open the day the code was handed over, so the client could have spent a day of
+ * their fourteen before the window the amendment names had even opened — and nothing on the page
+ * or in the contract would have shown the discrepancy. An agreed period has two ends.
+ *
+ * It is deliberately NOT symmetric with the end: an unparseable TRIAL_STARTS means "no start
+ * restriction", not "locked". Failing closed is right when the risk is processing data too long;
+ * here the risk is only that a client is let in early, and locking a paying prospect out of a
+ * working trial because of a typo in a date is the worse outcome. Loudly logged either way.
  */
 function trialClock() {
-  const raw = process.env.TRIAL_ENDS;
-  if (raw === undefined || raw === null || String(raw).trim() === '') {
-    return { ended: false, endsAt: null };
+  const rawEnd = process.env.TRIAL_ENDS;
+  let endsAt = null;
+  let ended = false;
+  if (rawEnd !== undefined && rawEnd !== null && String(rawEnd).trim() !== '') {
+    endsAt = Date.parse(String(rawEnd).trim());
+    if (!Number.isFinite(endsAt)) {
+      console.error(`TRIAL_ENDS is not a date I can read (${String(rawEnd)}) — locking the trial.`);
+      return { started: true, ended: true, startsAt: null, endsAt: null };
+    }
+    ended = Date.now() >= endsAt;
   }
-  const endsAt = Date.parse(String(raw).trim());
-  if (!Number.isFinite(endsAt)) {
-    console.error(`TRIAL_ENDS is not a date I can read (${String(raw)}) — locking the trial.`);
-    return { ended: true, endsAt: null };
+
+  const rawStart = process.env.TRIAL_STARTS;
+  let startsAt = null;
+  if (rawStart !== undefined && rawStart !== null && String(rawStart).trim() !== '') {
+    const t = Date.parse(String(rawStart).trim());
+    if (Number.isFinite(t)) startsAt = t;
+    else console.error(`TRIAL_STARTS is not a date I can read (${String(rawStart)}) — ignoring it.`);
   }
-  return { ended: Date.now() >= endsAt, endsAt };
+
+  return { started: startsAt === null || Date.now() >= startsAt, ended, startsAt, endsAt };
 }
 
 /* The cookie must never outlive the trial. */
@@ -309,8 +339,21 @@ function lastDayText(endsAt) {
   }
 }
 
-function gatePage({ target = '/', error = '', status = 401, endsAt = null } = {}) {
+/** The first usable day, for the window line on the gate page and the not-yet page. */
+function firstDayText(startsAt) {
+  if (!startsAt) return null;
+  try {
+    const [d, m, y] = ljubljana(new Date(startsAt),
+      { day: 'numeric', month: 'numeric', year: 'numeric' }).split('/').map(Number);
+    return `${d}. ${MESECI_RODILNIK[m - 1]} ${y}`;
+  } catch {
+    return new Date(startsAt).toISOString().slice(0, 10);
+  }
+}
+
+function gatePage({ target = '/', error = '', status = 401, endsAt = null, startsAt = null } = {}) {
   const last = lastDayText(endsAt);
+  const first = firstDayText(startsAt);
   return htmlResponse(
     SHELL(
       'Prenos dokumentacije — AIS',
@@ -325,11 +368,33 @@ function gatePage({ target = '/', error = '', status = 401, endsAt = null } = {}
       <button type="submit">Odpri</button>
     </form>
     <p class="foot">Kodo vnesete samo enkrat — brskalnik si jo zapomni do konca preizkusa.${
-      last ? `<br>Preizkus je odprt do vključno <strong>${escapeHtml(last.day)}</strong>` +
+      last ? `<br>Preizkus je odprt ${first ? `od <strong>${escapeHtml(first)}</strong> ` : ''}` +
+             `do vključno <strong>${escapeHtml(last.day)}</strong>` +
              ` <span class="tih">(zapre se ${escapeHtml(last.shuts)})</span>.` : ''
     }</p>`
     ),
     status
+  );
+}
+
+/**
+ * Before the agreed first day.
+ *
+ * 425 Too Early is the honest status: the request is well-formed and the caller is welcome, just
+ * not yet. It is NOT 401 (that would say the code is wrong) and NOT 410 (that would say the trial
+ * is over, which is the opposite of the truth and the message a client would remember).
+ */
+function notYetPage(startsAt) {
+  const first = firstDayText(startsAt);
+  return htmlResponse(
+    SHELL(
+      'Prenos dokumentacije — AIS',
+      `    <h1>Preizkus se še ni začel</h1>
+    <p class="sub">Dogovorjeno obdobje preizkusa se začne${first ? ` <strong>${escapeHtml(first)}</strong>` : ' kmalu'}.
+    Takrat bo ista koda za vstop delovala brez sprememb.</p>
+    <p class="foot">Štirinajst dni teče od tega dne, zato vam z danes ne vzamemo dneva.</p>`
+    ),
+    425
   );
 }
 
@@ -372,13 +437,20 @@ export default async function middleware(request) {
   if (clock.ended) {
     return isApi ? jsonResponse({ error: 'preizkus_zakljucen' }, 410) : endedPage();
   }
+  // Not yet. Checked AFTER `ended` so a misconfiguration that makes both true still closes the
+  // trial rather than reopening it.
+  if (!clock.started) {
+    return isApi
+      ? jsonResponse({ error: 'preizkus_se_ni_zacel' }, 425)
+      : notYetPage(clock.startsAt);
+  }
 
   // Fail closed: no passcode configured means nobody gets in.
   if (!passcode) {
     return isApi
       ? jsonResponse({ error: 'zaklenjeno' }, 503)
       : gatePage({ error: 'Stran trenutno ni na voljo. Obrnite se na AIS.', status: 503,
-                   endsAt: clock.endsAt });
+                   endsAt: clock.endsAt, startsAt: clock.startsAt });
   }
 
   const expected = await token(passcode);
@@ -420,8 +492,8 @@ export default async function middleware(request) {
     }
 
     return gatePage({ target, error: 'Koda ni pravilna. Poskusite znova.', status: 401,
-                      endsAt: clock.endsAt });
+                      endsAt: clock.endsAt, startsAt: clock.startsAt });
   }
 
-  return gatePage({ target: path + url.search, endsAt: clock.endsAt });
+  return gatePage({ target: path + url.search, endsAt: clock.endsAt, startsAt: clock.startsAt });
 }
