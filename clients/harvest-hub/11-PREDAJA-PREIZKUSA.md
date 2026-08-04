@@ -72,30 +72,32 @@ zahtevo predložiš.
 
 ## Kaj jim napisati
 
+Zadeva: **Preizkusna različica: avtomatizacija prenosa dokumentacije**
+
 > Pozdravljeni [ime],
 >
-> pošiljam preizkusno različico, kot dogovorjeno. Odprete jo na
-> **https://harvest-hub-preizkus.vercel.app**, koda za vstop je **[vstavi kodo]**. Vnesete jo
-> enkrat.
+> preizkusna različica je pripravljena. Odprete jo na
+> **https://harvest-hub-preizkus.vercel.app**, koda za vstop je **[vstavi kodo]**. Vnesete jo samo
+> enkrat, potem si jo brskalnik zapomni.
 >
-> Deluje tako, da ponudbo (ali celo mapo) povlečete na stran. Kontrolni list se izpolni sam,
-> zraven pa piše, kateri podatek je prebran iz ponudbe in kateri potrebuje vašo potrditev.
+> Ponudbo ali celo mapo povlečete na stran in kontrolni list se izpolni sam. Ob vsakem podatku
+> piše, ali je prebran iz ponudbe ali čaka na vašo potrditev.
 >
-> Preizkus je odprt do **17. 8. 2026**, potem se zapre sam. Datum piše tudi na vstopni strani.
+> Odprto je do **17. 8. 2026**, potem se zapre samo. Datum piše tudi na vstopni strani.
 >
-> Dvoje vas prosim, da veste vnaprej:
+> Dvoje, preden začnete.
 >
-> 1. **Vzorčni dokument je kar v aplikaciji** — pod poljem za nalaganje piše »Nimate ponudbe pri
->    roki?«, kliknete *Prenesite vzorčno ponudbo* in jo povlečete nazaj na stran. Podatki v njej
->    so izmišljeni. Dokler ne podpiševa priloženega aneksa k pogodbi o obdelavi osebnih podatkov,
->    vas prosim, da uporabljate ta vzorec in ne resničnih ponudb strank. Aneks je v priponki —
->    ena stran.
-> 2. **Pri nas se ne shrani nič** — ne dokument, ne prebrani podatki. To pomeni tudi dvoje: po
->    koncu preizkusa pri nas ni ničesar za izbrisati, in preizkus **ne beleži, kdo je kaj delal**.
->    Ker teče na gostovanem strežniku, gostitelj vodi svoj tehnični dnevnik zahtevkov (čas,
->    naslov strani, status) — brez vsebine dokumentov. Vse to je opisano v aneksu.
+> Vzorčno ponudbo najdete kar v aplikaciji. Pod poljem za nalaganje piše »Nimate ponudbe pri
+> roki?«, kliknete *Prenesite vzorčno ponudbo* in jo povlečete nazaj na stran. Podatki v njej so
+> izmišljeni. Prosim, da do podpisa priloženega aneksa k pogodbi o obdelavi osebnih podatkov
+> uporabljate ta vzorec in ne resničnih ponudb strank. Aneks je v priponki, ena stran.
 >
-> Zanima me predvsem, kje se moti in kaj manjka. Tisto, kar najdete, popravimo sproti.
+> Pri nas se ne shrani nič, ne dokument ne prebrani podatki. Po koncu preizkusa pri nas torej ni
+> ničesar za izbrisati, hkrati pa preizkus tudi ne beleži, kdo je kaj delal. Ker teče na gostovanem
+> strežniku, gostitelj vodi svoj tehnični dnevnik zahtevkov (čas, naslov strani, status), brez
+> vsebine dokumentov. Vse to piše v aneksu.
+>
+> Najbolj me zanima, kje se moti in kaj manjka. Kar najdete, popravimo sproti.
 >
 > Lep pozdrav,
 > Anej
