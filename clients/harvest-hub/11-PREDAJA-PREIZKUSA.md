@@ -23,8 +23,8 @@ zgodi na koncu, in kaj moraš urediti **preden** kdor koli naloži resnično pon
 Koda se vnese enkrat; brskalnik si jo zapomni do konca preizkusa. Stran je neindeksirana in nanjo
 ne kaže nobena javna povezava.
 
-**Datum konca lahko premakneš** — če jim preizkusa ne izročiš danes, ga zamakni, da dobijo polnih
-14 dni:
+**Preizkus je odprt od 5. 8.** Če ga Petri izročiš pozneje, zamakni konec, da dobi polnih 14 dni
+(premakni tudi `TRIAL_STARTS`, sicer je odprt že od 5. 8.):
 
 ```bash
 cd "/Users/ianveber/Desktop/Cloude CODE/clients/harvest-hub/trial" && vercel env rm TRIAL_ENDS production --yes; echo "2026-08-25T22:00:00Z" | vercel env add TRIAL_ENDS production && vercel deploy --prod --yes
@@ -73,23 +73,31 @@ zahtevo predložiš.
 
 ---
 
-## Kaj jim napisati
+## Kaj napisati Petri
 
 Zadeva: **Preizkusna različica: avtomatizacija prenosa dokumentacije**
 
-> Pozdravljeni [ime],
+> Pozdravljena Petra,
 >
 > preizkusna različica je pripravljena. Odprete jo na
 > **https://harvest-hub-preizkus.vercel.app**, koda za vstop je **[vstavi kodo]**. Vnesete jo samo
 > enkrat, potem si jo brskalnik zapomni.
 >
-> Odprta bo **od jutri, 5. 8., do vključno 18. 8. 2026**. Štirinajst dni teče od jutri, zato danes
-> še ne boste mogli noter, in tudi zadnji dan vam ne vzamemo. Obe meji pišeta na vstopni strani.
+> Odprta je **od danes, 5. 8., do vključno 18. 8. 2026**. Obe meji pišeta na vstopni strani.
 >
-> Ponudbo ali celo mapo povlečete na stran in kontrolni list se izpolni sam. Ob vsakem podatku
-> piše, ali je prebran iz ponudbe ali čaka na vašo potrditev.
+> Preden začnete, eno pojasnilo, ki se mi zdi pomembnejše od navodil za uporabo. **To, kar boste
+> videli, je približek avtomatizacije in približek končnega produkta, ni pa še produkt.** Je naše
+> izhodišče. Pokazati mora, da se dokumenti dajo brati zanesljivo in da kontrolni list nastane sam,
+> in prav to tudi pokaže. Ni pa še povezan z eDOKUMENTI ne z Zavarovalniškim programom, nima
+> uporabniških računov in ne vodi evidence, kdo je kaj naredil. Vse to pride v končni rešitvi.
 >
-> **Dvoje bi vas prosil, da spremljate teh štirinajst dni.**
+> Iz tega izhodišča gradimo naprej, in teh štirinajst dni je tisto, kar določi, v katero smer. Kar
+> boste povedali, gre neposredno v končni produkt, ne v predal s pripombami.
+>
+> Deluje tako, da ponudbo ali celo mapo povlečete na stran. Kontrolni list se izpolni sam, ob
+> vsakem podatku pa piše, ali je prebran iz ponudbe ali čaka na vašo potrditev.
+>
+> **Dvoje bi vas prosil, da spremljate.**
 >
 > Prvo je, kje se moti. Vsak konkreten primer, kjer je podatek prebral narobe ali dokumenta ni
 > prepoznal, je za nas več vreden kot splošen vtis. Kar najdete, popravimo sproti, še med
@@ -101,11 +109,12 @@ Zadeva: **Preizkusna različica: avtomatizacija prenosa dokumentacije**
 > eDOKUMENTE, prepis istih podatkov v Zavarovalniški program, izpolnitev kontrolnega lista in
 > privolitvene izjave. Vpišete enkrat. Od tam naprej se v kartici »Prihranek v tem preizkusu«
 > sešteva, koliko ste prihranili, čez vse, kar ste dali skozi. Ob koncu kliknete »Kopiraj
-> povzetek« in mi ga pošljete. To je številka, ki jo bova gledala, ko se bova pogovarjala o
-> nadaljevanju, in raje jo imam vašo kot svojo.
+> povzetek« in mi ga pošljete.
 >
-> Če se izkaže, da je prihranek majhen ali da je stroj kje celo počasnejši od vas, mi to prav tako
-> povejte. Takrat je smiselno gledati, kje se da še kaj skrajšati, ne pa iskati lepšo številko.
+> To je številka, ki jo bova gledala, ko se bova pogovarjala o nadaljevanju, in raje jo imam vašo
+> kot svojo. Če se izkaže, da je prihranek majhen ali da je stroj kje celo počasnejši od vas, mi
+> to prav tako povejte. Takrat je smiselno gledati, kje se da še kaj skrajšati, ne pa iskati lepšo
+> številko.
 >
 > Dvoje pa še, da veste vnaprej:
 >
@@ -115,9 +124,12 @@ Zadeva: **Preizkusna različica: avtomatizacija prenosa dokumentacije**
 >    vas prosim, da uporabljate ta vzorec in ne resničnih ponudb strank. Aneks je v priponki, ena
 >    stran.
 > 2. **Pri nas se ne shrani nič**, ne dokument ne prebrani podatki. Števec prihranka teče v vašem
->    brskalniku, na vaši napravi, in vsebuje samo števila in čas. K nam ne pride, dokler mi ga sami
->    ne pošljete. Ker preizkus teče na gostovanem strežniku, gostitelj vodi svoj tehnični dnevnik
->    zahtevkov (čas, naslov strani, status), brez vsebine dokumentov. Vse to piše v aneksu.
+>    brskalniku, na vaši napravi, in vsebuje samo števila in čas. K nam ne pride, dokler mi ga
+>    sami ne pošljete. Ker preizkus teče na gostovanem strežniku, gostitelj vodi svoj tehnični
+>    dnevnik zahtevkov (čas, naslov strani, status), brez vsebine dokumentov. Vse to piše v
+>    aneksu.
+>
+> Če se pri čemer koli zatakne, mi kar pišite.
 >
 > Lep pozdrav,
 > Anej
