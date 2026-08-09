@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIS — Owner board</title>
+<style>
+:root{
+  --bg:#f5f5f7; --card:#fff; --line:#e8e8ed; --line-soft:#f0f0f3;
+  --ink:#1d1d1f; --ink-2:#6e6e73; --ink-3:#a1a1a6;
+  --blue:#0071e3; --green:#34c759; --red:#ff3b30; --orange:#ff9500;
+  --r:16px; --shadow:0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);
+  font:15px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;padding:34px 24px 90px;
+}
+.wrap{max-width:900px;margin:0 auto}
+a{color:var(--blue);text-decoration:none}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:26px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:600;letter-spacing:-.02em}
+.brand i{width:9px;height:9px;border-radius:50%;background:var(--blue)}
+h1{font-size:32px;font-weight:600;letter-spacing:-.03em;margin:8px 0 4px}
+.date{color:var(--ink-2);font-size:15px}
+.streak{text-align:right;font-size:13px;color:var(--ink-2)}
+.streak b{display:block;font-size:26px;font-weight:600;color:var(--ink);letter-spacing:-.02em;line-height:1.1}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px;box-shadow:var(--shadow);margin-bottom:16px}
+.card h3{font-size:16px;font-weight:600;letter-spacing:-.01em;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card .hint{font-size:13px;color:var(--ink-3);margin-bottom:16px}
+.k{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+
+/* the one thing */
+.focus{border-left:3px solid var(--blue)}
+.focus .big{font-size:23px;font-weight:600;letter-spacing:-.02em;line-height:1.3;margin:6px 0 8px}
+.focus .why{color:var(--ink-2);font-size:15px;margin-bottom:20px}
+.task{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-top:1px solid var(--line-soft)}
+.task:hover{background:#fafafc;margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:8px}
+.tick{width:21px;height:21px;flex:0 0 21px;border-radius:50%;border:1.5px solid var(--line);
+  display:grid;place-items:center;font-size:12px;color:transparent;margin-top:1px;transition:.15s}
+.tick:hover{border-color:var(--blue)}
+.task.done .tick{background:var(--green);border-color:var(--green);color:#fff}
+.task.miss .tick{background:var(--red);border-color:var(--red);color:#fff}
+.task.done .txt{color:var(--ink-3);text-decoration:line-through}
+.task .txt{flex:1}
+.win{margin-top:18px;padding-top:16px;border-top:1px solid var(--line-soft);font-size:14px;color:var(--ink-2)}
+.win b{color:var(--ink);font-weight:500}
+
+/* north star */
+.ns{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.ns .n{font-size:26px;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.15}
+.ns .l{font-size:12px;color:var(--ink-2);margin-top:3px}
+.ns .n.good{color:var(--green)}.ns .n.warn{color:var(--orange)}.ns .n.bad{color:var(--red)}
+.bar{height:7px;border-radius:100px;background:#f0f0f3;overflow:hidden;margin-top:16px}
+.bar i{display:block;height:100%;background:var(--blue);border-radius:100px;transition:width .4s}
+.bar i.good{background:var(--green)}
+
+/* history */
+.hist{display:flex;gap:6px;flex-wrap:wrap}
+.day{width:46px;text-align:center}
+.day .d{font-size:10px;color:var(--ink-3);margin-bottom:5px}
+.day .box{height:34px;border-radius:9px;background:#f0f0f3;display:grid;place-items:center;gap:2px;font-size:10px;line-height:1}
+.day .box.am{background:#e8f1fd;color:var(--blue)}
+.day .box.both{background:#e7f8ec;color:#1d8a3d}
+.day.today .box{outline:2px solid var(--blue);outline-offset:1px}
+
+/* lists */
+.row{padding:13px 0;border-top:1px solid var(--line-soft);display:flex;gap:12px;align-items:flex-start}
+.row:first-of-type{border-top:none}
+.row .body{flex:1;min-width:0}
+.pill{display:inline-block;padding:3px 10px;border-radius:100px;font-size:12px;font-weight:500;background:#f0f0f3;color:var(--ink-2)}
+.pill.red{background:#ffecea;color:#c4291c}
+.pill.orange{background:#fff3e3;color:#b56a00}
+.pill.blue{background:#e8f1fd;color:var(--blue)}
+.pill.green{background:#e7f8ec;color:#1d8a3d}
+.x{color:var(--ink-3);font-size:18px;line-height:1;padding:2px 6px;border-radius:6px}
+.x:hover{background:#f0f0f3;color:var(--red)}
+
+.empty{color:var(--ink-2);font-size:14px;padding:6px 0}
+.primary{background:var(--blue);color:#fff;padding:9px 18px;border-radius:10px;font-size:14px;font-weight:500}
+.primary:hover{background:#0062c4}
+.ghost{border:1px solid var(--line);padding:8px 16px;border-radius:10px;font-size:14px;background:#fff}
+.ghost:hover{background:#f7f7f9}
+.link{font-size:13px;color:var(--blue)}
+
+/* keys */
+.keys{position:fixed;bottom:0;left:0;right:0;background:rgba(251,251,253,.92);
+  backdrop-filter:saturate(180%) blur(18px);border-top:1px solid var(--line);
+  padding:11px 24px;display:flex;gap:22px;justify-content:center;font-size:13px;color:var(--ink-2);flex-wrap:wrap}
+.keys b{display:inline-grid;place-items:center;width:20px;height:20px;border:1px solid var(--line);
+  border-radius:5px;background:#fff;font-size:11px;font-weight:600;color:var(--ink);margin-right:6px}
+.keys span{display:flex;align-items:center}
+
+dialog{border:none;border-radius:var(--r);padding:26px;width:min(560px,94vw);box-shadow:0 24px 70px rgba(0,0,0,.2)}
+dialog::backdrop{background:rgba(0,0,0,.3)}
+dialog h3{font-size:19px;font-weight:600;letter-spacing:-.02em;margin-bottom:4px}
+dialog .hint{font-size:13px;color:var(--ink-2);margin-bottom:18px}
+label{display:block;font-size:13px;color:var(--ink-2);margin:14px 0 5px}
+input,textarea,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fff;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:2px solid #cfe3fb;border-color:var(--blue)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:22px}
+.taskin{margin-bottom:8px}
+@media(max-width:760px){.ns{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <div class="brand"><i></i>AIS · Owner board</div>
+    <h1 id="hTitle">Today</h1>
+    <div class="date" id="hDate"></div>
+  </div>
+  <div class="streak">
+    <b id="hStreak">0</b>
+    days in a row
+    <div style="margin-top:6px"><a class="link" href="/">Agency dashboard →</a></div>
+  </div>
+</header>
+
+<div class="card" id="nsCard"></div>
+<div class="card focus" id="focusCard"></div>
+<div class="card" id="histCard"></div>
+<div class="card" id="bnCard"></div>
+<div class="card" id="wkCard"></div>
+
+</div>
+
+<div class="keys">
+  <span><b>M</b> Set today's focus</span>
+  <span><b>E</b> Close the day</span>
+  <span><b>B</b> Log something stuck</span>
+  <span><b>W</b> Weekly look-back</span>
+  <span><b>N</b> Set the target</span>
+</div>
+
+<!-- dialogs -->
+<dialog id="dNS">
+  <h3>What are we actually aiming at?</h3>
+  <p class="hint">One number, one date. Everything else is subordinate to it.</p>
+  <form method="dialog" id="fNS">
+    <label>What we're counting</label>
+    <input id="ns-type" placeholder="Cash collected" required>
+    <div class="two">
+      <div><label>Target</label><input id="ns-target" type="number" step="any" required placeholder="90000"></div>
+      <div><label>Where we are</label><input id="ns-current" type="number" step="any" required placeholder="21980"></div>
+    </div>
+    <div class="two">
+      <div><label>By when</label><input id="ns-deadline" type="date" required></div>
+      <div><label>Monthly running cost</label><input id="ns-oe" type="number" step="any" placeholder="1200"></div>
+    </div>
+    <div class="actions"><button type="button" class="ghost" data-close>Not now</button><button class="primary">Save</button></div>
+  </form>
+</dialog>
+
+<dialog id="dM">
+  <h3>What's the one thing in the way today?</h3>
+  <p class="hint">Not a to-do list. Name the single thing that, if it moved, would move everything behind it.</p>
+  <form method="dialog" id="fM">
+    <label>The thing in the way</label>
+    <input id="m-constraint" required placeholder="No written proof of the two jobs we already delivered">
+    <label>Why it's the one</label>
+    <textarea id="m-why" rows="2" placeholder="Every acquisition route in the playbook starts with a case study, and there isn't one."></textarea>
+    <label>Three to five moves that serve it — nothing else</label>
+    <div id="m-tasks"></div>
+    <button type="button" class="ghost" id="m-add" style="margin-top:4px">Add another</button>
+    <label>What winning today looks like</label>
+    <input id="m-win" placeholder="INSPECTUS case study drafted end to end">
+    <div class="actions"><button type="button" class="ghost" data-close>Not now</button><button class="primary">Set it</button></div>
+  </form>
+</dialog>
+
+<dialog id="dE">
+  <h3>How did the day go?</h3>
+  <p class="hint">Honestly. A missed move is information, not a failure.</p>
+  <form method="dialog" id="fE">
+    <div id="e-tasks"></div>
+    <label>Anything worth remembering</label>
+    <textarea id="e-note" rows="2" placeholder="Optional"></textarea>
+    <div class="actions"><button type="button" class="ghost" data-close>Not now</button><button class="primary">Close the day</button></div>
+  </form>
+</dialog>
+
+<dialog id="dB">
+  <h3>What's stuck?</h3>
+  <p class="hint">Write it down now, decide about it at the weekly look-back.</p>
+  <form method="dialog" id="fB">
+    <label>What's stuck</label>
+    <input id="b-text" required placeholder="Aneks 1 unsigned — hosted trial expires 17 Aug">
+    <div class="two">
+      <div><label>Where</label>
+        <select id="b-cat">
+          <option>Winning work</option><option>Delivering work</option>
+          <option>Money</option><option>My own time</option>
+        </select></div>
+      <div><label>How bad</label>
+        <select id="b-sev"><option value="low">Can wait</option><option value="medium" selected>Should move</option><option value="high">Blocking</option></select></div>
+    </div>
+    <div class="actions"><button type="button" class="ghost" data-close>Not now</button><button class="primary">Log it</button></div>
+  </form>
+</dialog>
+
+<dialog id="dW">
+  <h3>Weekly look-back</h3>
+  <p class="hint">Five steps, in order. Skipping to the last one is how money gets spent on the wrong thing.</p>
+  <form method="dialog" id="fW">
+    <label>1 · What is the thing in the way this week?</label>
+    <input id="w-1" required placeholder="Name it">
+    <label>2 · What can we get out of it without spending anything?</label>
+    <textarea id="w-2" rows="2" placeholder="Protect the mornings, prepare the inputs the night before, cut the rework"></textarea>
+    <label>3 · What slows down or stops so it can move?</label>
+    <textarea id="w-3" rows="2" placeholder="Everything running at full speed upstream just piles up"></textarea>
+    <label>4 · Does it need money or people yet?</label>
+    <textarea id="w-4" rows="2" placeholder="Only if 2 and 3 are genuinely exhausted"></textarea>
+    <label>5 · Where will it move to next?</label>
+    <input id="w-5" placeholder="Best guess">
+    <div class="two">
+      <div><label>Money in this week</label><input id="w-t" type="number" step="any" placeholder="0"></div>
+      <div><label>Money out this week</label><input id="w-oe" type="number" step="any" placeholder="0"></div>
+    </div>
+    <label>How many big things are open right now?</label>
+    <input id="w-wip" type="number" min="0" placeholder="3">
+    <div class="actions"><button type="button" class="ghost" data-close>Not now</button><button class="primary">Save the week</button></div>
+  </form>
+</dialog>
+
+<script>
+const KEY = 'ais-owner-os';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => (n === null || n === undefined || n === '') ? '—' : '€' + Number(n).toLocaleString('de-DE');
+const iso = d => d.toISOString().slice(0, 10);
+const TODAY = iso(new Date());
+
+const BLANK = { northStar:null, mission:null, history:[], bottlenecks:[], weeks:[] };
+let S = load();
+
+function load(){
+  try { return Object.assign({}, BLANK, JSON.parse(localStorage.getItem(KEY) || '{}')); }
+  catch { return structuredClone(BLANK); }
+}
+function save(){ localStorage.setItem(KEY, JSON.stringify(S)); render(); }
+
+function dayEntry(date, make){
+  let e = S.history.find(h => h.date === date);
+  if (!e && make) { e = { date, am:false, pm:false }; S.history.push(e); S.history.sort((a,b)=>a.date<b.date?-1:1); }
+  return e;
+}
+
+function streak(){
+  let n = 0;
+  for (let i = 0; i < 400; i++){
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const e = S.history.find(h => h.date === iso(d));
+    if (e && e.am) n++;
+    else if (i > 0 || (e && !e.am)) break;
+    else if (i === 0) continue;   // today not set yet doesn't break yesterday's run
+  }
+  return n;
+}
+
+// ── render ───────────────────────────────────────────────────────────────────
+function renderNS(){
+  const ns = S.northStar;
+  if (!ns){
+    $('#nsCard').innerHTML = `<h3>The target</h3>
+      <p class="empty">Nothing set. Press <b>N</b> to name one number and one date.</p>`;
+    return;
+  }
+  const gap = ns.target - ns.current;
+  const days = Math.max(0, Math.ceil((new Date(ns.deadline) - new Date(TODAY)) / 864e5));
+  const weeks = Math.max(1, days / 7);
+  const pace = gap / weeks;
+  const pctDone = Math.max(0, Math.min(100, ns.current / ns.target * 100));
+  const tone = pctDone >= 75 ? 'good' : pctDone >= 40 ? '' : 'warn';
+
+  $('#nsCard').innerHTML = `
+    <h3>The target <button class="link" data-open="dNS">Change</button></h3>
+    <p class="hint">${esc(ns.type)} · by ${esc(ns.deadline)}</p>
+    <div class="ns">
+      <div><div class="n">${money(ns.target)}</div><div class="l">Aiming at</div></div>
+      <div><div class="n ${tone}">${money(ns.current)}</div><div class="l">So far</div></div>
+      <div><div class="n">${money(gap)}</div><div class="l">Still to go</div></div>
+      <div><div class="n ${days < 30 && pctDone < 70 ? 'bad' : ''}">${money(Math.round(pace))}</div><div class="l">Needed per week · ${days} days left</div></div>
+    </div>
+    <div class="bar"><i class="${pctDone >= 75 ? 'good' : ''}" style="width:${pctDone}%"></i></div>
+    ${ns.oe ? `<p class="win" style="margin-top:14px">Running cost is <b>${money(ns.oe)}</b> a month, so the real number to clear is <b>${money(ns.oe)}</b> before any of this counts.</p>` : ''}`;
+}
+
+function renderFocus(){
+  const m = S.mission;
+  if (!m || m.date !== TODAY){
+    $('#focusCard').innerHTML = `<h3>What's in the way today</h3>
+      <p class="empty">Not set yet. Press <b>M</b>.${m ? ` Last set ${esc(m.date)}: “${esc(m.constraint)}”` : ''}</p>`;
+    return;
+  }
+  $('#focusCard').innerHTML = `
+    <h3>What's in the way today <button class="link" data-open="dM">Change</button></h3>
+    <div class="big">${esc(m.constraint)}</div>
+    ${m.why ? `<div class="why">${esc(m.why)}</div>` : ''}
+    ${(m.tasks || []).map((t, i) => `
+      <div class="task ${t.done ? 'done' : t.missed ? 'miss' : ''}">
+        <button class="tick" data-toggle="${i}" title="Done or not">${t.done ? '✓' : t.missed ? '✕' : ''}</button>
+        <span class="txt">${esc(t.text)}</span>
+      </div>`).join('')}
+    ${m.win ? `<div class="win">Winning today: <b>${esc(m.win)}</b></div>` : ''}
+    ${m.note ? `<div class="win">${esc(m.note)}</div>` : ''}`;
+}
+
+function renderHist(){
+  const cells = [];
+  for (let i = 13; i >= 0; i--){
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = iso(d);
+    const e = S.history.find(h => h.date === key);
+    const cls = e && e.am && e.pm ? 'both' : e && e.am ? 'am' : '';
+    cells.push(`<div class="day ${key === TODAY ? 'today' : ''}">
+      <div class="d">${d.toLocaleDateString('en-GB',{weekday:'narrow'})}${d.getDate()}</div>
+      <div class="box ${cls}">${e && e.am ? '●' : ''}${e && e.pm ? '●' : ''}</div>
+    </div>`);
+  }
+  $('#histCard').innerHTML = `<h3>Last two weeks</h3>
+    <p class="hint">One dot when the day is set, two when it's closed.</p>
+    <div class="hist">${cells.join('')}</div>`;
+}
+
+function renderBN(){
+  const open = S.bottlenecks.filter(b => b.status !== 'cleared');
+  const order = { high:0, medium:1, low:2 };
+  open.sort((a,b) => order[a.severity] - order[b.severity]);
+  $('#bnCard').innerHTML = `
+    <h3>Stuck <button class="link" data-open="dB">Add</button></h3>
+    <p class="hint">${open.length} open · press <b>B</b> to add one</p>
+    ${open.length ? open.map(b => `
+      <div class="row">
+        <div class="body">
+          <div>${esc(b.text)}</div>
+          <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+            <span class="pill">${esc(b.category)}</span>
+            <span class="pill ${b.severity === 'high' ? 'red' : b.severity === 'medium' ? 'orange' : ''}">
+              ${b.severity === 'high' ? 'Blocking' : b.severity === 'medium' ? 'Should move' : 'Can wait'}</span>
+            <span class="pill">since ${esc(b.date)}</span>
+          </div>
+        </div>
+        <button class="x" data-clear="${esc(b.id)}" title="Cleared">×</button>
+      </div>`).join('')
+    : `<p class="empty">Nothing logged.</p>`}`;
+}
+
+function renderWK(){
+  const w = S.weeks[S.weeks.length - 1];
+  if (!w){
+    $('#wkCard').innerHTML = `<h3>Weekly look-back</h3>
+      <p class="empty">None yet. Press <b>W</b> — it takes about ten minutes and it's the one that stops the drift.</p>`;
+    return;
+  }
+  const net = (Number(w.t) || 0) - (Number(w.oe) || 0);
+  $('#wkCard').innerHTML = `
+    <h3>Weekly look-back <button class="link" data-open="dW">New one</button></h3>
+    <p class="hint">Last done ${esc(w.date)}</p>
+    <div class="ns" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px">
+      <div><div class="n">${money(w.t)}</div><div class="l">Came in</div></div>
+      <div><div class="n">${money(w.oe)}</div><div class="l">Went out</div></div>
+      <div><div class="n ${net > 0 ? 'good' : net < 0 ? 'bad' : ''}">${money(net)}</div><div class="l">Left</div></div>
+    </div>
+    <div class="row"><div class="body"><div class="k">In the way</div><div>${esc(w.s1)}</div></div></div>
+    ${w.s2 ? `<div class="row"><div class="body"><div class="k">Free wins</div><div>${esc(w.s2)}</div></div></div>` : ''}
+    ${w.s3 ? `<div class="row"><div class="body"><div class="k">Slowing down</div><div>${esc(w.s3)}</div></div></div>` : ''}
+    ${w.s5 ? `<div class="row"><div class="body"><div class="k">Moves to next</div><div>${esc(w.s5)}</div></div></div>` : ''}
+    ${w.wip !== '' && w.wip != null ? `
+      <div class="win">Open at once: <b>${esc(w.wip)}</b>${Number(w.wip) > 3
+        ? ` — that's over three. <span style="color:var(--orange)">Finish something before starting anything.</span>` : ' — fine.'}</div>` : ''}`;
+}
+
+function render(){
+  $('#hDate').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  $('#hStreak').textContent = streak();
+  renderNS(); renderFocus(); renderHist(); renderBN(); renderWK();
+}
+
+// ── mission task inputs ──────────────────────────────────────────────────────
+function taskInput(v = ''){
+  const d = document.createElement('div');
+  d.className = 'taskin';
+  d.innerHTML = `<input placeholder="One move" value="${esc(v)}">`;
+  return d;
+}
+function fillMissionForm(){
+  const box = $('#m-tasks'); box.innerHTML = '';
+  const m = (S.mission && S.mission.date === TODAY) ? S.mission : null;
+  $('#m-constraint').value = m ? m.constraint : '';
+  $('#m-why').value = m ? (m.why || '') : '';
+  $('#m-win').value = m ? (m.win || '') : '';
+  const tasks = m && m.tasks && m.tasks.length ? m.tasks.map(t => t.text) : ['', '', ''];
+  tasks.forEach(t => box.appendChild(taskInput(t)));
+}
+$('#m-add').onclick = () => {
+  const box = $('#m-tasks');
+  if (box.children.length >= 5) return;
+  box.appendChild(taskInput());
+  box.lastChild.querySelector('input').focus();
+};
+
+// ── dialogs ──────────────────────────────────────────────────────────────────
+function open(id){
+  if (id === 'dM') fillMissionForm();
+  if (id === 'dE'){
+    const m = (S.mission && S.mission.date === TODAY) ? S.mission : null;
+    $('#e-tasks').innerHTML = m && m.tasks.length
+      ? m.tasks.map((t, i) => `
+          <div style="padding:11px 0;border-top:1px solid var(--line-soft)">
+            <div style="margin-bottom:7px">${esc(t.text)}</div>
+            <div style="display:flex;gap:8px">
+              <label style="margin:0;display:flex;gap:6px;align-items:center;color:var(--ink)">
+                <input type="radio" name="e${i}" value="done" style="width:auto" ${t.done ? 'checked' : ''}> Did it</label>
+              <label style="margin:0;display:flex;gap:6px;align-items:center;color:var(--ink)">
+                <input type="radio" name="e${i}" value="missed" style="width:auto" ${t.missed ? 'checked' : ''}> Didn't</label>
+            </div>
+          </div>`).join('')
+      : `<p class="empty">No moves were set today. Press M tomorrow morning.</p>`;
+    $('#e-note').value = m ? (m.note || '') : '';
+  }
+  if (id === 'dNS' && S.northStar){
+    const n = S.northStar;
+    $('#ns-type').value = n.type; $('#ns-target').value = n.target;
+    $('#ns-current').value = n.current; $('#ns-deadline').value = n.deadline; $('#ns-oe').value = n.oe ?? '';
+  }
+  if (id === 'dW'){
+    const m = (S.mission && S.mission.date === TODAY) ? S.mission : null;
+    if (m && !$('#w-1').value) $('#w-1').value = m.constraint;
+  }
+  $('#' + id).showModal();
+}
+
+document.addEventListener('click', e => {
+  const o = e.target.closest('[data-open]');   if (o) return open(o.dataset.open);
+  const c = e.target.closest('[data-close]');  if (c) return c.closest('dialog').close();
+  const t = e.target.closest('[data-toggle]');
+  if (t){
+    const task = S.mission.tasks[+t.dataset.toggle];
+    if (task.done) { task.done = false; task.missed = true; }
+    else if (task.missed) { task.missed = false; }
+    else { task.done = true; }
+    return save();
+  }
+  const x = e.target.closest('[data-clear]');
+  if (x){
+    const b = S.bottlenecks.find(b => b.id === x.dataset.clear);
+    if (b) { b.status = 'cleared'; save(); }
+  }
+});
+
+$('#fNS').addEventListener('submit', e => {
+  e.preventDefault();
+  S.northStar = {
+    type: $('#ns-type').value.trim(),
+    target: Number($('#ns-target').value),
+    current: Number($('#ns-current').value),
+    deadline: $('#ns-deadline').value,
+    oe: $('#ns-oe').value === '' ? null : Number($('#ns-oe').value),
+  };
+  $('#dNS').close(); save();
+});
+
+$('#fM').addEventListener('submit', e => {
+  e.preventDefault();
+  const texts = [...$('#m-tasks').querySelectorAll('input')].map(i => i.value.trim()).filter(Boolean);
+  const prev = (S.mission && S.mission.date === TODAY) ? S.mission.tasks : [];
+  S.mission = {
+    date: TODAY,
+    constraint: $('#m-constraint').value.trim(),
+    why: $('#m-why').value.trim(),
+    win: $('#m-win').value.trim(),
+    note: (S.mission && S.mission.date === TODAY) ? S.mission.note : '',
+    tasks: texts.map(t => {
+      const was = prev.find(p => p.text === t);
+      return { text: t, done: was ? was.done : false, missed: was ? was.missed : false };
+    }),
+  };
+  dayEntry(TODAY, true).am = true;
+  $('#dM').close(); save();
+});
+
+$('#fE').addEventListener('submit', e => {
+  e.preventDefault();
+  const m = (S.mission && S.mission.date === TODAY) ? S.mission : null;
+  if (m){
+    m.tasks.forEach((t, i) => {
+      const picked = document.querySelector(`input[name="e${i}"]:checked`);
+      t.done = picked ? picked.value === 'done' : false;
+      t.missed = picked ? picked.value === 'missed' : false;
+    });
+    m.note = $('#e-note').value.trim();
+  }
+  const d = dayEntry(TODAY, true); d.pm = true; d.am = d.am || !!m;
+  $('#dE').close(); save();
+});
+
+$('#fB').addEventListener('submit', e => {
+  e.preventDefault();
+  S.bottlenecks.push({
+    id: 'b' + Date.now(),
+    text: $('#b-text').value.trim(),
+    category: $('#b-cat').value,
+    severity: $('#b-sev').value,
+    status: 'open',
+    date: TODAY,
+  });
+  $('#fB').reset(); $('#dB').close(); save();
+});
+
+$('#fW').addEventListener('submit', e => {
+  e.preventDefault();
+  S.weeks.push({
+    date: TODAY,
+    s1: $('#w-1').value.trim(), s2: $('#w-2').value.trim(), s3: $('#w-3').value.trim(),
+    s4: $('#w-4').value.trim(), s5: $('#w-5').value.trim(),
+    t: $('#w-t').value, oe: $('#w-oe').value, wip: $('#w-wip').value,
+  });
+  $('#fW').reset(); $('#dW').close(); save();
+});
+
+// ── keyboard ─────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (document.querySelector('dialog[open]')) return;
+  const map = { m:'dM', e:'dE', b:'dB', w:'dW', n:'dNS' };
+  const id = map[e.key.toLowerCase()];
+  if (id) { e.preventDefault(); open(id); }
+});
+
+render();
+</script>
+</body>
+</html>

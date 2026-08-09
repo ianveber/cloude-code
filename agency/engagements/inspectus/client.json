@@ -1,0 +1,93 @@
+{
+  "slug": "inspectus",
+  "name": "INSPECTUS d.o.o.",
+  "vertical": "document-operations",
+  "function": "Turning the survey report into finished VLDR documentation, with AI validation",
+  "phase": "operate",
+  "started": "2026-06-04",
+  "owners": {
+    "ais": "Ian Veber",
+    "client": ""
+  },
+  "volume": "500–600 forms/week · Luka Koper handles ~800,000 vehicles/year",
+  "systems": [
+    "SURVEY REPORT.xlsx",
+    "PRINT VLDR template (AIAG-ECG / M-22)",
+    "EU 6546 form",
+    "Vercel"
+  ],
+  "economics": {
+    "currency": "EUR",
+    "build_fee": 1900,
+    "retainer": 227,
+    "run_cost": null,
+    "_CORRECTION": "Earlier version of this file wrongly recorded €14,900 + €590/mo as the engagement. That is the UNSIGNED VIN smart-filter proposal (Aug 2026), not delivered work. Corrected 2026-08-09 against Pogodba-A.",
+    "fee_note": "Contract A, 4 June 2026 — Phase 1, delivered and live. €1,900 one-off + €200/mo at signature. The August economics doc records the current existing subscription (VLDR + dashboard) at €227/mo.",
+    "run_cost_note": "Not separately measured for Phase 1. The tool processes Excel locally in the client's browser and runs on the client's own API keys, so most of the inference cost sits with them, not us.",
+    "terms": "12 months, then rolling monthly with 30 days' notice. 30-day guarantee from go-live. Code belongs to the client."
+  },
+  "pipeline": [
+    {
+      "contract": "A — VLDR processing automation",
+      "status": "delivered, live",
+      "fee": "€1,900 + €200/mo",
+      "date": "2026-06-04"
+    },
+    {
+      "contract": "B — capture from photo/form into Excel",
+      "status": "proposed, unsigned",
+      "fee": "€3,900 + monthly",
+      "note": "Targets the ~20 h/month of manual retyping into Excel"
+    },
+    {
+      "contract": "C — full process, A + B under one management",
+      "status": "proposed, unsigned",
+      "fee": "€4,900 + €390/mo"
+    },
+    {
+      "contract": "VIN smart filter",
+      "status": "proposed, unsigned",
+      "fee": "€14,900 + €590/mo (≤4 ships), €150/ship over",
+      "note": "Internal analysis recommended €19,700. Run cost €134/mo yr 1 → 77% margin, but only if the cheap-first-pass routing ships; unoptimized it is €255/mo and 57%. Reader scored 9/9 VIN in a controlled test."
+    }
+  ],
+  "proven": {
+    "vehicles_processed": 314,
+    "damages": 380,
+    "dropouts": 0,
+    "mislabels": 0,
+    "note": "On the client's own live data. This is the verified outcome — time savings for Phase 1 have never been measured."
+  },
+  "next_action": {
+    "what": "Ask INSPECTUS for case-study permission — the draft is written and everything in sales/ routes through it",
+    "owner": "Ian Veber",
+    "due": ""
+  },
+  "links": [
+    {
+      "label": "Case study (draft, needs client approval)",
+      "path": "agency/sales/case-studies/inspectus.md"
+    },
+    {
+      "label": "Contract A — delivered",
+      "path": "INSPEKTUS/ponudbe-inspectus/pogodbe/Pogodba-A-Avtomatizacija-VLDR-izvedeno.docx"
+    },
+    {
+      "label": "VIN filter economics (internal, not for the client)",
+      "path": "INSPEKTUS/ekonomika-projekta/AIS-INSPECTUS-VIN-Ekonomika.pdf"
+    },
+    {
+      "label": "User guide",
+      "path": "INSPEKTUS/NAVODILA-VLDR.md"
+    },
+    {
+      "label": "VLDR automation (live)",
+      "url": "https://inspectus-vldr.vercel.app"
+    }
+  ],
+  "watch": [
+    "The client uses inspectus-filter-demo.vercel.app — NOT inspectus-os.vercel.app. Run `vercel alias ls` and confirm before every deploy. Getting this wrong cost a full day on 2026-07-20.",
+    "INSPECTUS OS Phase 2 (login + saved runs) is built but stranded — it needs a Supabase project that has never been created.",
+    "The VIN cost-optimization branch is committed and undeployed. Finish it before the subscription is signed, not after."
+  ]
+}

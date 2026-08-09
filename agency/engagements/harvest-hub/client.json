@@ -1,0 +1,58 @@
+{
+  "slug": "harvest-hub",
+  "name": "Harvest Hub d.o.o.",
+  "vertical": "document-operations",
+  "function": "PRENOS — taking offer documents out of email and into both systems, without anyone retyping them",
+  "phase": "validation",
+  "started": "2026-07-23",
+  "owners": {
+    "ais": "Ian Veber",
+    "client": ""
+  },
+  "volume": "300–500 offers/month · ~7 documents each ≈ several thousand manual touches a year, every one of them typed twice",
+  "systems": [
+    "Email intake",
+    "eDOKUMENTE",
+    "Zavarovalniški program"
+  ],
+  "economics": {
+    "currency": "EUR",
+    "build_fee": 12000,
+    "retainer": null,
+    "run_cost": null,
+    "fee_note": "Solution 2 (adds automatic KLP + consent form and runs the signing process). Solution 1 is €8,900. Nothing signed yet — Aneks 1 is still out.",
+    "retainer_note": "Sold build-only: the client owns the source and pays their own runtime, ~€80–110/month. This breaks docs/pricing.md, which says never build without operate. See verticals/document-operations.md §6 — this engagement is the live test of whether that doctrine holds.",
+    "client_run_cost": "~€40–50/mo AI + €30–60/mo hosting in the EU"
+  },
+  "next_action": {
+    "what": "Get Aneks 1 signed — the hosted trial expires 17 August",
+    "owner": "Ian Veber",
+    "due": "2026-08-17"
+  },
+  "links": [
+    {
+      "label": "PRENOS ZERO proposal",
+      "path": "clients/harvest-hub/02-ponudba-prenos-zero.md"
+    },
+    {
+      "label": "Official offer (PDF)",
+      "path": "clients/harvest-hub/AIS-Ponudba-Harvest-Hub.pdf"
+    },
+    {
+      "label": "Aneks 1 — hosted trial",
+      "path": "clients/harvest-hub/10-aneks-1-gostovani-preizkus.pdf"
+    },
+    {
+      "label": "Trial handover",
+      "path": "clients/harvest-hub/11-PREDAJA-PREIZKUSA.md"
+    },
+    {
+      "label": "Trial (live)",
+      "url": "https://harvest-hub-preizkus.vercel.app"
+    }
+  ],
+  "watch": [
+    "Hosting the trial exposed four defects that cannot happen locally: a CSP rule cropping content, the wrong deployment region for EU data, model output leaking into logs, and a build script publishing the thing it was meant to guard. Deploy to the real target during build, never at handoff.",
+    "The no-storage guarantee had to be narrowed after review, and it covers four document types, not five. Do not let it drift back."
+  ]
+}

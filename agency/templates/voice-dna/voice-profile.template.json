@@ -1,0 +1,102 @@
+{
+  "_README": "Machine-readable voice rules. One per client (or one for AIS itself) at engagements/<slug>/voice-profile.json. This is the file agents load; voice-system-prompt.md is generated from it, and voice-of-brand.md is the human explanation. Doctrine lives in agents/16-sample-voice-locking.md — read that first.",
+
+  "subject": {
+    "name": "",
+    "slug": "",
+    "kind": "client | ais | owner",
+    "languages": ["sl", "en"],
+    "primary_language": "sl"
+  },
+
+  "sample_lock": {
+    "required": 16,
+    "collected": 0,
+    "locked": false,
+    "_note": "Below 16 curated samples the output is generic. Do not ship voice-dependent work until locked is true. Samples live in engagements/<slug>/voice-samples/ with a manifest.",
+    "samples": [
+      {
+        "id": "",
+        "path": "",
+        "channel": "",
+        "date": "",
+        "why_chosen": "",
+        "grade": "strong"
+      }
+    ]
+  },
+
+  "register": {
+    "formality": "vi",
+    "_formality_options": "sl: vi | ti. Getting this wrong in Slovene is the single most visible voice failure.",
+    "warmth": 3,
+    "directness": 4,
+    "technical_density": 2,
+    "_scale": "1–5. Measure these off the 16 samples, do not guess them.",
+    "sentence_length": "short-to-medium, one idea each",
+    "person": "we",
+    "hedging": "hedge real uncertainty explicitly, never hedge a fact"
+  },
+
+  "lexicon": {
+    "always": [],
+    "never": [],
+    "_never_seed": [
+      "leverage", "synergy", "delve", "unlock the power of", "supercharge",
+      "revolutionize", "game-changer", "cutting-edge", "world-class",
+      "best-in-class", "industry-leading", "we are excited to announce"
+    ],
+    "domain_terms": {},
+    "_domain_terms_note": "Term -> the exact way this subject says it. e.g. 'ponudba' not 'oferta'. Pull from the samples.",
+    "product_names": {},
+    "banned_claims": [],
+    "_banned_claims_note": "Things that are not true and must never be written even if they would help. See feedback: no fabricated credentials."
+  },
+
+  "punctuation": {
+    "em_dash": true,
+    "exclamation": false,
+    "questions_in_headings": false,
+    "emoji": "none",
+    "_emoji_note": "Set a small explicit palette only if the samples actually contain emoji. For regulated B2B this is almost always 'none'.",
+    "numbers": "Slovenian locale — comma decimals (305,50 €), space thousands separator"
+  },
+
+  "structure": {
+    "opener": "state the finding, not the greeting",
+    "answer_first": true,
+    "_answer_first_note": "Definitive answer in the first 40–60 words. Doubles as GEO structure — see sales/geo-aeo-strategy.md.",
+    "evidence": "every claim carries a number, a source, or a named example",
+    "closer": "one concrete next step with an owner",
+    "max_paragraph_lines": 4
+  },
+
+  "channels": {
+    "proposal": { "formality": "vi", "length": "long", "notes": "" },
+    "email": { "formality": "vi", "length": "short", "notes": "" },
+    "linkedin": { "formality": "vi", "length": "medium", "notes": "" },
+    "article": { "formality": "impersonal", "length": "long", "notes": "GEAF structure" },
+    "chat_reply": { "formality": "vi", "length": "very short", "notes": "" }
+  },
+
+  "people": {
+    "_note": "Sub-profiles where a named person's voice differs from the house voice. Each needs its own 16.",
+    "example-person": {
+      "role": "",
+      "differs_from_house": "",
+      "sample_count": 0
+    }
+  },
+
+  "refusals": {
+    "_note": "What this voice declines to do, in its own words.",
+    "topics": [],
+    "phrasing": ""
+  },
+
+  "review": {
+    "last_refreshed": "",
+    "refresh_every": "quarterly",
+    "drift_check": "Sample 10 recent outputs against 3 locked samples. If a stranger can't tell they're the same author, re-lock."
+  }
+}
