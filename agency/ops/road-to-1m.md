@@ -77,6 +77,58 @@ INSPECTUS is grandfathered. Every new quote uses the new band. `docs/pricing.md`
 
 ---
 
+## How the three of us organize around this
+
+### Rung −1 — the entity
+
+**Decided by Ian, 2026-08-10: the d.o.o. opens once INSPECTUS and Harvest Hub have paid.** The sequencing is sound — a Slovenian d.o.o. needs €7,500 of minimum share capital, and a company billing €227/month does not have it. Rung 0 is what funds the entity.
+
+That makes Rung 0 and the entity the same move, and it puts one unresolved question directly on the critical path.
+
+**⚠️ The check that has to happen before the invoices go out.** The s.p. that would issue them is recorded as **"V blokadi"** — a bank-level account block. In AJPES that normally means a creditor, FURS, or a court action rather than a voluntary wind-down. If it is still live, **money invoiced into that account can be intercepted before it reaches the founders** — meaning the €31,800 that is supposed to capitalize the d.o.o. may never arrive, and the plan stalls at the exact step it was designed to clear.
+
+INSPECTUS has been paying €227/month since June, so money is reaching *somewhere*. That is evidence the mechanism works, or that payments are landing somewhere with its own tax consequences. Either way it is knowable, and nobody has written down which.
+
+**Three questions to Anej, before the Harvest Hub invoice is issued:**
+
+1. Which account has been receiving the INSPECTUS payments since June?
+2. Is the block still live, and what caused it — voluntary wind-down, or a creditor / FURS / court action?
+3. If a €12,000 invoice is paid into that account tomorrow, does the money reach us?
+
+This is a five-minute conversation that de-risks €31,800. It is not paperwork; it is the difference between Rung 0 funding the company and Rung 0 funding somebody else. An s.p. owner is **personally liable**, so if the cause is a creditor action it can also follow Anej into the new entity — which is why the answer is needed before the d.o.o. is formed, not after.
+
+**Also unresolved, and cheap to fix while the lawyer is already engaged:** there is **no founders' agreement**. 33/33/33 with no tie-breaker is a deadlock waiting for the first real disagreement about price, and the two-originals-plus-one-invited structure is exactly the shape that needs vesting. Draft it in the same session as the d.o.o. paperwork.
+
+**Owner: Nejc** (legal lead + external representative).
+
+### Ownership is currently inverted, and that is the organizational failure
+
+Rung 0 as originally written assigned **three of four items to Ian** — case-study permission, the INSPECTUS contracts, the VIN work. But Ian is **Head of Engineering, working part-time, with an outside job**, and three of those four are **sales acts**. Meanwhile Nejc — "primary external representative, most meetings, in-person marketing, sales" — was assigned nothing.
+
+Corrected:
+
+| Person | Role | Owns in Rung 0 |
+|---|---|---|
+| **Nejc Feigel Boh** | Legal + primary external rep, sales | **The entity, the founders' agreement, the V-blokadi answer.** INSPECTUS case-study permission. INSPECTUS Contract B/C close. All invoicing and collection. |
+| **Anej Vučič** | Strategic, AI domain, relationships | **Harvest Hub end to end** — he signed the handover to Petra and holds the relationship. Pricing decisions under the new band. |
+| **Ian Veber** | Engineering (Claude as technical brain), ~15–20 h/wk | **VIN cost-routing deploy. Delivery only. Nothing commercial.** |
+
+The rule: **Ian's hours are the scarcest input in the company and they are the only ones that can build. Every hour he spends chasing a signature is an hour of delivery capacity destroyed.** If a task can be done by someone who is not the engineer, it is not Ian's.
+
+### The cadence already exists — run it, don't rewrite it
+
+`ops/runbook.md` has a full daily / weekly / monthly / quarterly rhythm, written May 2026, with these same three names on it. It has never been run. Do not write a second one.
+
+It does need cutting to fit the real budget — it assumes something close to full-time founders, and the actual pool is ~20 combined hours a week. Until Ian leaves iPROM, run this reduced set and nothing else:
+
+- **Monday, 30 min, all three, live.** What closed, what is blocked, who is stuck. Blockers get an owner and a date before the call ends.
+- **Friday, 15 min, async.** Each person updates their engagements in `engagements/*/client.json`. No meeting.
+- **First Monday of the month, 45 min.** The five-number scoreboard below. Nothing else on the agenda.
+
+Everything else in `runbook.md` — the daily loops, the per-engagement QBRs, the partner reciprocity review — resumes when there is a team to run it. Scheduling it now guarantees it gets skipped, and a skipped cadence teaches everyone the cadence is optional.
+
+---
+
 ## Constraint order
 
 One bottleneck at a time.
