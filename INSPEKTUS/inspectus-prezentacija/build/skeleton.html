@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INSPECTUS · Pametni filter — predstavitev</title>
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<style>
+/* ================= TOKENS (mirror inspectus-os globals.css) ================= */
+:root {
+  --ink:#333333; --navy:#425060; --navy-deep:#2a3340;
+  --bg:#ffffff; --bg-soft:#fafafa; --panel:#eef1f3;
+  --border:#dddddd; --muted:#9aa3ad;
+  --accent:#b09575; --accent-soft:#f3ece3;
+  --success:#3a7d00; --success-soft:#eaf3e0;
+  --danger:#a01f0a;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; background:#e9ecef; }
+body { font-family:'Open Sans', system-ui, sans-serif; color:var(--ink); }
+
+/* ================= PRINT GEOMETRY ================= */
+@page { size: 297mm 210mm; margin: 0; }
+* { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+.page {
+  width:297mm; height:210mm;
+  overflow:hidden; position:relative;
+  background:var(--bg);
+  page-break-after:always; break-after:page;
+  padding:12mm 16mm 10mm;
+  display:flex; flex-direction:column;
+}
+@media screen {
+  html { scroll-snap-type:y mandatory; }
+  .page { box-shadow:0 6px 24px rgba(33,48,66,.14); margin:24px auto; scroll-snap-align:start; }
+}
+@media print {
+  html, body { background:#fff; }
+  .ui { display:none !important; }
+}
+
+/* ================= PAGE CHROME ================= */
+.ptop { display:flex; align-items:center; justify-content:space-between; height:11mm; flex:0 0 auto; }
+.ptop img.logo { height:8mm; width:auto; }
+.pill {
+  font-size:8pt; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+  padding:1.4mm 4mm; border-radius:99px;
+}
+.pill--danes  { background:var(--accent-soft);  color:#7d6449; }
+.pill--jutri  { background:var(--success-soft); color:var(--success); }
+.pill--teh    { background:var(--panel);        color:var(--navy-deep); }
+.pill--prih   { background:var(--success-soft); color:var(--success); }
+.pfoot {
+  flex:0 0 auto; height:8mm; display:flex; align-items:flex-end; justify-content:space-between;
+  font-size:8pt; color:var(--muted); border-top:1px solid var(--border); padding-top:2.5mm; margin-top:2mm;
+}
+.stepdots { display:flex; gap:2mm; align-items:center; }
+.stepdots i { width:2.6mm; height:2.6mm; border-radius:50%; background:var(--border); display:block; }
+.stepdots i.on { background:var(--navy); }
+
+/* ================= TYPOGRAPHY ================= */
+.phead { flex:0 0 auto; margin-top:4mm; }
+.eyebrow { font-size:9pt; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 1.5mm; }
+.ptitle { font-size:26pt; font-weight:800; color:var(--navy-deep); margin:0; line-height:1.12; }
+.psub { font-size:11.5pt; color:var(--navy); margin:2mm 0 0; }
+.pbody { flex:1 1 auto; position:relative; min-height:0; }
+.kicker { font-size:14pt; font-weight:700; color:var(--navy-deep); }
+.mono { font-family:var(--mono); }
+
+/* stat band */
+.statband { display:flex; gap:6mm; flex:0 0 auto; margin-top:3mm; }
+.stat { flex:1; background:var(--bg-soft); border:1px solid var(--border); border-radius:10px; padding:3.5mm 5mm; }
+.stat b { display:block; font-size:19pt; font-weight:800; color:var(--navy-deep); line-height:1.1; }
+.stat b.gold { color:var(--accent); }
+.stat span { display:block; font-size:9pt; color:var(--muted); margin-top:1mm; }
+
+/* callout */
+.callout { border-left:3px solid var(--accent); background:var(--accent-soft); padding:3mm 5mm; border-radius:0 8px 8px 0; font-size:11pt; color:#6b543a; font-weight:600; }
+
+/* ================= FLOWCHART LANGUAGE ================= */
+.chart { position:relative; width:100%; height:100%; }
+.chart svg.wire { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.node {
+  position:absolute; background:var(--bg);
+  border:1px solid rgba(66,80,96,.4); border-radius:10px;
+  padding:3mm 4mm; font-size:10.5pt; font-weight:600; color:var(--navy-deep);
+  line-height:1.25; box-shadow:none;
+}
+.node .sub { display:block; font-size:8.5pt; font-weight:400; color:var(--muted); margin-top:1mm; line-height:1.3; }
+.node--ai   { background:var(--navy); border-color:var(--navy); color:#fff; }
+.node--ai .sub { color:#c8d0d9; }
+.node--vin  { border:2px solid var(--accent); }
+.node--pain { border-left:4px solid var(--accent); }
+.node--ghost{ background:var(--bg-soft); border-style:dashed; color:var(--muted); }
+.badge-warn {
+  position:absolute; font-size:8.5pt; font-weight:700; color:var(--danger);
+  background:#fdf0ee; border:1px solid #eacfc9; border-radius:8px; padding:2mm 3.5mm; line-height:1.3;
+}
+.xloop { position:absolute; font-size:22pt; font-weight:800; color:var(--accent); letter-spacing:.02em; }
+.xloop small { display:block; font-size:8.5pt; font-weight:600; color:var(--muted); letter-spacing:0; }
+</style>
+</head>
+<body>
+
+<!-- ===================== P1 · NASLOVNICA ===================== -->
+<section class="page" id="page-1">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span></span></header>
+  <div class="pbody"></div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span>1 / 10</span></footer>
+</section>
+
+<!-- ===================== P2 · KORAK 1 ===================== -->
+<section class="page" id="page-2">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span class="pill pill--danes">Danes</span></header>
+  <div class="phead"><p class="eyebrow">Današnji postopek · korak 1 od 5</p><h2 class="ptitle">Fotografiranje v pristanišču</h2></div>
+  <div class="pbody"></div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span class="stepdots"><i class="on"></i><i></i><i></i><i></i><i></i></span><span>2 / 10</span></footer>
+</section>
+
+<!-- ===================== P3 · KORAK 2 ===================== -->
+<section class="page" id="page-3">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span class="pill pill--danes">Danes</span></header>
+  <div class="phead"><p class="eyebrow">Današnji postopek · korak 2 od 5</p><h2 class="ptitle">Vse fotografije v eno mapo</h2></div>
+  <div class="pbody"></div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span class="stepdots"><i></i><i class="on"></i><i></i><i></i><i></i></span><span>3 / 10</span></footer>
+</section>
+
+<!-- ===================== P4 · KORAK 3 ===================== -->
+<section class="page" id="page-4">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span class="pill pill--danes">Danes</span></header>
+  <div class="phead"><p class="eyebrow">Današnji postopek · korak 3 od 5</p><h2 class="ptitle">Iskanje po mapi v pisarni</h2></div>
+  <div class="pbody"></div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span class="stepdots"><i></i><i></i><i class="on"></i><i></i><i></i></span><span>4 / 10</span></footer>
+</section>
+
+<!-- ===================== P5 · KORAK 4 ===================== -->
+<section class="page" id="page-5">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span class="pill pill--danes">Danes</span></header>
+  <div class="phead"><p class="eyebrow">Današnji postopek · korak 4 od 5</p><h2 class="ptitle">Ročno razvrščanje — vozilo za vozilom</h2></div>
+  <div class="pbody"></div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span class="stepdots"><i></i><i></i><i></i><i class="on"></i><i></i></span><span>5 / 10</span></footer>
+</section>
+
+<!-- ===================== P6 · KORAK 5 ===================== -->
+<section class="page" id="page-6">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span class="pill pill--danes">Danes</span></header>
+  <div class="phead"><p class="eyebrow">Današnji postopek · korak 5 od 5</p><h2 class="ptitle">Končni izdelek — in cena poti do njega</h2></div>
+  <div class="pbody"></div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span class="stepdots"><i></i><i></i><i></i><i></i><i class="on"></i></span><span>6 / 10</span></footer>
+</section>
+
+<!-- ===================== P7 · JUTRI ===================== -->
+<section class="page" id="page-7">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span class="pill pill--jutri">Jutri</span></header>
+  <div class="phead"><p class="eyebrow">Novi postopek</p><h2 class="ptitle">Pet korakov postane en sam</h2></div>
+  <div class="pbody"></div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span>7 / 10</span></footer>
+</section>
+
+<!-- ===================== P8 · PAMETNI FILTER ===================== -->
+<section class="page" id="page-8">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span class="pill pill--teh">Tehnologija</span></header>
+  <div class="phead"><p class="eyebrow">Pametni filter</p><h2 class="ptitle">Kako filter razvrsti 6.000 fotografij</h2></div>
+  <div class="pbody"></div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span>8 / 10</span></footer>
+</section>
+
+<!-- ===================== P9 · PRIHRANEK ===================== -->
+<section class="page" id="page-9">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span class="pill pill--prih">Prihranek</span></header>
+  <div class="phead"><p class="eyebrow">Kaj to pomeni v urah</p><h2 class="ptitle">Vsaka ladja vrne ekipi približno deset ur</h2></div>
+  <div class="pbody"></div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span>9 / 10</span></footer>
+</section>
+
+<!-- ===================== P10 · KAJ SLEDI ===================== -->
+<section class="page" id="page-10">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span></span></header>
+  <div class="phead"><p class="eyebrow">Naslednji koraki</p><h2 class="ptitle">Kaj sledi</h2></div>
+  <div class="pbody"></div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span>10 / 10</span></footer>
+</section>
+
+<!-- screen-only presentation nav -->
+<div class="ui" style="position:fixed; right:18px; bottom:18px; display:flex; gap:8px; z-index:9;">
+  <button id="btn-fs" style="font:600 13px 'Open Sans',sans-serif; padding:8px 14px; border-radius:8px; border:1px solid #ccd; background:#fff; cursor:pointer;">Celozaslonsko</button>
+</div>
+<script>
+  // screen-only: arrow-key page navigation + fullscreen (stripped from print by @media print .ui)
+  const pages = [...document.querySelectorAll('.page')];
+  let cur = 0;
+  function go(i){ cur = Math.max(0, Math.min(pages.length-1, i)); pages[cur].scrollIntoView({behavior:'smooth'}); }
+  addEventListener('keydown', e => {
+    if (e.key==='ArrowRight' || e.key==='PageDown' || e.key===' ') { e.preventDefault(); go(cur+1); }
+    if (e.key==='ArrowLeft'  || e.key==='PageUp')  { e.preventDefault(); go(cur-1); }
+  });
+  document.getElementById('btn-fs').onclick = () => document.documentElement.requestFullscreen();
+</script>
+</body>
+</html>

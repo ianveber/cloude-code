@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="sl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Constat — Joint Survey (Opel · Citroën · Peugeot)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <h1>Constat — Joint Survey</h1>
+    <p class="sub">Opel · Citroën · Peugeot (PSA / RUA V3). Opcija 1: ladijski prihod / Joint Survey.</p>
+
+    <div class="bar">
+      <button class="btn primary" id="demo">Pokaži 3 primere (iz e-pošte)</button>
+      <button class="btn ghost" id="print">🖨 Natisni / PDF</button>
+      <button class="btn ghost" id="clear">Počisti</button>
+    </div>
+
+    <div class="drop" id="drop">
+      Povleci sem <b>Obdelava</b> izvoz (Ares, .xlsx / .csv) ali klikni za izbiro.
+      <input type="file" id="file" accept=".xlsx,.xls,.csv" hidden>
+    </div>
+    <div class="status" id="status"></div>
+
+    <div id="out"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="codes.js"></script>
+  <script src="engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INSPECTUS · Pametni filter — predstavitev</title>
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<style>
+/* ================= TOKENS (mirror inspectus-os globals.css) ================= */
+:root {
+  --ink:#333333; --navy:#425060; --navy-deep:#2a3340;
+  --bg:#ffffff; --bg-soft:#fafafa; --panel:#eef1f3;
+  --border:#dddddd; --muted:#9aa3ad;
+  --accent:#b09575; --accent-soft:#f3ece3;
+  --success:#3a7d00; --success-soft:#eaf3e0;
+  --danger:#a01f0a;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; background:#e9ecef; }
+body { font-family:'Open Sans', system-ui, sans-serif; color:var(--ink); }
+
+/* ================= PRINT GEOMETRY ================= */
+@page { size: 297mm 210mm; margin: 0; }
+* { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+.page {
+  width:297mm; height:210mm;
+  overflow:hidden; position:relative;
+  background:var(--bg);
+  page-break-after:always; break-after:page;
+  padding:12mm 16mm 10mm;
+  display:flex; flex-direction:column;
+}
+@media screen {
+  html { scroll-snap-type:y mandatory; }
+  .page { box-shadow:0 6px 24px rgba(33,48,66,.14); margin:24px auto; scroll-snap-align:start; }
+}
+@media print {
+  html, body { background:#fff; }
+  .ui { display:none !important; }
+}
+
+/* ================= PAGE CHROME ================= */
+.ptop { display:flex; align-items:center; justify-content:space-between; height:11mm; flex:0 0 auto; }
+.ptop img.logo { height:8mm; width:auto; }
+.pill {
+  font-size:8pt; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+  padding:1.4mm 4mm; border-radius:99px;
+}
+.pill--danes  { background:var(--accent-soft);  color:#7d6449; }
+.pill--jutri  { background:var(--success-soft); color:var(--success); }
+.pill--teh    { background:var(--panel);        color:var(--navy-deep); }
+.pill--prih   { background:var(--success-soft); color:var(--success); }
+.pfoot {
+  flex:0 0 auto; height:8mm; display:flex; align-items:flex-end; justify-content:space-between;
+  font-size:8pt; color:var(--muted); border-top:1px solid var(--border); padding-top:2.5mm; margin-top:2mm;
+}
+.stepdots { display:flex; gap:2mm; align-items:center; }
+.stepdots i { width:2.6mm; height:2.6mm; border-radius:50%; background:var(--border); display:block; }
+.stepdots i.on { background:var(--navy); }
+
+/* ================= TYPOGRAPHY ================= */
+.phead { flex:0 0 auto; margin-top:4mm; }
+.eyebrow { font-size:9pt; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 1.5mm; }
+.ptitle { font-size:26pt; font-weight:800; color:var(--navy-deep); margin:0; line-height:1.12; }
+.psub { font-size:11.5pt; color:var(--navy); margin:2mm 0 0; }
+.pbody { flex:1 1 auto; position:relative; min-height:0; }
+.kicker { font-size:14pt; font-weight:700; color:var(--navy-deep); }
+.mono { font-family:var(--mono); }
+
+/* stat band */
+.statband { display:flex; gap:6mm; flex:0 0 auto; margin-top:3mm; }
+.stat { flex:1; background:var(--bg-soft); border:1px solid var(--border); border-radius:10px; padding:3.5mm 5mm; }
+.stat b { display:block; font-size:19pt; font-weight:800; color:var(--navy-deep); line-height:1.1; }
+.stat b.gold { color:var(--accent); }
+.stat span { display:block; font-size:9pt; color:var(--muted); margin-top:1mm; }
+
+/* callout */
+.callout { border-left:3px solid var(--accent); background:var(--accent-soft); padding:3mm 5mm; border-radius:0 8px 8px 0; font-size:11pt; color:#6b543a; font-weight:600; }
+
+/* ================= FLOWCHART LANGUAGE ================= */
+.chart { position:relative; width:100%; height:100%; }
+.chart svg.wire { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.node {
+  position:absolute; background:var(--bg);
+  border:1px solid rgba(66,80,96,.4); border-radius:10px;
+  padding:3mm 4mm; font-size:10.5pt; font-weight:600; color:var(--navy-deep);
+  line-height:1.25; box-shadow:none;
+}
+.node .sub { display:block; font-size:8.5pt; font-weight:400; color:var(--muted); margin-top:1mm; line-height:1.3; }
+.node--ai   { background:var(--navy); border-color:var(--navy); color:#fff; }
+.node--ai .sub { color:#c8d0d9; }
+.node--vin  { border:2px solid var(--accent); }
+.node--pain { border-left:4px solid var(--accent); }
+.node--ghost{ background:var(--bg-soft); border-style:dashed; color:var(--muted); }
+.badge-warn {
+  position:absolute; font-size:8.5pt; font-weight:700; color:var(--danger);
+  background:#fdf0ee; border:1px solid #eacfc9; border-radius:8px; padding:2mm 3.5mm; line-height:1.3;
+}
+.xloop { position:absolute; font-size:22pt; font-weight:800; color:var(--accent); letter-spacing:.02em; }
+.xloop small { display:block; font-size:8.5pt; font-weight:600; color:var(--muted); letter-spacing:0; }
+</style>
+</head>
+<body>
+
+<!-- ===================== P1 · NASLOVNICA ===================== -->
+<section class="page" id="page-1">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span></span></header>
+  <div class="pbody">
+<style>
+  #page-1 .pbody { display:flex; align-items:center; gap:10mm; }
+  #page-1 .cov-left { flex:0 0 122mm; }
+  #page-1 .cov-eyebrow { font-size:9pt; font-weight:700; letter-spacing:.14em; color:var(--muted); margin:0 0 7mm; }
+  #page-1 .cov-title { font-size:42pt; font-weight:800; color:var(--navy-deep); line-height:1.08; margin:0; }
+  #page-1 .cov-sub { font-size:13pt; color:var(--navy); line-height:1.5; margin:7mm 0 0; max-width:108mm; }
+  #page-1 .cov-meta { font-size:9pt; color:var(--muted); margin:11mm 0 0; }
+  #page-1 .cov-right { flex:1 1 auto; display:flex; align-items:center; justify-content:center; }
+  #page-1 .cov-right svg { width:128mm; height:auto; display:block; }
+</style>
+
+<div class="cov-left">
+  <p class="cov-eyebrow">PREDLOG ZA INSPECTUS d.o.o. &middot; LUKA KOPER</p>
+  <h1 class="cov-title">Od 6.000 fotografij do&nbsp;urejenih zapisov &mdash; samodejno.</h1>
+  <p class="cov-sub">Nova aplikacija za preglede vozil s pametnim filtrom za samodejno razvr&scaron;&#269;anje fotografij</p>
+  <p class="cov-meta">julij 2026 &middot; zaupno &mdash; za interno rabo INSPECTUS</p>
+</div>
+
+<div class="cov-right">
+  <svg viewBox="0 0 132 150" xmlns="http://www.w3.org/2000/svg" font-family="'Open Sans', system-ui, sans-serif">
+    <!-- scattered photos: today's chaos -->
+    <rect x="6.0" y="82.1" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(16.1 8.6 84.1)"/>
+    <rect x="14.0" y="61.8" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(0.5 16.6 63.7)"/>
+    <rect x="8.4" y="42.2" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-15.4 11.0 44.2)"/>
+    <rect x="20.1" y="85.1" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(11.8 22.7 87.1)"/>
+    <rect x="20.8" y="63.2" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(18.3 23.4 65.2)"/>
+    <rect x="40.5" y="63.8" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(4.4 43.1 65.8)"/>
+    <rect x="23.9" y="76.8" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(1.1 26.5 78.7)"/>
+    <rect x="31.7" y="79.3" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(-9.8 34.3 81.3)"/>
+    <rect x="37.8" y="78.0" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(-2.3 40.4 79.9)"/>
+    <rect x="31.5" y="44.3" width="5.2" height="3.9" rx="0.5" fill="var(--muted)" opacity="0.55" transform="rotate(5.3 34.1 46.3)"/>
+    <rect x="3.7" y="72.1" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-1.6 6.3 74.1)"/>
+    <rect x="18.4" y="117.2" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(18.8 21.0 119.2)"/>
+    <rect x="32.8" y="39.4" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-7.0 35.4 41.4)"/>
+    <rect x="24.0" y="96.5" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-16.3 26.6 98.5)"/>
+    <rect x="23.9" y="43.0" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(13.2 26.5 45.0)"/>
+    <rect x="5.4" y="101.5" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(13.2 8.0 103.5)"/>
+    <rect x="32.9" y="72.1" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(15.6 35.5 74.1)"/>
+    <rect x="17.4" y="79.5" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(4.9 20.0 81.5)"/>
+    <rect x="24.5" y="48.5" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(-15.7 27.1 50.5)"/>
+    <rect x="11.2" y="111.2" width="5.2" height="3.9" rx="0.5" fill="var(--muted)" opacity="0.55" transform="rotate(9.8 13.8 113.2)"/>
+    <rect x="30.8" y="87.5" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-15.2 33.4 89.4)"/>
+    <rect x="41.5" y="87.1" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-12.2 44.1 89.1)"/>
+    <rect x="8.1" y="60.8" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-11.8 10.7 62.8)"/>
+    <rect x="21.5" y="55.5" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(5.5 24.1 57.5)"/>
+    <rect x="33.5" y="92.0" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-10.9 36.1 93.9)"/>
+    <rect x="30.3" y="58.0" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-4.0 32.9 60.0)"/>
+    <rect x="40.9" y="99.0" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(-10.9 43.5 101.0)"/>
+    <rect x="21.3" y="112.5" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(-6.5 23.9 114.4)"/>
+    <rect x="23.2" y="107.6" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(-4.9 25.8 109.6)"/>
+    <rect x="0.8" y="85.1" width="5.2" height="3.9" rx="0.5" fill="var(--muted)" opacity="0.55" transform="rotate(-0.6 3.4 87.1)"/>
+    <rect x="3.3" y="52.8" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-12.1 5.9 54.7)"/>
+    <rect x="34.8" y="108.1" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(12.1 37.4 110.1)"/>
+    <rect x="22.4" y="92.0" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(9.1 25.0 94.0)"/>
+    <rect x="31.9" y="64.5" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(17.1 34.5 66.5)"/>
+    <rect x="35.6" y="47.9" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-3.0 38.2 49.9)"/>
+    <rect x="19.1" y="49.6" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(12.3 21.7 51.6)"/>
+    <rect x="13.2" y="56.0" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(15.9 15.8 58.0)"/>
+    <rect x="20.6" y="102.5" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(-16.7 23.2 104.5)"/>
+    <rect x="28.6" y="97.0" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(2.7 31.2 99.0)"/>
+    <rect x="40.0" y="43.2" width="5.2" height="3.9" rx="0.5" fill="var(--muted)" opacity="0.55" transform="rotate(6.0 42.6 45.2)"/>
+    <rect x="16.1" y="39.2" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-13.7 18.7 41.2)"/>
+    <rect x="38.7" y="51.4" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(17.6 41.3 53.4)"/>
+    <rect x="2.9" y="76.5" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-6.9 5.5 78.4)"/>
+    <rect x="3.5" y="60.8" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(15.2 6.1 62.7)"/>
+    <rect x="20.8" y="33.5" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(11.1 23.4 35.5)"/>
+    <rect x="13.7" y="31.9" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(14.1 16.3 33.9)"/>
+    <rect x="4.7" y="92.3" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(13.8 7.3 94.3)"/>
+    <rect x="9.4" y="95.8" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(4.1 12.0 97.7)"/>
+    <rect x="44.0" y="70.2" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(8.7 46.6 72.2)"/>
+    <rect x="25.9" y="60.8" width="5.2" height="3.9" rx="0.5" fill="var(--muted)" opacity="0.55" transform="rotate(9.5 28.5 62.7)"/>
+    <rect x="11.4" y="74.6" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(7.5 14.0 76.6)"/>
+    <rect x="14.2" y="46.2" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(14.9 16.8 48.2)"/>
+    <rect x="13.7" y="105.2" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-11.5 16.3 107.2)"/>
+    <rect x="34.5" y="33.4" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-1.8 37.1 35.4)"/>
+    <rect x="25.7" y="65.3" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(7.9 28.3 67.3)"/>
+    <rect x="43.1" y="78.5" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-10.0 45.7 80.5)"/>
+    <rect x="30.3" y="29.9" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(7.0 32.9 31.9)"/>
+    <rect x="27.4" y="102.1" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(-12.2 30.0 104.1)"/>
+    <rect x="40.2" y="55.9" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(-14.1 42.8 57.9)"/>
+    <rect x="27.9" y="109.5" width="5.2" height="3.9" rx="0.5" fill="var(--muted)" opacity="0.55" transform="rotate(12.1 30.5 111.5)"/>
+    <rect x="27.4" y="114.5" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(18.3 30.0 116.5)"/>
+    <rect x="10.2" y="68.0" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(8.7 12.8 69.9)"/>
+    <rect x="17.0" y="98.3" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(13.1 19.6 100.3)"/>
+    <rect x="5.2" y="66.8" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-11.4 7.8 68.7)"/>
+    <rect x="43.7" y="60.2" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(-8.8 46.3 62.2)"/>
+    <rect x="18.3" y="90.5" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(4.5 20.9 92.4)"/>
+    <rect x="11.3" y="100.6" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(-15.0 13.9 102.6)"/>
+    <rect x="8.1" y="89.3" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(-12.9 10.7 91.3)"/>
+    <rect x="24.7" y="83.3" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(-15.0 27.3 85.3)"/>
+    <rect x="14.0" y="83.5" width="5.2" height="3.9" rx="0.5" fill="var(--muted)" opacity="0.55" transform="rotate(-12.7 16.6 85.4)"/>
+    <!-- photos entering the funnel mouth -->
+    <rect x="47.4" y="61.1" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(-11 50 63)"/>
+    <rect x="50.4" y="72.1" width="5.2" height="3.9" rx="0.5" fill="var(--panel)" stroke="var(--border)" stroke-width="0.3" transform="rotate(8 53 74)"/>
+    <rect x="48.4" y="84.1" width="5.2" height="3.9" rx="0.5" fill="var(--border)" transform="rotate(14 51 86)"/>
+    <!-- funnel jaws: the smart filter -->
+    <path d="M 56 42 L 81 66.5 L 81 70.5 L 56 47.5 Z" fill="var(--navy)"/>
+    <path d="M 56 108 L 81 83.5 L 81 79.5 L 56 102.5 Z" fill="var(--navy)"/>
+    <!-- photos straightening inside the channel -->
+    <rect x="55.8" y="73.3" width="4.5" height="3.4" rx="0.4" fill="var(--navy)" opacity="0.45" transform="rotate(14 58 75)"/>
+    <rect x="63.8" y="73.3" width="4.5" height="3.4" rx="0.4" fill="var(--navy)" opacity="0.7" transform="rotate(7 66 75)"/>
+    <rect x="71.8" y="73.3" width="4.5" height="3.4" rx="0.4" fill="var(--navy)"/>
+    <!-- bronze throat: the one accent -->
+    <rect x="80.6" y="66" width="1.1" height="18" rx="0.55" fill="var(--accent)"/>
+    <!-- hairlines from throat to card rows -->
+    <path d="M 82.4 73 C 84 68 84 62 86 58.8" fill="none" stroke="var(--border)" stroke-width="0.4"/>
+    <path d="M 82.4 75 L 86 75.2" fill="none" stroke="var(--border)" stroke-width="0.4"/>
+    <path d="M 82.4 77 C 84 82 84 88 86 91.8" fill="none" stroke="var(--border)" stroke-width="0.4"/>
+    <!-- ordered vehicle cards -->
+    <g>
+      <rect x="86" y="52.0" width="20" height="13.5" rx="1.2" fill="var(--bg)" stroke="var(--border)" stroke-width="0.4"/>
+      <text x="88" y="56.3" font-family="var(--mono)" font-size="2.5" font-weight="600" fill="var(--navy-deep)">WF0 8K42</text>
+      <rect x="88" y="58.4" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+      <rect x="93.6" y="58.4" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+      <rect x="99.2" y="58.4" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+    </g>
+    <g>
+      <rect x="109" y="52.0" width="20" height="13.5" rx="1.2" fill="var(--bg)" stroke="var(--border)" stroke-width="0.4"/>
+      <text x="111" y="56.3" font-family="var(--mono)" font-size="2.5" font-weight="600" fill="var(--navy-deep)">VF3 A917</text>
+      <rect x="111" y="58.4" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+      <rect x="116.6" y="58.4" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+      <rect x="122.2" y="58.4" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+    </g>
+    <g>
+      <rect x="86" y="68.5" width="20" height="13.5" rx="1.2" fill="var(--bg)" stroke="var(--border)" stroke-width="0.4"/>
+      <text x="88" y="72.8" font-family="var(--mono)" font-size="2.5" font-weight="600" fill="var(--navy-deep)">W0V 2258</text>
+      <rect x="88" y="74.9" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+      <rect x="93.6" y="74.9" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+      <rect x="99.2" y="74.9" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+    </g>
+    <g>
+      <rect x="109" y="68.5" width="20" height="13.5" rx="1.2" fill="var(--bg)" stroke="var(--border)" stroke-width="0.4"/>
+      <text x="111" y="72.8" font-family="var(--mono)" font-size="2.5" font-weight="600" fill="var(--navy-deep)">VR1 7734</text>
+      <rect x="111" y="74.9" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+      <rect x="116.6" y="74.9" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+      <rect x="122.2" y="74.9" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+    </g>
+    <g>
+      <rect x="86" y="85.0" width="20" height="13.5" rx="1.2" fill="var(--bg)" stroke="var(--border)" stroke-width="0.4"/>
+      <text x="88" y="89.3" font-family="var(--mono)" font-size="2.5" font-weight="600" fill="var(--navy-deep)">ZFA 1046</text>
+      <rect x="88" y="91.4" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+      <rect x="93.6" y="91.4" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+      <rect x="99.2" y="91.4" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+    </g>
+    <g>
+      <rect x="109" y="85.0" width="20" height="13.5" rx="1.2" fill="var(--bg)" stroke="var(--border)" stroke-width="0.4"/>
+      <text x="111" y="89.3" font-family="var(--mono)" font-size="2.5" font-weight="600" fill="var(--navy-deep)">TMB 5490</text>
+      <rect x="111" y="91.4" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+      <rect x="116.6" y="91.4" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+      <rect x="122.2" y="91.4" width="5" height="4.6" rx="0.4" fill="var(--panel)"/>
+    </g>
+    <!-- zone labels -->
+    <text x="25" y="141.5" text-anchor="middle" font-size="3" font-weight="600" fill="var(--muted)">6.000 fotografij</text>
+    <text x="66" y="141.5" text-anchor="middle" font-size="3" font-weight="600" fill="var(--muted)">pametni filter</text>
+    <text x="107.5" y="141.5" text-anchor="middle" font-size="3" font-weight="600" fill="var(--muted)">urejeni zapisi po vozilih</text>
+  </svg>
+</div>
+</div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span>1 / 10</span></footer>
+</section>
+
+<!-- ===================== P2 · KORAK 1 ===================== -->
+<section class="page" id="page-2">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span class="pill pill--danes">Danes</span></header>
+  <div class="phead"><p class="eyebrow">Današnji postopek · korak 1 od 5</p><h2 class="ptitle">Fotografiranje v pristanišču</h2></div>
+  <div class="pbody">
+<style>
+  #page-2 .chart { height: 88mm; margin-top: 14mm; }
+  #page-2 .chart .node {
+    width: 43mm; height: 24mm;
+    display: flex; flex-direction: column; justify-content: center;
+    text-align: center; font-size: 10pt; padding: 2.5mm 3.5mm;
+  }
+  #page-2 .chart .node .sub { font-size: 8pt; }
+  #page-2 .xloop { text-align: center; }
+  #page-2 .stepnote {
+    font-size: 9pt; color: var(--muted); margin-top: 6mm;
+    border-top: 1px solid var(--border); padding-top: 3mm;
+  }
+</style>
+
+<div class="chart">
+  <svg class="wire" viewBox="0 0 265 88" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowP2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#425060"/>
+      </marker>
+      <marker id="arrowP2g" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#b09575"/>
+      </marker>
+    </defs>
+    <!-- horizontal chain, node mid-line y = 26 -->
+    <line x1="43"    y1="26" x2="54.6"  y2="26" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP2)"/>
+    <line x1="98.5"  y1="26" x2="110.1" y2="26" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP2)"/>
+    <line x1="154"   y1="26" x2="165.6" y2="26" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP2)"/>
+    <line x1="209.5" y1="26" x2="221.1" y2="26" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP2)"/>
+    <!-- loop back: node 5 bottom -> node 2 bottom -->
+    <path d="M 243.5 38 L 243.5 62 L 77 62 L 77 38.9"
+          fill="none" stroke="#b09575" stroke-width="0.6" marker-end="url(#arrowP2g)"/>
+  </svg>
+
+  <div class="node" style="left:0mm; top:14mm;">Ladja pripluje v Luko Koper</div>
+  <div class="node" style="left:55.5mm; top:14mm;">Inšpektor pristopi k vozilu</div>
+  <div class="node node--vin" style="left:111mm; top:14mm;">Fotografija VIN tablice<span class="sub">prva fotografija vsakega vozila</span></div>
+  <div class="node" style="left:166.5mm; top:14mm;">Obhod vozila — fotografija vsake poškodbe</div>
+  <div class="node" style="left:222mm; top:14mm;">Naslednje vozilo</div>
+
+  <div class="xloop" style="left:139mm; top:65mm; width:44mm;">× 200<small>vozil na ladjo</small></div>
+</div>
+
+<div class="statband">
+  <div class="stat"><b>~200</b><span>vozil na eni ladji</span></div>
+  <div class="stat"><b>~30</b><span>fotografij na vozilo</span></div>
+  <div class="stat"><b>≈ 6.000</b><span>fotografij na ladjo</span></div>
+</div>
+
+<p class="stepnote">Ta korak ostane tudi v novem sistemu — inšpektor svoje delo opravi enako. Vse, kar sledi, je danes ročno.</p>
+</div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span class="stepdots"><i class="on"></i><i></i><i></i><i></i><i></i></span><span>2 / 10</span></footer>
+</section>
+
+<!-- ===================== P3 · KORAK 2 ===================== -->
+<section class="page" id="page-3">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span class="pill pill--danes">Danes</span></header>
+  <div class="phead"><p class="eyebrow">Današnji postopek · korak 2 od 5</p><h2 class="ptitle">Vse fotografije v eno mapo</h2></div>
+  <div class="pbody">
+<style>
+  #page-3 .chart { height: 97mm; margin-top: 5mm; }
+  #page-3 .chart .node {
+    width: 43mm; height: 20mm;
+    display: flex; flex-direction: column; justify-content: center;
+    text-align: center; font-size: 10pt; padding: 2.5mm 3.5mm;
+  }
+  #page-3 .chart .node.mapa { width: 60mm; }
+  #page-3 .chart .node .sub { font-size: 8pt; }
+  #page-3 .scatter { position: absolute; left: 0; top: 34mm; width: 265mm; height: 60mm; overflow: visible; }
+</style>
+
+<div class="chart">
+  <svg class="wire" viewBox="0 0 265 96" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowP3" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#425060"/>
+      </marker>
+    </defs>
+    <line x1="43"   y1="10" x2="54.6"  y2="10" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP3)"/>
+    <line x1="98.5" y1="10" x2="110.1" y2="10" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP3)"/>
+    <line x1="141"  y1="20" x2="141"   y2="30.6" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP3)"/>
+  </svg>
+
+  <div class="node" style="left:0mm; top:0mm;">Konec pregleda</div>
+  <div class="node" style="left:55.5mm; top:0mm;">Prenos fotografij z aparata</div>
+  <div class="node mapa" style="left:111mm; top:0mm;">Skupna mapa<span class="sub">vseh 6.000 fotografij skupaj</span></div>
+
+  <svg class="scatter" viewBox="0 0 265 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+<g transform="translate(2.4,0.1) rotate(-0.5 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(16.0,-0.2) rotate(-7.5 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(27.0,1.0) rotate(1.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/><text x="4.5" y="5.3" font-family="ui-monospace,Menlo,monospace" font-size="1.55" fill="#9aa3ad" text-anchor="middle" textLength="8" lengthAdjust="spacingAndGlyphs">IMG_0412.jpg</text></g>
+<g transform="translate(41.1,-1.0) rotate(0.3 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(53.1,-0.8) rotate(6.7 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(63.6,0.5) rotate(-2.7 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(76.7,0.5) rotate(6.7 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(89.1,-0.3) rotate(5.6 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(103.2,-1.5) rotate(1.1 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(117.8,-1.1) rotate(6.4 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(128.9,-0.2) rotate(3.3 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(143.3,0.9) rotate(2.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(153.1,0.5) rotate(6.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(165.9,-1.3) rotate(7.4 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(178.8,-1.3) rotate(7.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(191.8,1.0) rotate(-3.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(204.0,-1.2) rotate(-6.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/><text x="4.5" y="5.3" font-family="ui-monospace,Menlo,monospace" font-size="1.55" fill="#9aa3ad" text-anchor="middle" textLength="8" lengthAdjust="spacingAndGlyphs">IMG_1993.jpg</text></g>
+<g transform="translate(219.9,-0.8) rotate(-1.1 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(230.8,-0.4) rotate(-2.7 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(241.8,-0.9) rotate(-2.4 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(2.5,7.5) rotate(0.3 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(16.7,6.3) rotate(-6.9 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(28.7,7.7) rotate(7.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(39.9,6.1) rotate(-0.4 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(50.5,6.9) rotate(-2.5 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(67.6,8.4) rotate(-1.7 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(79.2,6.9) rotate(-5.2 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(91.3,8.8) rotate(0.7 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(101.2,6.5) rotate(-6.1 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(118.2,6.3) rotate(-5.3 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/><text x="4.5" y="5.3" font-family="ui-monospace,Menlo,monospace" font-size="1.55" fill="#9aa3ad" text-anchor="middle" textLength="8" lengthAdjust="spacingAndGlyphs">IMG_1187.jpg</text></g>
+<g transform="translate(129.6,6.1) rotate(4.5 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(143.6,6.0) rotate(-5.6 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(154.1,6.4) rotate(7.3 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(167.4,9.1) rotate(3.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(180.0,8.0) rotate(-0.2 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(192.1,9.0) rotate(6.9 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(206.4,8.6) rotate(-2.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(217.9,8.2) rotate(-7.9 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(232.5,9.2) rotate(6.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(244.2,8.3) rotate(1.4 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(4.0,15.7) rotate(5.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(14.8,14.4) rotate(-3.2 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(29.8,16.8) rotate(1.4 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(41.4,16.0) rotate(-0.6 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(52.6,13.7) rotate(4.1 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/><text x="4.5" y="5.3" font-family="ui-monospace,Menlo,monospace" font-size="1.55" fill="#9aa3ad" text-anchor="middle" textLength="8" lengthAdjust="spacingAndGlyphs">IMG_2450.jpg</text></g>
+<g transform="translate(67.8,16.2) rotate(6.9 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(78.9,15.3) rotate(-2.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(90.3,14.0) rotate(-3.5 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(102.8,15.4) rotate(2.5 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(115.0,15.2) rotate(4.6 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(128.2,16.0) rotate(-4.6 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(139.9,16.8) rotate(-6.6 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(153.4,14.0) rotate(-7.9 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(166.6,15.8) rotate(1.3 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(180.4,15.2) rotate(-4.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(191.4,15.1) rotate(5.6 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(205.5,14.5) rotate(8.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(219.6,15.7) rotate(-4.4 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(231.6,14.0) rotate(4.3 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/><text x="4.5" y="5.3" font-family="ui-monospace,Menlo,monospace" font-size="1.55" fill="#9aa3ad" text-anchor="middle" textLength="8" lengthAdjust="spacingAndGlyphs">IMG_3544.jpg</text></g>
+<g transform="translate(242.3,15.3) rotate(5.9 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(4.3,22.9) rotate(-0.4 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(15.9,23.2) rotate(7.7 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(25.1,23.1) rotate(7.4 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(38.6,21.3) rotate(-1.9 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(50.5,24.4) rotate(6.9 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(66.0,24.2) rotate(3.5 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(79.9,23.4) rotate(-1.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(92.0,22.9) rotate(0.2 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(104.3,23.9) rotate(-2.5 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(116.8,24.3) rotate(-7.3 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(131.0,21.5) rotate(-4.2 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(141.1,21.6) rotate(-6.7 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(152.2,22.4) rotate(7.4 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/><text x="4.5" y="5.3" font-family="ui-monospace,Menlo,monospace" font-size="1.55" fill="#9aa3ad" text-anchor="middle" textLength="8" lengthAdjust="spacingAndGlyphs">IMG_3061.jpg</text></g>
+<g transform="translate(167.3,24.3) rotate(2.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(179.9,21.5) rotate(-5.5 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(191.6,21.3) rotate(-4.6 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(206.5,24.3) rotate(2.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(220.2,22.6) rotate(-1.5 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(231.5,23.7) rotate(5.4 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(241.1,23.5) rotate(-1.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(-0.2,30.5) rotate(-5.6 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(15.5,31.9) rotate(-6.4 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/><text x="4.5" y="5.3" font-family="ui-monospace,Menlo,monospace" font-size="1.55" fill="#9aa3ad" text-anchor="middle" textLength="8" lengthAdjust="spacingAndGlyphs">IMG_4021.jpg</text></g>
+<g transform="translate(28.4,29.8) rotate(0.1 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(39.5,31.3) rotate(6.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(54.0,31.8) rotate(-1.5 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(66.5,31.5) rotate(2.2 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(77.2,30.2) rotate(4.4 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(93.2,29.0) rotate(-1.9 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(104.9,29.6) rotate(7.1 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(116.4,30.6) rotate(7.4 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(126.8,29.6) rotate(-1.4 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(140.5,30.6) rotate(7.9 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(154.4,31.4) rotate(-5.9 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(165.3,29.9) rotate(5.5 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(179.3,30.2) rotate(-0.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(194.6,29.1) rotate(1.7 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/><text x="4.5" y="5.3" font-family="ui-monospace,Menlo,monospace" font-size="1.55" fill="#9aa3ad" text-anchor="middle" textLength="8" lengthAdjust="spacingAndGlyphs">IMG_5309.jpg</text></g>
+<g transform="translate(203.2,31.8) rotate(7.5 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(219.9,31.0) rotate(-7.2 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(231.5,30.7) rotate(4.9 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(241.4,31.0) rotate(-5.4 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(3.8,36.9) rotate(6.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(12.7,38.4) rotate(2.6 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(26.9,36.5) rotate(7.2 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(42.3,38.9) rotate(-3.7 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(50.7,38.1) rotate(3.2 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(64.4,36.7) rotate(4.9 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(77.9,36.9) rotate(-6.9 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(88.8,37.5) rotate(6.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(105.7,39.0) rotate(1.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/><text x="4.5" y="5.3" font-family="ui-monospace,Menlo,monospace" font-size="1.55" fill="#9aa3ad" text-anchor="middle" textLength="8" lengthAdjust="spacingAndGlyphs">IMG_4877.jpg</text></g>
+<g transform="translate(116.0,37.1) rotate(1.1 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(128.3,38.8) rotate(-0.1 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(141.3,37.6) rotate(4.9 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(154.5,39.5) rotate(7.1 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(166.2,36.8) rotate(-2.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(179.6,38.3) rotate(-1.5 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(194.8,38.3) rotate(-3.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(203.6,36.7) rotate(4.2 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(219.7,37.0) rotate(2.3 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(231.5,37.5) rotate(3.2 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(242.1,37.8) rotate(4.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(3.5,44.6) rotate(-4.2 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(16.6,46.9) rotate(7.5 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(25.3,45.5) rotate(-6.1 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(38.9,45.3) rotate(-7.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(52.9,44.7) rotate(0.1 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(63.4,45.1) rotate(2.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(80.0,47.1) rotate(-7.6 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(91.4,46.8) rotate(-2.5 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(101.8,44.5) rotate(-5.6 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(116.7,46.7) rotate(2.7 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(127.7,46.2) rotate(2.7 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(140.4,46.2) rotate(5.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(153.4,45.1) rotate(8.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(165.8,46.1) rotate(-1.2 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(182.1,46.9) rotate(-1.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(194.7,46.2) rotate(3.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(202.9,46.3) rotate(-1.9 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(216.7,46.3) rotate(1.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(228.6,44.9) rotate(3.0 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/></g>
+<g transform="translate(240.9,47.0) rotate(3.8 4.5 3.5)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><path d="M6.9,0 L6.9,2.1 L9,2.1" fill="none" stroke="#dddddd" stroke-width="0.25"/><text x="4.5" y="5.3" font-family="ui-monospace,Menlo,monospace" font-size="1.55" fill="#9aa3ad" text-anchor="middle" textLength="8" lengthAdjust="spacingAndGlyphs">IMG_5992.jpg</text></g>  </svg>
+</div>
+
+<div class="statband">
+  <div class="stat"><b>6.000</b><span>pomešanih fotografij v eni mapi</span></div>
+  <div class="stat"><b>0 %</b><span>razvrščeno</span></div>
+  <div class="stat"><b class="mono" style="font-size:13.5pt;">IMG_0001 … IMG_6000</b><span>edina identiteta fotografije</span></div>
+</div>
+
+<div class="callout" style="margin-top:3.5mm;">Nobena fotografija ne ve, kateremu vozilu pripada.</div>
+</div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span class="stepdots"><i></i><i class="on"></i><i></i><i></i><i></i></span><span>3 / 10</span></footer>
+</section>
+
+<!-- ===================== P4 · KORAK 3 ===================== -->
+<section class="page" id="page-4">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span class="pill pill--danes">Danes</span></header>
+  <div class="phead"><p class="eyebrow">Današnji postopek · korak 3 od 5</p><h2 class="ptitle">Iskanje po mapi v pisarni</h2></div>
+  <div class="pbody">
+<style>
+  #page-4 .chart { height: 84mm; margin-top: 11mm; }
+  #page-4 .chart .node {
+    width: 43mm; height: 24mm;
+    display: flex; flex-direction: column; justify-content: center;
+    text-align: center; font-size: 10pt; padding: 2.5mm 3.5mm;
+  }
+  #page-4 .chart .node .sub { font-size: 8pt; }
+  #page-4 .dlabel {
+    position: absolute; left: 118mm; top: 19mm; width: 40mm;
+    text-align: center; font-size: 9pt; font-weight: 600; color: var(--navy-deep); line-height: 1.25;
+  }
+  #page-4 .edge {
+    position: absolute; font-size: 8.5pt; font-weight: 700; color: var(--navy); letter-spacing: .06em;
+  }
+  #page-4 .prow { display: flex; gap: 6mm; align-items: stretch; margin-top: 3.5mm; }
+  #page-4 .prow .callout { display: flex; align-items: center; }
+</style>
+
+<div class="chart">
+  <svg class="wire" viewBox="0 0 265 84" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowP4" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#425060"/>
+      </marker>
+      <marker id="arrowP4m" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#9aa3ad"/>
+      </marker>
+    </defs>
+    <!-- node mid-line y = 26 (same rhythm as korak 1) -->
+    <line x1="43"   y1="26" x2="54.6"  y2="26" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP4)"/>
+    <line x1="98.5" y1="26" x2="115.6" y2="26" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP4)"/>
+    <!-- decision diamond -->
+    <polygon points="117,26 138,12.5 159,26 138,39.5" fill="#ffffff" stroke="rgba(66,80,96,.4)" stroke-width="0.35"/>
+    <!-- DA edge -->
+    <line x1="159" y1="26" x2="220.6" y2="26" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP4)"/>
+    <!-- NE loop back, dashed -->
+    <path d="M 138 39.5 L 138 56 L 77 56 L 77 39.4"
+          fill="none" stroke="#9aa3ad" stroke-width="0.5" stroke-dasharray="1.6 1.4" marker-end="url(#arrowP4m)"/>
+    <!-- thumbnail strip: the needle in the haystack -->
+    <g>
+      <g transform="translate(55.5,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(67,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(78.5,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(90,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(101.5,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(113,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(124.5,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(136,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><text x="4.5" y="5.2" font-family="ui-monospace,Menlo,monospace" font-size="1.55" fill="#7d6449" text-anchor="middle" textLength="8" lengthAdjust="spacingAndGlyphs">IMG_2183.jpg</text></g>
+      <g transform="translate(147.5,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(159,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(170.5,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(182,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <!-- magnifier ring over thumbnail 8 -->
+      <circle cx="140.5" cy="69.5" r="6.4" fill="none" stroke="#b09575" stroke-width="0.7"/>
+      <line x1="145.1" y1="74.1" x2="149.6" y2="78.6" stroke="#b09575" stroke-width="1.1" stroke-linecap="round"/>
+      <text x="55.5" y="80.5" font-size="2.8" fill="#9aa3ad" font-family="'Open Sans',sans-serif">6.000 fotografij — ena za drugo, dokler se ne pokaže VIN tablica</text>
+    </g>
+  </svg>
+
+  <div class="node" style="left:0mm; top:14mm;">Sodelavec v pisarni odpre mapo</div>
+  <div class="node" style="left:55.5mm; top:14mm;">Pregleduje fotografije eno za drugo</div>
+  <div class="dlabel">Je to VIN tablica?</div>
+  <div class="node" style="left:222mm; top:14mm;">Tu se začne novo vozilo</div>
+
+  <span class="edge" style="left:185mm; top:20.5mm;">DA</span>
+  <span class="edge" style="left:141mm; top:44mm; color:var(--muted);">NE</span>
+</div>
+
+<div class="statband">
+  <div class="stat"><b>2. oseba</b><span>vključena v proces</span></div>
+  <div class="stat"><b>pisarna</b><span>delo za računalnikom, ne na terenu</span></div>
+  <div class="stat"><b>vsaka napaka</b><span>se od tu prenese naprej</span></div>
+</div>
+
+<div class="callout" style="margin-top:3.5mm;">Iskanje igle v kupu sena — 6.000-krat na ladjo.</div>
+</div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span class="stepdots"><i></i><i></i><i class="on"></i><i></i><i></i></span><span>4 / 10</span></footer>
+</section>
+
+<!-- ===================== P5 · KORAK 4 ===================== -->
+<section class="page" id="page-5">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span class="pill pill--danes">Danes</span></header>
+  <div class="phead"><p class="eyebrow">Današnji postopek · korak 4 od 5</p><h2 class="ptitle">Ročno razvrščanje — vozilo za vozilom</h2></div>
+  <div class="pbody">
+<style>
+  #page-5 .chart { height: 88mm; margin-top: 15mm; }
+  #page-5 .statband { margin-top: 5mm; }
+  #page-5 .chart .node {
+    width: 43mm; height: 24mm;
+    display: flex; flex-direction: column; justify-content: center;
+    text-align: center; font-size: 10pt; padding: 2.5mm 3.5mm;
+  }
+  #page-5 .chart .node .sub { font-size: 8pt; }
+  #page-5 .chart .badge-warn { width: 44mm; text-align: center; }
+  #page-5 .xloop { text-align: center; }
+</style>
+
+<div class="chart">
+  <svg class="wire" viewBox="0 0 265 88" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowP5" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#425060"/>
+      </marker>
+      <marker id="arrowP5g" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#b09575"/>
+      </marker>
+    </defs>
+    <!-- top row, left to right (node mid y = 16) -->
+    <line x1="63"  y1="16" x2="109.6" y2="16" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP5)"/>
+    <line x1="154" y1="16" x2="200.6" y2="16" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP5)"/>
+    <!-- down the right side: 3 -> 4 -->
+    <line x1="240" y1="28" x2="240" y2="50.6" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP5)"/>
+    <!-- bottom row, right to left: 4 -> 5 -->
+    <line x1="202" y1="64" x2="155.4" y2="64" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP5)"/>
+    <!-- loop back to start: 5 -> 1 (bronze) -->
+    <path d="M 111 64 L 41.5 64 L 41.5 29.4"
+          fill="none" stroke="#b09575" stroke-width="0.6" marker-end="url(#arrowP5g)"/>
+  </svg>
+
+  <div class="node" style="left:20mm; top:4mm;">Najdi fotografijo VIN</div>
+  <div class="node" style="left:111mm; top:4mm;">Ročno preberi 17 znakov</div>
+  <div class="node" style="left:202mm; top:4mm;">Vtipkaj VIN v Ares<span class="sub">obstoječi sistem</span></div>
+  <div class="node" style="left:202mm; top:52mm;">Poišči pripadajoče fotografije poškodb</div>
+  <div class="node" style="left:111mm; top:52mm;">Pripni fotografije k vozilu</div>
+
+  <div class="badge-warn" style="left:150mm; top:33mm;">1 zatipkan znak = fotografije pri napačnem vozilu</div>
+
+  <div class="xloop" style="left:50mm; top:69mm; width:52mm;">× 200<small>vozil — eno za drugim</small></div>
+</div>
+
+<div class="statband">
+  <div class="stat"><b>~3 min</b><span>na vozilo (konzervativna ocena)</span></div>
+  <div class="stat"><b>≈ 10 ur</b><span>ročnega dela na ladjo</span></div>
+  <div class="stat"><b>monotonija</b><span>največji vir napak</span></div>
+</div>
+</div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span class="stepdots"><i></i><i></i><i></i><i class="on"></i><i></i></span><span>5 / 10</span></footer>
+</section>
+
+<!-- ===================== P6 · KORAK 5 ===================== -->
+<section class="page" id="page-6">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span class="pill pill--danes">Danes</span></header>
+  <div class="phead"><p class="eyebrow">Današnji postopek · korak 5 od 5</p><h2 class="ptitle">Končni izdelek — in cena poti do njega</h2></div>
+  <div class="pbody">
+<style>
+  #page-6 .chart { height: 102mm; margin-top: 13mm; }
+  #page-6 .chart .node {
+    width: 74mm; height: 24mm;
+    display: flex; flex-direction: column; justify-content: center;
+    text-align: center; font-size: 10.5pt; padding: 2.5mm 4mm;
+  }
+  #page-6 .chart .node .sub { font-size: 8.5pt; }
+  #page-6 .bilanca {
+    position: absolute; left: 150mm; top: 0; width: 115mm; height: 102mm;
+    background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px;
+    padding: 5mm 7mm 3mm; display: flex; flex-direction: column;
+  }
+  #page-6 .bilanca h3 {
+    margin: 0 0 1mm; font-size: 9pt; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  #page-6 .bilanca .row {
+    flex: 1; display: flex; align-items: center; gap: 4.5mm;
+    border-top: 1px solid var(--border); font-size: 10pt; color: var(--navy);
+  }
+  #page-6 .bilanca .row:first-of-type { border-top: none; }
+  #page-6 .bilanca .row b { flex: 0 0 16mm; font-size: 17pt; font-weight: 800; color: var(--navy-deep); text-align: right; }
+  #page-6 .bilanca .row.risk, #page-6 .bilanca .row.risk b { color: var(--danger); }
+  #page-6 .bilanca .row.risk b { font-size: 13pt; line-height: 1.1; }
+  #page-6 .kick {
+    margin-top: 10mm; text-align: center;
+    font-size: 15pt; font-weight: 700; color: var(--accent);
+  }
+</style>
+
+<div class="chart">
+  <svg class="wire" viewBox="0 0 265 102" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowP6" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#425060"/>
+      </marker>
+    </defs>
+    <line x1="70" y1="27" x2="70" y2="37.6" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP6)"/>
+    <line x1="70" y1="63" x2="70" y2="73.6" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP6)"/>
+  </svg>
+
+  <div class="node" style="left:33mm; top:3mm;">Zapis vozila v Aresu<span class="sub">VIN + fotografije poškodb</span></div>
+  <div class="node" style="left:33mm; top:39mm;">Poročila<span class="sub">VLDR · Constat</span></div>
+  <div class="node" style="left:33mm; top:75mm;">Naročniki<span class="sub">ladjarji, zavarovalnice, proizvajalci</span></div>
+
+  <div class="bilanca">
+    <h3>Bilanca današnjega postopka</h3>
+    <div class="row"><b>5</b><span>korakov</span></div>
+    <div class="row"><b>2</b><span>osebi</span></div>
+    <div class="row"><b>2</b><span>lokaciji — terminal in pisarna</span></div>
+    <div class="row"><b>10+</b><span>ur ročnega dela na ladjo</span></div>
+    <div class="row risk"><b>!</b><span>tveganje zamenjave vozila pri vsakem vnosu</span></div>
+  </div>
+</div>
+
+<p class="kick">Rezultat je pravi. Pot do njega je draga.</p>
+</div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span class="stepdots"><i></i><i></i><i></i><i></i><i class="on"></i></span><span>6 / 10</span></footer>
+</section>
+
+<!-- ===================== P7 · JUTRI ===================== -->
+<section class="page" id="page-7">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span class="pill pill--jutri">Jutri</span></header>
+  <div class="phead"><p class="eyebrow">Novi postopek</p><h2 class="ptitle">Pet korakov postane en sam</h2></div>
+  <div class="pbody">
+<style>
+  #page-7 .chart { height: 120mm; margin-top: 2mm; }
+
+  /* left: old 5-step miniature */
+  #page-7 .p7-lbl {
+    position: absolute; font-size: 7.5pt; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+  }
+  #page-7 .p7-mini {
+    width: 46mm; padding: 1.8mm 3mm; font-size: 8pt; font-weight: 600;
+    border-radius: 6px; text-align: left;
+  }
+
+  /* center: headline stack */
+  #page-7 .p7-hero { position: absolute; left: 52mm; top: 36mm; width: 58mm; text-align: center; }
+  #page-7 .p7-old { display: block; font-size: 13pt; font-weight: 700; color: var(--muted); text-decoration: line-through; }
+  #page-7 .p7-one { display: block; font-size: 40pt; font-weight: 800; color: var(--accent); line-height: 1.05; margin-top: 1.5mm; }
+
+  /* right: nodes inside the phone */
+  #page-7 .p7-pnode { width: 46mm; padding: 2.5mm 3.5mm; font-size: 9.5pt; text-align: left; }
+  #page-7 .p7-pnode .sub { font-size: 7.8pt; }
+
+  /* checks */
+  #page-7 .p7-check {
+    position: absolute; left: 180mm; width: 83mm;
+    display: flex; align-items: flex-start; gap: 3mm;
+    font-size: 10pt; font-weight: 600; color: var(--navy-deep); line-height: 1.3;
+  }
+  #page-7 .p7-check svg { flex: 0 0 auto; width: 4.5mm; height: 4.5mm; margin-top: .4mm; }
+
+  /* bottom band */
+  #page-7 .p7-band {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    border-top: 1px solid var(--border); padding-top: 3mm;
+    display: flex; align-items: baseline; justify-content: space-between; gap: 10mm;
+  }
+  #page-7 .p7-tag { font-size: 17pt; font-weight: 800; color: var(--navy-deep); white-space: nowrap; }
+  #page-7 .p7-note { font-size: 9pt; color: var(--muted); text-align: right; }
+</style>
+
+<div class="chart">
+  <svg class="wire" viewBox="0 0 265 120" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowP7" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#425060"/>
+      </marker>
+      <marker id="arrowP7m" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#9aa3ad"/>
+      </marker>
+    </defs>
+
+    <!-- left chain connectors -->
+    <line x1="25" y1="17" x2="25" y2="29.8" stroke="#9aa3ad" stroke-width="0.4" marker-end="url(#arrowP7m)"/>
+    <line x1="25" y1="39" x2="25" y2="51.8" stroke="#9aa3ad" stroke-width="0.4" marker-end="url(#arrowP7m)"/>
+    <line x1="25" y1="61" x2="25" y2="73.8" stroke="#9aa3ad" stroke-width="0.4" marker-end="url(#arrowP7m)"/>
+    <line x1="25" y1="83" x2="25" y2="95.8" stroke="#9aa3ad" stroke-width="0.4" marker-end="url(#arrowP7m)"/>
+
+    <!-- big center arrow: from the old chain to the phone -->
+    <line x1="56" y1="74" x2="112.3" y2="74" stroke="#425060" stroke-width="1.1" marker-end="url(#arrowP7)"/>
+
+    <!-- phone frame -->
+    <rect x="114" y="3" width="55" height="110" rx="8" fill="#ffffff" stroke="#425060" stroke-width="0.7"/>
+    <rect x="135.5" y="7.5" width="12" height="1.6" rx="0.8" fill="#425060" opacity="0.3"/>
+    <rect x="134.5" y="108.2" width="14" height="1.1" rx="0.55" fill="#dddddd"/>
+
+    <!-- connectors inside the phone -->
+    <line x1="141.5" y1="34" x2="141.5" y2="43.8" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP7)"/>
+    <line x1="141.5" y1="67" x2="141.5" y2="76.8" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP7)"/>
+  </svg>
+
+  <!-- left: old process, grayed out -->
+  <span class="p7-lbl" style="left:2mm; top:1mm;">Dosedanji postopek</span>
+  <div class="node node--ghost p7-mini" style="left:2mm; top:9mm;">1 · Fotografiranje</div>
+  <div class="node node--ghost p7-mini" style="left:2mm; top:31mm;">2 · Prenos v mapo</div>
+  <div class="node node--ghost p7-mini" style="left:2mm; top:53mm;">3 · Iskanje po mapi</div>
+  <div class="node node--ghost p7-mini" style="left:2mm; top:75mm;">4 · Ročni vnos v Ares</div>
+  <div class="node node--ghost p7-mini" style="left:2mm; top:97mm;">5 · Zapis vozila</div>
+
+  <!-- center: the headline -->
+  <div class="p7-hero">
+    <span class="p7-old">5 korakov</span>
+    <span class="p7-one">1 korak</span>
+  </div>
+
+  <!-- right: new flow inside the phone -->
+  <div class="node p7-pnode" style="left:118.5mm; top:14mm;">Inšpektor fotografira v aplikaciji<span class="sub">VIN, nato poškodbe — kot doslej</span></div>
+  <div class="node node--ai p7-pnode" style="left:118.5mm; top:45mm;">Pametni filter razvrsti vsako fotografijo sproti<span class="sub">AI prepozna VIN in poveže poškodbe</span></div>
+  <div class="node p7-pnode" style="left:118.5mm; top:78mm;">Zapis vozila nastane samodejno<span class="sub">pripravljen za VLDR in poročila</span></div>
+
+  <!-- checks -->
+  <div class="p7-check" style="top:34mm;"><svg viewBox="0 0 12 12"><path d="M2 6.5 L5 9.5 L10 3" fill="none" stroke="#3a7d00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Brez prenosa v mapo</div>
+  <div class="p7-check" style="top:48mm;"><svg viewBox="0 0 12 12"><path d="M2 6.5 L5 9.5 L10 3" fill="none" stroke="#3a7d00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Brez iskanja po pisarni</div>
+  <div class="p7-check" style="top:62mm;"><svg viewBox="0 0 12 12"><path d="M2 6.5 L5 9.5 L10 3" fill="none" stroke="#3a7d00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Brez ročnega vnosa VIN</div>
+  <div class="p7-check" style="top:76mm;"><svg viewBox="0 0 12 12"><path d="M2 6.5 L5 9.5 L10 3" fill="none" stroke="#3a7d00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Aplikacija na telefonu — brez namestitve</div>
+
+  <!-- danger strikes over old steps 2-4 (above the boxes) -->
+  <svg class="wire" viewBox="0 0 265 120" xmlns="http://www.w3.org/2000/svg" style="pointer-events:none;">
+    <line x1="2.5" y1="39.4" x2="47.5" y2="30.4" stroke="#a01f0a" stroke-width="0.45"/>
+    <line x1="2.5" y1="61.4" x2="47.5" y2="52.4" stroke="#a01f0a" stroke-width="0.45"/>
+    <line x1="2.5" y1="83.4" x2="47.5" y2="74.4" stroke="#a01f0a" stroke-width="0.45"/>
+  </svg>
+</div>
+
+<div class="p7-band">
+  <span class="p7-tag">Inšpektor začne. Inšpektor konča.</span>
+  <span class="p7-note">Prehodno obdobje: podprt tudi današnji način — nalaganje celotne mape naenkrat.</span>
+</div>
+</div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span>7 / 10</span></footer>
+</section>
+
+<!-- ===================== P8 · PAMETNI FILTER ===================== -->
+<section class="page" id="page-8">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span class="pill pill--teh">Tehnologija</span></header>
+  <div class="phead"><p class="eyebrow">Pametni filter</p><h2 class="ptitle">Kako filter razvrsti 6.000 fotografij</h2></div>
+  <div class="pbody">
+<style>
+  /* ===== P8 · Pametni filter — pipeline ===== */
+  #page-8 .p8-chart { position:relative; height:112mm; margin-top:4mm; }
+  #page-8 .p8-n {
+    width:55mm; height:25mm;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:2.5mm 3.5mm; font-size:10pt;
+  }
+  #page-8 .p8-n .sub { margin-top:1.2mm; font-size:8pt; }
+  #page-8 .p8-num {
+    position:absolute; top:-3.1mm; left:-3.1mm;
+    width:6.4mm; height:6.4mm; border-radius:50%;
+    background:var(--navy); color:#fff;
+    border:0.7mm solid var(--bg);
+    font-size:9.5pt; font-weight:700; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #page-8 .p8-tray {
+    left:118mm; top:47mm; width:52mm; height:17mm;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:2.5mm 3.5mm;
+  }
+  #page-8 .p8-tray .sub { margin-top:1mm; font-size:8pt; }
+  #page-8 .p8-ghost { left:221mm; top:33mm; width:41mm; padding:2mm 3mm; font-size:9pt; }
+  #page-8 .p8-ghost .sub { margin-top:0.8mm; font-size:8pt; }
+  #page-8 .p8-warn { left:221mm; top:57mm; width:41mm; height:21mm; font-weight:600; }
+  #page-8 .p8-warn span { display:block; }
+  #page-8 .p8-warn span + span { border-top:1px solid #eacfc9; margin-top:1.5mm; padding-top:1.5mm; }
+  #page-8 .p8-lab {
+    position:absolute; font-size:8pt; color:var(--muted);
+    background:var(--bg); padding:0 1mm; line-height:1.2;
+  }
+  #page-8 .p8-legend { position:absolute; left:6mm; top:48mm; font-size:8.5pt; color:var(--muted); line-height:2; }
+  #page-8 .p8-legend i { display:inline-block; width:9mm; vertical-align:middle; margin-right:2.2mm; border-top:0.55mm solid var(--navy); }
+  #page-8 .p8-legend i.dash { border-top:0.45mm dashed var(--muted); }
+  #page-8 .p8-proof {
+    margin-top:5mm; background:var(--bg-soft);
+    border:1px solid var(--border); border-radius:10px;
+    padding:4mm 6mm;
+  }
+  #page-8 .p8-proof .main { font-size:11.5pt; font-weight:600; color:var(--navy-deep); }
+  #page-8 .p8-proof .small { font-size:9pt; color:var(--muted); margin-top:1.5mm; }
+</style>
+
+<div class="chart p8-chart">
+  <svg class="wire" viewBox="0 0 265 112" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowP8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3.4" markerHeight="3.4" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--navy)"/>
+      </marker>
+      <marker id="arrowP8m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+      </marker>
+    </defs>
+    <!-- main flow, row 1 -->
+    <line x1="58"  y1="14.5" x2="70.6"  y2="14.5" stroke="var(--navy)" stroke-width="0.5" marker-end="url(#arrowP8)"/>
+    <line x1="126" y1="14.5" x2="138.6" y2="14.5" stroke="var(--navy)" stroke-width="0.5" marker-end="url(#arrowP8)"/>
+    <line x1="194" y1="14.5" x2="206.6" y2="14.5" stroke="var(--navy)" stroke-width="0.5" marker-end="url(#arrowP8)"/>
+    <!-- 4 -> 5 -->
+    <line x1="214" y1="27" x2="214" y2="83.6" stroke="var(--navy)" stroke-width="0.5" marker-end="url(#arrowP8)"/>
+    <!-- row 2, right to left -->
+    <line x1="207" y1="96.5" x2="160.4" y2="96.5" stroke="var(--navy)" stroke-width="0.5" marker-end="url(#arrowP8)"/>
+    <line x1="105" y1="96.5" x2="58.4"  y2="96.5" stroke="var(--navy)" stroke-width="0.5" marker-end="url(#arrowP8)"/>
+    <!-- dashed exceptions -->
+    <line x1="160" y1="27" x2="152.4" y2="46.6" stroke="var(--muted)" stroke-width="0.4" stroke-dasharray="1.8 1.8" marker-end="url(#arrowP8m)"/>
+    <line x1="128" y1="84" x2="133.8" y2="64.4" stroke="var(--muted)" stroke-width="0.4" stroke-dasharray="1.8 1.8" marker-end="url(#arrowP8m)"/>
+    <line x1="241" y1="27" x2="241" y2="32.6" stroke="var(--muted)" stroke-width="0.4" stroke-dasharray="1.8 1.8" marker-end="url(#arrowP8m)"/>
+    <line x1="241" y1="84" x2="241" y2="78.4" stroke="var(--muted)" stroke-width="0.4" stroke-dasharray="1.8 1.8" marker-end="url(#arrowP8m)"/>
+  </svg>
+
+  <!-- row 1 -->
+  <div class="node p8-n" style="left:3mm;top:2mm;"><span class="p8-num">1</span><span>Zajem</span><span class="sub">vsaka fotografija s časom in vrstnim redom</span></div>
+  <div class="node p8-n" style="left:71mm;top:2mm;"><span class="p8-num">2</span><span>Prepoznava vrste fotografije</span><span class="sub">VIN tablica ali poškodba</span></div>
+  <div class="node node--ai p8-n" style="left:139mm;top:2mm;"><span class="p8-num">3</span><span>Branje VIN</span><span class="sub">AI vid + dvojna kontrola: 17 znakov, dovoljeni znaki</span></div>
+  <div class="node p8-n" style="left:207mm;top:2mm;"><span class="p8-num">4</span><span>Združevanje po vozilih</span><span class="sub">fotografija VIN odpre novo vozilo; poškodbe sledijo svojemu VIN-u</span></div>
+
+  <!-- row 2 -->
+  <div class="node p8-n" style="left:207mm;top:84mm;"><span class="p8-num">5</span><span>Preverjanje s seznamom ladje</span><span class="sub">vsak prebran VIN se primerja s seznamom razkladanja</span></div>
+  <div class="node p8-n" style="left:105mm;top:84mm;"><span class="p8-num">6</span><span>Ocena zanesljivosti</span><span class="sub">zanesljivo → samodejno · negotovo → predal »Nerazvrščeno«</span></div>
+  <div class="node p8-n" style="left:3mm;top:84mm;"><span class="p8-num">7</span><span>Zapis vozila</span><span class="sub">VIN + fotografije + podatki → poročila (VLDR, Constat)</span></div>
+
+  <!-- review tray (single bronze emphasis) -->
+  <div class="node node--vin p8-tray"><span>»Nerazvrščeno«</span><span class="sub">predal za ročni pregled — nič se ne izgubi</span></div>
+
+  <!-- side branches -->
+  <div class="node node--ghost p8-ghost"><span>Dva inšpektorja</span><span class="sub">ločena tokova, brez mešanja</span></div>
+  <div class="badge-warn p8-warn"><span>VIN ni na seznamu ladje → opozorilo</span><span>vozilo s seznama brez fotografij → opozorilo</span></div>
+
+  <!-- line labels -->
+  <div class="p8-lab" style="left:159mm;top:33.5mm;">zamegljen VIN</div>
+  <div class="p8-lab" style="left:135mm;top:72.5mm;">negotovo</div>
+
+  <!-- legend -->
+  <div class="p8-legend">
+    <div><i></i>samodejna pot</div>
+    <div><i class="dash"></i>izjema — v ročni pregled</div>
+  </div>
+</div>
+
+<div class="p8-proof">
+  <div class="main">Jedro filtra že deluje — preizkušeno na resničnih fotografijah vozil. AI je VIN pravilno prebral v 9 od 9 primerov.</div>
+  <div class="small">Dvojna kontrola: oblika VIN (17 znakov) in seznam ladje — filter nikoli ne ugiba.</div>
+</div>
+</div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span>8 / 10</span></footer>
+</section>
+
+<!-- ===================== P9 · PRIHRANEK ===================== -->
+<section class="page" id="page-9">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span class="pill pill--prih">Prihranek</span></header>
+  <div class="phead"><p class="eyebrow">Kaj to pomeni v urah</p><h2 class="ptitle">Vsaka ladja vrne ekipi približno deset ur</h2></div>
+  <div class="pbody">
+<style>
+  #page-9 .p9-wrap { display:flex; flex-direction:column; height:100%; padding-top:6mm; }
+  #page-9 .p9-main { display:flex; gap:9mm; flex:1 1 auto; min-height:0; }
+
+  /* ---- left: assumptions ---- */
+  #page-9 .p9-assum {
+    flex:0 0 76mm; background:var(--bg-soft); border:1px solid var(--border);
+    border-radius:10px; padding:5.5mm 6mm 5mm; display:flex; flex-direction:column;
+  }
+  #page-9 .p9-assum h3 { margin:0; font-size:9pt; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--navy-deep); }
+  #page-9 .p9-assum p.lead { margin:1.5mm 0 0; font-size:8.5pt; color:var(--muted); line-height:1.4; }
+  #page-9 .p9-assum ul { list-style:none; margin:4mm 0 0; padding:0; }
+  #page-9 .p9-assum li {
+    font-size:10pt; color:var(--ink); line-height:1.4; font-weight:600;
+    padding:3.4mm 0; border-top:1px solid var(--border);
+  }
+  #page-9 .p9-assum li small { display:block; font-size:8pt; font-weight:400; color:var(--muted); margin-top:.5mm; }
+  #page-9 .p9-assum .foot { margin-top:auto; padding-top:3mm; border-top:1px solid var(--border); font-size:8pt; color:var(--muted); }
+
+  /* ---- right column ---- */
+  #page-9 .p9-right { flex:1 1 auto; display:flex; flex-direction:column; min-width:0; }
+
+  /* before/after bars */
+  #page-9 .p9-bars { display:flex; align-items:center; gap:8mm; margin-top:3mm; }
+  #page-9 .p9-barrows { flex:1 1 auto; min-width:0; }
+  #page-9 .p9-brow { display:flex; align-items:center; gap:4mm; }
+  #page-9 .p9-brow + .p9-brow { margin-top:5mm; }
+  #page-9 .p9-blab { flex:0 0 14mm; font-size:8pt; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+  #page-9 .p9-track { flex:1 1 auto; display:flex; align-items:center; gap:3mm; min-width:0; }
+  #page-9 .p9-bar { height:10mm; border-radius:5px; display:flex; align-items:center; }
+  #page-9 .p9-bar--navy {
+    width:100%; background:var(--navy); color:#fff;
+    font-size:9.5pt; font-weight:600; padding:0 4.5mm; white-space:nowrap;
+  }
+  #page-9 .p9-bar--green { width:9%; min-width:5mm; background:var(--success); }
+  #page-9 .p9-glab { font-size:9pt; font-weight:600; color:var(--success); white-space:nowrap; }
+  #page-9 .p9-hero { flex:0 0 auto; text-align:right; }
+  #page-9 .p9-hero b { display:block; font-size:44pt; font-weight:800; color:var(--accent); line-height:1; letter-spacing:-.01em; }
+  #page-9 .p9-hero small { display:block; font-size:8.5pt; font-weight:600; color:var(--muted); margin-top:1.5mm; }
+
+  /* monthly table */
+  #page-9 .p9-table { width:100%; border-collapse:collapse; margin-top:12mm; }
+  #page-9 .p9-table caption {
+    caption-side:top; text-align:left; font-size:9pt; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--navy-deep); padding-bottom:3.5mm;
+  }
+  #page-9 .p9-table th {
+    font-size:9pt; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
+    text-align:left; padding:0 0 2.6mm; border-bottom:1px solid var(--navy);
+  }
+  #page-9 .p9-table td {
+    font-size:11pt; color:var(--ink); padding:4.6mm 0; border-bottom:1px solid var(--border);
+    font-variant-numeric:tabular-nums;
+  }
+  #page-9 .p9-table td:first-child { font-weight:700; color:var(--navy-deep); }
+  #page-9 .p9-table td:last-child, #page-9 .p9-table th:last-child { text-align:right; }
+  #page-9 .p9-table td:last-child { font-weight:600; }
+  #page-9 .p9-table .cnum { width:32%; }
+
+  /* bottom line */
+  #page-9 .p9-bottom {
+    flex:0 0 auto; margin-top:5mm; padding-top:3.5mm; border-top:1px solid var(--border);
+    font-size:10.5pt; color:var(--navy); line-height:1.45;
+  }
+  #page-9 .p9-bottom b { color:var(--navy-deep); }
+</style>
+
+<div class="p9-wrap">
+  <div class="p9-main">
+
+    <!-- LEFT · assumptions -->
+    <aside class="p9-assum">
+      <h3>Predpostavke</h3>
+      <p class="lead">Preverite in zamenjamo z vašimi podatki.</p>
+      <ul>
+        <li>200 vozil na ladjo</li>
+        <li>~30 fotografij na vozilo <small>skupaj ≈ 6.000 fotografij</small></li>
+        <li>3 min ročnega razvrščanja in vnosa na vozilo</li>
+        <li>15–25 € polna cena pisarniške ure</li>
+        <li>N ladij na mesec <small>vstavimo vašo številko</small></li>
+      </ul>
+      <p class="foot">Ocena je namerno konzervativna.</p>
+    </aside>
+
+    <!-- RIGHT · bars + table -->
+    <div class="p9-right">
+
+      <div class="p9-bars">
+        <div class="p9-barrows">
+          <div class="p9-brow">
+            <span class="p9-blab">Danes</span>
+            <div class="p9-track">
+              <div class="p9-bar p9-bar--navy">≈ 11 ur na ladjo (razvrščanje + vnos + urejanje)</div>
+            </div>
+          </div>
+          <div class="p9-brow">
+            <span class="p9-blab">Jutri</span>
+            <div class="p9-track">
+              <div class="p9-bar p9-bar--green"></div>
+              <span class="p9-glab">0,5–1 h — pregled opozoril</span>
+            </div>
+          </div>
+        </div>
+        <div class="p9-hero">
+          <b>− 90&nbsp;%</b>
+          <small>manj ročnega dela na ladjo</small>
+        </div>
+      </div>
+
+      <table class="p9-table">
+        <caption>Mesečni prihranek</caption>
+        <thead>
+          <tr>
+            <th class="cnum">Ladij na mesec</th>
+            <th class="cnum">Prihranjene ure na mesec</th>
+            <th>Vrednost prihranka na mesec</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>2</td><td>20 ur</td><td>300–500 €</td></tr>
+          <tr><td>4</td><td>40 ur</td><td>600–1.000 €</td></tr>
+          <tr><td>6</td><td>60 ur</td><td>900–1.500 €</td></tr>
+          <tr><td>8</td><td>80 ur</td><td>1.200–2.000 €</td></tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+
+  <!-- full-width bottom line -->
+  <p class="p9-bottom">Poleg ur: vsaka zamenjava vozila pomeni sporno poročilo za naročnika. <b>Dvojna kontrola — VIN in seznam ladje</b> — to tveganje praktično odpravi.</p>
+</div>
+</div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span>9 / 10</span></footer>
+</section>
+
+<!-- ===================== P10 · KAJ SLEDI ===================== -->
+<section class="page" id="page-10">
+  <header class="ptop"><img class="logo" src="assets/logo-inspectus.png" alt="INSPECTUS"><span></span></header>
+  <div class="phead"><p class="eyebrow">Naslednji koraki</p><h2 class="ptitle">Kaj sledi</h2></div>
+  <div class="pbody">
+<style>
+  #page-10 .pbody { display:flex; flex-direction:column; }
+  #page-10 .tlwrap { flex:1 1 auto; display:flex; align-items:center; padding-bottom:9mm; }
+  #page-10 .tl { display:flex; width:100%; position:relative; }
+  #page-10 .tl::before { content:""; position:absolute; top:7mm; left:12.5%; right:12.5%; border-top:1px solid var(--border); }
+  #page-10 .tl-step { flex:1 1 0; position:relative; text-align:center; padding:0 5mm; }
+  #page-10 .tl-num {
+    width:14mm; height:14mm; border-radius:50%; background:var(--navy); color:#fff;
+    font-size:15pt; font-weight:800; line-height:14mm; text-align:center; margin:0 auto;
+  }
+  #page-10 .tl-title { font-size:12pt; font-weight:700; color:var(--navy-deep); margin:5mm 0 0; line-height:1.25; }
+  #page-10 .tl-sub { font-size:9pt; color:var(--muted); line-height:1.45; margin:1.5mm auto 0; max-width:50mm; }
+  #page-10 .assure {
+    flex:0 0 auto; background:var(--bg-soft); border:1px solid var(--border); border-radius:10px;
+    padding:5mm 8mm; font-size:11pt; color:var(--navy); text-align:center;
+  }
+  #page-10 .assure b { color:var(--accent); font-weight:700; }
+  #page-10 .contact { flex:0 0 auto; text-align:center; margin:8mm 0 2mm; }
+  #page-10 .contact .c1 { font-size:11pt; font-weight:700; color:var(--navy-deep); margin:0; }
+  #page-10 .contact .c2 { font-size:9pt; color:var(--muted); margin:1.5mm 0 0; }
+</style>
+
+<div class="tlwrap">
+  <div class="tl">
+    <div class="tl-step">
+      <div class="tl-num">1</div>
+      <p class="tl-title">Potrditev obsega</p>
+      <p class="tl-sub">skupaj dolo&#269;imo funkcionalnosti in prioritete</p>
+    </div>
+    <div class="tl-step">
+      <div class="tl-num">2</div>
+      <p class="tl-title">Pilot na eni resni&#269;ni ladji</p>
+      <p class="tl-sub">va&scaron;e fotografije, va&scaron; seznam razkladanja &mdash; izmerimo rezultat</p>
+    </div>
+    <div class="tl-step">
+      <div class="tl-num">3</div>
+      <p class="tl-title">Razvoj aplikacije</p>
+      <p class="tl-sub">aplikacija + pametni filter, sproti usklajeno z vami</p>
+    </div>
+    <div class="tl-step">
+      <div class="tl-num">4</div>
+      <p class="tl-title">Uvedba ob boku Aresa</p>
+      <p class="tl-sub">novi sistem te&#269;e vzporedno, prehod brez tveganja</p>
+    </div>
+  </div>
+</div>
+
+<div class="assure">Gradimo na temeljih, ki <b>&#382;e delujejo</b>: avtomatizacija VLDR (preizku&scaron;ena na 314 vozilih) in AI-bralnik VIN sta v produkciji.</div>
+
+<div class="contact">
+  <p class="c1">AIS Slovenija &middot; Operater AI sistemov</p>
+  <p class="c2">ais-slovenia.si</p>
+</div>
+</div>
+  <footer class="pfoot"><span>AIS Slovenija · Operater AI sistemov · Poganja Claude</span><span>10 / 10</span></footer>
+</section>
+
+<!-- screen-only presentation nav -->
+<div class="ui" style="position:fixed; right:18px; bottom:18px; display:flex; gap:8px; z-index:9;">
+  <button id="btn-fs" style="font:600 13px 'Open Sans',sans-serif; padding:8px 14px; border-radius:8px; border:1px solid #ccd; background:#fff; cursor:pointer;">Celozaslonsko</button>
+</div>
+<script>
+  // screen-only: arrow-key page navigation + fullscreen (stripped from print by @media print .ui)
+  const pages = [...document.querySelectorAll('.page')];
+  let cur = 0;
+  function go(i){ cur = Math.max(0, Math.min(pages.length-1, i)); pages[cur].scrollIntoView({behavior:'smooth'}); }
+  addEventListener('keydown', e => {
+    if (e.key==='ArrowRight' || e.key==='PageDown' || e.key===' ') { e.preventDefault(); go(cur+1); }
+    if (e.key==='ArrowLeft'  || e.key==='PageUp')  { e.preventDefault(); go(cur-1); }
+  });
+  document.getElementById('btn-fs').onclick = () => document.documentElement.requestFullscreen();
+</script>
+</body>
+</html>

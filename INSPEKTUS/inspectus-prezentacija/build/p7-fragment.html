@@ -1,0 +1,107 @@
+<style>
+  #page-7 .chart { height: 120mm; margin-top: 2mm; }
+
+  /* left: old 5-step miniature */
+  #page-7 .p7-lbl {
+    position: absolute; font-size: 7.5pt; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+  }
+  #page-7 .p7-mini {
+    width: 46mm; padding: 1.8mm 3mm; font-size: 8pt; font-weight: 600;
+    border-radius: 6px; text-align: left;
+  }
+
+  /* center: headline stack */
+  #page-7 .p7-hero { position: absolute; left: 52mm; top: 36mm; width: 58mm; text-align: center; }
+  #page-7 .p7-old { display: block; font-size: 13pt; font-weight: 700; color: var(--muted); text-decoration: line-through; }
+  #page-7 .p7-one { display: block; font-size: 40pt; font-weight: 800; color: var(--accent); line-height: 1.05; margin-top: 1.5mm; }
+
+  /* right: nodes inside the phone */
+  #page-7 .p7-pnode { width: 46mm; padding: 2.5mm 3.5mm; font-size: 9.5pt; text-align: left; }
+  #page-7 .p7-pnode .sub { font-size: 7.8pt; }
+
+  /* checks */
+  #page-7 .p7-check {
+    position: absolute; left: 180mm; width: 83mm;
+    display: flex; align-items: flex-start; gap: 3mm;
+    font-size: 10pt; font-weight: 600; color: var(--navy-deep); line-height: 1.3;
+  }
+  #page-7 .p7-check svg { flex: 0 0 auto; width: 4.5mm; height: 4.5mm; margin-top: .4mm; }
+
+  /* bottom band */
+  #page-7 .p7-band {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    border-top: 1px solid var(--border); padding-top: 3mm;
+    display: flex; align-items: baseline; justify-content: space-between; gap: 10mm;
+  }
+  #page-7 .p7-tag { font-size: 17pt; font-weight: 800; color: var(--navy-deep); white-space: nowrap; }
+  #page-7 .p7-note { font-size: 9pt; color: var(--muted); text-align: right; }
+</style>
+
+<div class="chart">
+  <svg class="wire" viewBox="0 0 265 120" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowP7" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#425060"/>
+      </marker>
+      <marker id="arrowP7m" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#9aa3ad"/>
+      </marker>
+    </defs>
+
+    <!-- left chain connectors -->
+    <line x1="25" y1="17" x2="25" y2="29.8" stroke="#9aa3ad" stroke-width="0.4" marker-end="url(#arrowP7m)"/>
+    <line x1="25" y1="39" x2="25" y2="51.8" stroke="#9aa3ad" stroke-width="0.4" marker-end="url(#arrowP7m)"/>
+    <line x1="25" y1="61" x2="25" y2="73.8" stroke="#9aa3ad" stroke-width="0.4" marker-end="url(#arrowP7m)"/>
+    <line x1="25" y1="83" x2="25" y2="95.8" stroke="#9aa3ad" stroke-width="0.4" marker-end="url(#arrowP7m)"/>
+
+    <!-- big center arrow: from the old chain to the phone -->
+    <line x1="56" y1="74" x2="112.3" y2="74" stroke="#425060" stroke-width="1.1" marker-end="url(#arrowP7)"/>
+
+    <!-- phone frame -->
+    <rect x="114" y="3" width="55" height="110" rx="8" fill="#ffffff" stroke="#425060" stroke-width="0.7"/>
+    <rect x="135.5" y="7.5" width="12" height="1.6" rx="0.8" fill="#425060" opacity="0.3"/>
+    <rect x="134.5" y="108.2" width="14" height="1.1" rx="0.55" fill="#dddddd"/>
+
+    <!-- connectors inside the phone -->
+    <line x1="141.5" y1="34" x2="141.5" y2="43.8" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP7)"/>
+    <line x1="141.5" y1="67" x2="141.5" y2="76.8" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP7)"/>
+  </svg>
+
+  <!-- left: old process, grayed out -->
+  <span class="p7-lbl" style="left:2mm; top:1mm;">Dosedanji postopek</span>
+  <div class="node node--ghost p7-mini" style="left:2mm; top:9mm;">1 · Fotografiranje</div>
+  <div class="node node--ghost p7-mini" style="left:2mm; top:31mm;">2 · Prenos v mapo</div>
+  <div class="node node--ghost p7-mini" style="left:2mm; top:53mm;">3 · Iskanje po mapi</div>
+  <div class="node node--ghost p7-mini" style="left:2mm; top:75mm;">4 · Ročni vnos v Ares</div>
+  <div class="node node--ghost p7-mini" style="left:2mm; top:97mm;">5 · Zapis vozila</div>
+
+  <!-- center: the headline -->
+  <div class="p7-hero">
+    <span class="p7-old">5 korakov</span>
+    <span class="p7-one">1 korak</span>
+  </div>
+
+  <!-- right: new flow inside the phone -->
+  <div class="node p7-pnode" style="left:118.5mm; top:14mm;">Inšpektor fotografira v aplikaciji<span class="sub">VIN, nato poškodbe — kot doslej</span></div>
+  <div class="node node--ai p7-pnode" style="left:118.5mm; top:45mm;">Pametni filter razvrsti vsako fotografijo sproti<span class="sub">AI prepozna VIN in poveže poškodbe</span></div>
+  <div class="node p7-pnode" style="left:118.5mm; top:78mm;">Zapis vozila nastane samodejno<span class="sub">pripravljen za VLDR in poročila</span></div>
+
+  <!-- checks -->
+  <div class="p7-check" style="top:34mm;"><svg viewBox="0 0 12 12"><path d="M2 6.5 L5 9.5 L10 3" fill="none" stroke="#3a7d00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Brez prenosa v mapo</div>
+  <div class="p7-check" style="top:48mm;"><svg viewBox="0 0 12 12"><path d="M2 6.5 L5 9.5 L10 3" fill="none" stroke="#3a7d00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Brez iskanja po pisarni</div>
+  <div class="p7-check" style="top:62mm;"><svg viewBox="0 0 12 12"><path d="M2 6.5 L5 9.5 L10 3" fill="none" stroke="#3a7d00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Brez ročnega vnosa VIN</div>
+  <div class="p7-check" style="top:76mm;"><svg viewBox="0 0 12 12"><path d="M2 6.5 L5 9.5 L10 3" fill="none" stroke="#3a7d00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Aplikacija na telefonu — brez namestitve</div>
+
+  <!-- danger strikes over old steps 2-4 (above the boxes) -->
+  <svg class="wire" viewBox="0 0 265 120" xmlns="http://www.w3.org/2000/svg" style="pointer-events:none;">
+    <line x1="2.5" y1="39.4" x2="47.5" y2="30.4" stroke="#a01f0a" stroke-width="0.45"/>
+    <line x1="2.5" y1="61.4" x2="47.5" y2="52.4" stroke="#a01f0a" stroke-width="0.45"/>
+    <line x1="2.5" y1="83.4" x2="47.5" y2="74.4" stroke="#a01f0a" stroke-width="0.45"/>
+  </svg>
+</div>
+
+<div class="p7-band">
+  <span class="p7-tag">Inšpektor začne. Inšpektor konča.</span>
+  <span class="p7-note">Prehodno obdobje: podprt tudi današnji način — nalaganje celotne mape naenkrat.</span>
+</div>

@@ -1,0 +1,12 @@
+node_modules
+.next
+.env.local
+.env
+.DS_Store
+*.log
+.vercel
+
+# Supabase CLI local state (never commit)
+supabase/.branches
+supabase/.temp
+supabase/.env

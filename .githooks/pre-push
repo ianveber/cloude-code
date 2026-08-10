@@ -1,0 +1,39 @@
+#!/bin/sh
+# ─────────────────────────────────────────────────────────────────────────────
+# pre-push — run the INSPECTUS VLDR test suite (incl. the transform drift guard)
+# before any push is allowed. Guards against the deployed
+# inspectus-vldr/lib/transform.js silently drifting from the inspectus-os twin
+# (see INSPEKTUS/inspectus-vldr/lib/transform-sync.test.js).
+#
+# This hook is TRACKED in the repo (.githooks/). It is active only after a
+# one-time:   git config core.hooksPath .githooks   (see .githooks/README.md)
+#
+# Emergency bypass (skips this hook):  git push --no-verify
+# ─────────────────────────────────────────────────────────────────────────────
+
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+VLDR_DIR="$REPO_ROOT/INSPEKTUS/inspectus-vldr"
+
+# Nothing to check if the VLDR project isn't in this checkout.
+[ -d "$VLDR_DIR" ] || exit 0
+
+# Resolve bun even when the push comes from a GUI git client with a minimal PATH.
+BUN=$(command -v bun 2>/dev/null)
+[ -z "$BUN" ] && [ -x "$HOME/.bun/bin/bun" ] && BUN="$HOME/.bun/bin/bun"
+if [ -z "$BUN" ]; then
+  echo "⚠️  pre-push: 'bun' not found — skipping INSPECTUS VLDR tests."
+  echo "   Install bun or push from a shell where bun is on PATH to re-enable the drift guard."
+  exit 0
+fi
+
+echo "▶ pre-push: running INSPECTUS VLDR tests (transform drift guard)…"
+if ! ( cd "$VLDR_DIR" && "$BUN" test ); then
+  echo ""
+  echo "✗ pre-push BLOCKED — INSPECTUS VLDR tests failed."
+  echo "   Likely the deployed transform.js and the inspectus-os twin have drifted,"
+  echo "   or a Remarks rule changed without updating both copies + tests."
+  echo "   Fix them, then push again — or bypass in an emergency with:  git push --no-verify"
+  exit 1
+fi
+echo "✓ pre-push: VLDR tests passed — pushing."
+exit 0

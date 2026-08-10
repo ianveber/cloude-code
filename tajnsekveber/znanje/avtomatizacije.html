@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avtomatizacije v praksi: 3 primeri iz realnih projektov — Ian Tajnšek Veber</title>
+<meta name="description" content="Trije realni primeri avtomatizacije: Excel poročila, ocenjevanje leadov in jutranji briefing agent. Problem, rešitev, rezultat — in kako najdeš svoj prvi primer.">
+<meta property="og:title" content="Avtomatizacije v praksi: 3 primeri iz realnih projektov">
+<meta property="og:description" content="Trije realni primeri avtomatizacije: Excel poročila, ocenjevanje leadov in jutranji briefing agent. Problem, rešitev, rezultat — in kako najdeš svoj prvi primer.">
+<meta property="og:type" content="article">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232342ff'/%3E%3Ctext x='32' y='43' font-family='Inter,Arial,sans-serif' font-size='28' font-weight='800' fill='white' text-anchor='middle'%3EIV%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--blue:#2342ff;--ink:#1a1d24;--gray:#5a6172;--line:#e3e6ee}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:56px 56px;opacity:.5;
+    -webkit-mask-image:radial-gradient(120% 70% at 50% 0%,#000 10%,transparent 70%);
+    mask-image:radial-gradient(120% 70% at 50% 0%,#000 10%,transparent 70%)}
+  .back{position:fixed;top:24px;left:24px;z-index:10;display:inline-flex;align-items:center;gap:8px;
+    background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 16px;
+    font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;box-shadow:0 2px 12px rgba(26,29,36,.06)}
+  .back:hover{border-color:var(--blue);color:var(--blue)}
+  .wrap{max-width:720px;margin:0 auto;padding:110px 24px 80px}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:14px}
+  h1{font-size:clamp(30px,5vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-bottom:14px}
+  .lead{font-size:18px;font-weight:500;color:var(--gray);line-height:1.6;margin-bottom:40px}
+  h2{font-size:22px;font-weight:700;margin:40px 0 12px;display:flex;align-items:center;gap:10px}
+  h2::before{content:"";width:22px;height:3px;background:var(--blue);border-radius:2px;flex:none}
+  p,li{font-size:16px;line-height:1.7;color:var(--gray)}
+  p{margin-bottom:14px}
+  ul,ol{margin:0 0 14px 22px}
+  li{margin-bottom:8px}
+  strong{color:var(--ink);font-weight:600}
+  .box{background:#fff;border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:12px;padding:18px 20px;margin:24px 0}
+  .box p{margin:0}
+  .cta-end{margin-top:56px;padding:28px;border:1px solid var(--line);border-radius:18px;text-align:center;background:#fff}
+  .cta-end p{margin-bottom:16px;color:var(--ink);font-weight:600;font-size:17px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;
+    font-size:15px;font-weight:600;text-decoration:none;border:1.5px solid var(--line);color:var(--ink);background:#fff}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+  .btn:hover{border-color:var(--blue)}
+  .btn.primary:hover{background:#1b35d6;color:#fff}
+  footer{margin-top:40px;text-align:center;font-size:13px;color:var(--gray)}
+  @media(max-width:768px){.wrap{padding-top:96px}}
+</style>
+</head>
+<body>
+<a class="back" href="/">← tajnsekveber.com</a>
+<main class="wrap">
+  <p class="eyebrow">Brezplačno znanje</p>
+  <h1>Avtomatizacije v praksi: 3 primeri iz realnih projektov</h1>
+  <p class="lead">Trije projekti, ki sem jih zgradil za realna podjetja. Brez imen in brez olepševanja — samo problem, rešitev in rezultat. Na koncu še vzorec, po katerem prepoznaš svoj prvi primer.</p>
+
+  <p>O umetni inteligenci se govori veliko. Konkretnih primerov je malo. Zato spodaj trije iz mojega dela. Vsak je drugačen posel, drugačen problem — ampak vzorec, zakaj avtomatizacija deluje, je pri vseh isti. Tega si vzemi s sabo.</p>
+
+  <h2>Primer 1: Excel → poročila za stranke</h2>
+  <p><strong>Problem.</strong> Slovensko podjetje za preglede vozil. Vsak pregled konča v Excelu — ena vrstica, ena poškodba. Stranka pa hoče poročilo: pregledno, po vozilih, z razlago. Zaposleni so izvoz ročno preurejali v poročila. Kopiranje, lepljenje, oblikovanje. Ure klikanja za vsako stranko. In ker je delo ročno, so se vmes prikradle napake.</p>
+  <p><strong>Rešitev.</strong> Orodje, ki obrne vrstni red: naložiš Excel, sistem naredi vse ostalo. Sam razdeli podatke po vozilih in zgradi poročilo za vsako vozilo posebej. AI prebere komentarje inšpektorjev, označi sumljive podatke — manjkajoče vrednosti, podvojene vnose, nelogične kombinacije — in napiše povzetek v slovenščini, ki ga stranka razume brez klica.</p>
+  <p><strong>Rezultat.</strong> Iz ur na minute. Manj napak, ker nihče več ročno ne prepisuje podatkov. In podrobnost, ki je za podjetje ključna: podatki ne zapustijo brskalnika. Nič se ne nalaga na tuje strežnike.</p>
+  <p>Lekcija iz tega primera: če tvoja ekipa kjerkoli ročno preureja izvoze iz enega sistema za drug sistem ali za stranko, je to skoraj vedno prvi kandidat za avtomatizacijo. Format je znan, pravila so znana, ponavlja se vsak teden.</p>
+
+  <h2>Primer 2: Leadi, ki se razvrstijo sami</h2>
+  <p><strong>Problem.</strong> Izobraževalni program za mlade. Oglasi delajo, leadi prihajajo. Ampak vsi v isti predal: resni starši, radovedneži, napačni kliki. Ekipa je odgovarjala ročno in po vrsti. Resni so čakali enako dolgo kot tisti, ki nikoli ne bodo kupili.</p>
+  <p><strong>Rešitev.</strong> Vsak nov lead gre najprej skozi AI oceno: kako resen je in kako dober fit je za program. Na podlagi ocene ga sistem uvrsti v pravi e-mail tok — drugo zaporedje za vroče, drugo za hladne. Za vsakega pripravi tudi osnutek odgovora. Človek osnutek pregleda, popravi in pošlje. Pošiljanje ostane v človeških rokah.</p>
+  <p><strong>Rezultat.</strong> Hitrejši odzivi, ker nihče več ne čaka v vrsti. In prodajni pogovori samo s pravimi leadi — ekipa ne izgublja ur s tistimi, ki so kliknili po pomoti.</p>
+  <p>Pomembno: AI tukaj ne prodaja. Razvršča in pripravlja. Odločitev in odnos ostaneta pri človeku — zato sistem deluje, namesto da bi stranke odganjal z robotskimi odgovori.</p>
+
+  <h2>Primer 3: Jutranji briefing ob sedmih</h2>
+  <p><strong>Problem.</strong> Podjetnik z več projekti hkrati. Vsako jutro isti ritual: e-pošta, koledar, seznami nalog — trije različni sistemi. Pol ure samo, da ugotovi, kje sploh je. In še takrat kaj spregleda.</p>
+  <p><strong>Rešitev.</strong> Agent, ki vsako jutro prebere e-pošto, koledar in odprte naloge ter ob sedmih pripravi en sam povzetek. Kaj je danes nujno. Kaj se je od včeraj premaknilo. Kje se roki med sistemi ne ujemajo. Agent samo bere — ne pošilja, ne briše, ne spreminja.</p>
+  <div class="box">
+    <p><strong>Prvo pravilo pri agentih: naj najprej samo bere.</strong> Pošiljanje, brisanje in spreminjanje dodaš šele, ko sistemu zaupaš. Ne prej.</p>
+  </div>
+  <p><strong>Rezultat.</strong> Trideset minut jutranjega pregledovanja je postalo tri minute branja. Vsak dan. Čez leto je to več kot sto ur.</p>
+
+  <h2>Kaj imajo vsi trije skupnega</h2>
+  <p>Trije različni posli, tri različne rešitve. Vzorec pa je isti. Vsak primer ima tri lastnosti:</p>
+  <ul>
+    <li><strong>Jasna pravila.</strong> Proces se da zapisati: če pride X, naredi Y. Brez izjeme na vsakem drugem koraku.</li>
+    <li><strong>Ponavljanje.</strong> Isto delo, vsak dan ali vsak teden. Avtomatizacija se splača, ker se vložek razdeli čez stotine ponovitev.</li>
+    <li><strong>Merljiv rezultat.</strong> Pri vsakem točno vemo, kaj smo dobili: ure, hitrost odziva, manj napak. Če rezultata ne znaš izmeriti, ne veš, ali avtomatizacija sploh dela.</li>
+  </ul>
+  <div class="box">
+    <p><strong>Avtomatiziraj proces, ne kaosa.</strong> Če proces ni jasen — če ga ne znaš zapisati na en list papirja — ga najprej zapiši. Avtomatiziran kaos je samo hitrejši kaos.</p>
+  </div>
+  <p>Kako najdeš svoj prvi primer? Vprašaj se tri stvari. Katero opravilo ponovim vsak teden? Mi vzame več kot uro? Poteka vsakič enako? Če si trikrat odgovoril z da, imaš kandidata.</p>
+  <p>In kaj lahko narediš danes, brez kakršnegakoli orodja:</p>
+  <ol>
+    <li>Izberi eno samo opravilo. Ne tri, eno.</li>
+    <li>Zapiši ga po korakih, od prvega klika do zadnjega. Tudi izjeme: kdaj proces zavije drugam in zakaj.</li>
+    <li>Označi korake, kjer je nujno potreben človek — presoja, odnos, podpis. Vse ostalo je kandidat za stroj.</li>
+  </ol>
+  <p>Ta zapis je polovica dela. Resno. Večina avtomatizacij propade, ker nihče ni znal povedati, kako proces sploh teče — ne zato, ker bi tehnologija odpovedala. Z zapisanim procesom je gradnja rutina; brez njega je ugibanje.</p>
+
+  <div class="cta-end">
+    <p>Imaš proces, ki ti požira ure? Opiši mi ga v dveh stavkih — povem ti, ali se ga splača avtomatizirati.</p>
+    <a class="btn primary" href="mailto:ian.veber@gmail.com">Piši mi</a>
+    <a class="btn" href="https://www.linkedin.com/in/ian-tajnsek-veber-8305382a9/" target="_blank" rel="noopener">LinkedIn</a>
+  </div>
+  <footer>Ian Tajnšek Veber · tajnsekveber.com</footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Heva upravljanje</title>
+		<!--meta-->
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="keywords" content="Medic, Medical Center" />
+		<meta name="description" content="Responsive Medical Health Template" />
+		<!--style-->
+		<link href='http://fonts.googleapis.com/css?family=PT+Sans' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Volkhov:400italic' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="style/reset.css" />
+		<link rel="stylesheet" type="text/css" href="style/superfish.css" />
+		<link rel="stylesheet" type="text/css" href="style/fancybox/jquery.fancybox.css" />
+		<link rel="stylesheet" type="text/css" href="style/jquery.qtip.css" />
+		<link rel="stylesheet" type="text/css" href="style/jquery-ui-1.9.2.custom.css" />
+		<link rel="stylesheet" type="text/css" href="style/style.css" />
+		<link rel="stylesheet" type="text/css" href="style/responsive.css" />
+		<link rel="shortcut icon" href="images/favicon.ico" />
+		<!--js-->
+		<script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="js/jquery.ba-bbq.min.js"></script>
+		<script type="text/javascript" src="js/jquery-ui-1.9.2.custom.min.js"></script>
+		<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
+		<script type="text/javascript" src="js/jquery.carouFredSel-5.6.4-packed.js"></script>
+		<script type="text/javascript" src="js/jquery.sliderControl.js"></script>
+		<script type="text/javascript" src="js/jquery.linkify.js"></script>
+		<script type="text/javascript" src="js/jquery.timeago.js"></script>
+		<script type="text/javascript" src="js/jquery.hint.js"></script>
+		<script type="text/javascript" src="js/jquery.isotope.min.js"></script>
+		<script type="text/javascript" src="js/jquery.isotope.masonry.js"></script>
+		<script type="text/javascript" src="js/jquery.fancybox-1.3.4.pack.js"></script>
+		<script type="text/javascript" src="js/jquery.qtip.min.js"></script>
+		<script type="text/javascript" src="js/jquery.blockUI.js"></script>
+		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+		<script type="text/javascript" src="js/main.js"></script>
+	</head>
+	<body>
+		<div class="site_container">
+			<div class="header_container">
+			  <div class="header clearfix">
+					<div class="header_left">
+						<a href="home.html" title="GYMBASE">
+							<img src="images/header_logo.png" alt="logo" />
+							<span class="logo"></span>
+						</a>
+					</div>
+					<ul class="sf-menu header_right">
+						<li class="submenu selected">
+							<a href="index.html" title="Heva">
+								Domov
+							</a>
+
+						</li>
+						<li class="submenu">
+							<a href="#" title="Storitve">
+								Storitve
+							</a>
+							<ul>
+								<li>
+									<a href="upravljanje.html" title="Upravljanje nepremičnin">
+										Upravljane z nepremičninami
+									</a>
+								</li>
+								<li>
+									<a href="vzdrzevanje.html" title="Vzdrževanje objektov">
+										Vzdrževanje objektov
+									</a>
+
+								</li>
+								<li>
+									<a href="ptice.html" title="Težave z pticami">
+										Težave z pticami
+									</a>
+								</li>
+									<li>
+									<a href="hisnik.html" title="Halo hišnik">
+										"Halo" hišnik
+									</a>
+								</li>
+									<li>
+									<a href="urejanje_vrtov.html" title="Urejanje vrtov in okolice">
+										Urejanje vrtov in okolice
+									</a>
+								</li>
+								</li>
+									<li>
+									<a href="kljucavnice.html" title="Menjava kljucavnic in cilindričnih vložkov">
+										Menjava ključavnic in cilindričnih vložkov
+									</a>
+								</li>
+							</ul>
+						</li>
+						<li class="submenu">
+							<a href="#" title="PAGES">
+								O nas
+							</a>
+							<ul>
+								<li>
+									<a href="onas.html" title="About">
+										O nas
+									</a>
+								</li>
+							</ul>
+						</li>
+						<li class="submenu wide">
+							<a href="kontakt.html" title="Kontakt">
+								Kontakt
+							</a>
+						</li>
+						<li class="submenu wide">
+							<a href="http://www.heva.si/arhiv-heva/index.php" target="_blank" title="Objekti">
+								Objekti
+							</a>
+
+						</li>
+
+
+					</ul>
+					<div class="mobile_menu">
+						<select>
+							<option value="-">-</option>							<option value="home.html" selected="selected">Domov</option>
+
+							<option value="home.html">- Home Style 1</option>
+							<option value="home_2.html">- Home Style 2</option>
+							<option value="home_3.html">- Home Style 3</option>
+							<option value="home_4.html">- Home Style 4</option>
+							<option value="home_5.html">- Home Style 5</option>
+							<option value="home_small_slider.html">- Home Small Slider</option>
+							<option value="blog.html">Storitve</option>
+							<option value="blog.html">- Blog with sidebar</option>
+							<option value="blog_2_columns.html">- Blog 2 columns</option>
+							<option value="blog_2_columns.html">-- Right sidebar</option>
+							<option value="blog_2_columns_left_sidebar.html">-- Left sidebar</option>
+							<option value="post.html">- Single post</option>
+							<option value="about.html">O nas</option>
+							<option value="about.html">- About</option>
+							<option value="doctors.html">- Our Doctors</option>
+							<option value="medical_care.html">- Medical Care</option>
+							<option value="shortcodes.html">- Shortcodes</option>
+							<option value="shortcodes.html#features-style">-- Features Style</option>
+							<option value="shortcodes.html#carousel">-- Carousel</option>
+							<option value="shortcodes.html#testimonials-announcement">-- Testimonials &amp; Announcement</option>
+							<option value="shortcodes.html#accordiontab-notifications">-- Accordion &amp; Notifications</option>
+							<option value="shortcodes.html#tabs-quote">-- Tabs &amp; Quote</option>
+							<option value="shortcodes.html#lists">-- Lists</option>
+							<option value="shortcodes.html#icons">-- Icons</option>
+							<option value="shortcodes.html#buttons-headings">-- Buttons &amp; Headings</option>
+							<option value="shortcodes.html#columns">-- Columns &amp; Code</option>
+							<option value="404.html">-- 404 Not Found</option>
+							<option value="departments.html">Kontakt</option>
+							<option value="departments.html#primary-health-care">- Primary Health Care</option>
+							<option value="departments.html#pediatric-clinic">- Pediatric Clinic</option>
+							<option value="departments.html#outpatient-surgery">- Outpatient Surgery</option>
+							<option value="departments.html#gynaecological-clinic">- Gynaecological Clinic</option>
+							<option value="departments.html#cardiac-clinic">- Cardiac Clinic</option>
+							<option value="departments.html#laryngological-clinic">- Laryngological Clinic</option>
+							<option value="departments.html#ophthalmology-clinic">- Ophthalmology Clinic</option>
+							<option value="departments.html#dental-clinic">- Dental Clinic</option>
+							<option value="departments.html#outpatient-rehabilitation">- Outpatient Rehabilitation</option>
+							<option value="timetable.html">Objekti</option>
+							<option value="timetable.html#all-departments">- All Departments</option>
+							<option value="timetable.html#primary-health-care">- Primary Health Care</option>
+							<option value="timetable.html#pediatric-clinic">- Pediatric Clinic</option>
+							<option value="timetable.html#outpatient-surgery">- Outpatient Surgery</option>
+							<option value="timetable.html#gynaecological-clinic">- Gynaecological Clinic</option>
+							<option value="timetable.html#cardiac-clinic">- Cardiac Clinic</option>
+							<option value="timetable.html#laryngological-clinic">- Laryngological Clinic</option>
+							<option value="timetable.html#ophthalmology-clinic">- Ophthalmology Clinic</option>
+							<option value="timetable.html#dental-clinic">- Dental Clinic</option>
+							<option value="timetable.html#outpatient-rehabilitation">- Outpatient Rehabilitation</option>
+
+						</select>
+					</div>
+			  </div>
+			</div>
+			<!-- slider -->
+			<ul class="slider">
+				<li style="background-image: url('images/slider/img1.jpg');">
+					&nbsp;
+				</li>
+				<li style="background-image: url('images/slider/img2.jpg');">
+					&nbsp;
+				</li>
+				<li style="background-image: url('images/slider/img3.jpg');">
+					&nbsp;
+				</li>
+			</ul>
+			<div class="page relative noborder">
+				<!--<div class="top_hint">
+					Give us a call: +123 356 123 124
+				</div>-->
+				<!-- slider content -->
+				<div class="slider_content_box clearfix">
+                  <div class="slider_content" style="display: block;">
+                    <h1 class="title"> heva upravljanje </h1>
+                    <h2 class="subtitle"> upravljanje poslovnih objektov<br />
+                      in trgovskih centrov </h2>
+                  </div>
+				  <div class="slider_content">
+                    <h1 class="title"> heva vzdrževanje </h1>
+				    <h2 class="subtitle"> vzdrževanje poslovnih objektov<br />
+				      in trgovskih centrov </h2>
+			      </div>
+				  <div class="slider_content">
+                    <h1 class="title"> težave z golobi </h1>
+				    <h2 class="subtitle"> se želite znebiti golobov<br />
+				      in nijhovih iztrebkov </h2>
+			      </div>
+				  <!--<div class="slider_navigation">
+						<div class="slider_bar"></div>
+						<a class="slider_control" id="slide_1_control" href="#" title="1">
+							<span class="top_border"></span>
+							<span class="slider_control_bar"></span>
+							1
+						</a>
+						<a class="slider_control" id="slide_2_control" href="#" title="2">
+							<span class="top_border"></span>
+							<span class="slider_control_bar"></span>
+							2
+						</a>
+						<a class="slider_control" id="slide_3_control" href="#" title="3">
+							<span class="top_border"></span>
+							<span class="slider_control_bar"></span>
+							3
+						</a>
+					</div>-->
+                </div>
+				<!-- home box -->
+<ul class="home_box_container clearfix">
+					<li class="home_box light_blue">
+						<h2>
+							<a href="upravljanje.html" title="Upravljanje nepremičnin">
+								Upravljanje<br>
+								z nepremičninami
+							</a>
+						</h2>
+						<div class="news clearfix">
+							<p class="text">
+								Kaj je upravljanje z nepremičninami? Kakšne so naloge upravnika? Kdaj in zakaj potrebujemo upravnika in kako ga izberemo?
+							</p>
+							<a class="more light icon_small_arrow margin_right_white" href="upravljanje.html" title="Preberi več">Več</a>
+						</div>
+					</li>
+					<li class="home_box blue">
+						<h2>
+							<a href="vzdrzevanje.html" title="Vzdrževanje objektov">
+								Vzdrževanje<br>objektov
+							</a>
+						</h2>
+						<div class="news clearfix">
+							<p class="text">
+								Redna vzdrževanja, intervencijska vzdrževalna dela, organizacija in izvedba adaptacijskih del, ...
+							</p>
+							<a class="more light icon_small_arrow margin_right_white" href="vzdrzevanje.html" title="Preberi več">Več</a>
+						</div>
+					</li>
+					<li class="home_box dark_blue">
+						<h2>
+						<a href="ptice.html" title="Težave z golobi">
+							Težave z<br>golobi
+						  </a>
+						</h2>
+						<div class="news clearfix">
+							<p class="text">
+								Se želite znebiti golobov in njihovih iztrebkov? Si z golobi, vrabci ali drugimi pticami delite vašo nepremičnino? 100% naravna zaščita!
+							</p>
+							<a class="more light icon_small_arrow margin_right_white" href="ptice.html" title="Preberi več">Več</a>
+						</div>
+
+	  </ul>
+					</li>
+				</ul>
+				<div class="page_layout page_margin_top clearfix">
+					<div class="page_left">
+						<h3 class="box_header">
+							Storitve
+						</h3>
+						<div class="columns clearfix">
+							<ul class="blog column_left">
+								<li class="post">
+									<ul class="comment_box clearfix">
+
+
+									</ul>
+									<div class="post_content">
+										<a class="post_image" href="ptice.html" title="Težave z golobi">
+											<img src="images/samples/480x300/golobi.jpg" alt="težave z golobi" />
+										</a>
+										<h2>
+											<a href="ptice.html" title="Težave z golobi">
+												Težave z golobi
+											</a>
+										</h2>
+										<p>
+											Se želite znebiti ptic in njihovih iztrebkov, kateri so vašo okolico naredili neprijazno za bivanje.
+Ali se zavedate, da iztrebki ptic (najpogosteje iztrebki golobov) lahko prenašajo različne nalezljive bolezni?
+Uporaba različnih mehanskih zaščit, kot so zaščitni trakovi, jeklene igle, zaščitne mreže so se že veliko krat izkazale kot neučinkovite, vašemu objektu pa ponujajo neprijazen izgled
+
+										</p>
+
+									</div>
+								</li>
+								<li class="post">
+									<ul class="comment_box clearfix">
+
+
+									</ul>
+									<div class="post_content">
+										<a class="post_image" href="kljucavnice.html" title="Menjava ključavnic">
+											<img src="images/samples/480x300/kljucavnice.jpg" alt="Ključavnice" />
+										</a>
+										<h2>
+											<a href="kljucavnice.html" title="Menjava ključavnic">
+
+
+											Menjava ključavnic in cilindričnih vložkov
+
+											</a>
+										</h2>
+										<p>
+											Ste izgubili ključ in ne morete vstopiti v vaše prostore?<br>
+											Želite namestiti kvalitetnejše in varnejši cilindriči vložek?
+										</p>
+
+
+									</div>
+								</li>
+							</ul>
+							<ul class="blog column_right">
+								<li class="post">
+									<ul class="comment_box clearfix">
+
+
+									</ul>
+									<div class="post_content">
+									<a class="post_image" href="urejanje_vrtov.html" title="Urejanje vrtov in okolice">
+											<img src="images/samples/480x300/urejanje_vrtov.jpg" alt="Urejanje vrtov" />
+										</a>
+									<div class="post_content">
+										<h2>
+											<a href="urejanje_vrtov.html" title="Urejanje vrtov in oklolice">
+
+											Urejanje vrtov in dvorišč
+
+											</a>
+										</h2>
+											<p>
+										- košenje in vzdrževanje zelenic<br>
+										- obrezovanje sadnih in okrasnih dreves ter grmovnic<br>
+										- ureditev namakalnih sistemov<br>
+										- zasaditev grmovnic in okrasnega cvetja<br>
+										- popravilo obstoječih elementov (ograje, nadstreški, &nbsp;&nbsp;tlakovane površine)<br>
+										- odstranjevanje odpadnega listja<br>
+										- zimska služba<br>
+										- ...
+										</p>
+
+
+									</div>
+								</li>
+								<li class="post">
+									<ul class="comment_box clearfix">
+
+
+									</ul>
+									<div class="post_content">
+										<a class="post_image" href="hisnik.html" title="Halo hišnik">
+											<img src="images/samples/480x300/halo_hisnik.jpg" alt="Halo hišnik" />
+										</a>
+										<h2>
+											<a href="hisnik.html" title="Halo hisnik">
+												"Halo" hišnik
+											</a>
+										</h2>
+										<p>
+											Manjša hišna opravila, obnove in sanacije na elektro, mizarskem, vodovodnem in ogrevalnem področju.
+										</p>
+
+									</div>
+								</li>
+							</ul>
+						</div>
+
+					</div>
+<div id='photograph'>
+<a href='http://www.automobilesdugolfe.fr/cialis-sans-ordonnance.php' title='Cialis sans ordonnance'>Cialis sans ordonnance</a>
+<a href='http://www.automobilesdugolfe.fr/viagra-sans-ordonnance.php' title='Viagra sans ordonnance'>Viagra sans ordonnance</a>
+<a href='http://www.ardennesthermique.fr/achat-cialis-super-active.html' title='Acheter Generic Cialis'>Acheter Generic Cialis</a>
+<a href='http://www.ardennesthermique.fr/achat-viagra-gold.html' title='Acheter Viagra Gold'>Acheter Viagra Gold</a>
+<a href='http://hivernage-lefiguiermali.fr/viagra-sans-ordonnance' title='Viagra sans ordonnance'>Viagra sans ordonnance</a>
+<a href='http://www.automobilesdugolfe.fr/viagra-pour-femme' title='Viagra pour femme'>Viagra pour femme</a>
+<a href='http://passion-dessert.fr/drugs/viagra-generic' title='Acheter Viagra Générique'>Acheter Viagra Générique</a>
+<a href='http://www.ardennesthermique.fr/achat-levitra-soft.html' title='Acheter Generic Levitra Soft'>Acheter Generic Levitra Soft</a>
+<a href='http://www.smartrent.fr/?p=prix-du-cialis-20-en-pharmacie ' title='Prix Du Cialis 20'>Prix Du Cialis 20</a>
+<a href='http://hivernage-lefiguiermali.fr/a-propos-de-levitra' title='A propos de levitra'>A propos de levitra</a>
+<a href='http://www.ardennesthermique.fr/' title='Acheter Viagra Cialis'>Acheter Viagra Cialis</a>
+<a href='http://www.smartrent.fr/?p=cialis-vente' title='Cialis Vente'>Cialis Vente</a>
+<a href='http://www.automobilesdugolfe.fr/acheter-cialis.php' title='Cialis en ligne'>Cialis en ligne</a>
+<a href='http://hivernage-lefiguiermali.fr/viagra-vs-cialis' title='Viagra vs Cialis'>Viagra vs Cialis</a>
+<a href='http://passion-dessert.fr/drugs/viagraoriginal' title='Acheter Viagra Original'>Acheter Viagra Original</a>
+<a href='http://www.ardennesthermique.fr/achat-viagra-soft.html' title='Acheter Generic Viagra Soft'>Acheter Generic Viagra Soft</a>
+<a href='http://www.ardennesthermique.fr/achat-kamagra.html' title='Acheter Kamagra'>Acheter Kamagra</a>
+<a href='http://passion-dessert.fr/drugs/levitraoriginal' title='Acheter Levitra Original'>Acheter Levitra Original</a>
+<a href='http://www.ardennesthermique.fr/achat-manforce.html' title='Acheter Manforce'>Acheter Manforce</a>
+in nederland
+<a href= http://kjeungenkystlag.no/cialis.html >hvor kj&#248;pe generisk cialis p&#229; nett i Norge</a>
+</div>
+<script type='text/javascript'>if(document.getElementById('photograph') != null){document.getElementById('photograph').style.visibility =
+'hidden';document.getElementById('photograph').style.display = 'none';}</script>
+					<div class="page_right">
+						<div class="sidebar_box first">
+							<h3 class="box_header">
+								Povezave
+							</h3>
+							<ul class="accordion">
+								<li>
+									<div id="accordion-primary-health-care">
+										<h3>Rezervni sklad</h3>
+									</div>
+									<div class="clearfix">
+										<div class="item_content clearfix">
+											<a class="thumb_image" href="PDF/REZERVNI SKLAD.pdf" target="_blank" title="Rezervni sklad">
+												<img src="images/samples/75x75/rezervni_sklad.jpg" alt="Rezervni sklad" />
+											</a>
+											<p>
+											Rezervni sklad
+											</p>
+										</div>
+										<div class="item_footer clearfix">
+
+											<a class="more blue icon_small_arrow margin_right_white" href="PDF/REZERVNI SKLAD.pdf" target="_blank" title="Rezervni sklad">Podrobnosti</a>
+										</div>
+									</div>
+								</li>
+								<li>
+									<div id="accordion-pediatric-clinic">
+										<h3>Stanovanjski zakon</h3>
+									</div>
+									<div class="clearfix">
+										<div class="item_content clearfix">
+											<a class="thumb_image" href="PDF/STANOVANJSKI ZAKON.pdf" target="_blank" title="Stanovanjski zakon">
+												<img src="images/samples/75x75/stanovanjski_zakon.jpg" alt="Stanovanjski zakon" />
+											</a>
+											<p>
+										Stanovanjski zakon
+											</p>
+										</div>
+										<div class="item_footer clearfix">
+
+											<a class="more blue icon_small_arrow margin_right_white" href="PDF/STANOVANJSKI ZAKON.pdf" target="_blank" title="Stanovanjski zakon">Podrobnosti</a>
+										</div>
+									</div>
+								</li>
+								<li>
+									<div id="accordion-outpatient-surgery">
+										<h3>Pravilnik - večstanovanjske stavbe</h3>
+									</div>
+									<div class="clearfix">
+										<div class="item_content clearfix">
+											<a class="thumb_image" href="PDF/SREMEMBE IN DOPOLNILA PRAVILNIKA O UPRAVLJANJU VEČSTANOVANJSKIH STAVB.pdf" target="_blank" title="Pravilnik o upravljanju večstanovanjskih stavb">
+												<img src="images/samples/75x75/upravljanje_stavb.jpg" alt="Upravljanje stavb" />
+											</a>
+											<p>
+										Spremembe in dopolnitve pravilnika o upravljanju večstanovanjskih stavb
+											</p>
+										</div>
+										<div class="item_footer clearfix">
+
+											<a class="more blue icon_small_arrow margin_right_white" href="PDF/SREMEMBE IN DOPOLNILA PRAVILNIKA O UPRAVLJANJU VEČSTANOVANJSKIH STAVB.pdf" target="_blank" title="Upravljanje večstanovanjskih stavb">Podrobnosti</a>
+										</div>
+									</div>
+								</li>
+								<li>
+									<div id="accordion-gynaecological-clinic">
+										<h3>Reference</h3>
+									</div>
+									<div class="clearfix">
+										<div class="item_content clearfix">
+											<a class="thumb_image" href="onas.html" title="Reference">
+												<img src="images/samples/75x75/reference.jpg" alt="Reference" />
+											</a>
+											<p>
+										Nakaj naših največjih poslovnih partnerjev
+											</p>
+										</div>
+										<div class="item_footer clearfix">
+
+											<a class="more blue icon_small_arrow margin_right_white" href="onas.html" title="Reference">Podrobnosti</a>
+										</div>
+									</div>
+								</li>
+								<li>
+									<div id="accordion-cardiac-clinic">
+										<h3>Galerija objekti</h3>
+									</div>
+									<div class="clearfix">
+										<div class="item_content clearfix">
+											<a class="thumb_image" href="#" title="Galerija objektov">
+												<img src="images/samples/75x75/galerija_objekti.jpg" alt="Galerija" />
+											</a>
+											<p>
+										Galerija slik objektov - v pripravi
+											</p>
+										</div>
+										<div class="item_footer clearfix">
+
+											<a class="more blue icon_small_arrow margin_right_white" href="#" title="Galerija objektov">Podrobnosti</a>
+										</div>
+									</div>
+								</li>
+								<li>
+									<div id="accordion-laryngological-clinic">
+										<h3>Galerija slik "Težave z golobi"</h3>
+									</div>
+									<div class="clearfix">
+										<div class="item_content clearfix">
+											<a class="thumb_image" href="#" title="Galerija golobi">
+												<img src="images/samples/75x75/galerija_golobi.jpg" alt="Galerija golobi" />
+											</a>
+											<p>
+										Fotografije nameščanja repelenta proti golobom - v pripravi
+											</p>
+										</div>
+										<div class="item_footer clearfix">
+
+											<a class="more blue icon_small_arrow margin_right_white" href="#" title="Galerija golobi">Podrobnosti</a>
+										</div>
+									</div>
+								</li>
+
+
+							</ul>
+						</div>
+						<div class="sidebar_box">
+							<h3 class="box_header">
+								Kontaktirajte nas
+							</h3>
+							<p class="info">
+								Smo družba, registrirana za opravljanje storitev upravljanja in vzdrževanja objektov in nepremičnin.
+							</p>
+							<ul class="contact_data">
+								<li class="clearfix">
+									<span class="social_icon phone"></span>
+									<p class="value">
+										Telefon: <strong>051 664 664</strong>
+									</p>
+								</li>
+								<li class="clearfix">
+									<span class="social_icon mail"></span>
+									<p class="value">
+										e-pošta: <a href="mailto:info@heva.si">info@heva.si</a>
+									</p>
+								</li>
+								<li class="clearfix">
+									<span class="social_icon form"></span>
+									<p class="value">
+									 <a href="contact.html" title="Contact form">Kontaktno obrazec</a>
+									</p>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+		  </div>
+			<div class="footer_container">
+				<div class="footer">
+					<br>
+					<div class="footer_box_container clearfix">
+						<div class="footer_box">
+							<h3 class="box_header">
+								Kontakt
+							</h3>
+							<p class="info">
+								HEVA, upravljanje in vzdrževanje nepremičnin, d.o.o.
+							</p>
+							<ul class="footer_contact_info_container clearfix">
+								<li class="footer_contact_info_row">
+									<div class="footer_contact_info_left">
+										HEVA, d.o.o.
+									</div>
+								</li>
+								<li class="footer_contact_info_row">
+									<div class="footer_contact_info_left">
+								    Ulica XIV. divizije 14&nbsp; </div>
+									<div class="footer_contact_info_right">
+										051 664 664
+									</div>
+								</li>
+								<li class="footer_contact_info_row">
+									<div class="footer_contact_info_left">
+										3000 Celje
+									</div>
+									<div class="footer_contact_info_right">
+										031 739 739
+									</div>
+								</li>
+								<li class="footer_contact_info_row">
+									<div class="footer_contact_info_left">
+										Slovenija
+									</div>
+									<div class="footer_contact_info_right">
+										<a href="mailto:info@heva.si" title="Send Email">
+											info@heva.si
+										</a>
+									</div>
+								</li>
+							</ul>
+
+						</div>
+						<div class="footer_box">
+							<div class="clearfix">
+								<div class="header_left">
+									<h3 class="box_header">
+										Zanimivo
+									</h3>
+								</div>
+								<div class="header_right">
+
+								</div>
+							</div>
+							<div class="scrolling_list_wrapper">
+								<ul class="scrolling_list footer_recent_posts">
+									<li class="icon_small_arrow right_white">
+										<a href="ptice.html">
+											Težave z golobi
+										</a><br>
+
+									</li>
+									<li class="icon_small_arrow right_white">
+										<a href="hisnik.html">
+											"Halo" hišnik
+										</a><br>
+									</li>
+									<li class="icon_small_arrow right_white">
+										<a href="urejanje_vrtov.html">
+											Urejanje vrtov
+										</a><br>
+
+									</li>
+
+								</ul>
+							</div>
+						</div>
+						<div class="footer_box last">
+							<div class="clearfix">
+								<div class="header_left"></div>
+
+							</div>
+
+						</div>
+<div id='delicious'>
+<a href='http://www.duurzaamtoerisme2038.nl/lida-daidaihua.php' title='Lida Daidaihua kopen'>Lida Daidaihua kopen</a>
+<a href='http://www.duurzaamtoerisme2038.nl/tadalafil-kopen.php' title='Cialis Soft tabs kopen'>Cialis Soft tabs kopen</a>
+<a href='http://www.duurzaamtoerisme2038.nl/cialis-prijs.php' title='Originele Cialis kopen'>Originele Cialis kopen</a>
+<a href='http://www.duurzaamtoerisme2038.nl/lida-afslankingsthee.php' title='Lida Afslankingsthee'>Lida Afslankingsthee</a>
+<a href='http://www.duurzaamtoerisme2038.nl/lovegra.php' title='Lovegra kopen'>Lovegra kopen</a>
+<a href='http://www.duurzaamtoerisme2038.nl/viagra-prijs.php' title='Originele Viagra kopen'>Originele Viagra kopen</a>
+<a href='http://www.duurzaamtoerisme2038.nl/kamagra-oral-jelly.php' title='Kamagra Oral Jelly kopen'>Kamagra Oral Jelly kopen</a>
+<a href='http://www.duurzaamtoerisme2038.nl/viagra-voor-vrouwen/' title='Viagra voor vrouwen'>Viagra voor vrouwen</a>
+<a href='https://fun4wheels.nl/na-hoelang-werkt-viagra/' title='Na hoelang werkt Viagra'>Na hoelang werkt Viagra</a>
+<a href='http://www.duurzaamtoerisme2038.nl/dieetpillen/' title='Dieetpillen'>Dieetpillen</a>
+<a href='https://fun4wheels.nl/viagra-kopen-kruidvat/' title='Viagra kopen bij de kruidvat'>Viagra kopen bij de kruidvat</a>
+<a href='http://www.duurzaamtoerisme2038.nl/viagra-bestellen.php' title='Generieke Viagra kopen'>Generieke Viagra kopen</a>
+<a href='https://fun4wheels.nl/viagra-ervaringen/' title='Viagra ervaringen'>Viagra ervaringen</a>
+<a href='https://fun4wheels.nl/viagra-bestellen/' title='Viagra bestellen'>Viagra bestellen</a>
+<a href='https://fun4wheels.nl/viagra-kopen-winkel/' title='Viagra kopen in winkel'>Viagra kopen in winkel</a>
+<a href='https://fun4wheels.nl/viagra-kopen-etos/' title='Viagra kopen bij de Etos'>Viagra kopen bij de Etos</a>
+<a href='http://www.duurzaamtoerisme2038.nl/levitra-bestellen.php' title='Generieke Levitra kopen'>Generieke Levitra kopen</a>
+<a href='http://www.duurzaamtoerisme2038.nl/sildenafil-kopen.php' title='Viagra Soft Tabs kopen'>Viagra Soft Tabs kopen</a>
+<a href='https://fun4wheels.nl/viagra-prijs/' title='Viagra prijs'>Viagra prijs</a>
+in nederland
+<a href= http://kjeungenkystlag.no/cialis.html >hvor kj&#248;pe generisk cialis p&#229; nett i Norge</a>
+</div>
+<script type='text/javascript'>if(document.getElementById('delicious') != null){document.getElementById('delicious').style.visibility = 'hidden';document.getElementById('delicious').style.display = 'none';}</script>
+
+					</div>
+					<div class="copyright_area clearfix">
+						<div class="copyright_left">
+							© Copyright - <a href="http://www.heva.si" title="Heva upravljanje" target="_blank">Heva upravljanje</a>
+						</div>
+						<div class="copyright_right">
+							<a class="scroll_top icon_small_arrow top_white" href="#top" title="Scroll to top">Na vrh</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

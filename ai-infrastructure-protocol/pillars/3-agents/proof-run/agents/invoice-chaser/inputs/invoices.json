@@ -1,0 +1,5 @@
+[
+  { "id": "INV-2041", "amount": 480.00, "currency": "EUR", "dueDate": "2026-06-20", "daysOverdue": 27, "customerName": "Kavarna Central", "customerEmail": "ana@kavarnacentral.si" },
+  { "id": "INV-2058", "amount": 1250.00, "currency": "EUR", "dueDate": "2026-07-01", "daysOverdue": 16, "customerName": "Studio Vibe d.o.o.", "customerEmail": "marko@studiovibe.si" },
+  { "id": "INV-2063", "amount": 95.50, "currency": "EUR", "dueDate": "2026-07-10", "daysOverdue": 7, "customerName": "Pekarna Sonce", "customerEmail": "info@pekarnasonce.si" }
+]

@@ -1,0 +1,1 @@
+run: ANTHROPIC_API_KEY=$(tr -d '[:space:]' < ~/.anthropic_key) node server.mjs

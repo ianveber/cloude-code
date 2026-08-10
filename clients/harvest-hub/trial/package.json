@@ -1,0 +1,12 @@
+{
+  "name": "harvest-hub-preizkus",
+  "private": true,
+  "type": "module",
+  "description": "Hosted 14-day trial of Prenos dokumentacije for Harvest Hub, supplied by AIS. Static client + one function (api/extract.js) + a passcode gate (middleware.js). Assembled from ../demo by build.sh — never edited by hand.",
+  "engines": {
+    "node": "22.x"
+  },
+  "dependencies": {
+    "@vercel/functions": "^3.7.6"
+  }
+}

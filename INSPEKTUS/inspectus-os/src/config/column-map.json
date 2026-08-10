@@ -1,0 +1,29 @@
+{
+  "_note": "Maps INSPECTUS's real SURVEY REPORT export to the VIN-FILAJ 'prepare for report' layout that their PRINT VLDR.xlsx template consumes. Edit here if their export columns change.",
+  "source_sheet": "SURVEY REPORT",
+  "source_header_row": 3,
+  "source_columns": {
+    "make_model": "MAKE/MODEL",
+    "vin": "VIN",
+    "part_code": "PART CODE",
+    "type_code": "TYPE CODE",
+    "part_text": "PART TEXT",
+    "type_text": "TYPE TEXT",
+    "severity": "SEVERITY",
+    "cause": "CAUSE",
+    "class": "CLASS",
+    "comments": "COMMENTS",
+    "order_id": "orderID"
+  },
+  "required_columns": ["MAKE/MODEL", "VIN", "PART CODE", "TYPE CODE", "SEVERITY", "CLASS", "COMMENTS"],
+  "vin_filaj_sheet": "prepare for report",
+  "max_damages": 7,
+  "header_fields": {
+    "date": "",
+    "transport_id": "NEPTUNE ITHAKI",
+    "delivering_party": "INSPECTUS ON BEHALF OF NEPTUNE LINES",
+    "receiving_party": "INSPECTUS ON BEHALF OF FRIKUS",
+    "location": "PORT OF KOPER"
+  },
+  "class_values": ["No Damage Evidence", "Damage", "Observation"]
+}

@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Heva — upravljanje in vzdrževanje nepremičnin | Celje</title>
+<meta name="description" content="HEVA d.o.o. Celje — upravljanje in vzdrževanje poslovnih objektov, trgovskih centrov in večstanovanjskih stavb. Vzdrževanje, urejanje okolice in menjava ključavnic. Pokličite 051 664 664.">
+<meta property="og:title" content="Heva — upravljanje in vzdrževanje nepremičnin">
+<meta property="og:description" content="En partner za upravljanje, vzdrževanje in urejeno okolico vašega objekta. Celje, Slovenija.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.heva.si/">
+<meta property="og:image" content="https://www.heva.si/assets/hero.jpg">
+<meta property="og:locale" content="sl_SI">
+<link rel="canonical" href="https://www.heva.si/">
+<link rel="icon" type="image/png" href="assets/logo-mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "HEVA, upravljanje in vzdrževanje nepremičnin, d.o.o.",
+  "description": "Upravljanje in vzdrževanje poslovnih objektov, trgovskih centrov in večstanovanjskih stavb.",
+  "telephone": "+386 51 664 664",
+  "email": "info@heva.si",
+  "url": "https://www.heva.si",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Ulica XIV. divizije 14",
+    "postalCode": "3000",
+    "addressLocality": "Celje",
+    "addressCountry": "SI"
+  }
+}
+</script>
+<style>
+/* ── PALETTE ───────────────────────────────────────────────────────────
+   The whole site's colour lives in this one block. Swapping it is the
+   only edit a recolour needs — every rule below references the tokens.
+
+   Measured from the logo files (not guessed):
+     logo-mark.png  #5ADBDB   rgb(90,219,219)   G and B identical -> cyan, hue 180°
+     logo-nav.png   #0B8F8D   rgb(11,143,141)   same hue, darker
+
+   ACTIVE: light blue (hue ~200°, B above G). This is a deliberate step
+   AWAY from the logo's exact hue — it reads bluer and cooler, and the
+   cyan mark still sits happily on it as an accent.
+   To go back to matching the logo exactly, paste the CYAN block below.
+   ──────────────────────────────────────────────────────────────────── */
+/* Every pair below is WCAG AA (>=4.5:1) — checked, not eyeballed.
+   Note the OLD teal failed this: white on #12ADAB was only 2.77:1.
+   The "light blue" impression comes from --brand-bright in the hero
+   headline; the button sits a shade deeper so white text is legible,
+   which matters for the elderly residents this site is written for. */
+:root{
+  --brand:#127CB4;         /* primary action — white text 4.60:1 */
+  --brand-dark:#0A6B9C;    /* hover + eyebrows — 5.24:1 even on tint */
+  --brand-bright:#6FD2F5;  /* light blue accent — 9.53:1 on the dark hero */
+  --brand-tint:#E6F5FC;    /* light section backgrounds */
+  --ink:#0C2430;
+  --text:#16303C;
+  --text-2:#55707C;
+  --text-3:#5A737F;        /* darkened from #8AA5B0, which was 2.60:1 */
+  --bg:#FFFFFF;
+  --bg-alt:#F2F9FD;
+  --bg-dark:#0A222E;
+  --border:#DBEAF2;
+
+  /* CYAN — matches the logo exactly. Swap in to revert:
+  --brand:#12ADAB;  --brand-dark:#0B8F8D;  --brand-bright:#50D8D8;
+  --brand-tint:#E4F8F8;  --ink:#0E2A2B;  --text:#183234;
+  --text-2:#57696A;  --text-3:#88A0A0;  --bg-alt:#F1F9F9;
+  --bg-dark:#0C2829;  --border:#DDEDED;                                */
+  --radius:16px;
+  --shadow:0 2px 16px rgba(12,36,48,.07);
+  --shadow-hover:0 12px 48px rgba(12,36,48,.14);
+  --max:1160px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(--text);background:var(--bg);line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:'Manrope',sans-serif;color:var(--ink);line-height:1.15;letter-spacing:-.02em}
+h1{font-size:clamp(2.4rem,5.4vw,4.2rem);font-weight:800}
+h2{font-size:clamp(1.8rem,3.6vw,2.7rem);font-weight:800}
+h3{font-size:clamp(1.15rem,1.8vw,1.45rem);font-weight:700}
+p{color:var(--text-2)}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+.container{max-width:var(--max);margin:0 auto;padding:0 28px}
+.section{padding:100px 0}
+.section-sm{padding:64px 0}
+.eyebrow{display:inline-block;font-family:'Manrope',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--brand-dark);margin-bottom:14px}
+.section-header{max-width:640px;margin-bottom:56px}
+.section-header.center{margin-left:auto;margin-right:auto;text-align:center}
+.section-header p{margin-top:14px;font-size:1.05rem}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:10px;font-family:'Manrope',sans-serif;font-weight:700;font-size:.95rem;padding:14px 28px;border-radius:999px;transition:transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s,background .25s;cursor:pointer;border:none}
+.btn:hover{transform:translateY(-2px)}
+.btn:focus-visible{outline:3px solid var(--brand-bright);outline-offset:2px}
+.btn-teal{background:var(--brand);color:#fff;box-shadow:0 6px 24px rgba(18,124,180,.35)}
+.btn-teal:hover{background:var(--brand-dark);box-shadow:0 10px 32px rgba(18,124,180,.45)}
+.btn-white{background:#fff;color:var(--ink);box-shadow:0 6px 24px rgba(0,0,0,.18)}
+.btn-ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.35);backdrop-filter:blur(6px)}
+.btn-ghost:hover{background:rgba(255,255,255,.22)}
+.btn-outline{background:transparent;color:var(--ink);border:1.5px solid var(--border)}
+.btn-outline:hover{border-color:var(--brand);color:var(--brand-dark)}
+
+/* ---------- nav ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(255,255,255,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s}
+.nav.scrolled{border-color:var(--border);box-shadow:0 2px 20px rgba(12,36,48,.06)}
+.nav-inner{max-width:var(--max);margin:0 auto;padding:0 28px;height:72px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo img{height:34px;width:auto}
+.nav-links{display:flex;align-items:center;gap:34px;list-style:none}
+.nav-links a{font-family:'Manrope',sans-serif;font-weight:600;font-size:.92rem;color:var(--text);transition:color .2s}
+.nav-links a:hover{color:var(--brand-dark)}
+.nav-phone{display:inline-flex;align-items:center;gap:8px;background:var(--brand);color:#fff !important;padding:10px 20px;border-radius:999px;box-shadow:0 4px 16px rgba(18,124,180,.3);transition:background .2s}
+.nav-phone:hover{background:var(--brand-dark)}
+.nav-burger{display:none;background:none;border:none;width:44px;height:44px;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.nav-burger span{display:block;width:22px;height:2px;background:var(--ink);transition:transform .3s,opacity .3s}
+.nav-burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.nav-burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.nav-mobile{display:none;background:#fff;border-bottom:1px solid var(--border);padding:12px 28px 24px}
+.nav-mobile.open{display:block}
+.nav-mobile a{display:block;padding:13px 0;font-family:'Manrope',sans-serif;font-weight:600;font-size:1.05rem;border-bottom:1px solid var(--bg-alt)}
+.nav-mobile a:last-child{border-bottom:none;color:var(--brand-dark)}
+
+/* ---------- hero ---------- */
+#hero{position:relative;min-height:92vh;display:flex;align-items:center;overflow:hidden;background:var(--bg-dark)}
+/* Three stacked photos; only .is-active is opaque. Cross-fade rather than
+   slide, so nothing moves behind the headline while you're reading it. */
+.hero-slides{position:absolute;inset:0}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 65%;
+  opacity:0;transition:opacity 1.1s ease-in-out;will-change:opacity}
+.hero-img.is-active{opacity:1}
+@media (prefers-reduced-motion:reduce){
+  .hero-img{transition:none}
+}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(100deg,rgba(8,28,38,.86) 0%,rgba(8,28,38,.62) 42%,rgba(8,28,38,.18) 75%,rgba(8,28,38,.05) 100%)}
+.hero-content{position:relative;z-index:2;max-width:var(--max);margin:0 auto;padding:150px 28px 90px;width:100%}
+.hero-tag{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#DCEEF9;font-family:'Manrope',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:8px 18px;border-radius:999px;backdrop-filter:blur(6px);margin-bottom:26px}
+.hero-tag-dot{width:7px;height:7px;border-radius:50%;background:var(--brand-bright);box-shadow:0 0 10px var(--brand-bright)}
+#hero h1{color:#fff;max-width:640px;margin-bottom:20px}
+#hero h1 em{font-style:normal;color:var(--brand-bright)}
+.hero-sub{color:rgba(255,255,255,.82);font-size:1.12rem;max-width:520px;margin-bottom:36px}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:48px}
+.hero-chips{display:flex;gap:10px;flex-wrap:wrap}
+.hero-chip{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.85);
+  font-family:inherit;font-size:.85rem;font-weight:500;padding:8px 16px;border-radius:999px;
+  backdrop-filter:blur(4px);cursor:pointer;transition:background .25s,border-color .25s,color .25s}
+.hero-chip:hover{background:rgba(255,255,255,.18);color:#fff}
+.hero-chip:focus-visible{outline:3px solid var(--brand-bright);outline-offset:3px}
+/* The chip whose photo is showing. Underline rather than a fill, so the row
+   still reads as a set of labels and not as three competing buttons. */
+.hero-chip.is-on{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.5);color:#fff;font-weight:600}
+
+/* ---------- proof strip ---------- */
+.proof-strip{padding:34px 0;background:var(--bg);border-bottom:1px solid var(--border)}
+.proof-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;text-align:center}
+.proof-item{display:flex;flex-direction:column;gap:4px}
+.proof-num{font-family:'Manrope',sans-serif;font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;color:var(--brand-dark);line-height:1.1}
+.proof-lab{font-size:.88rem;color:var(--text-2);line-height:1.35}
+@media(max-width:760px){.proof-grid{grid-template-columns:repeat(2,1fr);gap:26px 18px}}
+
+/* TO-BE-CONFIRMED marker — deliberately loud. Anything wearing .tbd is a
+   business fact I could not verify; it must be confirmed with Damijan or
+   removed before the site is published. Impossible to ship by accident. */
+.tbd{background:#FFF3CD;box-shadow:inset 0 -2px 0 #E0A800;color:#7A5312;
+  padding:0 5px;border-radius:3px}
+
+/* ---------- objekti belt (marquee) ---------- */
+.brands{padding:28px 0 32px;background:var(--bg-alt);border-bottom:1px solid var(--border)}
+.brands-label{text-align:center;font-family:'Manrope',sans-serif;font-size:.76rem;font-weight:700;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--text-3);margin-bottom:20px}
+/* Edge fade so items enter and leave instead of popping at the viewport edge. */
+.brands-marquee{overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 8%,#000 92%,transparent 100%);
+          mask-image:linear-gradient(90deg,transparent 0,#000 8%,#000 92%,transparent 100%)}
+.brands-track{display:flex;align-items:center;gap:56px;width:max-content;will-change:transform}
+.brands-track.is-animated{animation:brands-move var(--dur,40s) linear infinite}
+.brands-marquee:hover .brands-track.is-animated{animation-play-state:paused}
+.brand-row{display:flex;align-items:center;gap:56px;flex:none}
+@keyframes brands-move{from{transform:translateX(calc(-1 * var(--shift,50%)))}to{transform:translateX(0)}}
+.brand-item{font-family:'Manrope',sans-serif;font-size:1.02rem;font-weight:700;letter-spacing:.02em;
+  color:var(--text-3);white-space:nowrap;transition:color .25s}
+.brand-item:hover{color:var(--brand-dark)}
+.brands img{height:34px;width:auto;filter:grayscale(1);opacity:.55;transition:filter .25s,opacity .25s}
+.brands img:hover{filter:grayscale(0);opacity:1}
+@media (max-width:600px){.brands-track,.brand-row{gap:34px}.brand-item{font-size:.92rem}}
+/* No motion: wrap the single row and centre it instead of scrolling. */
+@media (prefers-reduced-motion:reduce){
+  .brands-marquee{overflow:visible;-webkit-mask-image:none;mask-image:none}
+  .brands-track{width:auto;flex-wrap:wrap;justify-content:center;row-gap:14px;animation:none}
+  .brand-row{flex-wrap:wrap;justify-content:center;row-gap:14px}
+}
+
+/* ---------- za koga ---------- */
+.audience-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.audience{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+  padding:34px 32px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px}
+.audience h3{margin-bottom:2px}
+.tick-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin:4px 0 8px}
+.tick-list li{position:relative;padding-left:28px;color:var(--text-2);font-size:.97rem}
+.tick-list li::before{content:"";position:absolute;left:0;top:.45em;width:16px;height:16px;
+  border-radius:50%;background:var(--brand-tint);
+  box-shadow:inset 0 0 0 1.5px var(--brand)}
+.tick-list li::after{content:"";position:absolute;left:5px;top:.72em;width:5px;height:8px;
+  border-right:2px solid var(--brand-dark);border-bottom:2px solid var(--brand-dark);
+  transform:rotate(42deg)}
+.audience .btn{align-self:flex-start;margin-top:auto}
+@media(max-width:820px){.audience-grid{grid-template-columns:1fr}}
+
+/* ---------- prevzem (steps) ---------- */
+.steps{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:22px;counter-reset:s}
+.step{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+  padding:28px 24px;box-shadow:var(--shadow);position:relative}
+.step-n{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;
+  border-radius:50%;background:var(--brand);color:#fff;font-family:'Manrope',sans-serif;
+  font-weight:800;font-size:1rem;margin-bottom:14px}
+.step h3{font-size:1.08rem;margin-bottom:8px}
+.step p{font-size:.94rem}
+.steps-note{text-align:center;margin-top:30px;color:var(--text-2)}
+.steps-note a{color:var(--brand-dark);font-weight:600;text-decoration:underline}
+@media(max-width:980px){.steps{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.steps{grid-template-columns:1fr}}
+
+/* ---------- footer legal line ---------- */
+.footer-legal{margin-top:34px;padding-top:20px;border-top:1px solid rgba(255,255,255,.12);
+  font-size:.82rem;line-height:1.9;color:rgba(255,255,255,.55)}
+.footer-legal .tbd{background:#FFF3CD;color:#7A5312;box-shadow:inset 0 -2px 0 #E0A800}
+
+/* ---------- enquiry form ---------- */
+.enquiry{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:30px 28px;display:flex;flex-direction:column;gap:15px}
+.enquiry h3{margin-bottom:2px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.field{display:flex;flex-direction:column;gap:6px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.field label{font-family:'Manrope',sans-serif;font-size:.86rem;font-weight:600;color:var(--text)}
+.field input,.field select,.field textarea{width:100%;font-family:'Inter',sans-serif;font-size:.97rem;
+  color:var(--ink);background:var(--bg-alt);border:1.5px solid var(--border);border-radius:12px;
+  padding:12px 14px;transition:border-color .18s,box-shadow .18s}
+.field textarea{resize:vertical;min-height:104px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--brand);
+  box-shadow:0 0 0 3px var(--brand-tint);background:var(--bg)}
+.consent{display:flex;gap:11px;align-items:flex-start;font-size:.88rem;color:var(--text-2);line-height:1.5}
+.consent input{margin-top:3px;width:17px;height:17px;flex:none;accent-color:var(--brand)}
+.consent a{color:var(--brand-dark);font-weight:600;text-decoration:underline}
+.enquiry .btn{align-self:flex-start}
+.form-msg{font-size:.9rem;font-weight:600;min-height:1.2em}
+.form-msg.ok{color:var(--brand-dark)}
+.form-msg.err{color:#A6462F}
+@media(max-width:560px){.field-row{grid-template-columns:1fr}}
+
+/* ---------- FAQ ---------- */
+.faq{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.faq-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden}
+.faq-item summary{cursor:pointer;list-style:none;padding:20px 56px 20px 24px;position:relative;
+  font-family:'Manrope',sans-serif;font-weight:700;font-size:1.03rem;color:var(--ink)}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary:hover{color:var(--brand-dark)}
+.faq-item summary:focus-visible{outline:3px solid var(--brand-bright);outline-offset:-3px}
+.faq-item summary::after{content:"";position:absolute;right:24px;top:50%;width:10px;height:10px;
+  border-right:2px solid var(--brand);border-bottom:2px solid var(--brand);
+  transform:translateY(-70%) rotate(45deg);transition:transform .2s}
+.faq-item[open] summary::after{transform:translateY(-30%) rotate(-135deg)}
+.faq-a{padding:0 24px 22px;border-top:1px solid var(--border);padding-top:16px}
+.faq-a a{color:var(--brand-dark);font-weight:600;text-decoration:underline}
+
+/* ---------- clients belt (legacy marquee — section removed, rules kept
+   in case a real logo belt is wanted later) ---------- */
+.clients-belt{padding:24px 0;background:var(--bg);border-bottom:1px solid var(--border)}
+.clients-label{text-align:center;font-family:'Manrope',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3);margin-bottom:18px}
+.marquee{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 7%,#000 93%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 7%,#000 93%,transparent 100%)}
+.marquee-track{display:flex;align-items:center;gap:56px;width:max-content;will-change:transform}
+.marquee-track.is-animated{animation:marquee-move var(--dur,40s) linear infinite}
+.marquee:hover .marquee-track.is-animated{animation-play-state:paused}
+.marquee-group{display:flex;align-items:center;gap:56px;flex:none}
+@keyframes marquee-move{from{transform:translateX(calc(-1 * var(--shift,50%)))}to{transform:translateX(0)}}
+.marquee img{height:34px;width:auto;filter:grayscale(1);opacity:.55;transition:filter .25s,opacity .25s}
+.marquee img:hover{filter:grayscale(0);opacity:1}
+.client-slot{flex:none;width:118px;height:42px;border:1px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);opacity:.7}
+@media (max-width:600px){.marquee-track,.marquee-group{gap:36px}.client-slot{width:96px;height:38px}}
+@media (prefers-reduced-motion:reduce){
+  .marquee{overflow:visible;-webkit-mask-image:none;mask-image:none}
+  .marquee-track{width:auto;flex-wrap:wrap;justify-content:center;row-gap:18px;animation:none}
+  .marquee-group{flex-wrap:wrap;justify-content:center;row-gap:18px}
+}
+
+/* ---------- services ---------- */
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:34px 30px;box-shadow:var(--shadow);transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s,border-color .3s}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover);border-color:#C4E0F2}
+.card-icon{width:54px;height:54px;border-radius:14px;background:var(--brand-tint);display:flex;align-items:center;justify-content:center;margin-bottom:22px}
+.card-icon svg{width:26px;height:26px;stroke:var(--brand-dark)}
+.card h3{margin-bottom:10px}
+.card p{font-size:.95rem}
+
+/* ---------- feature splits ---------- */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.feature-img{position:relative;border-radius:20px;overflow:hidden;box-shadow:var(--shadow-hover)}
+.feature-img img{width:100%;height:420px;object-fit:cover}
+.feature-img .tag{position:absolute;bottom:18px;left:18px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);font-family:'Manrope',sans-serif;font-weight:700;font-size:.85rem;color:var(--ink);padding:10px 18px;border-radius:999px;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.feature-text h2{margin-bottom:16px}
+.feature-text > p{margin-bottom:24px;font-size:1.02rem}
+.check-list{list-style:none;margin-bottom:30px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;padding:7px 0;color:var(--text-2);font-size:.98rem}
+.check-list svg{flex-shrink:0;width:20px;height:20px;margin-top:3px;stroke:var(--brand)}
+
+/* ---------- dark why section ---------- */
+.dark-section{background:var(--bg-dark);position:relative;overflow:hidden}
+.dark-section .glow{position:absolute;width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,rgba(111,210,245,.16),transparent 65%);top:-180px;right:-120px;pointer-events:none}
+.dark-section .eyebrow{color:var(--brand-bright)}
+.dark-section h2{color:#fff}
+.dark-section .section-header p{color:rgba(255,255,255,.6)}
+.why-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:34px 30px;transition:background .3s,transform .3s}
+.why-card:hover{background:rgba(255,255,255,.09);transform:translateY(-4px)}
+.why-num{font-family:'Manrope',sans-serif;font-weight:800;font-size:.9rem;color:var(--brand-bright);letter-spacing:.1em;margin-bottom:16px}
+.why-card h3{color:#fff;margin-bottom:10px}
+.why-card p{color:rgba(255,255,255,.62);font-size:.95rem}
+
+/* ---------- documents ---------- */
+.doc-card{display:flex;flex-direction:column;gap:14px;background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow);transition:transform .3s,box-shadow .3s}
+.doc-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}
+.doc-card .card-icon{margin-bottom:2px}
+.doc-card h3{font-size:1.1rem}
+.doc-card p{font-size:.92rem;flex-grow:1}
+.doc-link{font-family:'Manrope',sans-serif;font-weight:700;font-size:.9rem;color:var(--brand-dark);display:inline-flex;align-items:center;gap:7px}
+.doc-link span{transition:transform .25s}
+.doc-card:hover .doc-link span{transform:translateX(4px)}
+
+/* ---------- portal strip ---------- */
+.portal-strip{margin-top:28px;display:flex;align-items:center;gap:22px;background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:26px 30px;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s}
+.portal-strip:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover)}
+.portal-strip .card-icon{margin:0;flex-shrink:0}
+.portal-strip-text{flex-grow:1}
+.portal-strip-text h3{font-size:1.05rem;margin-bottom:3px}
+.portal-strip-text p{font-size:.9rem}
+.portal-strip .btn{flex-shrink:0}
+@media (max-width:600px){.portal-strip{flex-direction:column;align-items:flex-start}}
+
+/* ---------- cta band ---------- */
+.cta-band{background:linear-gradient(115deg,var(--brand-dark) 0%,var(--brand) 55%,var(--brand-bright) 130%);position:relative;overflow:hidden}
+.cta-band::after{content:"";position:absolute;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 65%);top:-200px;right:-100px;pointer-events:none}
+.cta-inner{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap}
+.cta-inner h2{color:#fff;max-width:560px}
+.cta-inner p{color:rgba(255,255,255,.85);margin-top:10px;max-width:520px}
+.cta-actions{display:flex;gap:14px;flex-wrap:wrap}
+
+/* ---------- contact ---------- */
+/* Contact now holds three children (details · form · map). Details and form
+   sit side by side; the map spans the full width beneath them. */
+.contact-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:40px 56px;align-items:start}
+.contact-grid .contact-map{grid-column:1 / -1}
+.contact-info h2{margin-bottom:16px}
+.contact-info > p{margin-bottom:32px;font-size:1.02rem}
+.contact-rows{display:flex;flex-direction:column;gap:14px;margin-bottom:34px}
+.contact-row{display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px 22px;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s}
+a.contact-row:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover)}
+.contact-row .card-icon{width:44px;height:44px;margin:0;border-radius:11px}
+.contact-row .card-icon svg{width:21px;height:21px}
+.contact-row .label{font-size:.78rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)}
+.contact-row .value{font-family:'Manrope',sans-serif;font-weight:700;color:var(--ink);font-size:1.02rem}
+.contact-map{position:relative;border-radius:20px;overflow:hidden;box-shadow:var(--shadow-hover);min-height:420px;border:1px solid var(--border)}
+.contact-map iframe{width:100%;height:100%;min-height:420px;border:0;display:block}
+.map-link{position:absolute;bottom:16px;left:16px;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);font-family:'Manrope',sans-serif;font-weight:700;font-size:.85rem;color:var(--ink);padding:10px 18px;border-radius:999px;box-shadow:0 4px 16px rgba(0,0,0,.15);transition:transform .25s}
+.map-link:hover{transform:translateY(-2px)}
+
+/* ---------- footer ---------- */
+footer{background:var(--bg-dark);color:rgba(255,255,255,.65);padding:72px 0 0}
+.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:48px;padding-bottom:56px}
+.footer-brand img{height:32px;margin-bottom:18px;filter:brightness(1.15)}
+.footer-brand p{color:rgba(255,255,255,.55);font-size:.93rem;max-width:300px}
+footer h4{font-family:'Manrope',sans-serif;color:#fff;font-size:.95rem;font-weight:700;margin-bottom:18px;letter-spacing:.03em}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+.footer-col a{color:rgba(255,255,255,.6);font-size:.93rem;transition:color .2s}
+.footer-col a:hover{color:var(--brand-bright)}
+.footer-col li{color:rgba(255,255,255,.6);font-size:.93rem}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.1);padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:.85rem;color:rgba(255,255,255,.4)}
+.footer-bottom a{color:rgba(255,255,255,.55)}
+.footer-bottom a:hover{color:var(--brand-bright)}
+
+/* ---------- reveal animations ---------- */
+[data-reveal]{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+[data-reveal].revealed{opacity:1;transform:translateY(0)}
+[data-delay="1"]{transition-delay:.08s}[data-delay="2"]{transition-delay:.16s}[data-delay="3"]{transition-delay:.24s}[data-delay="4"]{transition-delay:.32s}[data-delay="5"]{transition-delay:.4s}[data-delay="6"]{transition-delay:.48s}
+@media (prefers-reduced-motion: reduce){
+  [data-reveal]{opacity:1;transform:none;transition:none}
+  html{scroll-behavior:auto}
+}
+
+/* ---------- responsive ---------- */
+@media (max-width:960px){
+  .three-col{grid-template-columns:repeat(2,1fr)}
+  .two-col{grid-template-columns:1fr;gap:36px}
+  .contact-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .nav-links{display:none}
+  .nav-burger{display:flex}
+}
+@media (max-width:600px){
+  .three-col{grid-template-columns:1fr}
+  .section{padding:72px 0}
+  .footer-grid{grid-template-columns:1fr}
+  .feature-img img{height:300px}
+  .hero-content{padding-top:130px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="#hero" aria-label="Heva — domov">
+      <img src="assets/logo-nav.png" alt="Heva" width="110" height="50">
+    </a>
+    <ul class="nav-links">
+      <li><a href="#storitve">Storitve</a></li>
+      <li><a href="#prevzem">Prevzem</a></li>
+      <li><a href="#zakaj">Zakaj Heva</a></li>
+      <li><a href="#dokumenti">Dokumenti</a></li>
+      <li><a href="#kontakt">Kontakt</a></li>
+      <li><a class="nav-phone" href="tel:+38651664664">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        051 664 664</a></li>
+    </ul>
+    <button class="nav-burger" id="burger" aria-expanded="false" aria-controls="mobileMenu" aria-label="Odpri meni">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <nav class="nav-mobile" id="mobileMenu">
+    <a href="#storitve">Storitve</a>
+    <a href="#za-koga">Za koga</a>
+    <a href="#prevzem">Prevzem upravljanja</a>
+    <a href="#zakaj">Zakaj Heva</a>
+    <a href="#vprasanja">Pogosta vprašanja</a>
+    <a href="#dokumenti">Dokumenti</a>
+    <a href="#kontakt">Kontakt</a>
+    <a href="tel:+38651664664">📞 051 664 664</a>
+  </nav>
+</header>
+
+<!-- HERO — three rotating photographs, one per type of objekt Heva manages.
+     They map 1:1 onto the chips underneath, so the picture always shows what
+     the chip under the cursor says. The first is eager + fetchpriority=high
+     (it's the LCP element); the other two are lazy so they never delay paint.
+     Rotation pauses when the tab is hidden and is disabled entirely under
+     prefers-reduced-motion. -->
+<section id="hero">
+  <div class="hero-slides" aria-hidden="true">
+    <img class="hero-img is-active" src="assets/hero.jpg"
+         alt="" fetchpriority="high" data-chip="0">
+    <img class="hero-img" src="assets/hero-trgovski.jpg"
+         alt="" loading="lazy" data-chip="1">
+    <img class="hero-img" src="assets/hero-stanovanjski.jpg"
+         alt="" loading="lazy" data-chip="2">
+  </div>
+  <div class="hero-overlay" aria-hidden="true"></div>
+  <div class="hero-content">
+    <div class="hero-tag"><span class="hero-tag-dot"></span> Upravljanje · Vzdrževanje · Celje</div>
+    <h1>Vaš objekt.<br><em>Naša skrb.</em></h1>
+    <p class="hero-sub">Upravljanje in vzdrževanje poslovnih objektov, trgovskih centrov in večstanovanjskih stavb — en partner za vse, od rezervnega sklada do zimske službe.</p>
+    <div class="hero-actions">
+      <a class="btn btn-teal" href="tel:+38651664664">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Pokličite 051 664 664</a>
+      <a class="btn btn-ghost" href="#storitve">Naše storitve</a>
+    </div>
+    <!-- Buttons, not spans: clicking a chip jumps the hero to that photo. -->
+    <div class="hero-chips" role="group" aria-label="Vrste objektov">
+      <button type="button" class="hero-chip is-on" data-slide="0">Poslovni objekti</button>
+      <button type="button" class="hero-chip" data-slide="1">Trgovski centri</button>
+      <button type="button" class="hero-chip" data-slide="2">Večstanovanjske stavbe</button>
+    </div>
+  </div>
+</section>
+
+<!-- (Proof strip removed at Ian's request. CSS for .proof-* kept below
+     in case the numbers come back once Damijan confirms them.) -->
+
+<!-- OBJEKTI BELT — the "brands we work with" strip.
+     ⚠️ Deliberately shows OBJECT NAMES, not company logos. Checking the real
+     list: of the 42 objects, only SPAR (×12) is an actual brand — TPC, NC and
+     PC are generic Slovenian building-type abbreviations (trgovsko-poslovni /
+     nakupovalni / poslovni center), and the rest are street names. So a "brands
+     we work with" logo wall would have to be invented, and putting a retailer's
+     trademark up also claims a relationship with the RETAILER rather than the
+     BUILDING. Names are true, verifiable from the portal, and need no artwork.
+
+     To use real logos instead: drop files in assets/clients/ and swap any
+     <span class="brand-item">NAME</span> for
+     <img src="assets/clients/ime.png" alt="Ime">. Edit ONLY the first
+     .brand-row — the script clones it to fill the width.
+     ⚠️ Confirm the list with Damijan first: some may be past clients. -->
+<section class="brands" aria-label="Objekti v naši oskrbi">
+  <div class="brands-marquee">
+    <div class="brands-track" id="brandTrack">
+      <!-- Heva's real reference list (from Damijan, 2026-07-28). Entries with a
+           logo file render the logo; the rest fall back to the company name in
+           text, which looks deliberate rather than missing. -->
+      <div class="brand-row">
+        <span class="brand-item" data-brand="spar">SPAR</span>
+        <span class="brand-item" data-brand="merkur">Merkur</span>
+        <span class="brand-item" data-brand="nlb">NLB</span>
+        <span class="brand-item" data-brand="mcdonalds">McDonald's</span>
+        <span class="brand-item" data-brand="mana">Mana</span>
+        <span class="brand-item" data-brand="otp">OTP banka</span>
+        <span class="brand-item" data-brand="kik">KiK</span>
+        <span class="brand-item" data-brand="dbs">DBS</span>
+        <span class="brand-item" data-brand="t2">T-2</span>
+        <span class="brand-item" data-brand="telemach">Telemach</span>
+        <span class="brand-item" data-brand="nepremicnine-celje">Nepremičnine Celje</span>
+        <span class="brand-item" data-brand="pet-network">Pet Network</span>
+        <span class="brand-item" data-brand="sanolabor">Sanolabor</span>
+        <span class="brand-item" data-brand="jysk">JYSK</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="storitve" class="section">
+  <div class="container">
+    <div class="section-header center" data-reveal>
+      <span class="eyebrow">Storitve</span>
+      <h2>Vse, kar vaš objekt potrebuje</h2>
+      <p>Od celovitega upravljanja do menjave ključavnice — pokličete eno številko, mi poskrbimo za ostalo.</p>
+    </div>
+    <div class="three-col">
+      <div class="card" data-reveal data-delay="1">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 9h1m4 0h1M9 13h1m4 0h1M9 17h1m4 0h1"/></svg>
+        </div>
+        <h3>Upravljanje z nepremičninami</h3>
+        <p>Prevzamemo vse naloge upravnika: organizacijo obratovanja, delitev stroškov, rezervni sklad in komunikacijo z lastniki.</p>
+      </div>
+      <div class="card" data-reveal data-delay="2">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <h3>Vzdrževanje objektov</h3>
+        <p>Redna in intervencijska vzdrževalna dela ter organizacija in izvedba adaptacij — da objekt ohranja vrednost.</p>
+      </div>
+      <div class="card" data-reveal data-delay="3">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-3.1.2-4.2.9-4.9 2z"/></svg>
+        </div>
+        <h3>Urejanje vrtov in okolice</h3>
+        <p>Košnja, obrezovanje dreves in grmovnic, zasaditve, namakalni sistemi in zimska služba — skozi vse leto.</p>
+      </div>
+      <div class="card" data-reveal data-delay="4">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>
+        </div>
+        <h3>Menjava ključavnic</h3>
+        <p>Menjava ključavnic in cilindričnih vložkov — tudi takrat, ko ostanete brez ključa pred vrati.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ZA KOGA — the two audiences buy very differently and were previously
+     blended into one voice. Etažni lastniki decide as a group and care about
+     transparency; a commercial owner decides alone and cares about uptime. -->
+<section id="za-koga" class="section">
+  <div class="container">
+    <div class="section-header center" data-reveal>
+      <span class="eyebrow">Za koga delamo</span>
+      <h2>Dva različna objekta, dva različna pristopa</h2>
+      <p>Večstanovanjska stavba in trgovski center nimata istih potreb — zato ju ne obravnavamo enako.</p>
+    </div>
+    <div class="audience-grid">
+      <div class="audience" data-reveal>
+        <h3>Etažni lastniki</h3>
+        <p>Skupnost, ki potrebuje preglednega upravnika — jasno razdelitev stroškov, urejen rezervni sklad in nekoga, ki se oglasi na telefon.</p>
+        <ul class="tick-list">
+          <li>Pregledno vodenje rezervnega sklada</li>
+          <li>Obračun in delitev stroškov po ključu</li>
+          <li>Sklic in vodenje zborov lastnikov</li>
+          <li>Spletni arhiv dokumentov vaše stavbe</li>
+        </ul>
+        <a href="#kontakt" class="btn btn-outline">Povprašajte za stavbo</a>
+      </div>
+      <div class="audience" data-reveal data-delay="2">
+        <h3>Poslovni objekti in trgovski centri</h3>
+        <p>Objekt, ki mora obratovati brez prekinitev — vzdrževanje, okolica in intervencije, dogovorjene vnaprej.</p>
+        <ul class="tick-list">
+          <li>Redno in intervencijsko vzdrževanje</li>
+          <li>Urejena okolica in zimska služba</li>
+          <li>Koordinacija z najemniki in izvajalci</li>
+          <li>Ena kontaktna oseba za vse</li>
+        </ul>
+        <a href="#kontakt" class="btn btn-outline">Povprašajte za objekt</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PREVZEM — the single biggest objection when changing manager is
+     "how much hassle is this going to be". Nothing on the page answered it. -->
+<section id="prevzem" class="section" style="background:var(--brand-tint)">
+  <div class="container">
+    <div class="section-header center" data-reveal>
+      <span class="eyebrow">Menjava upravnika</span>
+      <h2>Prevzem upravljanja v štirih korakih</h2>
+      <p>Zamenjava upravnika zveni zapleteno. V praksi je večino dela na naši strani.</p>
+    </div>
+    <ol class="steps">
+      <li class="step" data-reveal>
+        <span class="step-n">1</span>
+        <h3>Pogovor in ogled</h3>
+        <p>Pogledamo objekt, pregledamo obstoječe stanje in vam povemo, kaj bi prevzeli.</p>
+      </li>
+      <li class="step" data-reveal data-delay="2">
+        <span class="step-n">2</span>
+        <h3>Ponudba</h3>
+        <p>Prejmete pisno ponudbo z jasno ceno — brez skritih postavk.</p>
+      </li>
+      <li class="step" data-reveal data-delay="3">
+        <span class="step-n">3</span>
+        <h3>Sklep lastnikov</h3>
+        <p>Etažni lastniki odločajo s sklepom. Pripravimo vse potrebno gradivo, po potrebi se udeležimo zbora.</p>
+      </li>
+      <li class="step" data-reveal data-delay="4">
+        <span class="step-n">4</span>
+        <h3>Prevzem dokumentacije</h3>
+        <p>Prevzem od prejšnjega upravnika uredimo mi — vključno z rezervnim skladom in arhivom. Vi le potrdite.</p>
+      </li>
+    </ol>
+    <p class="steps-note" data-reveal>
+      Za konkreten rok in postopek za vašo stavbo <a href="#kontakt">nas pokličite</a> — povemo po resnici, tudi če menjava v tem trenutku ni smiselna.
+    </p>
+  </div>
+</section>
+
+<!-- VRTOVI feature -->
+<section class="section" style="background:var(--bg-alt)">
+  <div class="container">
+    <div class="two-col">
+      <div class="feature-img" data-reveal>
+        <img src="assets/vrtovi.jpg" alt="Vrtnar obrezuje živo mejo na urejenem dvorišču večstanovanjske stavbe" loading="lazy">
+        <span class="tag">🌿 Skozi vse leto</span>
+      </div>
+      <div class="feature-text" data-reveal data-delay="2">
+        <span class="eyebrow">Urejanje vrtov in okolice</span>
+        <h2>Okolica, ki dviguje vrednost objekta</h2>
+        <p>Prvi vtis objekta ni vhod — je okolica. Skrbimo zanjo skozi vse leto, od prve pomladne košnje do zimske službe.</p>
+        <ul class="check-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Košnja ter obrezovanje dreves in grmovnic</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Zasaditve in namakalni sistemi</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Zimska služba — pluženje in posipanje</li>
+        </ul>
+        <a class="btn btn-outline" href="#kontakt">Pošljite povpraševanje</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY HEVA -->
+<section id="zakaj" class="section dark-section">
+  <div class="glow" aria-hidden="true"></div>
+  <div class="container">
+    <div class="section-header center" data-reveal>
+      <span class="eyebrow">Zakaj Heva</span>
+      <h2>En partner. Ena številka. Nič skrbi.</h2>
+      <p>Namesto petih izvajalcev en sogovornik, ki objekt pozna — in odgovarja, ko ga pokličete.</p>
+    </div>
+    <div class="three-col">
+      <div class="why-card" data-reveal data-delay="1">
+        <div class="why-num">01</div>
+        <h3>Vse na enem mestu</h3>
+        <p>Upravljanje, vzdrževanje, okolica, ključavnice — namesto petih izvajalcev pokličete enega. Nam.</p>
+      </div>
+      <!-- Was "Registrirana družba za upravljanje" — being registered is the
+           legal minimum, not a reason to choose anyone. Replaced with the
+           thing owners actually worry about: where their money goes. -->
+      <div class="why-card" data-reveal data-delay="2">
+        <div class="why-num">02</div>
+        <h3>Vidite, kam gre vsak evro</h3>
+        <p>Rezervni sklad vodimo ločeno in pregledno. Obračun stroškov je razdelan po ključu, dokumenti pa vam
+           so dostopni v spletnem arhivu — kadarkoli, brez klica na upravnika.</p>
+      </div>
+      <div class="why-card" data-reveal data-delay="3">
+        <div class="why-num">03</div>
+        <h3>Domači, ne klicni center</h3>
+        <p>Smo iz Celja in objekte poznamo osebno. Ko pokličete, se oglasi nekdo, ki ve, o kateri stavbi govorite —
+           tudi ob nujni intervenciji.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOCUMENTS -->
+<section id="dokumenti" class="section" style="background:var(--bg-alt)">
+  <div class="container">
+    <div class="section-header center" data-reveal>
+      <span class="eyebrow">Za etažne lastnike</span>
+      <h2>Koristni dokumenti in predpisi</h2>
+      <p>Zakonodaja, ki ureja upravljanje večstanovanjskih stavb — na enem mestu.</p>
+    </div>
+    <div class="three-col">
+      <a class="doc-card" data-reveal data-delay="1" href="https://pisrs.si/Pis.web/pregledPredpisa?id=ZAKO2008" target="_blank" rel="noopener">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <h3>Stanovanjski zakon (SZ-1)</h3>
+        <p>Temeljni zakon, ki ureja upravljanje večstanovanjskih stavb, pravice in obveznosti etažnih lastnikov.</p>
+        <span class="doc-link">Odpri predpis <span>→</span></span>
+      </a>
+      <a class="doc-card" data-reveal data-delay="2" href="https://pisrs.si/Pis.web/pregledPredpisa?id=PRAV9964" target="_blank" rel="noopener">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <h3>Pravilnik o upravljanju</h3>
+        <p>Pravilnik o upravljanju večstanovanjskih stavb — posli upravljanja in pooblastila upravnika.</p>
+        <span class="doc-link">Odpri predpis <span>→</span></span>
+      </a>
+      <div class="doc-card" data-reveal data-delay="3">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <h3>Rezervni sklad</h3>
+        <p>Sredstva za vzdrževanje stavbe, ki jih etažni lastniki vplačujejo mesečno. Vodimo ga pregledno, ločeno in v skladu z zakonom.</p>
+        <span class="doc-link" style="color:var(--text-3)">Vprašajte nas — razložimo</span>
+      </div>
+    </div>
+    <div class="portal-strip" data-reveal data-delay="4">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <div class="portal-strip-text">
+        <h3>Arhiv dokumentov za etažne lastnike</h3>
+        <p>Vpogled v dokumente vaše stavbe — vsak lastnik ima svoj dostop, ki ga prejme od upravnika,
+           in vidi izključno dokumente svoje stavbe. Povezava je šifrirana (HTTPS).</p>
+      </div>
+      <!-- ⚠️ POINTS AT THE NEW PORTAL, WHICH IS NOT DEPLOYED YET.
+           The new arhiv is static HTML + supabase-js, so it does NOT need its
+           own server or subdomain — deploy the contents of heva/portal-ui/ to
+           /arhiv/ on this same host and this link starts working, over HTTPS.
+           Until then it 404s, which is deliberately better than sending owners
+           to the old Chamilo login over plain HTTP. -->
+      <a class="btn btn-teal" href="arhiv/">Vstop v arhiv</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ — the questions owners actually ask before switching. Also the
+     page's best SEO surface: these are real Slovene search queries.
+     Native <details> so it works with no JS and is keyboard-accessible. -->
+<section id="vprasanja" class="section">
+  <div class="container">
+    <div class="section-header center" data-reveal>
+      <span class="eyebrow">Pogosta vprašanja</span>
+      <h2>Kar lastniki najpogosteje vprašajo</h2>
+    </div>
+    <div class="faq" data-reveal>
+      <details class="faq-item">
+        <summary>Kako zamenjamo upravnika?</summary>
+        <div class="faq-a"><p>Etažni lastniki o menjavi odločajo s sklepom — potrebna je podpora lastnikov
+          več kot polovice solastniških deležev. Gradivo za odločanje pripravimo mi, prevzem dokumentacije
+          in rezervnega sklada od prejšnjega upravnika pa uredimo sami. Podrobneje v razdelku
+          <a href="#prevzem">Prevzem upravljanja</a>.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary>Kaj je rezervni sklad in kdo z njim upravlja?</summary>
+        <div class="faq-a"><p>Rezervni sklad so sredstva, ki jih etažni lastniki mesečno vplačujejo za
+          vzdrževanje stavbe. Sredstva so ločena od sredstev upravnika in ostanejo vaša — upravnik jih le
+          vodi in z njimi plačuje dogovorjena vzdrževalna dela. Stanje in porabo vidite v arhivu dokumentov.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary>Koliko stane upravljanje?</summary>
+        <div class="faq-a"><p>Cena je odvisna od velikosti stavbe, števila enot in obsega storitev, zato je
+          poštena šele po ogledu. Ponudbo pripravimo pisno in z razdelanimi postavkami — brez naknadnih
+          presenečenj. <a href="#kontakt">Pokličite</a> in povemo okvir že po telefonu.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary>Ali prevzamete tudi manjše stavbe?</summary>
+        <div class="faq-a"><p><span class="tbd">Da — upravljamo stavbe od nekaj enot naprej.</span>
+          Za manjše stavbe se pogosto splača skrajšan obseg storitev. Povejte, koliko enot ima vaša stavba,
+          in povemo, ali smo prava izbira.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary>Kako hitro pridete ob nujni intervenciji?</summary>
+        <div class="faq-a"><p><span class="tbd">Na nujne prijave se odzovemo v 24 urah, ob izlivih vode
+          in izpadih elektrike takoj.</span> Pokličete eno številko — 051 664 664 — in uredimo.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary>Ali dobimo dostop do dokumentov stavbe?</summary>
+        <div class="faq-a"><p>Da. Vsak etažni lastnik dobi svoj dostop do spletnega arhiva, kjer so
+          dokumenti njegove stavbe — pogodbe, računi, zapisniki, zavarovalne police. Vidite samo dokumente
+          svoje stavbe.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<section class="section-sm cta-band">
+  <div class="container">
+    <div class="cta-inner" data-reveal>
+      <div>
+        <h2>Počila cev? Izpad elektrike? Brez ključa?</h2>
+        <p>En klic je dovolj — uredimo hitro in zanesljivo, tudi ob nujnih intervencijah.</p>
+      </div>
+      <div class="cta-actions">
+        <a class="btn btn-white" href="tel:+38651664664">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          051 664 664</a>
+        <a class="btn btn-ghost" href="#kontakt">Pišite nam</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="kontakt" class="section">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-info" data-reveal>
+        <span class="eyebrow">Kontakt</span>
+        <h2>Pogovorimo se o vašem objektu</h2>
+        <p>Pokličite, pišite ali se oglasite — z veseljem pripravimo ponudbo za upravljanje ali vzdrževanje.</p>
+        <div class="contact-rows">
+          <a class="contact-row" href="tel:+38651664664">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+            <div><div class="label">Telefon</div><div class="value">051 664 664</div></div>
+          </a>
+          <a class="contact-row" href="tel:+38631739739">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+            <div><div class="label">Mobilni telefon</div><div class="value">031 739 739</div></div>
+          </a>
+          <a class="contact-row" href="mailto:info@heva.si">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></div>
+            <div><div class="label">E-pošta</div><div class="value">info@heva.si</div></div>
+          </a>
+          <div class="contact-row">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
+            <div><div class="label">Naslov</div><div class="value">Ulica XIV. divizije 14, 3000 Celje</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ENQUIRY FORM
+           Markup carries Netlify Forms attributes, so on Netlify it works with
+           zero backend. On any other host the submit handler below falls back
+           to opening a pre-filled e-mail, so the form is never a dead end.
+           The consent checkbox + privacy link are required: this collects
+           personal data, which is the same obligation the resident portal
+           rests on. -->
+      <form class="enquiry" id="enquiry" name="povprasevanje" method="POST"
+            data-netlify="true" netlify-honeypot="company" data-reveal data-delay="2">
+        <input type="hidden" name="form-name" value="povprasevanje">
+        <p class="hp"><label>Ne izpolnjujte: <input name="company" tabindex="-1" autocomplete="off"></label></p>
+
+        <h3>Pošljite povpraševanje</h3>
+
+        <div class="field">
+          <label for="f-ime">Ime in priimek <span aria-hidden="true">*</span></label>
+          <input id="f-ime" name="ime" type="text" required autocomplete="name">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="f-mail">E-pošta <span aria-hidden="true">*</span></label>
+            <input id="f-mail" name="email" type="email" required autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="f-tel">Telefon</label>
+            <input id="f-tel" name="telefon" type="tel" autocomplete="tel">
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-objekt">Vrsta objekta</label>
+          <select id="f-objekt" name="objekt">
+            <option>Večstanovanjska stavba</option>
+            <option>Poslovni objekt</option>
+            <option>Trgovski center</option>
+            <option>Drugo</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-sporocilo">Sporočilo <span aria-hidden="true">*</span></label>
+          <textarea id="f-sporocilo" name="sporocilo" rows="4" required
+                    placeholder="Na kratko o objektu — naslov, število enot, kaj potrebujete."></textarea>
+        </div>
+        <label class="consent">
+          <input type="checkbox" name="soglasje" required>
+          <span>Strinjam se, da Heva d.o.o. moje podatke uporabi izključno za odgovor na to
+                povpraševanje. Več v <a href="zasebnost.html">politiki zasebnosti</a>.</span>
+        </label>
+        <button type="submit" class="btn btn-teal">Pošljite povpraševanje</button>
+        <p class="form-msg" id="formMsg" role="status" aria-live="polite"></p>
+      </form>
+
+      <div class="contact-map" data-reveal data-delay="3">
+        <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=15.2592%2C46.2236%2C15.2752%2C46.2316&amp;layer=mapnik&amp;marker=46.2276%2C15.2672" title="Zemljevid — HEVA d.o.o., Ulica XIV. divizije 14, Celje" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Ulica+XIV.+divizije+14%2C+3000+Celje" target="_blank" rel="noopener">Odpri v Google Zemljevidih →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="assets/logo-mark.png" alt="Heva">
+        <p>HEVA, upravljanje in vzdrževanje nepremičnin, d.o.o. — vaš partner za skrb za objekte v Celju in okolici.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Storitve</h4>
+        <ul>
+          <li><a href="#storitve">Upravljanje z nepremičninami</a></li>
+          <li><a href="#storitve">Vzdrževanje objektov</a></li>
+          <li><a href="#storitve">Urejanje vrtov in okolice</a></li>
+          <li><a href="#storitve">Menjava ključavnic</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Kontakt</h4>
+        <ul>
+          <li>Ulica XIV. divizije 14</li>
+          <li>3000 Celje, Slovenija</li>
+          <li><a href="tel:+38651664664">051 664 664</a></li>
+          <li><a href="tel:+38631739739">031 739 739</a></li>
+          <li><a href="mailto:info@heva.si">info@heva.si</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Informacije</h4>
+        <ul>
+          <li><a href="#prevzem">Prevzem upravljanja</a></li>
+          <li><a href="#vprasanja">Pogosta vprašanja</a></li>
+          <li><a href="#dokumenti">Dokumenti in predpisi</a></li>
+          <li><a href="zasebnost.html">Politika zasebnosti</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Company identification. Slovenian companies are expected to state
+         these; they were missing entirely. Both numbers need confirming
+         against the AJPES entry before publishing. -->
+    <div class="footer-legal">
+      HEVA, upravljanje in vzdrževanje nepremičnin, d.o.o. ·
+      Ulica XIV. divizije 14, 3000 Celje ·
+      Matična št.: <span class="tbd">DOPOLNI</span> ·
+      Davčna št.: <span class="tbd">DOPOLNI</span> ·
+      <span class="tbd">Zavezanec za DDV: da / ne</span>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© <span id="year">2026</span> HEVA d.o.o. — Vse pravice pridržane.</span>
+      <span><a href="zasebnost.html">Politika zasebnosti</a> · Izdelava: <a href="https://ais-slovenia.si" target="_blank" rel="noopener">AIS</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Sticky nav shadow
+const nav = document.getElementById('nav');
+addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 10), {passive:true});
+
+// Mobile menu
+const burger = document.getElementById('burger');
+const mobileMenu = document.getElementById('mobileMenu');
+burger.addEventListener('click', () => {
+  const open = mobileMenu.classList.toggle('open');
+  burger.setAttribute('aria-expanded', open);
+});
+mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  mobileMenu.classList.remove('open');
+  burger.setAttribute('aria-expanded', 'false');
+}));
+
+// Reveal on scroll
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('revealed'); io.unobserve(e.target); } });
+}, {threshold: .12, rootMargin: '0px 0px -40px 0px'});
+document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+
+// Enquiry form — POST to the host's form handler (Netlify picks this up
+// automatically). If there is no handler, fall back to a pre-filled e-mail
+// so the form is never a dead end no matter where this is deployed.
+// Hero photo rotation — one image per type of objekt, matched to the chips.
+// Cross-fade every 6s. Pauses when the tab is hidden (no point animating to
+// nobody, and it keeps a backgrounded tab off the CPU), stops permanently
+// once a chip is clicked so the visitor's choice isn't yanked away, and does
+// nothing at all under prefers-reduced-motion.
+(function initHero(){
+  const slides = [...document.querySelectorAll('.hero-img')];
+  const chips  = [...document.querySelectorAll('.hero-chip')];
+  if (slides.length < 2) return;
+
+  let i = 0, timer = null;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+
+  const show = n => {
+    i = (n + slides.length) % slides.length;
+    slides.forEach((s, k) => s.classList.toggle('is-active', k === i));
+    chips.forEach((c, k) => {
+      c.classList.toggle('is-on', k === i);
+      c.setAttribute('aria-pressed', k === i ? 'true' : 'false');
+    });
+  };
+  const start = () => { if (!timer && !reduced.matches) timer = setInterval(() => show(i + 1), 6000); };
+  const stop  = () => { clearInterval(timer); timer = null; };
+
+  chips.forEach((c, k) => c.addEventListener('click', () => { stop(); show(k); }));
+  document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());
+  reduced.addEventListener?.('change', e => e.matches ? stop() : start());
+
+  show(0);
+  start();
+})();
+
+// Brands belt — duplicates the row until it is wider than the viewport, then
+// translates by exactly one row width so the loop is seamless at any size.
+(function initBrands(){
+  const track = document.getElementById('brandTrack');
+  if (!track || !track.firstElementChild) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const build = () => {
+    while (track.children.length > 1) track.lastElementChild.remove();
+    track.classList.remove('is-animated');
+    const base = track.firstElementChild;
+    base.removeAttribute('aria-hidden');
+    track.appendChild(base.cloneNode(true));
+    const shift = track.children[1].offsetLeft - track.children[0].offsetLeft;
+    if (!shift) return;                       // nothing measurable yet
+    let guard = 0;
+    while (track.scrollWidth < innerWidth * 2 + shift && guard++ < 40) {
+      track.appendChild(base.cloneNode(true));
+    }
+    // Clones are decoration; screen readers should hear the list once.
+    [...track.children].forEach((g, n) => n && g.setAttribute('aria-hidden', 'true'));
+    track.style.setProperty('--shift', shift + 'px');
+    track.style.setProperty('--dur', Math.max(24, shift / 55) + 's');
+    track.classList.add('is-animated');
+  };
+  build();
+  let t; addEventListener('resize', () => { clearTimeout(t); t = setTimeout(build, 200); }, {passive:true});
+})();
+
+(function initEnquiry(){
+  const form = document.getElementById('enquiry');
+  if (!form) return;
+  const msg = document.getElementById('formMsg');
+  const say = (t, cls) => { msg.textContent = t; msg.className = 'form-msg ' + (cls || ''); };
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+    const btn = form.querySelector('button[type=submit]');
+    btn.disabled = true; say('Pošiljam …');
+
+    const data = new FormData(form);
+    if (data.get('company')) { btn.disabled = false; return; }   // honeypot tripped
+
+    try {
+      const r = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(data).toString()
+      });
+      if (!r.ok) throw new Error(r.status);
+      form.reset();
+      say('Hvala — povpraševanje je oddano. Oglasimo se v najkrajšem času.', 'ok');
+    } catch {
+      // No form backend on this host: hand it to the mail client instead.
+      const body = [
+        'Ime: '        + (data.get('ime') || ''),
+        'E-pošta: '    + (data.get('email') || ''),
+        'Telefon: '    + (data.get('telefon') || ''),
+        'Vrsta objekta: ' + (data.get('objekt') || ''),
+        '',
+        data.get('sporocilo') || ''
+      ].join('\n');
+      location.href = 'mailto:info@heva.si?subject='
+        + encodeURIComponent('Povpraševanje — heva.si')
+        + '&body=' + encodeURIComponent(body);
+      say('Odpiram vaš e-poštni program …');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+})();
+
+// Current year
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

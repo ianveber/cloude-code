@@ -1,0 +1,240 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "company-scan.schema.json",
+  "title": "AI Infrastructure Protocol — company scan (Gate 0 contract, as-is map)",
+  "description": "Output of G0 SCAN. This is the company's operating reality captured as a structured audit, not a survey: every department, every process, and per process the steps, tools, data touched, volume/frequency, hours spent, pains, and handoffs. Gate 0 validates .protocol/company-scan.json against this schema. Gate 0 green requires every department the company named to be present, and every process to have its tools, data, volume, and pains quantified — not just listed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "company",
+    "scan",
+    "departments",
+    "coverage"
+  ],
+  "properties": {
+    "company": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "industry", "headcount", "namedDepartments"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "industry": { "type": "string", "minLength": 1 },
+        "headcount": { "type": "integer", "minimum": 1 },
+        "revenueBand": {
+          "type": "string",
+          "description": "Optional coarse band, e.g. '<1M', '1-10M', '10-50M'. Not required — some clients won't share.",
+          "enum": ["<1M", "1-10M", "10-50M", "50M+", "undisclosed"]
+        },
+        "stack": {
+          "type": "array",
+          "description": "Company-wide systems of record named in the kickoff (ERP, CRM, accounting, comms). Per-process tools live under processes[].tools.",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "namedDepartments": {
+          "type": "array",
+          "minItems": 1,
+          "description": "The departments the company itself named in the kickoff. coverage.departmentsScanned must cover ALL of these for Gate 0 green — this is the anti-cherry-pick contract.",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "scan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scannedAt", "method", "operator"],
+      "properties": {
+        "scannedAt": { "type": "string", "format": "date-time" },
+        "operator": { "type": "string", "minLength": 1, "description": "Who ran the scan (AIS operator)." },
+        "method": {
+          "type": "array",
+          "minItems": 1,
+          "description": "How each fact was sourced. 'interview' = the company told us; 'agent-browser'/'scrape' = we inventoried their live tools/sites where permitted; 'artifact' = we read a doc/export they gave us.",
+          "items": { "type": "string", "enum": ["interview", "agent-browser", "scrape", "artifact", "observation"] }
+        },
+        "permissions": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "What we were permitted to inspect directly. Scraping/automating a tool without this recorded is a Gate 0 red.",
+          "properties": {
+            "toolsInventoried": { "type": "array", "items": { "type": "string" } },
+            "consentRecordedBy": { "type": "string" }
+          }
+        }
+      }
+    },
+    "departments": {
+      "type": "array",
+      "minItems": 1,
+      "description": "One entry per operating department. Every department in company.namedDepartments must appear here.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "processes"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "owner": { "type": "string", "description": "Human accountable for this department today." },
+          "headcount": { "type": "integer", "minimum": 0 },
+          "processes": {
+            "type": "array",
+            "minItems": 1,
+            "description": "The recurring processes this department runs. A department with zero processes is a Gate 0 red — a department that does nothing was mis-scanned.",
+            "items": { "$ref": "#/$defs/process" }
+          }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Self-reported coverage proof. Gate 0 cross-checks these counts against the actual arrays.",
+      "required": ["departmentsScanned", "processesScanned", "gaps"],
+      "properties": {
+        "departmentsScanned": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "processesScanned": { "type": "integer", "minimum": 1 },
+        "gaps": {
+          "type": "array",
+          "description": "Known blind spots — processes named but not yet fully captured. An empty array asserts full coverage. Never silently omit a gap; a hidden gap surfaces at G1 as an un-dispositionable process.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["what", "why"],
+            "properties": {
+              "what": { "type": "string", "minLength": 1 },
+              "why": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "process": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "One recurring process, fully quantified. Every required field below must carry a real value — 'unknown' volume or 'n/a' hours on a real process is a Gate 0 red, because you cannot rank a backlog you did not measure.",
+      "required": ["id", "name", "steps", "tools", "data", "volume", "hours", "pains", "handoffs"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "description": "Stable slug, e.g. 'invoice-approval'. G1 blueprint references processes by this id — it must be unique across the whole scan."
+        },
+        "name": { "type": "string", "minLength": 1 },
+        "trigger": {
+          "type": "string",
+          "description": "What starts this process (e.g. 'customer submits order', 'end of month', 'inbound email')."
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "description": "The ordered steps as the company actually does them, in their words. This is the automation surface — vagueness here caps the blueprint's ambition.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["order", "action"],
+            "properties": {
+              "order": { "type": "integer", "minimum": 1 },
+              "action": { "type": "string", "minLength": 1 },
+              "actor": { "type": "string", "description": "Role/person who performs this step today." },
+              "system": { "type": "string", "description": "Tool the step happens in (must appear in this process's tools[])." },
+              "decision": {
+                "type": "boolean",
+                "description": "True if this step is a judgement/decision point (matters for keep-human vs augment-AI at G1)."
+              }
+            }
+          }
+        },
+        "tools": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Every tool/system this process touches. Where permitted and inventoried via agent-browser/scrape, mark inspected:true.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "category": {
+                "type": "string",
+                "enum": ["crm", "erp", "accounting", "spreadsheet", "email", "chat", "docs", "storage", "custom-app", "database", "ai", "other"]
+              },
+              "hasApi": { "type": "boolean", "description": "Does it expose an API/webhook? Drives feasibility of full automation at G1." },
+              "inspected": { "type": "boolean", "description": "True if we inventoried it live (agent-browser/scrape) rather than only hearing about it." },
+              "monthlyCost": { "type": "number", "minimum": 0, "description": "Seat/subscription cost, if known — feeds G4 unit economics." }
+            }
+          }
+        },
+        "data": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Every data object this process reads or writes. Sensitivity drives which processes route through Pillar ⑤ Security at build time.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "sensitivity"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1, "description": "e.g. 'customer PII', 'invoice line items', 'contract PDF'." },
+              "sensitivity": { "type": "string", "enum": ["public", "internal", "confidential", "regulated-pii", "regulated-financial", "regulated-health"] },
+              "flow": { "type": "string", "enum": ["read", "write", "read-write"] },
+              "locatedIn": { "type": "string", "description": "Which tool/system holds it (should match a tools[].name)." }
+            }
+          }
+        },
+        "volume": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["count", "unit", "period"],
+          "description": "How often this process runs. Required and numeric — the whole backlog ranking is impact-weighted by volume × hours.",
+          "properties": {
+            "count": { "type": "number", "minimum": 0 },
+            "unit": { "type": "string", "enum": ["invocations", "records", "tickets", "emails", "documents", "orders", "reports", "other"] },
+            "period": { "type": "string", "enum": ["day", "week", "month", "quarter", "year"] }
+          }
+        },
+        "hours": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["perPeriodHours", "period", "peopleInvolved"],
+          "description": "Human hours this process consumes. This is the fuel for impact scoring and G4's 'cost taken out' number.",
+          "properties": {
+            "perPeriodHours": { "type": "number", "minimum": 0 },
+            "period": { "type": "string", "enum": ["day", "week", "month", "quarter", "year"] },
+            "peopleInvolved": { "type": "integer", "minimum": 0 },
+            "loadedHourlyCost": { "type": "number", "minimum": 0, "description": "Fully-loaded €/hour for the people doing it, if known — turns hours into euros for G4." }
+          }
+        },
+        "pains": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Concrete pain points: errors, delays, rework, bottlenecks, things people hate. Each must be specific enough to design against.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["description", "type"],
+            "properties": {
+              "description": { "type": "string", "minLength": 1 },
+              "type": { "type": "string", "enum": ["error-rate", "delay", "rework", "bottleneck", "manual-drudgery", "key-person-risk", "compliance-risk", "cost"] },
+              "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+              "evidence": { "type": "string", "description": "How we know — a quote, a metric, an observed instance. Adjective-only pains are weak input." }
+            }
+          }
+        },
+        "handoffs": {
+          "type": "array",
+          "description": "Points where work passes between people/teams/tools. Handoffs are where errors and delays concentrate and where automation pays off most. An empty array asserts a self-contained process — allowed, but rare.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "to", "via"],
+            "properties": {
+              "from": { "type": "string", "minLength": 1 },
+              "to": { "type": "string", "minLength": 1 },
+              "via": { "type": "string", "description": "Channel of the handoff: email, Slack, shared sheet, verbal, ticket, etc." },
+              "waitHours": { "type": "number", "minimum": 0, "description": "Typical idle time the work waits at this handoff." }
+            }
+          }
+        }
+      }
+    }
+  }
+}

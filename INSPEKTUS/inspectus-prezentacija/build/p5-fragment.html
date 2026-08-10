@@ -1,0 +1,51 @@
+<style>
+  #page-5 .chart { height: 88mm; margin-top: 15mm; }
+  #page-5 .statband { margin-top: 5mm; }
+  #page-5 .chart .node {
+    width: 43mm; height: 24mm;
+    display: flex; flex-direction: column; justify-content: center;
+    text-align: center; font-size: 10pt; padding: 2.5mm 3.5mm;
+  }
+  #page-5 .chart .node .sub { font-size: 8pt; }
+  #page-5 .chart .badge-warn { width: 44mm; text-align: center; }
+  #page-5 .xloop { text-align: center; }
+</style>
+
+<div class="chart">
+  <svg class="wire" viewBox="0 0 265 88" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowP5" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#425060"/>
+      </marker>
+      <marker id="arrowP5g" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#b09575"/>
+      </marker>
+    </defs>
+    <!-- top row, left to right (node mid y = 16) -->
+    <line x1="63"  y1="16" x2="109.6" y2="16" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP5)"/>
+    <line x1="154" y1="16" x2="200.6" y2="16" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP5)"/>
+    <!-- down the right side: 3 -> 4 -->
+    <line x1="240" y1="28" x2="240" y2="50.6" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP5)"/>
+    <!-- bottom row, right to left: 4 -> 5 -->
+    <line x1="202" y1="64" x2="155.4" y2="64" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP5)"/>
+    <!-- loop back to start: 5 -> 1 (bronze) -->
+    <path d="M 111 64 L 41.5 64 L 41.5 29.4"
+          fill="none" stroke="#b09575" stroke-width="0.6" marker-end="url(#arrowP5g)"/>
+  </svg>
+
+  <div class="node" style="left:20mm; top:4mm;">Najdi fotografijo VIN</div>
+  <div class="node" style="left:111mm; top:4mm;">Ročno preberi 17 znakov</div>
+  <div class="node" style="left:202mm; top:4mm;">Vtipkaj VIN v Ares<span class="sub">obstoječi sistem</span></div>
+  <div class="node" style="left:202mm; top:52mm;">Poišči pripadajoče fotografije poškodb</div>
+  <div class="node" style="left:111mm; top:52mm;">Pripni fotografije k vozilu</div>
+
+  <div class="badge-warn" style="left:150mm; top:33mm;">1 zatipkan znak = fotografije pri napačnem vozilu</div>
+
+  <div class="xloop" style="left:50mm; top:69mm; width:52mm;">× 200<small>vozil — eno za drugim</small></div>
+</div>
+
+<div class="statband">
+  <div class="stat"><b>~3 min</b><span>na vozilo (konzervativna ocena)</span></div>
+  <div class="stat"><b>≈ 10 ur</b><span>ročnega dela na ladjo</span></div>
+  <div class="stat"><b>monotonija</b><span>največji vir napak</span></div>
+</div>

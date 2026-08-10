@@ -1,0 +1,58 @@
+-- Minimal stand-ins for the Supabase-managed pieces that schema.sql
+-- depends on, so the REAL schema file can run unmodified on plain
+-- Postgres. Only what the schema touches is reproduced.
+
+create schema if not exists auth;
+create schema if not exists storage;
+
+create table if not exists auth.users (
+  id                  uuid primary key default gen_random_uuid(),
+  email               text unique,
+  raw_user_meta_data  jsonb default '{}'::jsonb
+);
+
+-- Supabase resolves the current user from the request JWT claims GUC.
+create or replace function auth.uid()
+returns uuid
+language sql
+stable
+as $$
+  select nullif(
+    current_setting('request.jwt.claims', true)::jsonb ->> 'sub',
+    ''
+  )::uuid;
+$$;
+
+create table if not exists storage.buckets (
+  id      text primary key,
+  name    text not null,
+  public  boolean not null default false
+);
+
+create table if not exists storage.objects (
+  id         uuid primary key default gen_random_uuid(),
+  bucket_id  text references storage.buckets(id),
+  name       text,
+  owner      uuid
+);
+alter table storage.objects enable row level security;
+
+-- Roles the policies target. On a stock Postgres these don't exist.
+do $$
+begin
+  if not exists (select 1 from pg_roles where rolname = 'anon') then
+    create role anon nologin noinherit;
+  end if;
+  if not exists (select 1 from pg_roles where rolname = 'authenticated') then
+    create role authenticated nologin noinherit;
+  end if;
+  if not exists (select 1 from pg_roles where rolname = 'service_role') then
+    create role service_role nologin noinherit bypassrls;
+  end if;
+end
+$$;
+
+grant usage on schema public, auth, storage to anon, authenticated, service_role;
+grant all on all tables in schema public, auth, storage to authenticated, service_role;
+alter default privileges in schema public
+  grant all on tables to authenticated, service_role;

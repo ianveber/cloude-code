@@ -1,0 +1,76 @@
+<style>
+  #page-4 .chart { height: 84mm; margin-top: 11mm; }
+  #page-4 .chart .node {
+    width: 43mm; height: 24mm;
+    display: flex; flex-direction: column; justify-content: center;
+    text-align: center; font-size: 10pt; padding: 2.5mm 3.5mm;
+  }
+  #page-4 .chart .node .sub { font-size: 8pt; }
+  #page-4 .dlabel {
+    position: absolute; left: 118mm; top: 19mm; width: 40mm;
+    text-align: center; font-size: 9pt; font-weight: 600; color: var(--navy-deep); line-height: 1.25;
+  }
+  #page-4 .edge {
+    position: absolute; font-size: 8.5pt; font-weight: 700; color: var(--navy); letter-spacing: .06em;
+  }
+  #page-4 .prow { display: flex; gap: 6mm; align-items: stretch; margin-top: 3.5mm; }
+  #page-4 .prow .callout { display: flex; align-items: center; }
+</style>
+
+<div class="chart">
+  <svg class="wire" viewBox="0 0 265 84" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowP4" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#425060"/>
+      </marker>
+      <marker id="arrowP4m" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#9aa3ad"/>
+      </marker>
+    </defs>
+    <!-- node mid-line y = 26 (same rhythm as korak 1) -->
+    <line x1="43"   y1="26" x2="54.6"  y2="26" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP4)"/>
+    <line x1="98.5" y1="26" x2="115.6" y2="26" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP4)"/>
+    <!-- decision diamond -->
+    <polygon points="117,26 138,12.5 159,26 138,39.5" fill="#ffffff" stroke="rgba(66,80,96,.4)" stroke-width="0.35"/>
+    <!-- DA edge -->
+    <line x1="159" y1="26" x2="220.6" y2="26" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP4)"/>
+    <!-- NE loop back, dashed -->
+    <path d="M 138 39.5 L 138 56 L 77 56 L 77 39.4"
+          fill="none" stroke="#9aa3ad" stroke-width="0.5" stroke-dasharray="1.6 1.4" marker-end="url(#arrowP4m)"/>
+    <!-- thumbnail strip: the needle in the haystack -->
+    <g>
+      <g transform="translate(55.5,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(67,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(78.5,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(90,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(101.5,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(113,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(124.5,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(136,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/><text x="4.5" y="5.2" font-family="ui-monospace,Menlo,monospace" font-size="1.55" fill="#7d6449" text-anchor="middle" textLength="8" lengthAdjust="spacingAndGlyphs">IMG_2183.jpg</text></g>
+      <g transform="translate(147.5,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(159,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(170.5,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <g transform="translate(182,66)"><rect width="9" height="7" fill="#fafafa" stroke="#dddddd" stroke-width="0.25"/><path d="M6.9,0 L9,2.1 L6.9,2.1 Z" fill="#eef1f3"/></g>
+      <!-- magnifier ring over thumbnail 8 -->
+      <circle cx="140.5" cy="69.5" r="6.4" fill="none" stroke="#b09575" stroke-width="0.7"/>
+      <line x1="145.1" y1="74.1" x2="149.6" y2="78.6" stroke="#b09575" stroke-width="1.1" stroke-linecap="round"/>
+      <text x="55.5" y="80.5" font-size="2.8" fill="#9aa3ad" font-family="'Open Sans',sans-serif">6.000 fotografij — ena za drugo, dokler se ne pokaže VIN tablica</text>
+    </g>
+  </svg>
+
+  <div class="node" style="left:0mm; top:14mm;">Sodelavec v pisarni odpre mapo</div>
+  <div class="node" style="left:55.5mm; top:14mm;">Pregleduje fotografije eno za drugo</div>
+  <div class="dlabel">Je to VIN tablica?</div>
+  <div class="node" style="left:222mm; top:14mm;">Tu se začne novo vozilo</div>
+
+  <span class="edge" style="left:185mm; top:20.5mm;">DA</span>
+  <span class="edge" style="left:141mm; top:44mm; color:var(--muted);">NE</span>
+</div>
+
+<div class="statband">
+  <div class="stat"><b>2. oseba</b><span>vključena v proces</span></div>
+  <div class="stat"><b>pisarna</b><span>delo za računalnikom, ne na terenu</span></div>
+  <div class="stat"><b>vsaka napaka</b><span>se od tu prenese naprej</span></div>
+</div>
+
+<div class="callout" style="margin-top:3.5mm;">Iskanje igle v kupu sena — 6.000-krat na ladjo.</div>

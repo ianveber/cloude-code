@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prenos dokumentacije — AIS</title>
+<style>
+  :root{
+    --bg:#f5f5f7; --card:#fff; --ink:#1d1d1f; --dim:#6e6e73; --line:#e8e8ed;
+    /* tertiary text and the lighter of the two rules — declared once so they stop drifting */
+    --dim2:#a1a1a8; --line2:#f2f2f5;
+    --blue:#0071e3; --green:#34c759; --orange:#ff9500; --red:#ff3b30;
+    --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
+       font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 80px}
+  h1{font-size:30px;letter-spacing:-.022em;margin:0 0 4px;font-weight:600}
+  .sub{color:var(--dim);margin:0 0 28px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+        box-shadow:0 1px 3px rgba(0,0,0,.04);padding:22px 24px;margin-bottom:16px}
+
+  /* drop zone */
+  #drop{border:2px dashed #d2d2d7;border-radius:16px;background:var(--card);
+        padding:52px 24px;margin-bottom:16px;text-align:center;cursor:pointer;
+        /* scoped to the drag highlight: an unscoped `all` also animated the collapse to .done,
+           which then never settled on a throttled tab and left the hero at full height */
+        transition:border-color .18s,background .18s}
+  #drop.hot{border-color:var(--blue);background:#f0f7ff}
+  #drop h2{margin:0 0 6px;font-size:19px;font-weight:600}
+  #drop p{margin:0;color:var(--dim);font-size:14px}
+  /* once a run has finished the hero has done its job: shrink it so the filled
+     kontrolni list sits as close to the top of the page as it can */
+  #drop.done{padding:16px 24px}
+  #drop.done h2{font-size:16px;margin:0}
+  #drop.done p{display:none}
+  #drop.busy{cursor:progress}
+  input[type=file]{display:none}
+
+  /* the agent-list drop zone — the same idiom as the hero, one size down.
+     Same dashed rule, same highlight, same radius as the cards around it. */
+  #regDrop{border:2px dashed #d2d2d7;border-radius:12px;background:var(--bg);
+        padding:18px 20px;text-align:center;cursor:pointer;
+        transition:border-color .18s,background .18s}
+  #regDrop.hot{border-color:var(--blue);background:#f0f7ff}
+
+  .btn{appearance:none;border:0;border-radius:980px;background:var(--blue);color:#fff;
+       font:inherit;font-weight:500;font-size:14px;padding:9px 20px;cursor:pointer}
+  .btn:hover{filter:brightness(1.06)} .btn:disabled{opacity:.4;cursor:default}
+  .btn.ghost{background:#e8e8ed;color:var(--ink)}
+  .btn:focus-visible{outline:3px solid #0071e355;outline-offset:2px}
+
+  /* status */
+  .status{display:flex;align-items:center;gap:10px;color:var(--dim);font-size:14px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--dim);flex:none}
+  .dot.go{background:var(--green)} .dot.warn{background:var(--orange)} .dot.bad{background:var(--red)}
+  .spin{width:15px;height:15px;border:2px solid #d2d2d7;border-top-color:var(--blue);
+        border-radius:50%;animation:s .7s linear infinite;flex:none}
+  @keyframes s{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion:reduce){.spin{animation:none}}
+
+  /* fields — the value is what the client came to read, so it gets the room */
+  .row{display:grid;grid-template-columns:130px minmax(0,1fr) auto;gap:14px;align-items:baseline;
+       padding:9px 0;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:0}
+  .k{color:var(--dim);font-size:13px}
+  .v{font-weight:500;word-break:break-word}
+  .v.empty{color:var(--dim2);font-weight:400}
+  .tag{font-size:12px;padding:2px 10px;border-radius:980px;white-space:nowrap}
+  .tag.ok{background:#e8f8ed;color:#1a7f37}
+  .tag.check{background:#fff4e5;color:#8a5200}
+  /* the default provenance, demoted to a dot: filled pills are reserved for the exceptions,
+     so the amber flags have something to stand out against */
+  .tag.quiet{background:none;color:var(--dim);padding-left:0;padding-right:0;
+       display:inline-flex;align-items:center;gap:6px}
+  .tag.quiet::before{content:"";width:6px;height:6px;border-radius:50%;
+       background:var(--green);flex:none}
+  .row.attn{background:#fffaf2;margin:0 -12px;padding-left:12px;padding-right:12px;border-radius:10px}
+
+  .split{display:grid;grid-template-columns:1.15fr 1fr;gap:16px}
+  @media (max-width:880px){.split{grid-template-columns:1fr}.row{grid-template-columns:1fr;gap:2px}}
+  /* the preview scales itself to this frame (lib/klp.js, screen mode only) — the KLP block
+     ends a third of the way down an A4 page, so the frame only needs that much height */
+  iframe{width:100%;height:260px;border:1px solid var(--line);border-radius:12px;background:#fff}
+  .muted{color:var(--dim);font-size:13px}
+  h3{font-size:16px;margin:0 0 12px;font-weight:600}
+  .banner{display:flex;gap:12px;align-items:flex-start;background:#fffaf2;
+          border:1px solid #ffe2bd;border-radius:12px;padding:14px 16px;margin-bottom:14px}
+  .banner .t{font-weight:500;margin-bottom:2px}
+  .banner:last-child{margin-bottom:0}
+  .banner.ok{background:#f2fbf5;border-color:#cbeed8}
+  .banner.info{background:#f1f6ff;border-color:#d3e3ff}
+  .hide{display:none}
+
+  /* inline text button (drop zone) */
+  .linky{appearance:none;border:0;background:none;color:var(--blue);font:inherit;
+         font-size:14px;padding:0;cursor:pointer}
+  .linky:hover{text-decoration:underline}
+  /* the sample-document line under the drop zone — present, never competing with it */
+  #vzorecLine{margin:10px 2px 0;font-size:13px;color:var(--dim)}
+  #vzorecLine a{color:var(--blue);text-decoration:none}
+  #vzorecLine a:hover{text-decoration:underline}
+  #vzorecLine .vzorecNote{display:block;margin-top:2px;color:var(--dim2);font-size:12px}
+
+  /* packet list — one line per document in the drop.
+     The whole LIST is the grid and each row is display:contents, so the three columns are shared
+     across rows: the name column sizes to the longest filename and every class tag lines up just
+     after it. A per-row grid with a 1fr name column pushed the tags into the middle of the card
+     with a 400px empty band beside each one; a per-row max-content column made them ragged. */
+  /* the gap is padding rather than column-gap so the row rule stays one unbroken line */
+  /* cells stretch so their bottom borders line up into one rule; the content is centred inside
+     each cell instead, which is what align-items:center on the grid would otherwise break */
+  #packetList{display:grid;grid-template-columns:minmax(0,max-content) 200px minmax(140px,1fr)}
+  .doc{display:contents}
+  .doc>*{display:flex;align-items:center;padding:9px 24px 9px 0;
+       border-bottom:1px solid var(--line)}
+  .doc>*:last-child{padding-right:0}
+  .doc:last-child>*{border-bottom:0}
+  .doc .dn{flex-direction:column;align-items:flex-start;font-weight:500;word-break:break-word}
+  .doc .ds{font-size:13px;color:var(--dim);display:flex;align-items:center;gap:8px}
+  .doc .sig{font-size:12px;color:var(--dim2);display:block;font-weight:400;margin-top:1px}
+  @media (max-width:880px){
+    #packetList{grid-template-columns:1fr}
+    .doc>*{padding:1px 0;border-bottom:0}
+    .doc>*:last-child{padding:1px 0 10px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+    .doc:last-child>*:last-child{padding-bottom:0;margin-bottom:0;border-bottom:0}
+  }
+  .tag.neutral{background:#eef0f4;color:#3c3c43}
+  .tag.blue{background:#eaf3ff;color:#05509e}
+  .spin.sm{width:12px;height:12px;border-width:2px}
+
+  /* counter card */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  @media (max-width:880px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:#fafafc;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .stat .n{font-size:32px;font-weight:600;letter-spacing:-.025em;line-height:1.1}
+  .stat .l{font-size:13px;color:var(--dim);margin-top:4px}
+  /* the two numbers that mean work for a person carry the only colour on the card */
+  .stat.attn{background:#fffaf2;border-color:#ffe2bd}
+  .stat.bad{background:#fff6ee;border-color:#ffd7ad}
+  .stat.bad .n{color:#a04a00}
+
+  /* collapsible cards */
+  details.card>summary{cursor:pointer;font-size:16px;font-weight:600;list-style:none;
+       display:flex;align-items:center;gap:9px}
+  details.card>summary::-webkit-details-marker{display:none}
+  details.card>summary::before{content:"›";color:var(--dim);transition:transform .15s;
+       display:inline-block;font-size:18px;line-height:1}
+  details.card[open]>summary::before{transform:rotate(90deg)}
+  details.card[open]>summary{margin-bottom:14px}
+  details.card>summary .cnt{font-weight:400;color:var(--dim);font-size:13px}
+
+  /* ROI capture */
+  .roi{display:grid;grid-template-columns:1fr 104px;gap:9px 14px;align-items:center;max-width:580px}
+  .roi label{font-size:14px}
+  .roi input{font:inherit;font-size:14px;padding:7px 10px;border:1px solid #d2d2d7;
+       border-radius:10px;width:100%;text-align:right;background:#fff;color:var(--ink)}
+  .roi input:focus{outline:2px solid #0071e355;border-color:var(--blue)}
+  .roiout{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+  .roiout .big,#prihranekBig{font-size:17px;font-weight:600;letter-spacing:-.01em}
+
+  .footrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 16px;padding:0 2px}
+
+  /* run log */
+  .log{list-style:none;margin:0;padding:0;max-height:270px;overflow:auto;font-size:13px;color:var(--dim)}
+  .log li{padding:4px 0;border-bottom:1px solid var(--line2);display:flex;gap:12px}
+  .log li:last-child{border-bottom:0}
+  .log .t{color:var(--dim2);flex:none;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Prenos dokumentacije</h1>
+  <p class="sub">Povlecite ponudbo Merkurja. Kontrolni list in privolitvena izjava se izpolnita sama.</p>
+
+  <!-- Filled in by app.js only when this is running on a server rather than on the user's own
+       machine. It must never be a static line: on the local demo it would be false. -->
+  <div id="hostedNotice" class="hide"></div>
+
+  <div id="drop">
+    <h2>Povlecite ponudbo ali celo mapo sem</h2>
+    <p>ali kliknite za izbiro datotek &middot;
+       <button type="button" class="linky" id="pickFolder">izberite celotno mapo</button></p>
+    <p style="margin-top:4px">datoteke se ne naložijo — za branje se posreduje besedilo strani,
+       pri dokumentih brez besedilnega sloja pa slika strani</p>
+    <input type="file" id="file" accept="application/pdf" multiple>
+    <input type="file" id="folder" webkitdirectory directory multiple>
+  </div>
+
+  <!-- The test document travels WITH the app.
+       Before the DPA amendment is signed, real client offers must not be uploaded here — so the
+       only way anyone can try this is if a safe document is within reach at the moment they want
+       to try it. Emailing it separately guarantees somebody reaches for a real one instead. Both
+       files are invented: the labels are Merkur's (the classifier fingerprints them), every value
+       is made up. `download` is what makes the browser save rather than open the PDF inline. -->
+  <p id="vzorecLine">
+    Nimate ponudbe pri roki?
+    <a href="vzorec/Vzorcna-ponudba.pdf" download>Prenesite vzorčno ponudbo</a>
+    in jo povlecite sem &middot;
+    <a href="vzorec/Vzorcni-register.csv" download>vzorčni register zastopnikov</a>
+    <span class="vzorecNote">izmišljeni podatki — varno za preizkus</span>
+  </p>
+
+  <div class="card hide" id="statusCard">
+    <div class="status" id="status"><span class="spin"></span><span>Berem dokument…</span></div>
+  </div>
+
+  <details class="card hide" id="packetCard" open>
+    <summary>Paket dokumentacije <span class="cnt" id="packetCount"></span></summary>
+    <div id="packetList"></div>
+    <p class="muted hide" id="packetNote"></p>
+  </details>
+
+  <!-- the filled kontrolni list is the point of the page, so nothing that merely counts it
+       stands between the drop zone and it: the gate and the numbers are the epilogue -->
+  <div id="results"></div>
+
+  <!-- The agent list, supplied by the client. Hidden until the banner asks for it AND this
+       installation has no list of its own. Nothing here leaves the browser. -->
+  <div class="card hide" id="regCard">
+    <h3>Vaš register zastopnikov</h3>
+    <p class="muted" style="margin:0 0 12px">
+      Ponudba nosi licenco AZN, kontrolni list pa vašo interno številko. Naložite svoj seznam
+      zastopnikov in številke se izpolnijo same.
+    </p>
+    <p style="margin:0 0 14px">
+      Seznam se prebere tukaj, v vašem brskalniku — nikamor se ne pošlje in se nikjer ne shrani.
+    </p>
+    <div id="regDrop">
+      <div>Povlecite seznam sem ali
+        <button type="button" class="linky" id="regPick">izberite datoteko</button></div>
+      <p class="muted" style="margin:6px 0 0">
+        V Excelu shranite kot CSV: dva stolpca — ime in priimek zastopnika ter njegova interna
+        številka. Naslovna vrstica ni obvezna.
+      </p>
+    </div>
+    <input type="file" id="regFile" accept=".csv,.txt,.json,text/csv,text/plain,application/json">
+    <div id="regMsg" style="margin-top:14px"></div>
+  </div>
+
+  <div class="card hide" id="gateCard">
+    <h3>Popolnost paketa</h3>
+    <div id="gateBody"></div>
+  </div>
+
+  <div class="card hide" id="statsCard">
+    <h3>Ta pregled v številkah</h3>
+    <div class="stats" id="stats"></div>
+    <p class="muted" style="margin:14px 0 0" id="statsNote">Te številke so iz tega pregleda.</p>
+  </div>
+
+  <!-- The running total for the whole trial. This is the number the fourteen days exist to
+       produce: not how fast one review was, but what the client actually saved across everything
+       they put through it. Filled by renderPrihranek(); hidden until there is something in it. -->
+  <div class="card hide" id="prihranekCard">
+    <h3>Prihranek v tem preizkusu</h3>
+    <div class="stats" id="prihranekStats"></div>
+    <p class="big" style="margin:16px 0 0" id="prihranekBig"></p>
+    <p class="muted" style="margin:6px 0 0" id="prihranekObdobje"></p>
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" id="prihranekKopiraj">Kopiraj povzetek</button>
+      <button class="btn ghost" id="prihranekPonastavi">Začni znova</button>
+    </div>
+    <p class="muted" style="margin:10px 0 0">
+      Števec teče v tem brskalniku in na tem računalniku. K nam ne pride nič — ne dokument,
+      ne prebrani podatki, ne ta števec. Kolega na svojem računalniku ima svojega.
+      Ročni čas je vaša ocena iz panela spodaj, strojni čas je izmerjen.
+    </p>
+  </div>
+
+  <div class="card hide" id="exportCard">
+    <h3>Podatki za eDOKUMENTE</h3>
+    <p class="muted" style="margin:0 0 14px">
+      Predlog strukture podatkov, ki ga lahko predate dobavitelju eDOKUMENTOV. Poimenovanja polj so
+      naša in niso povzeta po vaših sistemih — dokončno obliko potrdimo skupaj v Fazi 0.
+      Vsak podatek nosi svoj izvor, zato je razvidno, kaj je prebrano iz ponudbe in kaj čaka na
+      potrditev sodelavca.
+    </p>
+    <button class="btn" id="exportBtn">Prenesi podatke za eDOKUMENTE</button>
+    <p class="muted" style="margin:12px 0 0">
+      Datoteka je v strojno berljivi obliki, primerni za vašega dobavitelja. Vsebuje osebne
+      podatke iz prebranih ponudb — ravnajte z njo enako kot z izvirniki.
+    </p>
+  </div>
+
+  <details class="card" id="roiCard">
+    <summary>Koliko časa to vzame danes?</summary>
+    <p class="muted" style="margin:0 0 16px">
+      Šest korakov iz vašega opisa današnjega postopka. Vpišite minute na eno ponudbo —
+      številke so vaše, mi jih ne predpostavljamo.
+    </p>
+    <div class="roi" id="roiSteps"></div>
+    <div class="roiout" id="roiOut"></div>
+  </details>
+
+  <div class="footrow">
+    <button class="btn ghost" id="scopeBtn">Natisni obseg</button>
+    <span class="muted">Kaj ta predstavitev pokaže in kaj je namenoma zunaj njenega obsega.</span>
+  </div>
+
+  <details class="card hide" id="logCard">
+    <summary>Zapis poteka <span class="cnt" id="logCount"></span></summary>
+    <ol class="log" id="log"></ol>
+    <p class="muted" style="margin:12px 0 0">
+      Zapis vsebuje imena datotek in vrste dokumentov — nobenega podatka iz njihove vsebine.
+      Osebna imena v imenih datotek so v zapisu zakrita.
+    </p>
+  </details>
+
+</div>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>

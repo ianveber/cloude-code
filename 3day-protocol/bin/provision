@@ -1,0 +1,316 @@
+#!/usr/bin/env node
+/**
+ * provision — create the entire cloud backend for one app, in one command.
+ *
+ * This is the layer that exists because "Ian needs to create the Supabase
+ * project" has stranded INSPEKTUS OS Phase 2 and Heva for months. Gate 0 of
+ * the engine asserts that a project exists. Nothing created one. Now something does.
+ *
+ *   provision plan   <runDir>   what would happen, no side effects
+ *   provision apply  <runDir>   do it — resumable, never destructive
+ *   provision status <runDir>   what exists so far
+ *
+ * Design commitments, each avoiding a specific known failure:
+ *   - fail forward, never auto-destroy. A half-provisioned run resumes;
+ *     abandoning requires a deliberate, separate teardown.
+ *   - guards live inside the API clients, so no path here can reach a
+ *     destructive verb on a project the factory did not create.
+ *   - the DB password is written mode-600 before the create call and never
+ *     printed, logged, or passed in argv.
+ *   - `supabase link` is never run and git is never connected to Vercel.
+ *
+ * CommonJS with a shebang to match bin/gate-check; the lib/ modules are ESM,
+ * loaded via dynamic import(). Zero dependencies — the pack lives on iCloud
+ * where node_modules corrupts.
+ */
+
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+
+const PACK_ROOT = path.resolve(__dirname, '..');
+
+function fail(msg, code = 1) {
+  process.stderr.write(`provision: ${msg}\n`);
+  process.exit(code);
+}
+
+function readSpec(runDir) {
+  const p = path.join(runDir, '.protocol', 'spec.json');
+  try {
+    return JSON.parse(fs.readFileSync(p, 'utf8'));
+  } catch {
+    fail(`no readable spec at ${p}. Run \`gate-check init\` and compile a spec first.`);
+  }
+}
+
+/** Project slug: from spec.slug, else spec.project, else the directory name. */
+function slugFor(runDir, spec) {
+  const raw = spec.slug || spec.project || spec.name || path.basename(runDir);
+  const slug = String(raw)
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 100);
+  if (!slug) fail(`could not derive a usable project slug from ${JSON.stringify(raw)}`);
+  return slug;
+}
+
+async function libs() {
+  const base = path.join(PACK_ROOT, 'lib', 'cloud');
+  const url = (f) => require('url').pathToFileURL(path.join(base, f)).href;
+  return {
+    guards: await import(url('guards.mjs')),
+    supa: await import(url('supabase-api.mjs')),
+    vercel: await import(url('vercel-api.mjs')),
+    manifest: await import(url('manifest.mjs')),
+  };
+}
+
+async function cmdPlan(runDir) {
+  const { guards, manifest, supa } = await libs();
+  guards.assertSafeRunDir(runDir);
+  const spec = readSpec(runDir);
+  const slug = slugFor(runDir, spec);
+  const existing = manifest.readManifest(runDir);
+  const pending = manifest.pendingIntent(runDir);
+
+  const schema = path.join(runDir, 'supabase', 'schema.sql');
+  const lines = [
+    `run directory   ${runDir}`,
+    `project slug    ${slug}`,
+    `region          ${spec.region || supa.DEFAULT_REGION}`,
+    `schema          ${fs.existsSync(schema) ? schema : '(none — database will be empty)'}`,
+    '',
+    'would do:',
+    existing?.supabase?.ref
+      ? `  · Supabase       already created (${existing.supabase.ref}) — skip`
+      : '  · Supabase       CREATE project, generate + store a 40-char password',
+    '  · schema         apply supabase/schema.sql if present',
+    '  · auth           disable_signup = true, then read back and assert',
+    '  · keys           fetch publishable + secret, write .env.local (mode 600)',
+    existing?.vercel?.name
+      ? `  · Vercel         already created (${existing.vercel.name}) — skip`
+      : `  · Vercel         CREATE project "${slug}", link, push env`,
+    '  · invariant      assert NO git repo is connected to the Vercel project',
+  ];
+  if (pending) {
+    lines.push('', `⚠ pending intent from a previous run: ${pending.step} (${pending.ts})`);
+    lines.push('  `apply` will reconcile this by name before creating anything new.');
+  }
+  process.stdout.write(lines.join('\n') + '\n');
+}
+
+async function cmdStatus(runDir) {
+  const { manifest } = await libs();
+  const m = manifest.readManifest(runDir);
+  if (!m) {
+    process.stdout.write('nothing provisioned yet\n');
+    return;
+  }
+  process.stdout.write(JSON.stringify(m, null, 2) + '\n');
+}
+
+async function cmdApply(runDir) {
+  const { guards, supa, vercel, manifest } = await libs();
+  guards.assertSafeRunDir(runDir);
+
+  const spec = readSpec(runDir);
+  const slug = slugFor(runDir, spec);
+  const region = spec.region || supa.DEFAULT_REGION;
+  const orgSlug = spec.supabaseOrg || process.env.FACTORY_SUPABASE_ORG;
+  if (!orgSlug) fail('no Supabase org. Set spec.supabaseOrg or FACTORY_SUPABASE_ORG.');
+
+  const client = supa.createClient({ token: supa.resolveToken() });
+  const vc = vercel.createVercel();
+  let m = manifest.readManifest(runDir) ?? {};
+
+  // ── Supabase project ──────────────────────────────────────────────────────
+  if (!m.supabase?.ref) {
+    // Reconcile a crash between "asked" and "recorded" — never create twice.
+    const pending = manifest.pendingIntent(runDir);
+    if (pending?.step === manifest.STEPS.CREATE_SUPABASE) {
+      const all = await client.listProjects();
+      const matches = all.filter((p) => p.name === pending.detail.name);
+      if (matches.length > 1) {
+        fail(
+          `resume found ${matches.length} Supabase projects named "${pending.detail.name}". ` +
+            `Refusing to guess which one is yours — resolve this by hand.`,
+          2,
+        );
+      }
+      if (matches.length === 1) {
+        process.stdout.write(`· recovered ${matches[0].ref} from a previous interrupted run\n`);
+        guards.recordOwned(matches[0].ref, { project: slug });
+        m = manifest.writeManifest(runDir, { slug, supabase: { ref: matches[0].ref, region } }, { clearIntent: true });
+      }
+    }
+  }
+
+  if (!m.supabase?.ref) {
+    const pwFile = path.join(runDir, '.protocol', 'db-password');
+    const dbPass = manifest.generateDbPassword();
+    manifest.writeSecretFile(pwFile, dbPass); // mode 600, BEFORE the call
+    manifest.recordIntent(runDir, manifest.STEPS.CREATE_SUPABASE, { name: slug });
+
+    process.stdout.write(`· creating Supabase project "${slug}" in ${region}…\n`);
+    const project = await client.createProject({
+      name: slug,
+      orgSlug,
+      dbPass,
+      region,
+      acknowledgeNonEU: spec.regionAcknowledgeNonEU === true,
+    });
+    m = manifest.writeManifest(
+      runDir,
+      { slug, supabase: { ref: project.ref, region, passwordFile: pwFile } },
+      { clearIntent: true },
+    );
+    process.stdout.write(`  ref ${project.ref}\n`);
+  }
+
+  const ref = m.supabase.ref;
+
+  // ── wait for the database to actually answer ──────────────────────────────
+  // A project returns COMING_UP for a minute or two after creation, and any
+  // query against it dies with an unhelpful 500. Provisioning is not done when
+  // the create call returns.
+  if (!m.healthyAt) {
+    process.stdout.write('· waiting for the database to come up…');
+    await client.waitUntilHealthy(ref, { onTick: () => process.stdout.write('.') });
+    process.stdout.write(' ready\n');
+    m = manifest.writeManifest(runDir, { healthyAt: new Date().toISOString() });
+  }
+
+  // ── schema ────────────────────────────────────────────────────────────────
+  const schemaFile = path.join(runDir, 'supabase', 'schema.sql');
+  if (fs.existsSync(schemaFile) && !m.schemaAppliedAt) {
+    process.stdout.write('· applying schema…\n');
+    await client.runSql(ref, fs.readFileSync(schemaFile, 'utf8'));
+    m = manifest.writeManifest(runDir, { schemaAppliedAt: new Date().toISOString() });
+  }
+
+  // ── close public signup ───────────────────────────────────────────────────
+  if (!m.signupClosedAt) {
+    process.stdout.write('· disabling public signup…\n');
+    await client.setAuthConfig(ref, { disable_signup: true }); // patches, reads back, asserts
+    m = manifest.writeManifest(runDir, { signupClosedAt: new Date().toISOString() });
+  }
+
+  // ── keys → .env.local ─────────────────────────────────────────────────────
+  const envFile = path.join(runDir, '.env.local');
+  if (!fs.existsSync(envFile)) {
+    process.stdout.write('· writing .env.local (mode 600)…\n');
+    const keys = await client.getApiKeys(ref);
+    const byName = (n) => keys.find((k) => k.name === n || k.type === n)?.api_key;
+    const body =
+      `NEXT_PUBLIC_SUPABASE_URL=https://${ref}.supabase.co\n` +
+      `NEXT_PUBLIC_SUPABASE_ANON_KEY=${byName('anon') || byName('publishable') || ''}\n` +
+      `SUPABASE_SECRET_KEY=${byName('service_role') || byName('secret') || ''}\n`;
+    manifest.writeSecretFile(envFile, body);
+  }
+
+  // ── Vercel ────────────────────────────────────────────────────────────────
+  if (!m.vercel?.name) {
+    process.stdout.write(`· creating Vercel project "${slug}"…\n`);
+    manifest.recordIntent(runDir, manifest.STEPS.CREATE_VERCEL, { name: slug });
+    const r = vc.createProject(slug);
+    vc.link(runDir, slug);
+    m = manifest.writeManifest(
+      runDir,
+      { vercel: { name: slug, alreadyExisted: r.alreadyExisted } },
+      { clearIntent: true },
+    );
+  }
+
+  // Standing invariant — checked every run, not once at setup.
+  vc.assertNoGitConnection(slug);
+
+  process.stdout.write(
+    `\n✅ provisioned\n` +
+      `   supabase   ${ref} (${region})\n` +
+      `   vercel     ${slug}\n` +
+      `   env        ${envFile}\n` +
+      `   password   ${m.supabase.passwordFile || '(recovered run — see manifest)'}\n` +
+      `   signup     closed\n` +
+      `   git→vercel not connected (deploy-guard remains the only deploy path)\n`,
+  );
+}
+
+/**
+ * Destroy everything this run created. Deliberately awkward: two flags, and
+ * --project must match the manifest's own slug. The guards make it impossible
+ * to reach a project the factory did not create; this makes it hard to reach
+ * the WRONG factory project by fat-finger.
+ */
+async function cmdTeardown(runDir, argv) {
+  const { supa, vercel, manifest } = await libs();
+  const m = manifest.readManifest(runDir);
+  if (!m) fail('nothing to tear down — no provision manifest here');
+
+  const confirmed = argv.includes('--yes');
+  const named = argv[argv.indexOf('--project') + 1];
+  if (!confirmed || argv.indexOf('--project') === -1) {
+    fail(
+      `teardown is deliberate: rerun with --yes --project ${m.slug}\n` +
+        `  this DESTROYS Supabase ${m.supabase?.ref || '(none)'} and Vercel ${m.vercel?.name || '(none)'}`,
+      2,
+    );
+  }
+  if (named !== m.slug) {
+    fail(`--project "${named}" does not match this run's project "${m.slug}" — refusing`, 2);
+  }
+
+  if (m.supabase?.ref && !m.supabaseDeletedAt) {
+    process.stdout.write(`· deleting Supabase ${m.supabase.ref}…\n`);
+    try {
+      // assertOwned inside the client is what makes this safe.
+      await supa.createClient({ token: supa.resolveToken() }).deleteProject(m.supabase.ref);
+    } catch (e) {
+      // Already gone is success — teardown must be re-runnable after a
+      // partial failure, which is exactly how the first live run ended.
+      // Supabase reports an already-deleted project as 400 "Resource has been
+      // removed", not 404 — matching only on 404 leaves teardown unable to finish.
+      if (!/404|not found|has been removed/i.test(e.message)) throw e;
+      process.stdout.write('  (already gone)\n');
+    }
+    manifest.writeManifest(runDir, { supabaseDeletedAt: new Date().toISOString() });
+  }
+  if (m.vercel?.name) {
+    process.stdout.write(`· deleting Vercel ${m.vercel.name}…\n`);
+    vercel.createVercel().removeProject(m.vercel.name);
+  }
+  manifest.writeManifest(runDir, { tornDownAt: new Date().toISOString() });
+  process.stdout.write('✅ torn down\n');
+}
+
+async function main() {
+  const [cmd, dirArg] = process.argv.slice(2);
+  if (!cmd || ['-h', '--help', 'help'].includes(cmd)) {
+    process.stdout.write(
+      'usage: provision <plan|apply|status> <runDir>\n\n' +
+        '  plan    show what would happen — no side effects\n' +
+        '  apply   create the backend — resumable, never destructive\n' +
+        '  status  print the provision manifest\n' +
+        '  teardown --yes --project <slug>   DESTROY what this run created\n',
+    );
+    process.exit(0);
+  }
+  if (!dirArg) fail(`\`provision ${cmd}\` needs a run directory`);
+  const runDir = path.resolve(dirArg);
+  if (!fs.existsSync(runDir)) fail(`no such directory: ${runDir}`);
+
+  try {
+    if (cmd === 'plan') return await cmdPlan(runDir);
+    if (cmd === 'apply') return await cmdApply(runDir);
+    if (cmd === 'status') return await cmdStatus(runDir);
+    if (cmd === 'teardown') return await cmdTeardown(runDir, process.argv.slice(2));
+    fail(`unknown command "${cmd}"`);
+  } catch (e) {
+    // A GuardViolation is a refusal, not a crash — distinct exit code.
+    fail(e.message, e.exitCode || 1);
+  }
+}
+
+main();

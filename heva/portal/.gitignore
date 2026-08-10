@@ -1,0 +1,9 @@
+.env
+.env.local
+.env*.local
+node_modules/
+.next/
+
+# Supabase CLI scratch state — machine-local, and `linked-project.json` is how
+# a stray `--linked` write ends up on the wrong database. See supabase-account-map.
+supabase/.temp/

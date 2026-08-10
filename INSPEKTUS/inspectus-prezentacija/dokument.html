@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<title>INSPECTUS · Pametni filter — dokument</title>
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<style>
+:root {
+  --ink:#333333; --navy:#425060; --navy-deep:#2a3340;
+  --bg-soft:#fafafa; --border:#dddddd; --muted:#9aa3ad;
+  --accent:#b09575; --accent-soft:#f3ece3;
+  --success:#3a7d00; --danger:#a01f0a;
+}
+* { box-sizing:border-box; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+@page { size: A4; margin: 20mm 18mm 24mm; }
+html, body { margin:0; padding:0; }
+body { font-family:'Open Sans', system-ui, sans-serif; color:var(--ink); font-size:10.5pt; line-height:1.55; }
+
+.docfoot { position:fixed; bottom:-14mm; left:0; right:0; font-size:8pt; color:var(--muted); border-top:1px solid var(--border); padding-top:2mm; display:flex; justify-content:space-between; }
+
+/* title block */
+.titleblock { margin:10mm 0 12mm; }
+.titleblock img { height:11mm; margin-bottom:10mm; }
+.eyebrow { font-size:9pt; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin:0 0 3mm; }
+h1 { font-size:24pt; font-weight:800; color:var(--navy-deep); line-height:1.18; margin:0 0 4mm; }
+.subtitle { font-size:12.5pt; color:var(--navy); margin:0 0 6mm; }
+.meta { font-size:9pt; color:var(--muted); }
+
+/* sections */
+h2 { font-size:15pt; font-weight:800; color:var(--navy-deep); margin:9mm 0 3mm; break-after:avoid; }
+h2 .no { color:var(--accent); margin-right:2mm; }
+h3 { font-size:11pt; font-weight:700; color:var(--navy-deep); margin:5mm 0 1.5mm; break-after:avoid; }
+p { margin:0 0 3mm; }
+ul { margin:0 0 3mm 5mm; padding:0; }
+li { margin-bottom:1.2mm; }
+.section { break-inside:auto; }
+.pagebreak { break-before:page; }
+
+/* components */
+.box { background:var(--bg-soft); border:1px solid var(--border); border-radius:8px; padding:4mm 5mm; margin:3mm 0 4mm; break-inside:avoid; }
+.callout { border-left:3px solid var(--accent); background:var(--accent-soft); color:#6b543a; font-weight:600; padding:3mm 5mm; border-radius:0 6px 6px 0; margin:3mm 0 4mm; break-inside:avoid; }
+.warn { border-left:3px solid var(--danger); background:#fdf0ee; color:var(--danger); padding:3mm 5mm; border-radius:0 6px 6px 0; margin:3mm 0 4mm; break-inside:avoid; }
+.kicker { font-size:12.5pt; font-weight:700; color:var(--accent); margin:4mm 0; }
+table { width:100%; border-collapse:collapse; margin:3mm 0 4mm; break-inside:avoid; }
+th { font-size:8.5pt; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); text-align:left; border-bottom:1.5px solid var(--navy); padding:2mm 3mm; }
+td { font-size:10.5pt; border-bottom:1px solid var(--border); padding:2.2mm 3mm; }
+td b { color:var(--navy-deep); }
+.num { font-weight:800; color:var(--navy-deep); }
+.stage { display:flex; gap:4mm; margin-bottom:3.5mm; break-inside:avoid; }
+.stage .n { flex:0 0 8mm; height:8mm; border-radius:50%; background:var(--navy); color:#fff; font-weight:800; font-size:11pt; display:flex; align-items:center; justify-content:center; margin-top:.5mm; }
+.stage .t b { color:var(--navy-deep); }
+.small { font-size:9pt; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ============ NASLOVNICA / UVOD ============ -->
+<div class="titleblock">
+  <img src="assets/logo-inspectus.png" alt="INSPECTUS">
+  <p class="eyebrow">Predlog za INSPECTUS d.o.o. · Luka Koper · julij 2026</p>
+  <h1>Pametni filter — avtomatizacija razvrščanja fotografij in prenova sistema Ares</h1>
+  <p class="subtitle">Celovita razlaga avtomatizacije: kako danes poteka delo, kaj se spremeni in kako deluje pametni filter, ki 6.000 fotografij samodejno razvrsti k pravim vozilom.</p>
+  <p class="meta">Pripravil: AIS Slovenija · Dokument spremlja predstavitev z diagrami poteka (PDF / Miro) · Zaupno — za interno rabo INSPECTUS</p>
+</div>
+
+<h2>Povzetek</h2>
+<p>Ob vsakem razkladanju ladje v pristanišču inšpektorji INSPECTUS pregledajo približno 200 vozil in pri tem posnamejo okoli 6.000 fotografij — najprej fotografijo VIN tablice, nato fotografije vseh poškodb, nastalih med prevozom. Te fotografije danes potujejo skozi pet ročnih korakov: iz fotoaparata v skupno mapo, iz mape skozi ročno pregledovanje v pisarni, nato skozi ročni vnos VIN številk in pripenjanje fotografij v sistem Ares. Postopek zahteva dve osebi na dveh lokacijah in približno deset ur ročnega dela na ladjo — pri čemer vsaka ročna prepisovalna napaka pomeni fotografije pri napačnem vozilu.</p>
+<p>Predlagamo prenovo: <b>nova spletna aplikacija</b> (naslednik sistema Ares, ki ga ekipa pozna) z vgrajenim <b>pametnim filtrom</b>. Inšpektor fotografira neposredno v aplikaciji na telefonu — brez računalnika, brez map, brez ročnega vnosa. Pametni filter vsako fotografijo sproti prepozna, prebere VIN, jo poveže s pravim vozilom in samodejno ustvari zapis vozila, pripravljen za poročila (VLDR, Constat).</p>
+<p>Rezultat: <b>pet korakov postane en sam</b>. Inšpektor začne in konča celoten postopek na terenu; pisarniško razvrščanje odpade. Konzervativno ocenjeno to pomeni približno <b>90 % manj ročnega dela na ladjo</b>, predvsem pa bistveno manjše tveganje zamenjave vozil. Jedro rešitve ni ideja na papirju — avtomatizacija VLDR je že v produkciji (preizkušena na resničnem poročilu s 314 vozili), AI-bralnik VIN pa je v testu prebral 9 od 9 VIN številk pravilno.</p>
+
+<!-- ============ DANES ============ -->
+<h2 class="pagebreak"><span class="no">1</span>Današnji postopek — pet korakov, dve osebi, deset ur</h2>
+
+<h3>Korak 1 · Fotografiranje v pristanišču</h3>
+<p>Ladja pripluje v Luko Koper. Inšpektor pristopi k vsakemu vozilu, najprej fotografira VIN tablico (prva fotografija vsakega vozila), nato obhodi vozilo in fotografira vsako poškodbo. Postopek ponovi pri približno 200 vozilih — skupaj nastane okoli 6.000 fotografij na ladjo. <b>Ta korak je strokovno jedro vašega dela in ostane tudi v novem sistemu</b> — inšpektor svoje delo opravi popolnoma enako. Vse, kar sledi, pa je danes ročno.</p>
+
+<h3>Korak 2 · Vse fotografije v eno mapo</h3>
+<p>Po koncu pregleda se fotografije prenesejo s fotoaparata v skupno mapo. V njej se znajde vseh 6.000 fotografij skupaj — brez vrstnega reda, brez oznak, z imeni datotek IMG_0001 do IMG_6000. Nobena fotografija ne "ve", kateremu vozilu pripada; edina identiteta fotografije je zaporedna številka datoteke.</p>
+
+<h3>Korak 3 · Iskanje po mapi v pisarni</h3>
+<p>V pisarni druga oseba odpre mapo in pregleduje fotografije eno za drugo ter išče fotografije VIN tablic — vsaka najdena VIN tablica pomeni začetek novega vozila. To je dobesedno iskanje igle v kupu sena, 6.000-krat na ladjo. V proces je vključena druga oseba, delo se preseli s terena za računalnik, in vsaka napaka, ki nastane tu, se prenese v vse nadaljnje korake.</p>
+
+<h3>Korak 4 · Ročno razvrščanje — vozilo za vozilom</h3>
+<p>Za vsako vozilo posebej: najdi fotografijo VIN, ročno preberi 17 znakov, vtipkaj VIN v Ares, poišči pripadajoče fotografije poškodb in jih pripni k vozilu. In tako 200-krat, eno vozilo za drugim. Pri približno 3 minutah na vozilo (konzervativna ocena) to znese <b>okoli 10 ur ročnega dela na ladjo</b>. Delo je monotono — in ravno monotonija je največji vir napak.</p>
+<div class="warn"><b>1 zatipkan znak = fotografije pri napačnem vozilu.</b> Ročno prepisovanje 17-mestnih VIN številk je najbolj ranljiva točka celotnega postopka: zamenjava vozila pomeni sporno poročilo za naročnika.</div>
+
+<h3>Korak 5 · Končni izdelek</h3>
+<p>Rezultat je zapis vozila v Aresu (VIN + fotografije poškodb), iz katerega nastanejo poročila (VLDR, Constat) za naročnike — ladjarje, zavarovalnice in proizvajalce. Rezultat je pravi in ga naročniki potrebujejo. Problem ni izdelek, temveč pot do njega.</p>
+<div class="box">
+  <b>Bilanca današnjega postopka (na eno ladjo):</b>
+  <ul>
+    <li><span class="num">5</span> korakov</li>
+    <li><span class="num">2</span> osebi</li>
+    <li><span class="num">2</span> lokaciji — terminal in pisarna</li>
+    <li><span class="num">10+</span> ur ročnega dela</li>
+    <li>tveganje zamenjave vozila pri vsakem ročnem vnosu</li>
+  </ul>
+</div>
+<p class="kicker">Rezultat je pravi. Pot do njega je draga.</p>
+
+<!-- ============ JUTRI ============ -->
+<h2><span class="no">2</span>Nova rešitev — pet korakov postane en sam</h2>
+<p>Nova aplikacija je spletna aplikacija, ki jo inšpektor doda na začetni zaslon telefona (PWA — deluje kot običajna aplikacija, brez namestitve iz trgovine). Celoten postopek se zgodi na terenu, v enem koraku:</p>
+<div class="stage"><div class="n">1</div><div class="t"><b>Inšpektor fotografira v aplikaciji</b> — VIN, nato poškodbe, popolnoma enako kot doslej. Nič se ne spremeni v načinu dela na terenu; aplikacija ob začetku novega vozila ponudi gumb »Novo vozilo — fotografiraj VIN«, zato je vsaka fotografija že ob nastanku pripisana pravemu vozilu.</div></div>
+<div class="stage"><div class="n">2</div><div class="t"><b>Pametni filter razvrsti vsako fotografijo sproti</b> — umetna inteligenca prepozna VIN in poveže fotografije poškodb s pravim vozilom, medtem ko inšpektor že nadaljuje z naslednjim vozilom.</div></div>
+<div class="stage"><div class="n">3</div><div class="t"><b>Zapis vozila nastane samodejno</b> — VIN, fotografije in podatki so takoj pripravljeni za poročila (VLDR, Constat), brez kakršnegakoli dela v pisarni.</div></div>
+<p>Kaj vse odpade:</p>
+<ul>
+  <li>prenos fotografij v skupno mapo,</li>
+  <li>iskanje po mapi v pisarni,</li>
+  <li>ročno branje in vnos 17-mestnih VIN številk,</li>
+  <li>ročno pripenjanje fotografij k vozilom.</li>
+</ul>
+<p class="kicker">Inšpektor začne. Inšpektor konča.</p>
+<p class="small">Prehodno obdobje: podprt ostane tudi današnji način dela — celotno mapo fotografij je mogoče naložiti naenkrat, pametni filter pa jo razvrsti za nazaj. Prehod na novi način zato ne zahteva spremembe čez noč.</p>
+
+<!-- ============ FILTER ============ -->
+<h2 class="pagebreak"><span class="no">3</span>Kako deluje pametni filter — sedem stopenj</h2>
+<p>Pametni filter je jedro avtomatizacije: sistem, ki prejme približno 200 VIN številk in 6.000 pomešanih fotografij ter vsako fotografijo razvrsti k pravemu vozilu. Deluje v sedmih stopnjah:</p>
+
+<div class="stage"><div class="n">1</div><div class="t"><b>Zajem.</b> Vsaka fotografija vstopi v sistem s časom nastanka in vrstnim redom. Pri fotografiranju v aplikaciji je vrstni red zanesljiv sam po sebi; pri naknadnem nalaganju cele mape se fotografije uredijo po času posnetka.</div></div>
+<div class="stage"><div class="n">2</div><div class="t"><b>Prepoznava vrste fotografije.</b> Filter za vsako fotografijo ugotovi, ali prikazuje VIN tablico ali poškodbo. Fotografije VIN tablic so sidra, okoli katerih se gradi razvrščanje.</div></div>
+<div class="stage"><div class="n">3</div><div class="t"><b>Branje VIN.</b> Umetna inteligenca z računalniškim vidom prebere 17-mestno VIN številko s fotografije. Vsak prebran VIN gre skozi dvojno kontrolo: mora imeti točno 17 znakov in vsebovati samo znake, ki so v VIN številkah dovoljeni. Kar ne prestane kontrole, se ne ugiba — gre v ročni pregled.</div></div>
+<div class="stage"><div class="n">4</div><div class="t"><b>Združevanje po vozilih.</b> Fotografija VIN odpre novo vozilo; vse fotografije poškodb, ki sledijo, pripadajo temu vozilu — natanko tako, kot inšpektor fizično dela na terenu. Če VIN s fotografije ni berljiv, se prejšnje vozilo vseeno zapre in sporne fotografije gredo v ročni pregled — filter nikoli tiho ne združi dveh vozil. Če na isti ladji delata dva inšpektorja, njuna tokova ostaneta strogo ločena in se ne mešata.</div></div>
+<div class="stage"><div class="n">5</div><div class="t"><b>Preverjanje s seznamom ladje.</b> Seznam razkladanja pove, katerih ~200 vozil je dejansko na ladji. Vsak prebran VIN se primerja s tem seznamom: popolno ujemanje se potrdi samodejno; drobna napaka pri branju (npr. zamenjava 8 in B) se samodejno popravi in vidno označi. Sistem hkrati opozori v obe smeri: če se pojavi VIN, ki ga ni na seznamu ladje, in če je na seznamu vozilo, ki nima nobene fotografije — torej vozilo, ki še ni bilo pregledano.</div></div>
+<div class="stage"><div class="n">6</div><div class="t"><b>Ocena zanesljivosti.</b> Kar je zanesljivo, se razvrsti samodejno. Vse negotovo — zamegljen VIN, VIN izven seznama, nejasno zaporedje — pristane v predalu <b>»Nerazvrščeno«</b>, kjer oseba fotografijo z enim potegom pripne pravemu vozilu. Nič se ne izgubi in nič se ne razvrsti »na slepo«.</div></div>
+<div class="stage"><div class="n">7</div><div class="t"><b>Zapis vozila.</b> Za vsako vozilo nastane zapis: VIN, fotografije (ločeno VIN tablica in poškodbe), časi, inšpektor in revizijska sled — iz česa je sistem sklepal in kaj je bilo morda samodejno popravljeno. Zapis je takoj pripravljen za poročila VLDR in Constat.</div></div>
+
+<div class="callout">Filter nikoli ne ugiba. Vsaka fotografija je bodisi zanesljivo razvrščena z dvojno kontrolo (oblika VIN + seznam ladje) bodisi predana v ročni pregled.</div>
+<div class="box"><b>Jedro filtra že deluje.</b> AI-bralnik VIN je bil preizkušen na resničnih fotografijah vozil in je VIN pravilno prebral v 9 od 9 primerov. Avtomatizacija VLDR, na katero se novi sistem naveže, je v produkciji in preizkušena na resničnem poročilu s 314 vozili.</div>
+
+<!-- ============ ZANESLJIVOST ============ -->
+<h2><span class="no">4</span>Zanesljivost, nadzor in varnost podatkov</h2>
+<ul>
+  <li><b>Človek ima zadnjo besedo.</b> Vse, česar filter ne potrdi z gotovostjo, pregleda oseba v predalu »Nerazvrščeno«. Pričakovano gre za majhen delež fotografij — pregled opozoril traja pol ure do uro na ladjo.</li>
+  <li><b>Revizijska sled.</b> Za vsako fotografijo je zabeleženo, zakaj je bila pripisana določenemu vozilu. Kot neodvisna kontrolna organizacija lahko naročniku vedno pokažete, kako je zapis nastal.</li>
+  <li><b>Opozorila namesto tihih napak.</b> Neskladja (VIN izven seznama, nepregledana vozila, podvojeni VIN) sistem izpostavi — ne skrije.</li>
+  <li><b>Vaši podatki ostanejo vaši.</b> Fotografije in zapisi živijo v vašem sistemu; umetna inteligenca se uporablja za branje in razvrščanje, ne za shranjevanje vaših podatkov pri tretjih osebah.</li>
+</ul>
+
+<!-- ============ PRIHRANEK ============ -->
+<h2><span class="no">5</span>Prihranek — kaj avtomatizacija pomeni v urah</h2>
+<div class="box">
+  <b>Predpostavke</b> — preverite in zamenjamo z vašimi podatki:
+  <ul>
+    <li>200 vozil na ladjo · ~30 fotografij na vozilo (≈ 6.000)</li>
+    <li>3 min ročnega razvrščanja in vnosa na vozilo</li>
+    <li>15–25 € polna cena pisarniške ure</li>
+    <li>N ladij na mesec — vstavimo vašo številko</li>
+  </ul>
+  <span class="small">Ocena je namerno konzervativna.</span>
+</div>
+<p><b>Danes:</b> 200 vozil × 3 min = 10 ur razvrščanja in vnosa + približno 1 ura prenosa in urejanja ≈ <b>11 ur na ladjo</b>.<br>
+<b>Jutri:</b> 0,5–1 h — samo pregled opozoril v predalu »Nerazvrščeno«.<br>
+<b>Razlika: približno 10 ur na ladjo oziroma − 90 % ročnega dela.</b></p>
+<table>
+  <tr><th>Ladij na mesec</th><th>Prihranjene ure na mesec</th><th>Vrednost prihranka na mesec</th></tr>
+  <tr><td><b>2</b></td><td>20 ur</td><td>300–500 €</td></tr>
+  <tr><td><b>4</b></td><td>40 ur</td><td>600–1.000 €</td></tr>
+  <tr><td><b>6</b></td><td>60 ur</td><td>900–1.500 €</td></tr>
+  <tr><td><b>8</b></td><td>80 ur</td><td>1.200–2.000 €</td></tr>
+</table>
+<p>Poleg ur je tu še težje merljiv, a pomembnejši učinek: <b>vsaka zamenjava vozila pomeni sporno poročilo za naročnika</b>. Dvojna kontrola — oblika VIN in seznam ladje — to tveganje praktično odpravi.</p>
+
+<!-- ============ KAJ SLEDI ============ -->
+<h2><span class="no">6</span>Uvedba — kaj sledi</h2>
+<div class="stage"><div class="n">1</div><div class="t"><b>Potrditev obsega.</b> Skupaj določimo funkcionalnosti in prioritete — kaj mora novi sistem znati prvi dan in kaj pride kasneje.</div></div>
+<div class="stage"><div class="n">2</div><div class="t"><b>Pilot na eni resnični ladji.</b> Vaše fotografije, vaš seznam razkladanja — izmerimo dejanski rezultat filtra na resničnem primeru, preden se karkoli spremeni v vašem delu.</div></div>
+<div class="stage"><div class="n">3</div><div class="t"><b>Razvoj aplikacije.</b> Aplikacija + pametni filter, razvita sproti in usklajena z vami.</div></div>
+<div class="stage"><div class="n">4</div><div class="t"><b>Uvedba ob boku Aresa.</b> Novi sistem teče vzporedno z obstoječim; prehod je postopen in brez tveganja za tekoče delo.</div></div>
+<div class="box">Gradimo na temeljih, ki <b>že delujejo</b>: avtomatizacija VLDR (preizkušena na 314 vozilih) in AI-bralnik VIN sta v produkciji.</div>
+<p style="margin-top:8mm"><b>AIS Slovenija · Operater AI sistemov</b><br><span class="small">ais-slovenia.si · Poganja Claude</span></p>
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+<style>
+  #page-2 .chart { height: 88mm; margin-top: 14mm; }
+  #page-2 .chart .node {
+    width: 43mm; height: 24mm;
+    display: flex; flex-direction: column; justify-content: center;
+    text-align: center; font-size: 10pt; padding: 2.5mm 3.5mm;
+  }
+  #page-2 .chart .node .sub { font-size: 8pt; }
+  #page-2 .xloop { text-align: center; }
+  #page-2 .stepnote {
+    font-size: 9pt; color: var(--muted); margin-top: 6mm;
+    border-top: 1px solid var(--border); padding-top: 3mm;
+  }
+</style>
+
+<div class="chart">
+  <svg class="wire" viewBox="0 0 265 88" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowP2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#425060"/>
+      </marker>
+      <marker id="arrowP2g" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#b09575"/>
+      </marker>
+    </defs>
+    <!-- horizontal chain, node mid-line y = 26 -->
+    <line x1="43"    y1="26" x2="54.6"  y2="26" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP2)"/>
+    <line x1="98.5"  y1="26" x2="110.1" y2="26" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP2)"/>
+    <line x1="154"   y1="26" x2="165.6" y2="26" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP2)"/>
+    <line x1="209.5" y1="26" x2="221.1" y2="26" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP2)"/>
+    <!-- loop back: node 5 bottom -> node 2 bottom -->
+    <path d="M 243.5 38 L 243.5 62 L 77 62 L 77 38.9"
+          fill="none" stroke="#b09575" stroke-width="0.6" marker-end="url(#arrowP2g)"/>
+  </svg>
+
+  <div class="node" style="left:0mm; top:14mm;">Ladja pripluje v Luko Koper</div>
+  <div class="node" style="left:55.5mm; top:14mm;">Inšpektor pristopi k vozilu</div>
+  <div class="node node--vin" style="left:111mm; top:14mm;">Fotografija VIN tablice<span class="sub">prva fotografija vsakega vozila</span></div>
+  <div class="node" style="left:166.5mm; top:14mm;">Obhod vozila — fotografija vsake poškodbe</div>
+  <div class="node" style="left:222mm; top:14mm;">Naslednje vozilo</div>
+
+  <div class="xloop" style="left:139mm; top:65mm; width:44mm;">× 200<small>vozil na ladjo</small></div>
+</div>
+
+<div class="statband">
+  <div class="stat"><b>~200</b><span>vozil na eni ladji</span></div>
+  <div class="stat"><b>~30</b><span>fotografij na vozilo</span></div>
+  <div class="stat"><b>≈ 6.000</b><span>fotografij na ladjo</span></div>
+</div>
+
+<p class="stepnote">Ta korak ostane tudi v novem sistemu — inšpektor svoje delo opravi enako. Vse, kar sledi, je danes ročno.</p>

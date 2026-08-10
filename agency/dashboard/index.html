@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIS — Agency</title>
+<style>
+:root{
+  --bg:#f5f5f7; --card:#ffffff; --line:#e8e8ed; --line-soft:#f0f0f3;
+  --ink:#1d1d1f; --ink-2:#6e6e73; --ink-3:#a1a1a6;
+  --blue:#0071e3; --green:#34c759; --red:#ff3b30; --orange:#ff9500;
+  --r:16px; --shadow:0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font:15px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased; display:flex; min-height:100vh;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+/* sidebar */
+aside{
+  width:264px; flex:0 0 264px; background:#fbfbfd; border-right:1px solid var(--line);
+  padding:24px 16px; position:sticky; top:0; height:100vh; overflow-y:auto;
+}
+.brand{display:flex;align-items:center;gap:9px;padding:0 8px 22px;font-size:17px;font-weight:600;letter-spacing:-.02em}
+.brand i{width:9px;height:9px;border-radius:50%;background:var(--blue);display:block}
+.group{margin-bottom:22px}
+.group h4{
+  font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink-3); padding:0 8px 8px;
+}
+.nav{display:block;padding:7px 8px;border-radius:9px;color:var(--ink-2);font-size:14px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav:hover{background:#f0f0f3;color:var(--ink)}
+.nav.on{background:#e8f1fd;color:var(--blue);font-weight:500}
+.nav .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:8px;vertical-align:1px}
+.newbtn{width:100%;margin-top:6px;padding:7px 8px;border-radius:9px;color:var(--blue);font-size:14px;text-align:left}
+.newbtn:hover{background:#e8f1fd}
+aside footer{padding:16px 8px 0;border-top:1px solid var(--line);font-size:12px;color:var(--ink-3)}
+
+/* main */
+main{flex:1;min-width:0;padding:34px 40px 80px;max-width:1180px}
+.crumbs{font-size:13px;color:var(--ink-3);margin-bottom:10px}
+h1{font-size:30px;font-weight:600;letter-spacing:-.025em;margin-bottom:6px}
+.sub{color:var(--ink-2);font-size:15px;margin-bottom:26px}
+
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.tab{padding:9px 14px;font-size:14px;color:var(--ink-2);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab:hover{color:var(--ink)}
+.tab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:500}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow)}
+.card + .card{margin-top:16px}
+.card h3{font-size:16px;font-weight:600;letter-spacing:-.01em;margin-bottom:14px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:900px){.g3,.g4,.g2{grid-template-columns:1fr}aside{display:none}main{padding:24px 20px}}
+
+.stat .n{font-size:30px;font-weight:600;letter-spacing:-.03em;line-height:1.1}
+.stat .l{font-size:13px;color:var(--ink-2);margin-top:4px}
+.stat .n.good{color:var(--green)} .stat .n.warn{color:var(--orange)} .stat .n.bad{color:var(--red)}
+
+dl.rows{display:grid;grid-template-columns:auto 1fr;gap:11px 22px;font-size:14px}
+dl.rows dt{color:var(--ink-2);white-space:nowrap}
+dl.rows dd{color:var(--ink)}
+
+.pill{display:inline-block;padding:3px 10px;border-radius:100px;font-size:12px;font-weight:500;background:#f0f0f3;color:var(--ink-2)}
+.pill.blue{background:#e8f1fd;color:var(--blue)}
+.pill.green{background:#e7f8ec;color:#1d8a3d}
+.pill.orange{background:#fff3e3;color:#b56a00}
+.pill.red{background:#ffecea;color:#c4291c}
+
+/* pipeline */
+.pipe{display:flex;gap:8px;flex-wrap:wrap}
+.step{flex:1;min-width:110px;padding:13px 12px;border-radius:12px;background:#f7f7f9;border:1px solid var(--line-soft);text-align:center}
+.step .k{font-size:13px;font-weight:500}
+.step .s{font-size:11px;color:var(--ink-3);margin-top:3px}
+.step.done{background:#e7f8ec;border-color:#cdeed8}
+.step.done .k{color:#1d8a3d}
+.step.now{background:#e8f1fd;border-color:#cfe3fb}
+.step.now .k{color:var(--blue);font-weight:600}
+
+/* files + lists */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:0 10px 9px}
+td{padding:10px;border-top:1px solid var(--line-soft)}
+tr:hover td{background:#fafafc}
+td a{color:var(--blue)}
+.mono{font-variant-numeric:tabular-nums}
+
+.empty{padding:40px 22px;text-align:center;color:var(--ink-2)}
+.empty p{margin-bottom:14px}
+.primary{background:var(--blue);color:#fff;padding:9px 18px;border-radius:10px;font-size:14px;font-weight:500}
+.primary:hover{background:#0062c4}
+.ghost{border:1px solid var(--line);padding:8px 16px;border-radius:10px;font-size:14px;background:#fff}
+.ghost:hover{background:#f7f7f9}
+
+.bar{height:6px;border-radius:100px;background:#f0f0f3;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--blue);border-radius:100px}
+.bar i.good{background:var(--green)}
+
+.note{font-size:13px;color:var(--ink-2);margin-top:12px;padding-top:12px;border-top:1px solid var(--line-soft)}
+
+dialog{border:none;border-radius:var(--r);padding:24px;width:min(440px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.18)}
+dialog::backdrop{background:rgba(0,0,0,.28)}
+dialog h3{margin-bottom:16px}
+label{display:block;font-size:13px;color:var(--ink-2);margin:12px 0 5px}
+input,select{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fff}
+input:focus,select:focus{outline:2px solid #cfe3fb;border-color:var(--blue)}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.err{color:var(--red);font-size:13px;margin-top:10px}
+</style>
+</head>
+<body>
+
+<aside>
+  <div class="brand"><i></i>AIS</div>
+
+  <div class="group">
+    <h4>Operations</h4>
+    <a class="nav" href="#today">Today</a>
+    <a class="nav" href="/owner" target="_blank">Owner board</a>
+  </div>
+
+  <div class="group">
+    <h4>Clients</h4>
+    <div id="clientNav"></div>
+    <button class="newbtn" id="newBtn">+ Add a client</button>
+  </div>
+
+  <div class="group">
+    <h4>Library</h4>
+    <div id="libNav"></div>
+  </div>
+
+  <footer id="foot">Loading…</footer>
+</aside>
+
+<main id="view"><div class="empty">Loading…</div></main>
+
+<dialog id="newDlg">
+  <h3>Add a client</h3>
+  <form method="dialog" id="newForm">
+    <label for="f-name">Client name</label>
+    <input id="f-name" required placeholder="Harvest Hub d.o.o.">
+    <label for="f-slug">Short name (used for the folder)</label>
+    <input id="f-slug" required pattern="[a-z0-9][a-z0-9-]*" placeholder="harvest-hub">
+    <label for="f-func">What work are we taking over?</label>
+    <input id="f-func" placeholder="Document intake and transfer into two systems">
+    <label for="f-owner">Who owns it here?</label>
+    <input id="f-owner" placeholder="Ian Veber">
+    <div class="err" id="f-err" hidden></div>
+    <div class="actions">
+      <button type="button" class="ghost" id="f-cancel">Not now</button>
+      <button type="submit" class="primary">Create</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const eur = n => (n === null || n === undefined || n === '') ? '—' : '€' + Number(n).toLocaleString('de-DE');
+const OWNER_KEY = 'ais-owner-os';
+
+let STATE = null;
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  const body = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(body.error || 'That did not work.');
+  return body;
+}
+
+// ── sidebar ──────────────────────────────────────────────────────────────────
+function phaseTone(phase) {
+  if (phase === 'operate') return 'var(--green)';
+  if (['onboarding','build','validation'].includes(phase)) return 'var(--blue)';
+  if (['discovery','scoping'].includes(phase)) return 'var(--orange)';
+  return 'var(--ink-3)';
+}
+
+function renderNav() {
+  const hash = location.hash || '#today';
+  $('#clientNav').innerHTML = STATE.clients.length
+    ? STATE.clients.map(c => `
+       <a class="nav ${hash === '#c/' + c.slug ? 'on' : ''}" href="#c/${esc(c.slug)}">
+         <span class="dot" style="background:${phaseTone(c.phase)}"></span>${esc(c.name)}
+       </a>`).join('')
+    : `<div style="padding:6px 8px;font-size:13px;color:var(--ink-3)">Nothing here yet</div>`;
+
+  $('#libNav').innerHTML = STATE.library.map(sec => `
+    <div style="margin-bottom:10px">
+      <div style="font-size:11px;color:var(--ink-3);padding:2px 8px 4px;text-transform:capitalize">${esc(sec.section)}</div>
+      ${sec.entries.map(e => `<a class="nav" href="/file?path=${encodeURIComponent(e.path)}" target="_blank">${esc(e.title)}</a>`).join('')}
+    </div>`).join('');
+
+  $('#foot').innerHTML =
+    `${STATE.counts.clients} client${STATE.counts.clients === 1 ? '' : 's'} · ${STATE.counts.running} running<br>${esc(STATE.today)}`;
+
+  document.querySelectorAll('aside .nav[href^="#"]').forEach(a => a.classList.toggle('on', a.getAttribute('href') === hash));
+}
+
+// ── today ────────────────────────────────────────────────────────────────────
+function readOwner() {
+  try { return JSON.parse(localStorage.getItem(OWNER_KEY) || '{}'); } catch { return {}; }
+}
+
+function todayView() {
+  const o = readOwner();
+  const missions = (o.mission && o.mission.date === STATE.today) ? o.mission : null;
+  const opens = (o.bottlenecks || []).filter(b => b.status !== 'cleared');
+  const nexts = STATE.clients.filter(c => c.next_action && c.next_action.what);
+
+  return `
+    <div class="crumbs">Operations</div>
+    <h1>Today</h1>
+    <p class="sub">${esc(new Date(STATE.today).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'}))}</p>
+
+    <div class="card">
+      <h3>What's in the way</h3>
+      ${missions ? `
+        <p style="font-size:17px;font-weight:500;margin-bottom:6px">${esc(missions.constraint)}</p>
+        <p style="color:var(--ink-2);font-size:14px">${esc(missions.why || '')}</p>
+        <div style="margin-top:16px">
+          ${(missions.tasks || []).map(t => `
+            <div style="display:flex;gap:9px;padding:7px 0;border-top:1px solid var(--line-soft)">
+              <span style="color:${t.done ? 'var(--green)' : 'var(--ink-3)'}">${t.done ? '✓' : '○'}</span>
+              <span style="${t.done ? 'color:var(--ink-3);text-decoration:line-through' : ''}">${esc(t.text)}</span>
+            </div>`).join('')}
+        </div>`
+      : `<p style="color:var(--ink-2)">Nothing set for today.
+           <a href="/owner" target="_blank" style="color:var(--blue)">Open the owner board</a> and name the one thing holding everything up.</p>`}
+    </div>
+
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card">
+        <h3>Next move, per client</h3>
+        ${nexts.length ? nexts.map(c => `
+          <div style="padding:10px 0;border-top:1px solid var(--line-soft)">
+            <a href="#c/${esc(c.slug)}" style="font-weight:500">${esc(c.name)}</a>
+            <div style="font-size:14px;color:var(--ink-2);margin-top:2px">${esc(c.next_action.what)}</div>
+            <div style="font-size:12px;color:var(--ink-3);margin-top:3px">
+              ${esc(c.next_action.owner || 'No owner yet')}${c.next_action.due ? ' · due ' + esc(c.next_action.due) : ''}
+            </div>
+          </div>`).join('')
+        : `<p style="color:var(--ink-2)">No next moves recorded.</p>`}
+      </div>
+
+      <div class="card">
+        <h3>Things that are stuck</h3>
+        ${opens.length ? opens.map(b => `
+          <div style="padding:10px 0;border-top:1px solid var(--line-soft)">
+            <div>${esc(b.text)}</div>
+            <div style="margin-top:5px">
+              <span class="pill ${b.severity === 'high' ? 'red' : b.severity === 'medium' ? 'orange' : ''}">${esc(b.category)}</span>
+            </div>
+          </div>`).join('')
+        : `<p style="color:var(--ink-2)">Nothing logged as stuck. Add one from the owner board with <b>B</b>.</p>`}
+      </div>
+    </div>
+
+    <p class="note">This page only reads. Change anything here from the owner board or the client's files.</p>`;
+}
+
+// ── client ───────────────────────────────────────────────────────────────────
+function overviewTab(d) {
+  const m = d.meta, e = m.economics || {};
+  const margin = (e.retainer && e.run_cost !== null && e.run_cost !== undefined && e.retainer > 0)
+    ? Math.round((e.retainer - e.run_cost) / e.retainer * 100) : null;
+  const syn = d.synthetic;
+
+  return `
+    <div class="grid g4">
+      <div class="card stat"><div class="n">${esc(d.phase_label || '—')}</div><div class="l">Stage</div></div>
+      <div class="card stat"><div class="n mono">${eur(e.build_fee)}</div><div class="l">One-off fee</div></div>
+      <div class="card stat"><div class="n mono">${e.retainer ? eur(e.retainer) : '—'}</div><div class="l">Every month</div></div>
+      <div class="card stat">
+        <div class="n mono ${margin === null ? '' : margin >= 65 ? 'good' : margin >= 55 ? 'warn' : 'bad'}">${margin === null ? '—' : margin + '%'}</div>
+        <div class="l">Kept from the monthly</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>The engagement</h3>
+      <dl class="rows">
+        <dt>Work we took over</dt><dd>${esc(m.function) || '<span style="color:var(--ink-3)">Not written down yet</span>'}</dd>
+        <dt>Volume</dt><dd>${esc(m.volume) || '<span style="color:var(--ink-3)">Not measured yet</span>'}</dd>
+        <dt>Their systems</dt><dd>${(m.systems || []).length ? (m.systems).map(s => `<span class="pill">${esc(s)}</span>`).join(' ') : '<span style="color:var(--ink-3)">—</span>'}</dd>
+        <dt>Ours to answer for</dt><dd>${esc((m.owners || {}).ais) || '<span style="color:var(--red)">Nobody named</span>'}</dd>
+        <dt>Theirs to answer for</dt><dd>${esc((m.owners || {}).client) || '<span style="color:var(--red)">Nobody named</span>'}</dd>
+        <dt>Started</dt><dd>${esc(m.started) || '—'}</dd>
+      </dl>
+      ${!((m.owners || {}).ais) || !((m.owners || {}).client)
+        ? `<p class="note" style="color:var(--red)">Every agent needs a name on both sides before anything goes live.</p>` : ''}
+    </div>
+
+    ${m.next_action && m.next_action.what ? `
+    <div class="card">
+      <h3>Next move</h3>
+      <p style="font-size:17px">${esc(m.next_action.what)}</p>
+      <p style="font-size:13px;color:var(--ink-2);margin-top:6px">
+        ${esc(m.next_action.owner) || 'No owner'}${m.next_action.due ? ' · due ' + esc(m.next_action.due) : ' · no date'}
+      </p>
+      ${!m.next_action.owner || !m.next_action.due
+        ? `<p class="note" style="color:var(--orange)">A move without an owner and a date does not happen.</p>` : ''}
+    </div>` : ''}
+
+    <div class="card">
+      <h3>Practice run before real records</h3>
+      ${syn ? `
+        <div class="grid g2">
+          <div>
+            <div class="stat"><div class="n mono ${syn.corpus >= syn.corpus_target ? 'good' : 'warn'}">${syn.corpus}</div><div class="l">of ${syn.corpus_target} made-up documents</div></div>
+            <div class="bar"><i class="${syn.corpus >= syn.corpus_target ? 'good' : ''}" style="width:${Math.min(100, syn.corpus / syn.corpus_target * 100)}%"></i></div>
+          </div>
+          <div>
+            <div class="stat"><div class="n mono ${syn.edge_cases >= syn.edge_target ? 'good' : 'warn'}">${syn.edge_cases}</div><div class="l">of ${syn.edge_target} tricky cases</div></div>
+            <div class="bar"><i class="${syn.edge_cases >= syn.edge_target ? 'good' : ''}" style="width:${Math.min(100, syn.edge_cases / syn.edge_target * 100)}%"></i></div>
+          </div>
+        </div>
+        <p class="note">${syn.ready
+          ? 'Ready — the system can start seeing real records.'
+          : 'Not ready. Nothing touches their real records until both bars are full.'}</p>`
+      : `<p style="color:var(--ink-2)">No practice set yet.</p>
+         <p class="note">Add made-up documents under <span class="mono">engagements/${esc(d.slug)}/synthetic/</span> — a few hundred that look like theirs, and fifty of the awkward ones. Their real records come last.</p>`}
+    </div>`;
+}
+
+function pipelineTab(d) {
+  return `
+    <div class="card">
+      <h3>Where this is</h3>
+      <div class="pipe">
+        ${d.phases.map(p => `
+          <div class="step ${p.current ? 'now' : p.done ? 'done' : ''}">
+            <div class="k">${esc(p.label)}</div>
+            <div class="s">${p.current ? 'here now' : p.done ? 'done' : ''}</div>
+          </div>`).join('')}
+      </div>
+      <p class="note">Stages come from <span class="mono">delivery/phases.md</span>. Change the stage by editing
+        <span class="mono">engagements/${esc(d.slug)}/client.json</span>.</p>
+    </div>
+
+    <div class="card">
+      <h3>Before anything goes live</h3>
+      <dl class="rows">
+        <dt>Named person, our side</dt><dd>${(d.meta.owners||{}).ais ? '<span class="pill green">Yes</span>' : '<span class="pill red">Missing</span>'}</dd>
+        <dt>Named person, their side</dt><dd>${(d.meta.owners||{}).client ? '<span class="pill green">Yes</span>' : '<span class="pill red">Missing</span>'}</dd>
+        <dt>Practice run finished</dt><dd>${d.synthetic && d.synthetic.ready ? '<span class="pill green">Yes</span>' : '<span class="pill orange">Not yet</span>'}</dd>
+        <dt>Four-week supervised run</dt><dd><span class="pill">Track in the engagement notes</span></dd>
+      </dl>
+      <p class="note">Four weeks, always: watching only → drafting for review → live inside the company → live with their customers.</p>
+    </div>`;
+}
+
+function economicsTab(d) {
+  const e = d.meta.economics || {};
+  const kept = (e.retainer && e.run_cost != null) ? e.retainer - e.run_cost : null;
+  const pct = (kept !== null && e.retainer) ? Math.round(kept / e.retainer * 100) : null;
+  const yr1 = (e.build_fee || 0) + (e.retainer || 0) * 12 - (e.run_cost || 0) * 12;
+
+  return `
+    <div class="grid g3">
+      <div class="card stat"><div class="n mono">${eur(e.retainer)}</div><div class="l">They pay monthly</div></div>
+      <div class="card stat"><div class="n mono">${eur(e.run_cost)}</div><div class="l">Costs us to run</div></div>
+      <div class="card stat"><div class="n mono ${pct === null ? '' : pct >= 65 ? 'good' : pct >= 55 ? 'warn' : 'bad'}">${kept === null ? '—' : eur(kept)}</div><div class="l">We keep${pct !== null ? ' · ' + pct + '%' : ''}</div></div>
+    </div>
+
+    <div class="card">
+      <h3>First twelve months</h3>
+      <dl class="rows">
+        <dt>One-off fee</dt><dd class="mono">${eur(e.build_fee)}</dd>
+        <dt>Twelve months of subscription</dt><dd class="mono">${e.retainer ? eur(e.retainer * 12) : '—'}</dd>
+        <dt>Twelve months of running costs</dt><dd class="mono">${e.run_cost != null ? '−' + eur(e.run_cost * 12) : '—'}</dd>
+        <dt><b>Left over</b></dt><dd class="mono"><b>${(e.build_fee || e.retainer) ? eur(yr1) : '—'}</b></dd>
+      </dl>
+      <p class="note">Before anyone's time. Build hours are not in this number — check the fee against hours spent before calling it a win.</p>
+    </div>
+
+    ${pct !== null && pct < 55 ? `
+      <div class="card" style="border-color:#ffd9d5;background:#fffaf9">
+        <h3 style="color:var(--red)">This one is too thin</h3>
+        <p style="color:var(--ink-2)">Anything under 55% doesn't cover the real cost of looking after it. Either the price is low or the running cost can come down — the cheaper-first-pass trick usually finds most of it.</p>
+      </div>` : ''}`;
+}
+
+function filesTab(d) {
+  if (!d.files.length) return `<div class="card"><div class="empty"><p>No files yet.</p></div></div>`;
+  const groups = {};
+  d.files.forEach(f => (groups[f.folder] = groups[f.folder] || []).push(f));
+  return Object.entries(groups).map(([folder, files]) => `
+    <div class="card">
+      <h3>${folder === '.' ? 'Main folder' : esc(folder)}</h3>
+      <table>
+        <thead><tr><th>File</th><th style="width:110px">Size</th></tr></thead>
+        <tbody>${files.map(f => `
+          <tr>
+            <td><a href="/file?path=${encodeURIComponent(f.path)}" target="_blank">${esc(f.name)}</a></td>
+            <td class="mono" style="color:var(--ink-2)">${(f.size / 1024).toFixed(0)} KB</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`).join('');
+}
+
+const TABS = {
+  overview: ['Overview', overviewTab],
+  pipeline: ['Progress', pipelineTab],
+  economics: ['Money', economicsTab],
+  files: ['Files', filesTab],
+};
+
+async function clientView(slug, tab) {
+  const d = await api('/api/client/' + encodeURIComponent(slug));
+  const active = TABS[tab] ? tab : 'overview';
+  $('#view').innerHTML = `
+    <div class="crumbs">Clients</div>
+    <h1>${esc(d.meta.name || d.slug)}</h1>
+    <p class="sub">${esc(d.meta.function) || 'No description yet'}</p>
+    <div class="tabs">
+      ${Object.entries(TABS).map(([k, [label]]) =>
+        `<a class="tab ${k === active ? 'on' : ''}" href="#c/${esc(slug)}/${k}">${label}</a>`).join('')}
+    </div>
+    ${TABS[active][1](d)}`;
+}
+
+// ── router ───────────────────────────────────────────────────────────────────
+async function route() {
+  renderNav();
+  const h = (location.hash || '#today').slice(1);
+  try {
+    if (h.startsWith('c/')) {
+      const [, slug, tab] = h.split('/');
+      await clientView(slug, tab);
+    } else {
+      $('#view').innerHTML = todayView();
+    }
+  } catch (err) {
+    $('#view').innerHTML = `<div class="card"><div class="empty"><p>${esc(err.message)}</p>
+      <a class="ghost" href="#today">Back to today</a></div></div>`;
+  }
+}
+
+// ── new client ───────────────────────────────────────────────────────────────
+$('#newBtn').onclick = () => { $('#f-err').hidden = true; $('#newDlg').showModal(); };
+$('#f-cancel').onclick = () => $('#newDlg').close();
+$('#f-name').addEventListener('input', e => {
+  const slug = $('#f-slug');
+  if (!slug.dataset.touched) {
+    slug.value = e.target.value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+  }
+});
+$('#f-slug').addEventListener('input', e => { e.target.dataset.touched = '1'; });
+
+$('#newForm').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const err = $('#f-err');
+  err.hidden = true;
+  try {
+    const body = {
+      name: $('#f-name').value.trim(),
+      slug: $('#f-slug').value.trim(),
+      function: $('#f-func').value.trim(),
+      owner_ais: $('#f-owner').value.trim(),
+    };
+    const res = await api('/api/client', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    $('#newDlg').close();
+    $('#newForm').reset();
+    $('#f-slug').dataset.touched = '';
+    STATE = await api('/api/state');
+    location.hash = '#c/' + res.created;
+    route();
+  } catch (e) {
+    err.textContent = e.message;
+    err.hidden = false;
+  }
+});
+
+// ── boot ─────────────────────────────────────────────────────────────────────
+window.addEventListener('hashchange', route);
+(async () => {
+  try {
+    STATE = await api('/api/state');
+    route();
+  } catch (e) {
+    $('#view').innerHTML = `<div class="card"><div class="empty"><p>Couldn't reach the server.</p></div></div>`;
+  }
+})();
+</script>
+</body>
+</html>

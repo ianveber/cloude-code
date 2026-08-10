@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/Users/ianveber/Desktop/Cloude CODE/3day-protocol/bin/deploy-guard\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/Users/ianveber/Desktop/Cloude CODE/3day-protocol/bin/journal-append\""
+          }
+        ]
+      }
+    ]
+  }
+}

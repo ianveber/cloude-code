@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INSPECTUS — VLDR avtomatizacija</title>
+<link rel="icon" type="image/png" href="/inspectus-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body class="bg-white text-[#333333] min-h-screen">
+  <div class="h-1.5 w-full bg-[#425060]"></div>
+  <header class="max-w-6xl mx-auto px-6 pt-8 pb-6">
+    <div class="flex items-center justify-between">
+      <img src="/inspectus-logo.png" alt="INSPECTUS" class="h-9 w-auto">
+      <span class="text-xs tracking-widest text-[#6b7280] uppercase">AI · VLDR avtomatizacija</span>
+    </div>
+    <h1 class="text-3xl font-bold mt-6 text-[#2a3340]">VLDR avtomatizacija</h1>
+    <p class="text-[#6b7280] mt-1 text-sm">Povlecite SURVEY REPORT.xlsx — v nekaj sekundah dobite VIN-FILAJ, VLDR kartice in AI povzetek.</p>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 pb-20">
+    <section id="drop-zone"
+      class="relative border-2 border-dashed border-[#c3ccd4] hover:border-[#425060] bg-[#fafbfc] rounded-2xl p-16 text-center transition-colors cursor-pointer">
+      <input id="file-input" type="file" accept=".xlsx,.xls" class="hidden">
+      <div class="text-[#2a3340] font-semibold">Spustite SURVEY REPORT.xlsx sem</div>
+      <div class="text-[#6b7280] text-sm mt-2">ali kliknite za izbiro · <a href="/sample-survey-report.xlsx" class="underline text-[#425060] hover:text-[#2a3340] font-semibold" download>prenesite vzorec</a></div>
+    </section>
+
+    <section id="report-header" class="mt-6">
+      <h2 class="text-[#6b7280] text-xs uppercase tracking-widest mb-3">Podatki poročila (glava VIN-FILAJ)</h2>
+      <div class="grid grid-cols-1 md:grid-cols-6 gap-3">
+        <div class="md:col-span-2"><label class="block text-[11px] uppercase tracking-wider text-[#6b7280] mb-1">Datum</label><input id="hdr-date" class="w-full bg-white border border-[#d6dce1] focus:border-[#425060] outline-none rounded-md px-3 py-1.5 text-sm text-[#333333]" placeholder="10.05.2026"></div>
+        <div class="md:col-span-2"><label class="block text-[11px] uppercase tracking-wider text-[#6b7280] mb-1">Transport ID</label><input id="hdr-transport" class="w-full bg-white border border-[#d6dce1] focus:border-[#425060] outline-none rounded-md px-3 py-1.5 text-sm text-[#333333]"></div>
+        <div class="md:col-span-2"><label class="block text-[11px] uppercase tracking-wider text-[#6b7280] mb-1">Lokacija pregleda</label><input id="hdr-location" class="w-full bg-white border border-[#d6dce1] focus:border-[#425060] outline-none rounded-md px-3 py-1.5 text-sm text-[#333333]"></div>
+        <div class="md:col-span-3"><label class="block text-[11px] uppercase tracking-wider text-[#6b7280] mb-1">Dostavni prevoznik</label><input id="hdr-delivering" class="w-full bg-white border border-[#d6dce1] focus:border-[#425060] outline-none rounded-md px-3 py-1.5 text-sm text-[#333333]"></div>
+        <div class="md:col-span-3"><label class="block text-[11px] uppercase tracking-wider text-[#6b7280] mb-1">Prejemni prevoznik</label><input id="hdr-receiving" class="w-full bg-white border border-[#d6dce1] focus:border-[#425060] outline-none rounded-md px-3 py-1.5 text-sm text-[#333333]"></div>
+      </div>
+    </section>
+
+    <section id="pipeline" class="mt-10 hidden">
+      <h2 class="text-[#6b7280] text-xs uppercase tracking-widest mb-3">Potek</h2>
+      <ol id="pipeline-steps" class="space-y-1.5"></ol>
+    </section>
+
+    <section id="results" class="mt-10 hidden">
+      <nav id="tabs" class="flex gap-1 border-b border-[#e0e4e8] mb-5 overflow-x-auto">
+        <button data-tab="urejanje" class="tab-btn px-4 py-2 text-sm font-semibold border-b-2 border-[#425060] text-[#425060]">Urejanje podatkov</button>
+        <button data-tab="vinfilaj" class="tab-btn px-4 py-2 text-sm font-semibold border-b-2 border-transparent text-[#6b7280] hover:text-[#2a3340]">VIN-FILAJ</button>
+        <button data-tab="grouped" class="tab-btn px-4 py-2 text-sm font-semibold border-b-2 border-transparent text-[#6b7280] hover:text-[#2a3340]">Združen Survey Report</button>
+        <button data-tab="vldr"     class="tab-btn px-4 py-2 text-sm font-semibold border-b-2 border-transparent text-[#6b7280] hover:text-[#2a3340]">VLDR Kartice</button>
+        <button data-tab="summary"  class="tab-btn px-4 py-2 text-sm font-semibold border-b-2 border-transparent text-[#6b7280] hover:text-[#2a3340]">Povzetek</button>
+        <button data-tab="validate" class="tab-btn px-4 py-2 text-sm font-semibold border-b-2 border-transparent text-[#6b7280] hover:text-[#2a3340]">AI Validacija</button>
+        <button data-tab="analitika" class="tab-btn px-4 py-2 text-sm font-semibold border-b-2 border-transparent text-[#6b7280] hover:text-[#2a3340]">Analitika</button>
+      </nav>
+      <div id="tab-urejanje" class="tab-panel hidden"></div>
+      <div id="tab-vinfilaj" class="tab-panel hidden"></div>
+      <div id="tab-grouped"  class="tab-panel hidden"></div>
+      <div id="tab-vldr"     class="tab-panel hidden"></div>
+      <div id="tab-summary"  class="tab-panel hidden"></div>
+      <div id="tab-validate" class="tab-panel hidden"></div>
+      <div id="tab-analitika" class="tab-panel hidden"></div>
+
+      <div id="chat" class="mt-10">
+        <h3 class="text-[#6b7280] text-xs uppercase tracking-widest mb-2">Vprašaj po podatkih</h3>
+        <form id="chat-form" class="flex gap-2">
+          <input id="chat-input" type="text"
+            class="flex-1 bg-white border border-[#d6dce1] focus:border-[#425060] outline-none rounded-lg px-4 py-2 text-sm text-[#333333]"
+            placeholder="npr. 'Pokaži vse VINe z resnostjo 3' ali 'Koliko vozil je poškodovanih in koliko ima opombe, v %?'">
+          <button class="bg-[#425060] text-white font-semibold px-5 py-2 rounded-lg hover:bg-[#33404e] transition-colors">Vprašaj</button>
+        </form>
+        <div id="chat-feedback" class="text-xs text-[#6b7280] mt-2"></div>
+        <div id="chat-answer" class="hidden mt-3 bg-white border border-[#e0e4e8] rounded-lg p-4 text-sm leading-relaxed text-[#333333] whitespace-pre-wrap shadow-sm"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="text-center text-[#9aa3ad] text-xs py-8 border-t border-[#e7eaed]">
+    Pripravil AIS Slovenija za INSPECTUS · Poganja Claude
+  </footer>
+
+  <script src="/vendor/xlsx.full.min.js"></script>
+  <script src="/vendor/html2canvas.min.js"></script>
+  <script src="/vendor/jszip.min.js"></script>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

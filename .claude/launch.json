@@ -2,10 +2,189 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "Veta Dashboard",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": ["/tmp/tm_server.py"],
+      "name": "jarvis-cockpit",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "jarvis-cockpit/bridge.mjs"
+      ],
+      "port": 4599
+    },
+    {
+      "name": "elementum",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "/Users/ianveber/Desktop/Cloude CODE/clients/elementum/_preview-server.mjs"
+      ],
+      "port": 8821
+    },
+    {
+      "name": "grafy-refresh",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "/Users/ianveber/Desktop/Cloude CODE/clients/grafy/refresh/_preview-server.mjs"
+      ],
+      "port": 4317
+    },
+    {
+      "name": "athlos-chatbot",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": [
+        "/Users/ianveber/Desktop/Cloude CODE/athlos-chatbot/server.mjs"
+      ],
+      "port": 8010
+    },
+    {
+      "name": "athlos-greek",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "/Users/ianveber/builds/agreek",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5179",
+        "--strictPort"
+      ],
+      "port": 5179,
+      "autoPort": false
+    },
+    {
+      "name": "athlos-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "/private/tmp/athlos-app2/athlos-main",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5180",
+        "--strictPort"
+      ],
+      "port": 5180
+    },
+    {
+      "name": "inspectus-os",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "/Users/ianveber/Desktop/Cloude CODE/INSPEKTUS/inspectus-os",
+        "run",
+        "dev"
+      ],
+      "port": 3020
+    },
+    {
+      "name": "constat-builder",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "/Users/ianveber/Desktop/Cloude CODE/INSPEKTUS/constat-builder/_server.mjs"
+      ],
+      "port": 4318
+    },
+    {
+      "name": "vldr-cal",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "/tmp/vldr-cal-harness/_server.mjs"
+      ],
+      "port": 4319
+    },
+    {
+      "name": "inspectus-tmp",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "/tmp/inspectus-os",
+        "run",
+        "dev"
+      ],
+      "port": 3025
+    },
+    {
+      "name": "picikato",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "/Users/ianveber/Desktop/Cloude CODE/picikato/_preview-server.mjs"
+      ],
+      "port": 8830
+    },
+    {
+      "name": "heva",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "/Users/ianveber/Desktop/Cloude CODE/heva/_preview-server.mjs"
+      ],
+      "port": 4321
+    },
+    {
+      "name": "heva-refresh",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "/Users/ianveber/Desktop/Cloude CODE/heva/refresh/_preview-server.mjs"
+      ],
+      "port": 4320
+    },
+    {
+      "name": "herminaviolina",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "/tmp/herminaviolina",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5186",
+        "--strictPort"
+      ],
+      "port": 5186
+    },
+    {
+      "name": "ais-portal",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "/Users/ianveber/builds/ais-portal",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "3030"
+      ],
+      "port": 3030
+    },
+    {
+      "name": "protocol-hosted",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "/Users/ianveber/protocol-hosted",
+        "run",
+        "dev"
+      ],
       "port": 3000
+    },
+    {
+      "name": "athlos-app",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "/Users/ianveber/Desktop/Cloude CODE/clients/athlos",
+        "run",
+        "dev"
+      ],
+      "port": 3001
+    },
+    {
+      "name": "harvest-demo",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-lc",
+        "cd '/Users/ianveber/Desktop/Cloude CODE/clients/harvest-hub/demo' && ANTHROPIC_API_KEY=$(tr -d '[:space:]' < ~/.anthropic_key) node server.mjs"
+      ],
+      "port": 8020
     }
   ]
 }

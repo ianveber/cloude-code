@@ -1,0 +1,178 @@
+@import "tailwindcss";
+
+/* ========================================
+   INSPECTUS Center — Design System
+   ======================================== */
+
+:root {
+  --ink: #333333;
+  --navy: #425060;        /* primary slate-navy */
+  --navy-deep: #2a3340;
+  --bg: #ffffff;
+  --bg-soft: #fafafa;
+  --border: #dddddd;
+  --accent: #b09575;      /* warm */
+  --success: #3a7d00;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Open Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.content {
+  padding: 28px 32px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.sidebar {
+  position: relative;
+  background: var(--navy);
+  color: #fff;
+  padding: 20px 14px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #dfe4e9;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.sidebar a.active,
+.sidebar a:hover {
+  background: rgba(255, 255, 255, .12);
+  color: #fff;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 860px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+}
+
+/* ========================================
+   VLDR / Nova obdelava — ported from inspectus-vldr/styles.css
+   ======================================== */
+
+/* Drop zone drag state */
+.drop-zone.dragover { border-color: #425060 !important; background: rgba(66,80,96,0.05) !important; }
+
+/* Pipeline steps */
+.pipeline-step { display:flex; align-items:center; gap:.75rem; font-size:.875rem; color:#9aa3ad; transition: color .2s; }
+.pipeline-step.active { color:#2a3340; font-weight:600; }
+.pipeline-step.done   { color:#425060; }
+.pipeline-dot { width:.5rem; height:.5rem; border-radius:9999px; background:#c3ccd4; flex-shrink:0; transition: all .2s; }
+.pipeline-step.active .pipeline-dot { background:#2a3340; box-shadow: 0 0 0 4px rgba(42,51,64,.12); }
+.pipeline-step.done   .pipeline-dot { background:#425060; box-shadow: 0 0 0 4px rgba(66,80,96,.15); }
+
+/* VIN-FILAJ table */
+.vinfilaj-table { width:100%; border-collapse: collapse; font-size:.75rem; }
+.vinfilaj-table th, .vinfilaj-table td { border:1px solid #dddddd; padding:.4rem .6rem; text-align:left; white-space:nowrap; color:#333333; }
+.vinfilaj-table th { background:#eef1f3; color:#425060; font-weight:700; text-transform: uppercase; letter-spacing:.05em; font-size:.65rem; }
+.vinfilaj-table tr:nth-child(even) td { background:#fafbfc; }
+.vinfilaj-scroll { overflow:auto; max-height: 70vh; border:1px solid #dddddd; border-radius:.5rem; }
+
+/* Urejanje editable table */
+.editable-table { width:100%; border-collapse: collapse; font-size:.75rem; }
+.editable-table th, .editable-table td { border:1px solid #dddddd; padding:.25rem .4rem; text-align:left; white-space:nowrap; color:#333333; }
+.editable-table th { background:#eef1f3; color:#425060; font-weight:700; text-transform: uppercase; letter-spacing:.05em; font-size:.65rem; position:sticky; top:0; z-index:1; }
+.editable-table tr:nth-child(even) td { background:#fafbfc; }
+.editable-table input, .editable-table select { border:1px solid #d6dce1; border-radius:4px; padding:.2rem .35rem; font-size:.75rem; color:#333333; background:#fff; outline:none; transition: border-color .15s; }
+.editable-table input:focus, .editable-table select:focus { border-color:#425060; box-shadow:0 0 0 2px rgba(66,80,96,.12); }
+.editable-scroll { overflow:auto; max-height: 60vh; border:1px solid #dddddd; border-radius:.5rem; }
+.editable-select { width:100%; min-width:6rem; }
+
+/* VLDR card — EU 6546 form overlay; the renderer sets its own size/position inline.
+   Keep this class minimal so the exported JPG is a clean form (no border/radius/shadow). */
+.vldr-card { background:#fff; }
+.vldr-header { background:#425060; color:#fff; padding: 1rem 1.25rem; display:flex; justify-content:space-between; align-items:center; }
+.vldr-section { padding: .75rem 1.25rem; border-bottom:1px solid #e5e7eb; }
+.vldr-table { width:100%; border-collapse: collapse; font-size:.8rem; }
+.vldr-table th, .vldr-table td { padding: .35rem .5rem; border-bottom:1px solid #e5e7eb; text-align:left; }
+.vldr-table th { background:#f0f3f5; font-size:.7rem; text-transform: uppercase; letter-spacing:.05em; color:#425060; }
+
+/* ========================================
+   Domov — KPI cards + CTA
+   ======================================== */
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 680px) {
+  .kpi-row { grid-template-columns: 1fr; }
+}
+
+.kpi-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kpi-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: #9aa3ad;
+}
+
+.kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--navy-deep);
+  line-height: 1;
+}
+
+.kpi-cta {
+  display: inline-block;
+  background: var(--navy);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 22px;
+  border-radius: 8px;
+  transition: background .15s;
+}
+
+.kpi-cta:hover {
+  background: var(--navy-deep);
+}

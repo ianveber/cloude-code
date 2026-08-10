@@ -1,0 +1,57 @@
+<style>
+  #page-6 .chart { height: 102mm; margin-top: 13mm; }
+  #page-6 .chart .node {
+    width: 74mm; height: 24mm;
+    display: flex; flex-direction: column; justify-content: center;
+    text-align: center; font-size: 10.5pt; padding: 2.5mm 4mm;
+  }
+  #page-6 .chart .node .sub { font-size: 8.5pt; }
+  #page-6 .bilanca {
+    position: absolute; left: 150mm; top: 0; width: 115mm; height: 102mm;
+    background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px;
+    padding: 5mm 7mm 3mm; display: flex; flex-direction: column;
+  }
+  #page-6 .bilanca h3 {
+    margin: 0 0 1mm; font-size: 9pt; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  #page-6 .bilanca .row {
+    flex: 1; display: flex; align-items: center; gap: 4.5mm;
+    border-top: 1px solid var(--border); font-size: 10pt; color: var(--navy);
+  }
+  #page-6 .bilanca .row:first-of-type { border-top: none; }
+  #page-6 .bilanca .row b { flex: 0 0 16mm; font-size: 17pt; font-weight: 800; color: var(--navy-deep); text-align: right; }
+  #page-6 .bilanca .row.risk, #page-6 .bilanca .row.risk b { color: var(--danger); }
+  #page-6 .bilanca .row.risk b { font-size: 13pt; line-height: 1.1; }
+  #page-6 .kick {
+    margin-top: 10mm; text-align: center;
+    font-size: 15pt; font-weight: 700; color: var(--accent);
+  }
+</style>
+
+<div class="chart">
+  <svg class="wire" viewBox="0 0 265 102" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowP6" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 Z" fill="#425060"/>
+      </marker>
+    </defs>
+    <line x1="70" y1="27" x2="70" y2="37.6" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP6)"/>
+    <line x1="70" y1="63" x2="70" y2="73.6" stroke="#425060" stroke-width="0.5" marker-end="url(#arrowP6)"/>
+  </svg>
+
+  <div class="node" style="left:33mm; top:3mm;">Zapis vozila v Aresu<span class="sub">VIN + fotografije poškodb</span></div>
+  <div class="node" style="left:33mm; top:39mm;">Poročila<span class="sub">VLDR · Constat</span></div>
+  <div class="node" style="left:33mm; top:75mm;">Naročniki<span class="sub">ladjarji, zavarovalnice, proizvajalci</span></div>
+
+  <div class="bilanca">
+    <h3>Bilanca današnjega postopka</h3>
+    <div class="row"><b>5</b><span>korakov</span></div>
+    <div class="row"><b>2</b><span>osebi</span></div>
+    <div class="row"><b>2</b><span>lokaciji — terminal in pisarna</span></div>
+    <div class="row"><b>10+</b><span>ur ročnega dela na ladjo</span></div>
+    <div class="row risk"><b>!</b><span>tveganje zamenjave vozila pri vsakem vnosu</span></div>
+  </div>
+</div>
+
+<p class="kick">Rezultat je pravi. Pot do njega je draga.</p>

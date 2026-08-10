@@ -1,0 +1,70 @@
+#!/usr/bin/env node
+/**
+ * journal-append — Claude Code PostToolUse hook for the 3-Day App Protocol.
+ *
+ * Zero-dependency stock Node (CommonJS). Reads a PostToolUse event as JSON on
+ * stdin ({"tool_name":"Bash","tool_input":{...},"cwd":"..."}) and appends one
+ * line {ts, tool, phase} to <run project>/.protocol/journal.jsonl.
+ *
+ * Contract (plan: Enforcement / JOURNAL, fires on EVERY tool call):
+ *   - pure O(1) append (fs.appendFileSync, no read-modify-write)
+ *   - NEVER blocks the tool: on ANY error print a warning to stderr, exit 0
+ *   - not inside a run project (no .protocol/ walking up) => silently exit 0
+ */
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+
+try {
+  const raw = fs.readFileSync(0, 'utf8');
+  if (!raw.trim()) process.exit(0); // nothing to journal
+
+  const event = JSON.parse(raw); // throws -> warning path below
+
+  const tool =
+    event && typeof event.tool_name === 'string' && event.tool_name
+      ? event.tool_name
+      : 'unknown';
+
+  // Locate the run project: walk up from the event cwd to a dir with .protocol/
+  let dir = path.resolve(
+    event && typeof event.cwd === 'string' && event.cwd ? event.cwd : process.cwd()
+  );
+  let runProject = null;
+  for (;;) {
+    if (fs.existsSync(path.join(dir, '.protocol'))) {
+      runProject = dir;
+      break;
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  if (!runProject) process.exit(0); // not a protocol run — nothing to do
+
+  let phase = 'unknown';
+  try {
+    phase =
+      fs.readFileSync(path.join(runProject, '.protocol', 'phase'), 'utf8').trim() ||
+      'unknown';
+  } catch {
+    /* phase file missing — journal anyway */
+  }
+
+  fs.appendFileSync(
+    path.join(runProject, '.protocol', 'journal.jsonl'),
+    JSON.stringify({ ts: new Date().toISOString(), tool, phase }) + '\n'
+  );
+  process.exit(0);
+} catch (e) {
+  // NEVER block a tool call over journaling.
+  try {
+    process.stderr.write(
+      `journal-append warning: ${(e && e.message) || 'unknown error'} — tool call not blocked\n`
+    );
+  } catch {
+    /* even stderr failed; still exit 0 */
+  }
+  process.exit(0);
+}

@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+/* ========================================
+   INSPECTUS Center — Design System
+   ======================================== */
+
+:root {
+  --ink: #333333;
+  --navy: #425060;        /* primary slate-navy */
+  --navy-deep: #2a3340;
+  --bg: #ffffff;
+  --bg-soft: #fafafa;
+  --border: #dddddd;
+  --accent: #b09575;      /* warm */
+  --success: #3a7d00;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Open Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.content {
+  padding: 28px 32px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.sidebar {
+  position: relative;
+  background: var(--navy);
+  color: #fff;
+  padding: 20px 14px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #dfe4e9;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.sidebar a.active,
+.sidebar a:hover {
+  background: rgba(255, 255, 255, .12);
+  color: #fff;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 860px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+}

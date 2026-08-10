@@ -1,0 +1,1714 @@
+#!/usr/bin/env node
+/**
+ * gate-check — 3-Day App Protocol gate engine.
+ *
+ * Zero-dependency stock Node (CommonJS). One file, subcommand dispatch.
+ * Run state lives in the RUN PROJECT (found by walking up from cwd to the
+ * dir containing .protocol/), never in this pack.
+ *
+ * Subcommands:
+ *   init <dir>                     scaffold .protocol/ + install hooks into
+ *                                  <dir>/.claude/settings.json (merge, never clobber)
+ *   0                              Gate 0: validate .protocol/spec.json against
+ *                                  templates/build-spec.schema.json + provisioning checklist
+ *   1 --report <path>              Gate 1: ingest a design-lint report (evidence)
+ *   1 --approve "<name>"           Gate 1: human sign-off — REFUSED unless a lint
+ *                                  report was ingested this gate cycle
+ *   2                              Gate 2: security pass — pgTAP RLS via `supabase
+ *                                  test db`, secret scan (gitleaks or built-in regex),
+ *                                  input-validation heuristics on route handlers
+ *   2 --attest "<name>: <reason>"  Gate 2 break-glass: named human attestation when
+ *                                  tooling is down — SHIP-REPORT carries a red banner
+ *   3 [--url <prod-url>]           Gate 3: verified deploy — prod URL 200, anon RLS
+ *                                  probe of spec.protectedRoutes (401/403/redirect,
+ *                                  never 200), smoke (playwright or curl-level
+ *                                  fallback), renders SHIP-REPORT.md on green
+ *   doctor                         verify the external tool matrix with versions
+ *   status [--force "<reason>"]    gate table incl. stale detection; exit 1 if the
+ *                                  current phase's prior gate is not green;
+ *                                  --force logs an override to journal.jsonl, exits 0
+ *   reopen <N>                     gate N -> pending, cascading reset of gates > N
+ *   note <text>                    append {ts,type:"note",text} to journal.jsonl
+ *
+ * Gate state machine: pending -> red -> green; green -> stale on git drift
+ * (recorded head vs current HEAD, or dirty tree); `reopen N` -> pending,
+ * cascading to all later gates.
+ *
+ * Exit codes: 0 = ok / green / allowed; 1 = red gate, blocked status, usage
+ * or environment error (fail closed).
+ */
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const { execFileSync, spawnSync } = require('child_process');
+
+const PACK_BIN = __dirname; // .../3day-protocol/bin
+const PACK_ROOT = path.dirname(PACK_BIN);
+const SCHEMA_PATH = path.join(PACK_ROOT, 'templates', 'build-spec.schema.json');
+const DEPLOY_GUARD = path.join(PACK_BIN, 'deploy-guard');
+const JOURNAL_APPEND = path.join(PACK_BIN, 'journal-append');
+
+const GATES = [0, 1, 2, 3];
+const PHASES = ['P1', 'P2', 'P3', 'P4', 'P5'];
+// The gate that must be green BEFORE working in each phase.
+const PRIOR_GATE = { P1: null, P2: 0, P3: 1, P4: 1, P5: 2 };
+
+const USAGE = `gate-check — 3-Day App Protocol gate engine
+
+usage:
+  gate-check init <dir>                 scaffold .protocol/ + install run-project hooks
+  gate-check 0                          Gate 0: spec + provisioning checklist
+  gate-check 1 --report <path>          Gate 1: ingest design-lint report
+  gate-check 1 --approve "<name>"       Gate 1: human sign-off (needs a report first)
+  gate-check 2                          Gate 2: security pass (RLS, secrets, input validation)
+  gate-check 2 --attest "<name>: <why>" Gate 2 break-glass attestation (red report banner)
+  gate-check 3 [--url <prod-url>]       Gate 3: verified deploy + SHIP-REPORT.md
+  gate-check doctor                     verify external tool matrix
+  gate-check status [--force "<why>"]   gate table; exit 1 if prior gate not green
+  gate-check reopen <N>                 reset gate N (+ all later gates) to pending
+  gate-check note <text>                append an intervention note to the journal
+`;
+
+// ---------------------------------------------------------------- helpers
+
+function fail(msg) {
+  process.stderr.write(`gate-check: ${msg}\n`);
+  process.exit(1);
+}
+
+function findUp(startDir, relPath) {
+  let dir = path.resolve(startDir);
+  for (;;) {
+    if (fs.existsSync(path.join(dir, relPath))) return dir;
+    const parent = path.dirname(dir);
+    if (parent === dir) return null;
+    dir = parent;
+  }
+}
+
+/** Locate the run project (dir containing .protocol/) or die with guidance. */
+function requireRunProject() {
+  const dir = findUp(process.cwd(), '.protocol');
+  if (!dir) {
+    fail(
+      `no .protocol/ run-state found walking up from ${process.cwd()}. ` +
+        `Run \`gate-check init <dir>\` first, or cd into the run project.`
+    );
+  }
+  return dir;
+}
+
+function protocolDir(runDir) {
+  return path.join(runDir, '.protocol');
+}
+
+function gateFile(runDir, n) {
+  return path.join(protocolDir(runDir), 'gates', `gate-${n}.json`);
+}
+
+function readGate(runDir, n) {
+  const p = gateFile(runDir, n);
+  if (!fs.existsSync(p)) return { exists: false, status: 'pending', gate: null };
+  try {
+    const gate = JSON.parse(fs.readFileSync(p, 'utf8'));
+    return { exists: true, status: gate.status || 'unknown', gate };
+  } catch {
+    return { exists: true, status: 'malformed', gate: null };
+  }
+}
+
+function writeGate(runDir, n, obj) {
+  fs.writeFileSync(gateFile(runDir, n), JSON.stringify(obj, null, 2) + '\n');
+  journal(runDir, { type: 'gate', gate: n, status: obj.status });
+}
+
+function journal(runDir, entry) {
+  fs.appendFileSync(
+    path.join(protocolDir(runDir), 'journal.jsonl'),
+    JSON.stringify({ ts: new Date().toISOString(), ...entry }) + '\n'
+  );
+}
+
+function readPhase(runDir) {
+  try {
+    const p = fs.readFileSync(path.join(protocolDir(runDir), 'phase'), 'utf8').trim();
+    return PHASES.includes(p) ? p : p || 'P1';
+  } catch {
+    return 'P1';
+  }
+}
+
+function gitHead(runDir) {
+  try {
+    return execFileSync('git', ['rev-parse', 'HEAD'], {
+      cwd: runDir,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    }).trim();
+  } catch {
+    return null;
+  }
+}
+
+/** Read .protocol/spec.json, or null. Never throws — callers decide meaning. */
+function readSpecQuiet(runDir) {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(runDir, '.protocol', 'spec.json'), 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function gitDirty(runDir) {
+  try {
+    return (
+      execFileSync('git', ['status', '--porcelain'], {
+        cwd: runDir,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      }).trim() !== ''
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Effective gate status for display/enforcement: a green gate whose recorded
+ * head no longer matches HEAD (or whose tree is dirty) is STALE (fix #4).
+ */
+function effectiveGate(runDir, n) {
+  const { exists, status, gate } = readGate(runDir, n);
+  let effective = status;
+  let detail = '';
+  if (status === 'green' && gate && gate.head) {
+    const head = gitHead(runDir);
+    if (head === null) {
+      // F4: git unreadable means freshness CANNOT be checked. Previously this
+      // recorded a detail string and left the gate green — so a run project
+      // with no git repo held a green gate that could never go stale, and
+      // deploys stayed unblocked no matter how far the code drifted.
+      // Unprovable freshness must fail closed, not open.
+      effective = 'stale';
+      detail = 'freshness unproven (no readable git repo) — run `git init` and commit';
+    } else if (head !== gate.head) {
+      effective = 'stale';
+      detail = `green at ${gate.head.slice(0, 8)}, HEAD now ${head.slice(0, 8)}`;
+    } else if (gitDirty(runDir)) {
+      effective = 'stale';
+      detail = 'working tree dirty since green';
+    }
+  } else if (status === 'green' && (!gate || !gate.head)) {
+    // F4: a green with no recorded head has nothing to compare against. That is
+    // also the shape a hand-edited gate file takes, so treating it as green
+    // would make forging one trivial.
+    effective = 'stale';
+    detail = 'no head recorded — freshness unproven; re-run the gate';
+  } else if (status === 'green' || status === 'red') {
+    detail = '';
+  }
+  if (gate && gate.approver) detail = detail || `approved by ${gate.approver}`;
+  return { exists, effective, raw: status, gate, detail };
+}
+
+/**
+ * A genuine `gate-check 2` green records the security-pass signature: the
+ * pgTAP RLS summary object AND a non-empty evidence[] array. A hand-edited
+ * {"status":"green","head":"<HEAD>"} carries neither — it is not a verified
+ * pass and must not be honored downstream. (Attested gates are handled
+ * separately; they legitimately carry no rls summary.)
+ */
+function gate2GreenIsVerified(gate) {
+  return !!(
+    gate &&
+    gate.rls &&
+    typeof gate.rls === 'object' &&
+    Array.isArray(gate.evidence) &&
+    gate.evidence.length > 0
+  );
+}
+
+/** Parse `--flag value` style options out of an argv slice. */
+function parseFlags(args, spec) {
+  // spec: { report: true, approve: true, force: true } (true = takes a value)
+  const flags = {};
+  const positional = [];
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a.startsWith('--')) {
+      const name = a.slice(2);
+      if (!(name in spec)) fail(`unknown flag --${name}\n\n${USAGE}`);
+      if (spec[name]) {
+        const val = args[i + 1];
+        if (val === undefined || val.startsWith('--')) {
+          flags[name] = '';
+        } else {
+          flags[name] = val;
+          i++;
+        }
+      } else {
+        flags[name] = true;
+      }
+    } else {
+      positional.push(a);
+    }
+  }
+  return { flags, positional };
+}
+
+// ------------------------------------------------- JSON-schema (subset) validator
+
+/**
+ * Validates `value` against the subset of JSON Schema used by
+ * templates/build-spec.schema.json: type, required, properties, items,
+ * minItems, minLength, enum, const. Pushes "dotted.path: message" strings.
+ */
+function validateSchema(schema, value, at, errors) {
+  if (schema.const !== undefined && value !== schema.const) {
+    errors.push(`${at}: must equal ${JSON.stringify(schema.const)}`);
+    return;
+  }
+  if (schema.enum && !schema.enum.includes(value)) {
+    errors.push(`${at}: must be one of ${JSON.stringify(schema.enum)}`);
+    return;
+  }
+  if (schema.type) {
+    const t = Array.isArray(value) ? 'array' : value === null ? 'null' : typeof value;
+    if (t !== schema.type) {
+      errors.push(`${at}: expected ${schema.type}, got ${t}`);
+      return;
+    }
+  }
+  if (schema.type === 'string' && schema.minLength !== undefined) {
+    if (value.length < schema.minLength) errors.push(`${at}: must not be empty`);
+  }
+  if (schema.type === 'array') {
+    if (schema.minItems !== undefined && value.length < schema.minItems) {
+      errors.push(`${at}: needs at least ${schema.minItems} item(s), has ${value.length}`);
+    }
+    if (schema.items) {
+      value.forEach((v, i) => validateSchema(schema.items, v, `${at}[${i}]`, errors));
+    }
+  }
+  if (schema.type === 'object') {
+    for (const req of schema.required || []) {
+      if (!(req in value)) errors.push(`${at}.${req}: missing required field`);
+    }
+    for (const [key, sub] of Object.entries(schema.properties || {})) {
+      if (key in value) validateSchema(sub, value[key], `${at}.${key}`, errors);
+    }
+  }
+}
+
+// -------------------------------------------------------------------- init
+
+const SPEC_PLACEHOLDER = {
+  project: '',
+  pages: [],
+  entities: [],
+  auth: { roles: [] },
+  design: { direction: '', tokens: {} },
+  deployTarget: 'vercel',
+  scopeFence: [],
+  protectedRoutes: [],
+  provisioning: {
+    docker: { checked: false, verify: 'docker info (the daemon must answer, not just exist)' },
+    supabaseCli: { checked: false, verify: 'supabase --version' },
+    vercelCli: { checked: false, verify: 'vercel --version' },
+    node: { checked: false, verify: 'node --version' },
+    claudePlan: { attested: false, note: 'human attests: Claude plan has headroom for the run' },
+    supabaseRef: { attested: false, note: 'human attests: Supabase project created, ref in hand' },
+    vercelAccount: { attested: false, note: 'human attests: Vercel account/team ready' },
+  },
+};
+
+function shellQuote(p) {
+  return `"${p}"`;
+}
+
+/** Ensure hooks[event] contains a matcher entry running `command`. */
+function ensureHook(hooks, event, matcher, command) {
+  if (!Array.isArray(hooks[event])) hooks[event] = [];
+  const present = hooks[event].some(
+    (m) => Array.isArray(m.hooks) && m.hooks.some((h) => h && h.command === command)
+  );
+  if (!present) {
+    hooks[event].push({ matcher, hooks: [{ type: 'command', command }] });
+    return true;
+  }
+  return false;
+}
+
+function cmdInit(args) {
+  const dir = args[0];
+  if (!dir) fail(`init <dir> — a target directory is required.\n\n${USAGE}`);
+  const runDir = path.resolve(dir);
+  const proto = protocolDir(runDir);
+
+  fs.mkdirSync(path.join(proto, 'gates'), { recursive: true });
+  fs.mkdirSync(path.join(proto, 'evidence'), { recursive: true });
+
+  // Idempotent scaffolding — never clobber existing run state.
+  const specPath = path.join(proto, 'spec.json');
+  if (!fs.existsSync(specPath)) {
+    fs.writeFileSync(specPath, JSON.stringify(SPEC_PLACEHOLDER, null, 2) + '\n');
+  }
+  const phasePath = path.join(proto, 'phase');
+  if (!fs.existsSync(phasePath)) fs.writeFileSync(phasePath, 'P1\n');
+  const journalPath = path.join(proto, 'journal.jsonl');
+  if (!fs.existsSync(journalPath)) fs.writeFileSync(journalPath, '');
+
+  // Keep run state out of the app's git history so gate writes never dirty
+  // the tree (stale detection compares the APP code, not protocol state).
+  const gitignorePath = path.join(runDir, '.gitignore');
+  let gi = '';
+  try {
+    gi = fs.readFileSync(gitignorePath, 'utf8');
+  } catch {
+    /* no .gitignore yet */
+  }
+  if (!gi.split('\n').some((l) => l.trim() === '.protocol/' || l.trim() === '.protocol')) {
+    fs.writeFileSync(gitignorePath, gi + (gi && !gi.endsWith('\n') ? '\n' : '') + '.protocol/\n');
+  }
+
+  // Install enforcement hooks into the RUN PROJECT's .claude/settings.json,
+  // referencing the pack's scripts by ABSOLUTE path (fix #1: hook content
+  // lives in the pack, casual edits to the run project can't neuter it).
+  const claudeDir = path.join(runDir, '.claude');
+  const settingsPath = path.join(claudeDir, 'settings.json');
+  let settings = {};
+  if (fs.existsSync(settingsPath)) {
+    try {
+      settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+    } catch (e) {
+      fail(
+        `${settingsPath} exists but is malformed JSON (${e.message}) — ` +
+          `refusing to clobber it. Fix the file and re-run \`gate-check init\`.`
+      );
+    }
+  }
+  if (typeof settings !== 'object' || settings === null || Array.isArray(settings)) {
+    fail(`${settingsPath} is not a JSON object — refusing to clobber it.`);
+  }
+  if (!settings.hooks || typeof settings.hooks !== 'object') settings.hooks = {};
+  const addedGuard = ensureHook(
+    settings.hooks,
+    'PreToolUse',
+    'Bash',
+    shellQuote(DEPLOY_GUARD)
+  );
+  const addedJournal = ensureHook(
+    settings.hooks,
+    'PostToolUse',
+    '',
+    shellQuote(JOURNAL_APPEND)
+  );
+  fs.mkdirSync(claudeDir, { recursive: true });
+  fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n');
+
+  journal(runDir, {
+    type: 'init',
+    dir: runDir,
+    hooksInstalled: { deployGuard: addedGuard, journalAppend: addedJournal },
+  });
+
+  process.stdout.write(
+    `initialized run project at ${runDir}\n` +
+      `  .protocol/ scaffolded (phase=${readPhase(runDir)})\n` +
+      `  hooks -> ${settingsPath}\n` +
+      `     PreToolUse  : ${DEPLOY_GUARD}${addedGuard ? '' : ' (already present)'}\n` +
+      `     PostToolUse : ${JOURNAL_APPEND}${addedJournal ? '' : ' (already present)'}\n` +
+      `NOTE: open the Claude Code session IN this directory — hooks only fire there.\n`
+  );
+}
+
+// ------------------------------------------------------------------ Gate 0
+
+function cmdGate0() {
+  const runDir = requireRunProject();
+  const specPath = path.join(protocolDir(runDir), 'spec.json');
+  const ts = new Date().toISOString();
+
+  const red = (errors) => {
+    writeGate(runDir, 0, { status: 'red', ts, errors });
+    process.stderr.write(`GATE 0 RED — ${errors.length} finding(s):\n`);
+    for (const e of errors) process.stderr.write(`  ✗ ${e}\n`);
+    process.exit(1);
+  };
+
+  if (!fs.existsSync(specPath)) {
+    red([`spec.json: missing at ${specPath} — Gate 0 has no spec to validate`]);
+  }
+
+  let spec;
+  try {
+    spec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
+  } catch (e) {
+    red([`spec.json: malformed JSON (${e.message})`]);
+  }
+
+  let schema;
+  try {
+    schema = JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf8'));
+  } catch (e) {
+    fail(`cannot read pack schema ${SCHEMA_PATH} (${e.message})`);
+  }
+
+  const errors = [];
+  validateSchema(schema, spec, 'spec', errors);
+  if (errors.length > 0) red(errors);
+
+  writeGate(runDir, 0, {
+    status: 'green',
+    ts,
+    head: gitHead(runDir),
+    evidence: [
+      `spec.json conforms to build-spec.schema.json (project: ${spec.project})`,
+      `provisioning checklist complete: supabaseCli, vercelCli, node checked; claudePlan, supabaseRef, vercelAccount attested`,
+      // Report docker's REAL state rather than asserting it was checked. It is
+      // informational since the 2026-08-01 deferral (Gate 2 proves RLS against
+      // the provisioned project), and the old line claimed a check that the
+      // schema no longer requires and the run may never have made.
+      `docker: ${spec.provisioning?.docker?.checked === true
+        ? 'running'
+        : 'not running — optional; Gate 2 proves RLS against the provisioned project'}`,
+    ],
+  });
+  process.stdout.write(`GATE 0 GREEN — spec valid, provisioning checklist complete.\n`);
+}
+
+// ------------------------------------------------------------------ doctor
+
+const DOCTOR_TOOLS = [
+  { name: 'node', required: true, probe: () => process.version },
+  // F1: `docker --version` exits 0 with the daemon DEAD — it only proves a
+  // binary is on PATH. Probe the engine instead.
+  //
+  // No longer REQUIRED: Gate 2's RLS proof runs against the app's own
+  // provisioned Supabase project (see bin/rls-run), which is both simpler and
+  // stronger than a container plus a hand-written stub of Supabase's auth
+  // schema. Docker is now an optional offline path, so a stopped daemon must
+  // not block a run that does not need it.
+  {
+    name: 'docker',
+    required: false,
+    cmd: 'docker',
+    args: ['info', '--format', '{{.ServerVersion}}'],
+    hint: 'installed but not running — `open -a Docker`. Optional: Gate 2 proves RLS against the provisioned project.',
+  },
+  { name: 'supabase', required: true, cmd: 'supabase', args: ['--version'] },
+  { name: 'vercel', required: true, cmd: 'vercel', args: ['--version'] },
+  {
+    name: 'playwright',
+    required: true,
+    cmd: 'npx',
+    args: ['--no-install', 'playwright', '--version'],
+  },
+  {
+    name: 'gitleaks',
+    required: false,
+    cmd: 'gitleaks',
+    args: ['version'],
+    fallback: 'built-in regex secret scan',
+  },
+];
+
+function probeTool(t) {
+  if (t.probe) return { ok: true, version: t.probe() };
+  try {
+    const outText = execFileSync(t.cmd, t.args, {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 20000,
+    });
+    const line = outText.split('\n').find((l) => l.trim()) || 'ok';
+    return { ok: true, version: line.trim() };
+  } catch {
+    return { ok: false, version: null };
+  }
+}
+
+function cmdDoctor() {
+  const rows = [];
+  const missing = [];
+  for (const t of DOCTOR_TOOLS) {
+    const { ok, version } = probeTool(t);
+    let status;
+    let detail;
+    if (ok) {
+      status = 'OK';
+      detail = version;
+    } else if (t.fallback) {
+      status = 'FALLBACK';
+      detail = `not found — using ${t.fallback}`;
+    } else {
+      status = 'MISSING';
+      // A tool-specific hint beats a generic one. Telling someone to INSTALL
+      // Docker when Docker is installed and merely stopped sends them down the
+      // wrong path entirely.
+      detail = t.hint || (t.required ? 'REQUIRED — install before Gate 0' : 'not found');
+      if (t.required) missing.push(t.name);
+    }
+    rows.push([t.name, status, detail]);
+  }
+
+  const w1 = Math.max(...rows.map((r) => r[0].length), 4) + 2;
+  const w2 = Math.max(...rows.map((r) => r[1].length), 6) + 2;
+  process.stdout.write('TOOL'.padEnd(w1) + 'STATUS'.padEnd(w2) + 'VERSION / DETAIL\n');
+  for (const [name, status, detail] of rows) {
+    process.stdout.write(name.padEnd(w1) + status.padEnd(w2) + detail + '\n');
+  }
+
+  if (missing.length > 0) {
+    process.stderr.write(`\ndoctor: missing required tool(s): ${missing.join(', ')}\n`);
+    process.exit(1);
+  }
+  process.stdout.write('\ndoctor: all required tools present.\n');
+}
+
+// ------------------------------------------------------------------ Gate 1
+
+function cmdGate1(args) {
+  const { flags } = parseFlags(args, { report: true, approve: true });
+  if (!('report' in flags) && !('approve' in flags)) {
+    fail(`gate 1 needs --report <path> and/or --approve "<name>".\n\n${USAGE}`);
+  }
+  const runDir = requireRunProject();
+  const ts = new Date().toISOString();
+
+  if ('report' in flags) {
+    const reportPath = flags.report && path.resolve(flags.report);
+    if (!flags.report) fail('--report needs a file path.');
+    if (!fs.existsSync(reportPath)) {
+      fail(`--report: no such file: ${reportPath} — the lint report does not exist.`);
+    }
+    const dest = path.join(
+      protocolDir(runDir),
+      'evidence',
+      `gate1-lint-${Date.now()}-${path.basename(reportPath)}`
+    );
+    fs.copyFileSync(reportPath, dest);
+    const rel = path.relative(runDir, dest);
+    writeGate(runDir, 1, {
+      status: 'red',
+      ts,
+      head: gitHead(runDir),
+      report: rel,
+      note: 'lint report ingested — awaiting human approval (gate-check 1 --approve "<name>")',
+    });
+    journal(runDir, { type: 'evidence', gate: 1, file: rel });
+    process.stdout.write(`GATE 1: lint report ingested -> ${rel}\n`);
+  }
+
+  if ('approve' in flags) {
+    const approver = (flags.approve || '').trim();
+    if (!approver) fail('--approve needs the approver\'s name, e.g. --approve "Ian Veber".');
+    const { gate } = readGate(runDir, 1);
+    if (!gate || !gate.report) {
+      fail(
+        `GATE 1 approval REFUSED — no lint report has been ingested this gate cycle. ` +
+          `Run \`gate-check 1 --report <path>\` first, then approve.`
+      );
+    }
+    // F5: the design sign-off is one of only two blocking gates, and it was
+    // accepting arbitrary free text as a signature — so it was not a control,
+    // it was a comment field. When the spec declares approvers, the name must
+    // be one of them.
+    //
+    // Deliberately backwards compatible: a spec with no approvers[] accepts any
+    // name, because refusing them would break every run already in flight. The
+    // allowlist binds only once someone declares one.
+    const spec = readSpecQuiet(runDir);
+    const allowed = Array.isArray(spec?.approvers) ? spec.approvers : null;
+    if (allowed && allowed.length && !allowed.some((a) => String(a).trim() === approver)) {
+      fail(
+        `GATE 1 approval REFUSED — "${approver}" is not in spec.approvers ` +
+          `(${allowed.map((a) => `"${a}"`).join(', ')}). A signature from someone the spec ` +
+          `does not name is not an approval.`
+      );
+    }
+
+    writeGate(runDir, 1, {
+      status: 'green',
+      ts: new Date().toISOString(),
+      head: gitHead(runDir),
+      approver,
+      report: gate.report,
+      evidence: [gate.report],
+    });
+    process.stdout.write(`GATE 1 GREEN — design approved by ${approver} (report: ${gate.report}).\n`);
+  }
+}
+
+// ------------------------------------------------------------------ Gate 2
+//
+// Security pass. Three checks, ALL must pass; every error path is RED, never
+// green (the false-green is the product-killing bug):
+//   1. RLS: `supabase test db` (pgTAP on the local shadow db) in the run
+//      project. CLI missing / run fails / zero tests => RED.
+//   2. Secrets: gitleaks if on PATH, else built-in regex scan (service_role
+//      JWTs, sk-ant-*, generic 40+ char high-entropy assignments). Hit => RED.
+//   3. Input validation heuristic: app/api + src/app/api route handlers using
+//      raw req.body / request.json() / searchParams without a zod/valibot
+//      parse in the same handler. Unparsed POST/PUT/PATCH => RED.
+
+function evidenceDirOf(runDir) {
+  const d = path.join(protocolDir(runDir), 'evidence');
+  fs.mkdirSync(d, { recursive: true });
+  return d;
+}
+
+function writeEvidence(runDir, name, content) {
+  const dest = path.join(evidenceDirOf(runDir), name);
+  fs.writeFileSync(dest, content.endsWith('\n') ? content : content + '\n');
+  const rel = path.relative(runDir, dest);
+  journal(runDir, { type: 'evidence', gate: name.startsWith('gate3') ? 3 : 2, file: rel });
+  return rel;
+}
+
+/** Parse pg_prove / TAP output for test counts. */
+function parseTapCounts(outText) {
+  let total = 0;
+  let failed = 0;
+  let sawCount = false;
+  for (const m of outText.matchAll(/Tests=(\d+)/g)) {
+    total += Number(m[1]);
+    sawCount = true;
+  }
+  if (!sawCount) {
+    // raw TAP: plan lines "1..N"
+    for (const m of outText.matchAll(/^\s*1\.\.(\d+)/gm)) {
+      total += Number(m[1]);
+      sawCount = true;
+    }
+  }
+  failed += [...outText.matchAll(/^\s*not ok\b/gm)].length;
+  return { sawCount, total, failed };
+}
+
+/** Check 1 — RLS via `supabase test db`. Returns {finding, summary, output}. */
+function runRlsCheck(runDir) {
+  // F3 — PREFERRED PATH: the pack owns the runner and the arithmetic.
+  //
+  // When the app ships `supabase/tests/cases/`, Gate 2 delegates to
+  // bin/rls-run, which lives HERE, in the pack. The app contributes only .sql
+  // case files: data, never code. It cannot supply the runner and it cannot
+  // supply the verdict.
+  //
+  // The rejected design was to execute `<runDir>/supabase/tests/run.sh` and
+  // parse its stdout. That script sits inside the app under test and is
+  // written by the agent being judged — a four-line shell script printing
+  // "All tests successful" would have been the entire security verdict.
+  //
+  // Parsing rls-run's stdout IS safe, and the difference is the whole point:
+  // that binary is ours and the app cannot replace it.
+  if (fs.existsSync(path.join(runDir, 'supabase', 'tests', 'cases'))) {
+    const packRunner = path.join(PACK_BIN, 'rls-run');
+    const res = spawnSync(process.execPath, [packRunner, runDir], {
+      cwd: runDir,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 600000,
+    });
+    const raw = `$ rls-run ${runDir}\n${res.stdout || ''}${res.stderr || ''}`;
+    let report;
+    try {
+      report = JSON.parse(res.stdout);
+    } catch {
+      return {
+        finding:
+          'RLS: the pack runner produced no parseable report — treat as red and inspect ' +
+          '.protocol/evidence/gate2-rls.txt.',
+        summary: null,
+        output: raw,
+      };
+    }
+    if (!report.ok) {
+      return {
+        finding: (report.findings && report.findings[0]) || 'RLS: suite failed.',
+        summary: null,
+        output: raw,
+      };
+    }
+    return {
+      finding: null,
+      summary: { total: report.total ?? report.caseCount ?? 0, failed: report.failed ?? 0 },
+      output: raw,
+    };
+  }
+
+  const res = spawnSync('supabase', ['test', 'db'], {
+    cwd: runDir,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    timeout: 600000,
+  });
+  const output = `$ supabase test db  (cwd: ${runDir})\n${res.stdout || ''}${res.stderr || ''}`;
+
+  if (res.error && res.error.code === 'ENOENT') {
+    return {
+      finding:
+        'RLS: supabase CLI not found on PATH — install it (brew install supabase/tap/supabase) ' +
+        'and ensure Docker is running, or break-glass with `gate-check 2 --attest "<name>: <reason>"`.',
+      summary: null,
+      output: output + '\n(supabase CLI not found on PATH)',
+    };
+  }
+  if (res.error) {
+    return {
+      finding: `RLS: \`supabase test db\` failed to run (${res.error.message}) — fix the CLI/Docker and re-run.`,
+      summary: null,
+      output: `${output}\n(error: ${res.error.message})`,
+    };
+  }
+  if (res.status !== 0) {
+    return {
+      finding:
+        `RLS: \`supabase test db\` exited ${res.status} — pgTAP suite failing or shadow db down; ` +
+        'see .protocol/evidence/gate2-rls.txt and fix before re-running.',
+      summary: null,
+      output,
+    };
+  }
+  const { sawCount, total, failed } = parseTapCounts(output);
+  if (!sawCount) {
+    return {
+      finding:
+        'RLS: `supabase test db` exited 0 but no test count could be read from its output — ' +
+        'cannot prove any test ran; treat as red and inspect .protocol/evidence/gate2-rls.txt.',
+      summary: null,
+      output,
+    };
+  }
+  if (total === 0) {
+    return {
+      finding:
+        'RLS: the pgTAP suite ran ZERO tests — a zero-test pass is not a pass. Write deny-by-default ' +
+        'negative cases for every table under supabase/tests/ and re-run.',
+      summary: { total: 0, passed: 0, failed: 0 },
+      output,
+    };
+  }
+  if (failed > 0) {
+    return {
+      finding: `RLS: ${failed}/${total} pgTAP test(s) failing — fix the policies/tests and re-run.`,
+      summary: { total, passed: total - failed, failed },
+      output,
+    };
+  }
+  return { finding: null, summary: { total, passed: total, failed: 0 }, output };
+}
+
+// ---- secrets scan (check 2)
+
+const SCAN_SKIP_DIRS = new Set([
+  '.git', 'node_modules', '.next', '.protocol', '.vercel', '.claude',
+  'dist', 'build', 'coverage', 'out',
+]);
+const SCAN_SKIP_FILES = new Set([
+  '.env.example', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lock', 'bun.lockb',
+]);
+const SCAN_SOURCE_EXT = new Set([
+  '.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs', '.sql', '.json', '.yaml', '.yml', '.toml', '.sh',
+]);
+const SCAN_MAX_BYTES = 2 * 1024 * 1024;
+
+function listScannableFiles(runDir) {
+  const files = [];
+  const walk = (dir) => {
+    let entries;
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const ent of entries) {
+      const full = path.join(dir, ent.name);
+      if (ent.isDirectory()) {
+        if (!SCAN_SKIP_DIRS.has(ent.name)) walk(full);
+        continue;
+      }
+      if (!ent.isFile()) continue;
+      if (SCAN_SKIP_FILES.has(ent.name)) continue;
+      // F2: a gitignored file cannot leak through the repo. `provision` writes
+      // real keys into .env.local by design, so flagging it made every
+      // correctly-built app fail its own gate. An UNIGNORED .env is still a
+      // finding — one `git add -A` from a public leak.
+      const isEnv = ent.name.startsWith('.env');
+      const isSource = SCAN_SOURCE_EXT.has(path.extname(ent.name));
+      if (!isEnv && !isSource) continue;
+      try {
+        if (fs.statSync(full).size > SCAN_MAX_BYTES) continue;
+      } catch {
+        continue;
+      }
+      files.push(full);
+    }
+  };
+  walk(runDir);
+
+  // F2: drop anything git already refuses to track. A gitignored file cannot
+  // leak through the repository, and `provision` writes real keys into
+  // .env.local by design — flagging it made every correctly-provisioned app
+  // fail its own security gate, which teaches people to ignore the gate.
+  //
+  // Fails SAFE: if git cannot answer (no repo, git missing), nothing is
+  // excused and every file is still scanned. An unavailable tool must never
+  // silence a security check.
+  const res = spawnSync('git', ['check-ignore', '--stdin'], {
+    cwd: runDir,
+    input: files.join('\n') + '\n',
+    encoding: 'utf8',
+  });
+  if (!res.error && (res.status === 0 || res.status === 1)) {
+    const ignored = new Set(
+      (res.stdout || '').split('\n').map((l) => l.trim()).filter(Boolean)
+    );
+    if (ignored.size) return files.filter((f) => !ignored.has(f));
+  }
+  return files;
+}
+
+function shannonEntropy(s) {
+  const freq = new Map();
+  for (const c of s) freq.set(c, (freq.get(c) || 0) + 1);
+  let e = 0;
+  for (const n of freq.values()) {
+    const p = n / s.length;
+    e -= p * Math.log2(p);
+  }
+  return e;
+}
+
+function b64urlJson(part) {
+  try {
+    const pad = part.replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(Buffer.from(pad, 'base64').toString('utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function redactSecret(s) {
+  return `${s.slice(0, 6)}…[${s.length} chars redacted]`;
+}
+
+/** Built-in regex secret scan of one file's content. Returns hit descriptors. */
+function scanContentForSecrets(content, relFile) {
+  const hits = [];
+  for (const m of content.matchAll(/sk-ant-[A-Za-z0-9_-]{16,}/g)) {
+    hits.push({ file: relFile, kind: 'Anthropic API key (sk-ant-*)', match: m[0] });
+  }
+  for (const m of content.matchAll(/eyJ[A-Za-z0-9_-]{8,}\.([A-Za-z0-9_-]{8,})\.[A-Za-z0-9_-]{8,}/g)) {
+    const payload = b64urlJson(m[1]);
+    if (payload && payload.role === 'service_role') {
+      hits.push({ file: relFile, kind: 'Supabase service_role JWT', match: m[0] });
+    }
+  }
+  for (const m of content.matchAll(
+    /[A-Za-z_][A-Za-z0-9_]*\s*[:=]\s*['"`]?([A-Za-z0-9+/_=-]{40,})['"`]?/g
+  )) {
+    const val = m[1];
+    if (val.startsWith('eyJ')) continue; // JWTs handled above (anon key is legitimately public)
+    if (shannonEntropy(val) >= 4.5) {
+      hits.push({ file: relFile, kind: 'high-entropy assignment (40+ chars)', match: val });
+    }
+  }
+  return hits;
+}
+
+/** Check 2 — secrets. gitleaks when available, else built-in regex scan. */
+function runSecretScan(runDir) {
+  const probe = spawnSync('gitleaks', ['version'], {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    timeout: 15000,
+  });
+  if (!probe.error && probe.status === 0) {
+    const res = spawnSync(
+      'gitleaks',
+      ['detect', '--no-banner', '--redact', '-s', runDir],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 180000 }
+    );
+    const output = `$ gitleaks detect --no-banner --redact -s ${runDir}\n${res.stdout || ''}${res.stderr || ''}`;
+    if (res.error || (res.status !== 0 && res.status !== 1)) {
+      return {
+        tool: 'gitleaks',
+        finding:
+          `secrets: gitleaks errored (${res.error ? res.error.message : `exit ${res.status}`}) — ` +
+          'fix the gitleaks install (or remove it to use the built-in scan) and re-run.',
+        output,
+      };
+    }
+    if (res.status === 1) {
+      return {
+        tool: 'gitleaks',
+        finding:
+          'secrets: gitleaks found leaked secret(s) — see .protocol/evidence/gate2-secrets.txt, ' +
+          'rotate the exposed keys, purge them from code/history, then re-run.',
+        output,
+      };
+    }
+    return { tool: 'gitleaks', finding: null, output: output + '\nno leaks found.' };
+  }
+
+  // built-in regex fallback
+  const hits = [];
+  for (const file of listScannableFiles(runDir)) {
+    let content;
+    try {
+      content = fs.readFileSync(file, 'utf8');
+    } catch {
+      continue;
+    }
+    hits.push(...scanContentForSecrets(content, path.relative(runDir, file)));
+  }
+  const lines = ['built-in regex secret scan (gitleaks not on PATH)'];
+  for (const h of hits) lines.push(`  ✗ ${h.file}: ${h.kind}: ${redactSecret(h.match)}`);
+  if (hits.length === 0) lines.push('  no findings.');
+  return {
+    tool: 'built-in regex scan',
+    finding:
+      hits.length > 0
+        ? `secrets: built-in scan found ${hits.length} secret(s) in the run project — ` +
+          'see .protocol/evidence/gate2-secrets.txt, rotate + remove them, then re-run.'
+        : null,
+    output: lines.join('\n'),
+  };
+}
+
+// ---- input validation heuristic (check 3)
+
+function findRouteFiles(runDir) {
+  const files = [];
+  for (const root of ['app/api', 'src/app/api']) {
+    const base = path.join(runDir, root);
+    if (!fs.existsSync(base)) continue;
+    const walk = (dir) => {
+      for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, ent.name);
+        if (ent.isDirectory()) walk(full);
+        else if (/^route\.(js|jsx|ts|tsx|mjs|cjs)$/.test(ent.name)) files.push(full);
+      }
+    };
+    walk(base);
+  }
+  return files;
+}
+
+/**
+ * Heuristic: per exported HTTP-method handler, raw req.body / request.json()
+ * / searchParams usage without a zod/valibot parse call in the same handler.
+ * Returns [{method}] for each unparsed handler in the file.
+ */
+function scanRouteHandlers(content) {
+  const exportRe =
+    /export\s+(?:async\s+)?(?:function|const)\s+(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\b/g;
+  const marks = [];
+  let m;
+  while ((m = exportRe.exec(content)) !== null) marks.push({ method: m[1], index: m.index });
+  const unparsed = [];
+  for (let i = 0; i < marks.length; i++) {
+    const end = i + 1 < marks.length ? marks[i + 1].index : content.length;
+    const chunk = content.slice(marks[i].index, end);
+    const rawUse =
+      /\b(?:req|request)\.body\b|\b(?:req|request)\.(?:json|formData|text)\s*\(|\bsearchParams\b/.test(
+        chunk
+      );
+    // Schema-validation call, NOT any incidental `.parse(`. safeParse/parseAsync/
+    // safeParseAsync are zod/valibot-specific and always count. Bare `.parse(` is
+    // ambiguous — JSON.parse(), Number.parse*, Date.parse(), url.parse() etc. are
+    // NOT validation, so a bare `.parse(` only counts when its receiver is not one
+    // of those built-ins (a schema object like `schema.parse(...)` does).
+    const schemaCall =
+      /\.(?:safeParse|parseAsync|safeParseAsync)\s*\(/.test(chunk) ||
+      /(?<!\b(?:JSON|Number|Date|url|URL|querystring|qs|path))\.parse\s*\(/.test(chunk) ||
+      /\bvalibot\b/.test(chunk);
+    if (rawUse && !schemaCall) unparsed.push({ method: marks[i].method });
+  }
+  return unparsed;
+}
+
+/** Check 3 — input validation. Returns {finding, warnings, output}. */
+function runInputValidationCheck(runDir) {
+  const routeFiles = findRouteFiles(runDir);
+  const warnings = [];
+  for (const file of routeFiles) {
+    let content;
+    try {
+      content = fs.readFileSync(file, 'utf8');
+    } catch {
+      continue;
+    }
+    for (const u of scanRouteHandlers(content)) {
+      warnings.push({ file: path.relative(runDir, file), method: u.method });
+    }
+  }
+  const mutating = warnings.filter((w) => ['POST', 'PUT', 'PATCH'].includes(w.method));
+  const lines = [`input-validation heuristic: ${routeFiles.length} route handler file(s) scanned`];
+  for (const w of warnings) {
+    lines.push(`  ⚠ ${w.file}: ${w.method} uses raw req.body/request.json()/searchParams without a zod/valibot parse`);
+  }
+  if (warnings.length === 0) lines.push('  no unparsed input usage found.');
+  return {
+    finding:
+      mutating.length > 0
+        ? `input validation: ${mutating.length} POST/PUT/PATCH handler(s) consume raw input without a ` +
+          'zod/valibot parse — add schema.parse()/safeParse() before use ' +
+          `(${mutating.map((w) => `${w.file}:${w.method}`).join(', ')}).`
+        : null,
+    warnings,
+    output: lines.join('\n'),
+  };
+}
+
+function cmdGate2(args) {
+  const { flags } = parseFlags(args, { attest: true });
+  const runDir = requireRunProject();
+  const ts = new Date().toISOString();
+
+  // Break-glass attestation — Gate 2 only (plan fix #9).
+  if ('attest' in flags) {
+    const raw = (flags.attest || '').trim();
+    const sep = raw.indexOf(':');
+    const name = sep > 0 ? raw.slice(0, sep).trim() : '';
+    const reason = sep > 0 ? raw.slice(sep + 1).trim() : '';
+    if (!name || !reason) {
+      fail('--attest needs "<name>: <reason>", e.g. --attest "Ian Veber: Docker down, client demo".');
+    }
+    writeGate(runDir, 2, { status: 'attested', ts, head: gitHead(runDir), approver: name, reason });
+    journal(runDir, { type: 'attest', gate: 2, approver: name, reason });
+    process.stdout.write(
+      `GATE 2 ATTESTED (break-glass) by ${name}: ${reason}\n` +
+        `  This is NOT a verification. The SHIP-REPORT will carry a red attestation banner.\n` +
+        `  Re-run \`gate-check 2\` for real as soon as tooling is back.\n`
+    );
+    return;
+  }
+
+  const findings = [];
+  const evidence = [];
+
+  const rls = runRlsCheck(runDir);
+  evidence.push(writeEvidence(runDir, 'gate2-rls.txt', rls.output));
+  if (rls.finding) findings.push(rls.finding);
+
+  const secrets = runSecretScan(runDir);
+  evidence.push(writeEvidence(runDir, 'gate2-secrets.txt', secrets.output));
+  if (secrets.finding) findings.push(secrets.finding);
+
+  const inputVal = runInputValidationCheck(runDir);
+  evidence.push(writeEvidence(runDir, 'gate2-input-validation.txt', inputVal.output));
+  if (inputVal.finding) findings.push(inputVal.finding);
+
+  if (findings.length > 0) {
+    writeGate(runDir, 2, { status: 'red', ts, errors: findings, evidence });
+    process.stderr.write(`GATE 2 RED — ${findings.length} finding(s):\n`);
+    for (const f of findings) process.stderr.write(`  ✗ ${f}\n`);
+    process.exit(1);
+  }
+
+  writeGate(runDir, 2, {
+    status: 'green',
+    ts,
+    head: gitHead(runDir),
+    evidence,
+    rls: rls.summary,
+    secrets: { tool: secrets.tool, findings: 0 },
+    inputValidation: { warnings: inputVal.warnings.length },
+  });
+  process.stdout.write(
+    `GATE 2 GREEN — RLS ${rls.summary.passed}/${rls.summary.total} pgTAP tests passed, ` +
+      `secrets clean (${secrets.tool}), input validation clean` +
+      (inputVal.warnings.length ? ` (${inputVal.warnings.length} non-mutating warning(s))` : '') +
+      `.\n`
+  );
+}
+
+// ------------------------------------------------------------------ Gate 3
+//
+// Verified deploy + handover. Preconditions: gate 2 effectively green (stale
+// green does NOT count) or attested (break-glass — the report screams it).
+// Checks: prod URL 200; thin RLS probe — anon fetch of each protected route
+// must 401/403/redirect, NEVER 200; smoke (playwright if available, else
+// curl-level, clearly marked). On green renders SHIP-REPORT.md.
+
+function fetchWithTimeout(url, opts = {}) {
+  return fetch(url, {
+    ...opts,
+    signal: AbortSignal.timeout(15000),
+    headers: { 'user-agent': 'gate-check (3-Day App Protocol, gate 3 probe)' },
+  });
+}
+
+/** Smoke: playwright when usable, else curl-level fallback (v0-acceptable). */
+function runSmoke(runDir, baseUrl, reachableSummary) {
+  const probe = spawnSync('npx', ['--no-install', 'playwright', '--version'], {
+    cwd: runDir,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    timeout: 60000,
+  });
+  const hasPlaywright = !probe.error && probe.status === 0;
+  if (hasPlaywright) {
+    const candidates = [
+      'tests/smoke.spec.ts', 'tests/smoke.spec.js',
+      'e2e/smoke.spec.ts', 'e2e/smoke.spec.js',
+      path.join('.protocol', 'smoke.spec.ts'), path.join('.protocol', 'smoke.spec.js'),
+    ];
+    const specFile = candidates.find((c) => fs.existsSync(path.join(runDir, c)));
+    if (specFile) {
+      const res = spawnSync('npx', ['--no-install', 'playwright', 'test', specFile], {
+        cwd: runDir,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+        timeout: 600000,
+        env: { ...process.env, SMOKE_BASE_URL: baseUrl },
+      });
+      const ok = !res.error && res.status === 0;
+      return {
+        mode: `playwright (${specFile})`,
+        ok,
+        output:
+          `smoke: playwright ${specFile} against ${baseUrl}\n` +
+          `${res.stdout || ''}${res.stderr || ''}\n` +
+          (ok ? 'PASS' : `FAIL (${res.error ? res.error.message : `exit ${res.status}`})`),
+      };
+    }
+    return {
+      mode: 'curl-level (playwright installed but no smoke spec found)',
+      ok: null,
+      output:
+        `smoke: curl-level (playwright installed but no smoke spec found at tests/e2e/.protocol smoke.spec.*)\n` +
+        `${reachableSummary}\nsignup → core action → persist NOT exercised (v0-dogfood fallback).`,
+    };
+  }
+  return {
+    mode: 'curl-level (playwright unavailable)',
+    ok: null,
+    output:
+      `smoke: curl-level (playwright unavailable)\n` +
+      `${reachableSummary}\nsignup → core action → persist NOT exercised (v0-dogfood fallback).`,
+  };
+}
+
+// ---- SHIP-REPORT rendering
+
+const SHIP_TEMPLATE = path.join(PACK_ROOT, 'templates', 'SHIP-REPORT.template.md');
+
+/**
+ * Minimal renderer for the template's conventions:
+ *   {{NAME}} scalar; {{#S}}...{{/S}} block (array => repeat per item, truthy
+ *   => once, falsy => omit); {{^S}}...{{/S}} inverse. Unknown scalars => '—'.
+ */
+function renderTemplate(tpl, ctx) {
+  const blockRe = /\{\{([#^])([A-Za-z0-9_]+)\}\}\n?([\s\S]*?)\{\{\/\2\}\}\n?/;
+  let out = tpl;
+  for (;;) {
+    const m = blockRe.exec(out);
+    if (!m) break;
+    const [whole, kind, name, inner] = m;
+    const val = ctx[name];
+    let rep = '';
+    if (kind === '#') {
+      if (Array.isArray(val)) {
+        rep = val.map((item) => renderTemplate(inner, { ...ctx, ...item })).join('');
+      } else if (val) {
+        rep = renderTemplate(inner, ctx);
+      }
+    } else {
+      const empty = !val || (Array.isArray(val) && val.length === 0);
+      if (empty) rep = renderTemplate(inner, ctx);
+    }
+    out = out.slice(0, m.index) + rep + out.slice(m.index + whole.length);
+  }
+  return out.replace(/\{\{([A-Za-z0-9_]+)\}\}/g, (_, name) =>
+    ctx[name] !== undefined && ctx[name] !== null ? String(ctx[name]) : '—'
+  );
+}
+
+function readJournal(runDir) {
+  try {
+    return fs
+      .readFileSync(path.join(protocolDir(runDir), 'journal.jsonl'), 'utf8')
+      .split('\n')
+      .filter(Boolean)
+      .map((l) => {
+        try {
+          return JSON.parse(l);
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function gateRow(runDir, n) {
+  const { gate, status } = readGate(runDir, n);
+  return {
+    status: status.toUpperCase(),
+    ts: (gate && gate.ts) || '—',
+    approver: (gate && gate.approver) || '—',
+    evidence:
+      gate && Array.isArray(gate.evidence) && gate.evidence.length
+        ? gate.evidence.map((e) => `\`${e}\``).join(', ')
+        : '—',
+  };
+}
+
+function buildShipReportData(runDir, spec, url, ts, probeRows, probeEvidenceRel, smoke, gate3Evidence) {
+  const entries = readJournal(runDir);
+  const overrides = entries.filter((e) => e.type === 'override');
+  const attests = entries.filter((e) => e.type === 'attest');
+  const notes = entries.filter((e) => e.type === 'note');
+  const g2 = readGate(runDir, 2).gate || {};
+  const attestations =
+    g2.status === 'attested'
+      ? [
+          {
+            GATE_N: 2,
+            ATTESTER: g2.approver || 'unknown',
+            ATTEST_REASON: g2.reason || '—',
+            ATTEST_TS: g2.ts || '—',
+            REVERIFY_STATUS: 'PENDING — re-run `gate-check 2` with tooling up',
+          },
+        ]
+      : [];
+  const interventionCount = overrides.length + attests.length + notes.length;
+
+  let runDuration = '—';
+  if (entries.length > 0 && entries[0].ts) {
+    const ms = Date.parse(ts) - Date.parse(entries[0].ts);
+    if (Number.isFinite(ms) && ms >= 0) runDuration = `${(ms / 3600000).toFixed(1)}h`;
+  }
+
+  let nextVersion = '—';
+  try {
+    const pkg = JSON.parse(fs.readFileSync(path.join(runDir, 'package.json'), 'utf8'));
+    nextVersion = (pkg.dependencies && pkg.dependencies.next) || '—';
+  } catch {
+    /* no package.json */
+  }
+  let vercelProject = '—';
+  try {
+    const vp = JSON.parse(fs.readFileSync(path.join(runDir, '.vercel', 'project.json'), 'utf8'));
+    vercelProject = vp.projectName || vp.projectId || '—';
+  } catch {
+    /* not linked */
+  }
+
+  const g0 = gateRow(runDir, 0);
+  const g1 = gateRow(runDir, 1);
+  const g2row = gateRow(runDir, 2);
+  const g1gate = readGate(runDir, 1).gate || {};
+  const rls = g2.rls || null;
+
+  const pages = Array.isArray(spec.pages) ? spec.pages : [];
+  const entities = Array.isArray(spec.entities) ? spec.entities : [];
+  const roles = (spec.auth && Array.isArray(spec.auth.roles) && spec.auth.roles) || [];
+
+  return {
+    PROJECT_NAME: spec.project || path.basename(runDir),
+    SHIP_DATE: ts.slice(0, 10),
+    PROD_URL: url,
+    RUN_DURATION: runDuration,
+    OPERATOR_NAME: g1gate.approver || '—',
+    PROTOCOL_VERSION: 'v0 (B1 dogfood)',
+    HAS_OVERRIDES_OR_ATTESTATIONS: overrides.length + attestations.length > 0,
+    WHAT_WAS_BUILT_SUMMARY:
+      `${spec.project || 'App'} — ${pages.length} page(s) ` +
+      `(${pages.map((p) => p.name).join(', ') || 'n/a'}), ` +
+      `${entities.length} data entit${entities.length === 1 ? 'y' : 'ies'} ` +
+      `(${entities.map((e) => e.name).join(', ') || 'n/a'}), built from \`.protocol/spec.json\`.`,
+    ACTORS: roles.join(', ') || '—',
+    CORE_ACTIONS: pages.map((p) => p.purpose || p.name).filter(Boolean).join('; ') || '—',
+    NEXT_VERSION: nextVersion,
+    SUPABASE_REF: spec.supabaseRef || '—',
+    VERCEL_PROJECT: vercelProject,
+    SPEC_EVIDENCE_LINK: g0.evidence,
+    SHIP_HEAD: gitHead(runDir) || 'no git HEAD (repo unreadable)',
+    GATE0_STATUS: g0.status, GATE0_TS: g0.ts, GATE0_EVIDENCE_LINKS: g0.evidence,
+    GATE1_STATUS: g1.status, GATE1_TS: g1.ts, GATE1_APPROVER: g1.approver,
+    GATE1_EVIDENCE_LINKS: g1.evidence,
+    GATE2_STATUS: g2row.status, GATE2_TS: g2row.ts, GATE2_APPROVER: g2row.approver,
+    GATE2_EVIDENCE_LINKS: g2row.evidence,
+    GATE3_STATUS: 'GREEN', GATE3_TS: ts,
+    GATE3_EVIDENCE_LINKS:
+      gate3Evidence.map((e) => `\`${e}\``).join(', ') + ` · smoke: ${smoke.mode}`,
+    PGTAP_TOTAL: rls ? rls.total : '—',
+    PGTAP_PASSED: rls ? rls.passed : '—',
+    PGTAP_FAILED: rls ? rls.failed : '—',
+    PGTAP_TABLES_COVERED: '—',
+    TABLE_COUNT: entities.length,
+    PGTAP_SUITE_SOURCE: 'supabase/tests/ (run via `supabase test db`)',
+    PGTAP_RUNTIME: '—',
+    PGTAP_EVIDENCE_LINK: '`.protocol/evidence/gate2-rls.txt`',
+    PROBE_ROWS: probeRows,
+    PROBE_EVIDENCE_LINK: `\`${probeEvidenceRel}\``,
+    SECRETS_TOOL: (g2.secrets && g2.secrets.tool) || '—',
+    SECRETS_RESULT: g2.secrets ? 'PASS' : '—',
+    SECRETS_DETAIL: g2.secrets ? `${g2.secrets.findings} finding(s)` : '—',
+    ENV_RESULT: 'not run (v0)', ENV_DETAIL: 'env audit lands post-v0',
+    BUNDLE_RESULT: 'not run (v0)', BUNDLE_DETAIL: 'bundle scan lands post-v0',
+    INPUT_VALIDATION_RESULT: g2.inputValidation ? 'PASS' : '—',
+    INPUT_VALIDATION_DETAIL: g2.inputValidation
+      ? `${g2.inputValidation.warnings} warning(s)`
+      : '—',
+    G1_LINT_LINK: g1gate.report ? `\`${g1gate.report}\`` : '—',
+    G3_LINT_LINK: 'not run (v0)',
+    CLAUDE_COST: 'not captured (v0)', COST_SOURCE: 'manual /cost entry pending',
+    SUPABASE_TIER: '—', VERCEL_TIER: '—', OTHER_COSTS: '—', TOTAL_COST: '—',
+    MONTHLY_ESTIMATE: '—',
+    INTERVENTION_COUNT: interventionCount,
+    INTERVENTION_VERDICT: interventionCount <= 15 ? 'within budget' : 'OVER BUDGET',
+    FORCE_COUNT: overrides.length,
+    ATTEST_COUNT: attests.length,
+    NOTE_COUNT: notes.length,
+    CHAT_CORRECTION_COUNT: 0,
+    INTERVENTION_ROWS: [...overrides, ...attests, ...notes].map((e) => ({
+      TS: e.ts || '—',
+      TYPE: e.type,
+      DETAIL: e.reason || e.text || (e.gate !== undefined ? `gate ${e.gate}` : '—'),
+    })),
+    ATTESTATIONS: attestations,
+    FORCED_ADVANCES: overrides.map((o) => ({
+      GATE_N: o.gate !== undefined ? o.gate : '—',
+      FORCER: 'operator (see journal)',
+      FORCE_REASON: o.reason || '—',
+      FORCE_TS: o.ts || '—',
+    })),
+    CREDENTIAL_ROWS: [
+      {
+        CRED_NAME: 'Supabase service_role key',
+        CRED_LOCATION: 'Supabase dashboard + Vercel env (server-side only)',
+        CRED_HOLDER: 'operator',
+        CRED_ROTATION: 'rotate on handover; never client-exposed',
+      },
+      {
+        CRED_NAME: 'Supabase anon key',
+        CRED_LOCATION: 'Vercel env (NEXT_PUBLIC_*)',
+        CRED_HOLDER: 'public by design (RLS enforced)',
+        CRED_ROTATION: 'rotate if service_role ever leaked',
+      },
+    ],
+    CHANGE_CONTENT_HOWTO: 'edit the page in the repo, commit, re-run `gate-check 2`, deploy',
+    CHANGE_DESIGN_HOWTO: 'edit tokens/components',
+    ADMIN_HOWTO: 'Supabase dashboard (Auth + Table editor)',
+    SUPPORT_CONTACT: 'the operator who shipped this run',
+    RENDER_TS: ts,
+  };
+}
+
+async function cmdGate3(args) {
+  const { flags } = parseFlags(args, { url: true });
+  const runDir = requireRunProject();
+  const ts = new Date().toISOString();
+
+  const red = (errors) => {
+    writeGate(runDir, 3, { status: 'red', ts, errors });
+    process.stderr.write(`GATE 3 RED — ${errors.length} finding(s):\n`);
+    for (const e of errors) process.stderr.write(`  ✗ ${e}\n`);
+    process.exit(1);
+  };
+
+  // Precondition: gate 2 effectively green (stale does NOT count) or attested.
+  const g2 = effectiveGate(runDir, 2);
+  if (g2.effective !== 'green' && g2.effective !== 'attested') {
+    red([
+      `gate 2 is ${g2.effective.toUpperCase()}${g2.detail ? ` (${g2.detail})` : ''} — ` +
+        'Gate 3 refuses to verify a deploy the security pass has not seen. Run `gate-check 2` first.',
+    ]);
+  }
+  // A green gate 2 must carry the real security-pass evidence — a hand-edited
+  // bare green (no rls summary / no evidence) is not a verified pass.
+  if (g2.effective === 'green' && !gate2GreenIsVerified(g2.gate)) {
+    red([
+      'gate 2 claims green but carries no verification evidence (missing RLS summary and/or evidence ' +
+        'paths) — this looks hand-edited, not a real `gate-check 2` pass. Run `gate-check 2` for real ' +
+        '(or `gate-check 2 --attest` to break-glass) before Gate 3.',
+    ]);
+  }
+  if (g2.effective === 'attested') {
+    process.stderr.write(
+      'GATE 3 WARNING: gate 2 is ATTESTED (break-glass), not verified — the SHIP-REPORT will carry a red banner.\n'
+    );
+  }
+
+  // Spec + production URL.
+  let spec = {};
+  try {
+    spec = JSON.parse(fs.readFileSync(path.join(protocolDir(runDir), 'spec.json'), 'utf8'));
+  } catch (e) {
+    red([`spec.json unreadable (${e.message}) — Gate 3 needs the spec for the URL and protected routes.`]);
+  }
+  const url = flags.url || spec.deployUrl || (spec.deploy && spec.deploy.url) || spec.prodUrl;
+  if (!url) {
+    red(['no production URL — add "deployUrl" to .protocol/spec.json or pass `gate-check 3 --url <https://...>`.']);
+  }
+  if (!/^https?:\/\//.test(url)) {
+    red([`production URL must start with http(s):// — got "${url}".`]);
+  }
+
+  const errors = [];
+  const probeLines = [`gate 3 probes — ${ts}`];
+  const probeRows = [];
+
+  // 1. prod URL responds 200.
+  let rootStatus = null;
+  try {
+    const res = await fetchWithTimeout(url, { redirect: 'follow' });
+    rootStatus = res.status;
+  } catch (e) {
+    errors.push(`prod URL unreachable: ${url} (${e.message}) — check the deploy, domain, and DNS.`);
+  }
+  probeLines.push(`root ${url} -> ${rootStatus === null ? 'UNREACHABLE' : rootStatus}`);
+  if (rootStatus !== null && rootStatus !== 200) {
+    errors.push(`prod URL ${url} returned ${rootStatus}, expected 200 — fix the deploy before handover.`);
+  }
+
+  // 2. Thin RLS probe (decision 2A): anon fetch of each protected route must
+  //    401/403/redirect — NEVER 200.
+  const protectedRoutes = Array.isArray(spec.protectedRoutes) ? spec.protectedRoutes : [];
+  if (protectedRoutes.length === 0) {
+    // A green Gate 3 with zero probes proves nothing about deployed RLS — a
+    // wide-open app would pass unnoticed. The deployed anon probe is Gate 3's
+    // core security check, so an empty route set is RED, not a warning.
+    probeLines.push(
+      'FAIL: no protectedRoutes declared in spec.json — the deployed anon RLS probe had nothing to ' +
+        'check, so Gate 3 cannot prove protected routes deny anon access.'
+    );
+    errors.push(
+      'no protectedRoutes declared in .protocol/spec.json — Gate 3 refuses to go green without at ' +
+        'least one deployed anon RLS probe. Declare spec.protectedRoutes (e.g. ["/dashboard","/api/clients"]) ' +
+        'and re-run `gate-check 3`.'
+    );
+  }
+  for (const route of protectedRoutes) {
+    let probeUrl;
+    try {
+      probeUrl = new URL(route, url).toString();
+    } catch {
+      errors.push(`protected route "${route}" does not form a valid URL against ${url} — fix spec.protectedRoutes.`);
+      continue;
+    }
+    let status = null;
+    try {
+      const res = await fetchWithTimeout(probeUrl, { redirect: 'manual' });
+      status = res.status;
+    } catch (e) {
+      errors.push(`RLS probe could not reach ${probeUrl} (${e.message}) — probe must complete; failing closed.`);
+      probeLines.push(`anon ${probeUrl} -> UNREACHABLE  FAIL`);
+      probeRows.push({
+        TABLE: route, OPERATION: 'anon GET (no auth cookie)',
+        EXPECTED: 'deny (401/403/redirect)', OBSERVED: 'unreachable', RESULT: 'FAIL',
+      });
+      continue;
+    }
+    const pass = status === 401 || status === 403 || (status >= 300 && status < 400);
+    probeLines.push(`anon ${probeUrl} -> ${status}  ${pass ? 'PASS (denied)' : 'FAIL'}`);
+    probeRows.push({
+      TABLE: route,
+      OPERATION: 'anon GET (no auth cookie)',
+      EXPECTED: 'deny (401/403/redirect)',
+      OBSERVED: String(status),
+      RESULT: pass ? 'PASS' : 'FAIL',
+    });
+    if (!pass) {
+      errors.push(
+        status === 200
+          ? `RLS PROBE FAILED: anon request to ${probeUrl} returned 200 — the protected route is PUBLIC. ` +
+            'Fix RLS/auth middleware, redeploy, re-run `gate-check 3`.'
+          : `RLS probe inconclusive: ${probeUrl} returned ${status} (expected 401/403/redirect) — ` +
+            'verify the route exists on the deploy and is auth-guarded.'
+      );
+    }
+  }
+  const probeEvidenceRel = writeEvidence(runDir, 'gate3-probe.txt', probeLines.join('\n'));
+
+  // 3. Smoke.
+  const reachableSummary =
+    `root ${url} -> ${rootStatus === null ? 'UNREACHABLE' : rootStatus}; ` +
+    `${protectedRoutes.length} protected route(s) probed.`;
+  const smoke = runSmoke(runDir, url, reachableSummary);
+  const smokeEvidenceRel = writeEvidence(runDir, 'gate3-smoke.txt', smoke.output);
+  if (smoke.ok === false) {
+    errors.push('smoke: playwright smoke FAILED — see .protocol/evidence/gate3-smoke.txt; fix and re-run.');
+  }
+
+  if (errors.length > 0) red(errors);
+
+  // 4. Render SHIP-REPORT.md (green only) + write the gate.
+  const gate3Evidence = [probeEvidenceRel, smokeEvidenceRel];
+  let tpl;
+  try {
+    // the leading HTML comment documents placeholder conventions — stripped
+    // from the rendered report per the template's own contract.
+    tpl = fs.readFileSync(SHIP_TEMPLATE, 'utf8').replace(/^<!--[\s\S]*?-->\s*/, '');
+  } catch (e) {
+    red([`cannot read SHIP-REPORT template ${SHIP_TEMPLATE} (${e.message}) — the handover report is mandatory.`]);
+  }
+  const data = buildShipReportData(
+    runDir, spec, url, ts, probeRows, probeEvidenceRel, smoke, gate3Evidence
+  );
+  const reportPath = path.join(runDir, 'SHIP-REPORT.md');
+  fs.writeFileSync(reportPath, renderTemplate(tpl, data));
+  journal(runDir, { type: 'ship-report', file: 'SHIP-REPORT.md' });
+
+  writeGate(runDir, 3, {
+    status: 'green',
+    ts,
+    head: gitHead(runDir),
+    evidence: gate3Evidence,
+    url,
+    smoke: smoke.mode,
+    probes: probeRows.length,
+  });
+  process.stdout.write(
+    `GATE 3 GREEN — ${url} live (200), ${probeRows.length} RLS probe(s) denied, ` +
+      `smoke: ${smoke.mode}.\nSHIP-REPORT.md rendered -> ${reportPath}\n`
+  );
+}
+
+// ------------------------------------------------------------------ status
+
+function cmdStatus(args) {
+  const { flags } = parseFlags(args, { force: true });
+  const runDir = requireRunProject();
+  const phase = readPhase(runDir);
+
+  const rows = GATES.map((n) => {
+    const g = effectiveGate(runDir, n);
+    return {
+      n,
+      status: g.effective.toUpperCase(),
+      ts: (g.gate && g.gate.ts) || '—',
+      detail: g.detail || '',
+      effective: g.effective,
+    };
+  });
+
+  process.stdout.write(`run project : ${runDir}\nphase       : ${phase}\n\n`);
+  process.stdout.write(
+    'GATE'.padEnd(6) + 'STATUS'.padEnd(11) + 'TS'.padEnd(27) + 'DETAIL\n'
+  );
+  for (const r of rows) {
+    process.stdout.write(
+      String(r.n).padEnd(6) + r.status.padEnd(11) + String(r.ts).padEnd(27) + r.detail + '\n'
+    );
+  }
+
+  const prior = PRIOR_GATE[phase];
+  if (prior === null || prior === undefined) {
+    process.stdout.write(`\nphase ${phase}: no prior gate required — OK.\n`);
+    return;
+  }
+
+  const gate = rows[prior];
+  const passing = gate.effective === 'green' || gate.effective === 'attested';
+  if (passing) {
+    if (gate.effective === 'attested') {
+      process.stdout.write(
+        `\nWARNING: gate ${prior} is ATTESTED (break-glass), not verified.\n`
+      );
+    }
+    process.stdout.write(`\nphase ${phase}: prior gate ${prior} is green — OK.\n`);
+    return;
+  }
+
+  const why = `phase ${phase} requires gate ${prior} green, but it is ${gate.effective.toUpperCase()}${
+    gate.detail ? ` (${gate.detail})` : ''
+  }`;
+
+  if ('force' in flags) {
+    const reason = (flags.force || '').trim();
+    if (!reason) fail('--force needs a reason, e.g. --force "client demo in 1h".');
+    journal(runDir, { type: 'override', phase, gate: prior, reason });
+    process.stdout.write(
+      `\nOVERRIDDEN: ${why}\n  forced by reason: "${reason}" — logged to journal.jsonl ` +
+        `and will surface in SHIP-REPORT.md.\n`
+    );
+    return; // exit 0
+  }
+
+  process.stderr.write(
+    `\nBLOCKED: ${why}. Run \`gate-check ${prior}\` (or \`gate-check status --force "<reason>"\` to override — logged).\n`
+  );
+  process.exit(1);
+}
+
+// ------------------------------------------------------------------ reopen
+
+function cmdReopen(args) {
+  const n = Number.parseInt(args[0], 10);
+  if (!GATES.includes(n)) {
+    fail(`reopen <N> — N must be one of ${GATES.join(', ')} (got: ${args[0] ?? 'nothing'}).`);
+  }
+  const runDir = requireRunProject();
+  const ts = new Date().toISOString();
+  const cascade = [];
+
+  writeGate(runDir, n, { status: 'pending', ts, reopened: true });
+  for (const m of GATES.filter((g) => g > n)) {
+    if (fs.existsSync(gateFile(runDir, m))) {
+      writeGate(runDir, m, { status: 'pending', ts, resetBy: `reopen ${n}` });
+      cascade.push(m);
+    }
+  }
+  journal(runDir, { type: 'reopen', gate: n, cascade });
+  process.stdout.write(
+    `gate ${n} reopened -> pending` +
+      (cascade.length ? ` (cascade reset: gate ${cascade.join(', gate ')})` : '') +
+      '\n'
+  );
+}
+
+// -------------------------------------------------------------------- note
+
+function cmdNote(args) {
+  const text = args.join(' ').trim();
+  if (!text) fail('note <text> — the note text is required.');
+  const runDir = requireRunProject();
+  journal(runDir, { type: 'note', text });
+  process.stdout.write('noted.\n');
+}
+
+// ------------------------------------------------------------------- main
+
+function main() {
+  const [, , cmd, ...args] = process.argv;
+  if (!cmd || cmd === '--help' || cmd === '-h' || cmd === 'help') {
+    process.stderr.write(USAGE);
+    process.exit(cmd ? 0 : 1);
+  }
+  switch (cmd) {
+    case 'init':
+      return cmdInit(args);
+    case '0':
+      return cmdGate0(args);
+    case '1':
+      return cmdGate1(args);
+    case '2':
+      return cmdGate2(args);
+    case '3':
+      // async (network probes) — any crash fails closed, never green.
+      return void cmdGate3(args).catch((e) =>
+        fail(`gate 3 crashed (${e && e.message ? e.message : e}) — failing closed; fix and re-run.`)
+      );
+    case 'doctor':
+      return cmdDoctor(args);
+    case 'status':
+      return cmdStatus(args);
+    case 'reopen':
+      return cmdReopen(args);
+    case 'note':
+      return cmdNote(args);
+    default:
+      return fail(`unknown subcommand "${cmd}"\n\n${USAGE}`);
+  }
+}
+
+main();

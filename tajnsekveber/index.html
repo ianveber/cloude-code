@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ian Tajnšek Veber — AI sistemi za podjetja</title>
+<meta name="description" content="Soustanovitelj AIS Slovenia. AI agenti in avtomatizacije za podjetja. Gradim tudi ATHLOS in Grafy nanoSolutions.">
+<meta property="og:title" content="Ian Tajnšek Veber">
+<meta property="og:description" content="AI agenti in avtomatizacije za podjetja.">
+<meta property="og:image" content="https://tajnsekveber.com/ian.jpg">
+<meta property="og:url" content="https://tajnsekveber.com">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232342ff'/%3E%3Ctext x='32' y='43' font-family='Inter,Arial,sans-serif' font-size='28' font-weight='800' fill='white' text-anchor='middle'%3EIV%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ——— DEPTH & GLASS · royal blue dimensional variant ——— */
+  @property --ring-angle{syntax:"<angle>";initial-value:0deg;inherits:false}
+  :root{
+    --blue:#2342ff;
+    --blue-deep:#1b35d6;
+    --blue-soft:rgba(35,66,255,.08);
+    --ink:#1a1d24;
+    --gray:#5a6172;
+    --line:#e3e6ee;
+    /* layered shadow recipes — soft, deep, premium */
+    --shadow-sm:
+      0 1px 2px rgba(26,29,36,.05),
+      0 3px 6px rgba(26,29,36,.04),
+      0 8px 18px rgba(35,66,255,.05);
+    --shadow-md:
+      0 1px 2px rgba(26,29,36,.05),
+      0 4px 10px rgba(26,29,36,.05),
+      0 14px 28px rgba(26,29,36,.06),
+      0 28px 56px rgba(35,66,255,.08);
+    --shadow-lg:
+      0 2px 4px rgba(26,29,36,.06),
+      0 8px 16px rgba(26,29,36,.07),
+      0 24px 48px rgba(26,29,36,.10),
+      0 48px 96px rgba(35,66,255,.14);
+    --glass-bg:rgba(255,255,255,.55);
+    --glass-line:rgba(227,230,238,.9);
+    --glass-edge:inset 0 1px 0 rgba(255,255,255,.85);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  html{overflow-x:hidden}
+  body{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    color:var(--ink);
+    background-color:#fff;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  /* ——— depth stack: grid (far) → squares (mid) → content (near) ——— */
+  .bg{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+  .layer{position:absolute;inset:-64px;will-change:transform}
+  .grid-lines{
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px,transparent 1px),
+      linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:56px 56px;
+    -webkit-mask-image:radial-gradient(120% 90% at 50% 42%,#000 25%,transparent 78%);
+    mask-image:radial-gradient(120% 90% at 50% 42%,#000 25%,transparent 78%);
+  }
+  .bg-glow{
+    position:absolute;inset:0;
+    background-image:radial-gradient(260px circle at var(--mx,-500px) var(--my,-500px),rgba(35,66,255,.08),transparent 70%);
+  }
+  .bg-glow::after{
+    content:"";position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(35,66,255,.38) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(35,66,255,.38) 1px,transparent 1px);
+    background-size:56px 56px;
+    -webkit-mask-image:radial-gradient(190px circle at var(--mx,-500px) var(--my,-500px),#000 0%,transparent 100%);
+    mask-image:radial-gradient(190px circle at var(--mx,-500px) var(--my,-500px),#000 0%,transparent 100%);
+  }
+  /* mid-layer floating glass squares */
+  .sq{
+    position:absolute;width:60px;height:60px;border-radius:12px;
+    background:rgba(35,66,255,.06);
+    border:1px solid rgba(35,66,255,.16);
+    box-shadow:var(--glass-edge),0 12px 28px rgba(35,66,255,.08);
+    -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+    animation:floatsq 9s ease-in-out infinite alternate;
+  }
+  .sq1{left:120px;top:180px}
+  .sq2{right:180px;top:420px;animation-duration:12s;animation-delay:-3s;background:rgba(35,66,255,.04);width:44px;height:44px}
+  .sq3{left:300px;bottom:130px;animation-duration:14s;animation-delay:-6s;background:rgba(35,66,255,.05);width:76px;height:76px;border-radius:16px}
+  @keyframes floatsq{from{transform:translateY(0) rotate(0deg)}to{transform:translateY(-18px) rotate(2deg)}}
+
+  /* ——— film grain over everything ——— */
+  .grain{
+    position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size:180px 180px;
+  }
+
+  /* ——— frosted lang toggle ——— */
+  .lang-toggle{
+    position:fixed;top:24px;right:24px;z-index:10;
+    display:flex;gap:2px;padding:3px;
+    background:var(--glass-bg);
+    -webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5);
+    border:1px solid var(--glass-line);border-radius:999px;
+    box-shadow:var(--glass-edge),0 2px 6px rgba(26,29,36,.05),0 10px 24px rgba(35,66,255,.08);
+  }
+  .lang-toggle button{
+    border:0;background:transparent;cursor:pointer;
+    font:inherit;font-size:13px;font-weight:600;color:var(--gray);
+    padding:5px 12px;border-radius:999px;
+    transition:color .15s;
+  }
+  .lang-toggle button.active{
+    background:var(--blue);color:#fff;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 2px 8px rgba(35,66,255,.45);
+  }
+
+  /* ——— hero ——— */
+  .hero{
+    min-height:100vh;min-height:100svh;
+    max-width:1100px;margin:0 auto;
+    display:grid;grid-template-columns:1.15fr .85fr;
+    align-items:center;gap:72px;
+    padding:64px 36px;
+    will-change:transform;
+  }
+  .kicker{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--blue);margin-bottom:20px;
+  }
+  .kicker::before{content:"";width:28px;height:2px;background:var(--blue);border-radius:2px;box-shadow:0 2px 6px rgba(35,66,255,.4)}
+  h1{font-size:clamp(34px,4.6vw,54px);font-weight:800;letter-spacing:-.02em;line-height:1.05}
+  .lead{
+    font-size:clamp(18px,2vw,22px);font-weight:600;margin-top:14px;
+    background:linear-gradient(90deg,var(--blue) 0%,#7b90ff 50%,var(--blue) 100%);
+    background-size:200% auto;
+    -webkit-background-clip:text;background-clip:text;
+    color:transparent;-webkit-text-fill-color:transparent;
+    animation:sheen 5s linear infinite;
+    width:fit-content;
+  }
+  @keyframes sheen{to{background-position:-200% center}}
+  .bio{font-size:16px;line-height:1.65;color:var(--gray);margin-top:16px;max-width:52ch}
+
+  /* glass project chips */
+  .projects{list-style:none;display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+  .projects li{
+    display:flex;align-items:baseline;gap:8px;
+    background:var(--glass-bg);
+    -webkit-backdrop-filter:blur(12px) saturate(1.5);backdrop-filter:blur(12px) saturate(1.5);
+    border:1px solid var(--glass-line);border-radius:999px;
+    padding:8px 16px;font-size:14px;
+    box-shadow:var(--glass-edge),var(--shadow-sm);
+    transition:transform .2s cubic-bezier(.16,1,.3,1),box-shadow .2s,border-color .2s;
+  }
+  .projects li:hover{
+    transform:translateY(-2px);
+    border-color:rgba(35,66,255,.35);
+    box-shadow:var(--glass-edge),var(--shadow-md);
+  }
+  .projects li strong{font-weight:700}
+  .projects li span{color:var(--gray);font-size:13px}
+
+  /* CTA — primary stays solid royal blue */
+  .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:12px 22px;border-radius:999px;
+    font-size:15px;font-weight:600;text-decoration:none;
+    border:1px solid var(--glass-line);color:var(--ink);
+    background:var(--glass-bg);
+    -webkit-backdrop-filter:blur(12px) saturate(1.5);backdrop-filter:blur(12px) saturate(1.5);
+    box-shadow:var(--glass-edge),var(--shadow-sm);
+    transition:border-color .15s,background .15s,color .15s,transform .15s,box-shadow .2s;
+  }
+  .btn:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-1px);box-shadow:var(--glass-edge),var(--shadow-md)}
+  .btn.primary{
+    background:var(--blue);border-color:var(--blue);color:#fff;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.28),
+      0 2px 4px rgba(35,66,255,.25),
+      0 8px 20px rgba(35,66,255,.35),
+      0 20px 44px rgba(35,66,255,.22);
+  }
+  .btn.primary:hover{
+    background:var(--blue-deep);color:#fff;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.28),
+      0 3px 6px rgba(35,66,255,.3),
+      0 12px 28px rgba(35,66,255,.42),
+      0 26px 56px rgba(35,66,255,.26);
+  }
+  .btn svg{width:17px;height:17px;flex:none}
+  .btn.pending{opacity:.45;pointer-events:none}
+
+  /* ——— frosted knowledge cards ——— */
+  .knowledge{margin-top:40px}
+  .knowledge-title{
+    font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--gray);margin-bottom:12px;
+  }
+  .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-width:580px}
+  .card{
+    display:block;border-radius:16px;
+    background:var(--glass-bg);
+    -webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5);
+    border:1px solid var(--glass-line);
+    padding:14px 16px;text-decoration:none;color:inherit;
+    box-shadow:var(--glass-edge),var(--shadow-sm);
+    transition:border-color .2s,transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s;
+  }
+  .card:hover{
+    border-color:rgba(35,66,255,.45);
+    transform:translateY(-3px);
+    box-shadow:var(--glass-edge),var(--shadow-md);
+  }
+  .card strong{display:block;font-size:14px;font-weight:700;color:var(--ink)}
+  .card span{display:block;font-size:12.5px;line-height:1.45;color:var(--gray);margin-top:4px}
+  .card .soon{display:inline-block;margin-top:8px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);font-style:normal}
+  .card.pending{opacity:.55;pointer-events:none}
+
+  /* ——— portrait: backlight + conic ring + deep tilt ——— */
+  .portrait{
+    position:relative;justify-self:end;width:min(100%,360px);
+    transform-style:preserve-3d;
+  }
+  /* breathing royal-blue backlight */
+  .portrait .backlight{
+    position:absolute;inset:-28%;z-index:-2;border-radius:50%;
+    background:radial-gradient(closest-side,rgba(35,66,255,.30),rgba(35,66,255,.12) 48%,transparent 72%);
+    animation:breathe 7s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes breathe{
+    0%,100%{transform:scale(.92);opacity:.65}
+    50%{transform:scale(1.08);opacity:1}
+  }
+  /* offset frame → rotating conic royal-blue ring (static blue fallback) */
+  .portrait::after{
+    content:"";position:absolute;inset:0;z-index:-1;
+    border-radius:30px;
+    transform:translate(16px,16px);
+    border:2px solid var(--blue);
+  }
+  @supports ((mask-composite:exclude) or (-webkit-mask-composite:xor)){
+    .portrait::after{
+      border:0;padding:2px;
+      background:conic-gradient(from var(--ring-angle,0deg),
+        #2342ff 0%, #93a5ff 22%, #2342ff 45%, #c3ccff 70%, #2342ff 100%);
+      -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor;
+      mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+      mask-composite:exclude;
+      animation:spin-ring 9s linear infinite;
+    }
+  }
+  @keyframes spin-ring{to{--ring-angle:360deg}}
+  .portrait img{
+    display:block;width:100%;height:auto;
+    border-radius:28px;
+    box-shadow:var(--shadow-lg);
+  }
+  /* moving specular highlight */
+  .portrait .shine{
+    position:absolute;inset:0;border-radius:28px;pointer-events:none;
+    background:radial-gradient(340px circle at var(--sx,50%) var(--sy,50%),
+      rgba(255,255,255,.32),rgba(255,255,255,.06) 42%,transparent 68%);
+    mix-blend-mode:screen;
+    opacity:0;transition:opacity .25s;
+  }
+  .portrait:hover .shine{opacity:1}
+
+  /* ——— entrance ——— */
+  .intro>*{animation:rise .7s cubic-bezier(.16,1,.3,1) both}
+  .intro>*:nth-child(1){animation-delay:.04s}
+  .intro>*:nth-child(2){animation-delay:.1s}
+  .intro>*:nth-child(3){animation-delay:.16s}
+  .intro>*:nth-child(4){animation-delay:.22s}
+  .intro>*:nth-child(5){animation-delay:.28s}
+  .intro>*:nth-child(6){animation-delay:.34s}
+  .intro>*:nth-child(7){animation-delay:.4s}
+  .portrait{animation:rise .8s cubic-bezier(.16,1,.3,1) .12s backwards;will-change:transform}
+  @keyframes rise{from{opacity:0;transform:translateY(16px);filter:blur(5px)}to{opacity:1;transform:none;filter:blur(0)}}
+
+  @media (prefers-reduced-motion:reduce){
+    .intro>*,.portrait,.sq,.lead,.portrait .backlight,.portrait::after{animation:none}
+  }
+  @media (max-width:768px){
+    .grid-lines,.bg-glow::after{background-size:44px 44px}
+    .sq2,.sq3{display:none}
+    .sq1{left:44px;top:132px}
+    .hero{grid-template-columns:1fr;gap:40px;padding:96px 24px 64px;text-align:center}
+    .portrait{order:-1;justify-self:center;width:min(70%,260px)}
+    .portrait::after{transform:translate(10px,10px)}
+    .portrait .backlight{inset:-20%}
+    .kicker{justify-content:center}
+    .bio{margin-left:auto;margin-right:auto}
+    .projects,.cta{justify-content:center}
+    .knowledge{margin-top:32px}
+    .cards{grid-template-columns:1fr;max-width:340px;margin:0 auto}
+    .grain{opacity:.03}
+  }
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true">
+  <div class="layer" id="layer-grid">
+    <div class="grid-lines"></div>
+    <div class="bg-glow" id="bg-glow"></div>
+  </div>
+  <div class="layer" id="layer-mid">
+    <div class="sq sq1"></div>
+    <div class="sq sq2"></div>
+    <div class="sq sq3"></div>
+  </div>
+</div>
+<div class="grain" aria-hidden="true"></div>
+<nav class="lang-toggle" aria-label="Jezik / Language">
+  <button id="btn-sl" class="active" type="button" aria-pressed="true">SL</button>
+  <button id="btn-en" type="button" aria-pressed="false">EN</button>
+</nav>
+
+<main class="hero" id="hero">
+  <div class="intro">
+    <p class="kicker" data-sl="Soustanovitelj · AIS Slovenia" data-en="Co-founder · AIS Slovenia">Soustanovitelj · AIS Slovenia</p>
+    <h1>Ian Tajnšek Veber</h1>
+    <p class="lead" data-sl="Postavljam AI agente in avtomatizacije za podjetja." data-en="I build AI agents and automations for businesses.">Postavljam AI agente in avtomatizacije za podjetja.</p>
+    <p class="bio"
+       data-sl="Soustanovitelj AIS Slovenia — AI agenti in avtomatizacije za podjetja. Gradim ATHLOS, AI trening za športnike, in spletno prisotnost Grafy nanoSolutions. Od ideje do delujočega sistema v nekaj tednih."
+       data-en="Co-founder of AIS Slovenia — AI agents and automations for businesses. Building ATHLOS, AI training for athletes, and the web presence of Grafy nanoSolutions. Idea to working system in weeks.">
+       Soustanovitelj AIS Slovenia — AI agenti in avtomatizacije za podjetja. Gradim ATHLOS, AI trening za športnike, in spletno prisotnost Grafy nanoSolutions. Od ideje do delujočega sistema v nekaj tednih.</p>
+    <ul class="projects">
+      <li><strong>AIS Slovenia</strong><span data-sl="AI agenti" data-en="AI agents">AI agenti</span></li>
+      <li><strong>ATHLOS</strong><span data-sl="AI trening" data-en="AI training">AI trening</span></li>
+      <li><strong>Grafy nanoSolutions</strong><span data-sl="nanotehnologija" data-en="nanotech">nanotehnologija</span></li>
+    </ul>
+    <div class="cta">
+      <a id="link-linkedin" class="btn primary pending" aria-disabled="true">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+        LinkedIn</a>
+      <a id="link-instagram" class="btn pending" aria-disabled="true">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.88 5.88 0 0 0-2.13 1.38A5.88 5.88 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.8.72 1.47 1.38 2.13a5.88 5.88 0 0 0 2.13 1.38c.76.3 1.64.5 2.91.56 1.28.06 1.69.07 4.95.07s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.88 5.88 0 0 0 2.13-1.38 5.88 5.88 0 0 0 1.38-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.88 5.88 0 0 0-1.38-2.13A5.88 5.88 0 0 0 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.41-11.85a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88z"/></svg>
+        Instagram</a>
+      <a class="btn" href="mailto:ian.veber@gmail.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m3 6 9 7 9-7"/></svg>
+        <span data-sl="Piši mi" data-en="Email me">Piši mi</span></a>
+    </div>
+    <div class="knowledge">
+      <p class="knowledge-title" data-sl="Brezplačno znanje" data-en="Free knowledge">Brezplačno znanje</p>
+      <div class="cards" id="knowledge-cards"></div>
+    </div>
+  </div>
+
+  <figure class="portrait">
+    <span class="backlight" aria-hidden="true"></span>
+    <img src="/ian.jpg" alt="Ian Tajnšek Veber" width="800" height="1000" fetchpriority="high">
+    <span class="shine" aria-hidden="true"></span>
+  </figure>
+</main>
+
+<script>
+  // Drop real profile URLs here.
+  const LINKS = {
+    linkedin: "https://www.linkedin.com/in/ian-tajnsek-veber-8305382a9/",
+    instagram: "https://www.instagram.com/ian.veber0/"
+  };
+
+  // Free-knowledge cards — set url to activate a card; empty url = dimmed "kmalu".
+  const KNOWLEDGE = [
+    { sl: "AI vodič za podjetja", en: "AI guide for business", descSl: "Kako začeti z AI agenti", descEn: "How to start with AI agents", url: "/znanje/ai-vodic.html" },
+    { sl: "Avtomatizacije v praksi", en: "Automations in practice", descSl: "Trije primeri iz realnih projektov", descEn: "Three real-project examples", url: "/znanje/avtomatizacije.html" },
+    { sl: "Moja orodja", en: "My toolkit", descSl: "Orodja, ki jih uporabljam vsak dan", descEn: "The tools I use every day", url: "/znanje/orodja.html" }
+  ];
+
+  for (const [key, url] of Object.entries(LINKS)) {
+    const a = document.getElementById("link-" + key);
+    if (url) {
+      a.href = url;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.classList.remove("pending");
+      a.removeAttribute("aria-disabled");
+    }
+  }
+
+  const cardsEl = document.getElementById("knowledge-cards");
+  for (const item of KNOWLEDGE) {
+    const card = document.createElement("a");
+    card.className = "card" + (item.url ? "" : " pending");
+    if (item.url) {
+      card.href = item.url;
+      if (/^https?:/.test(item.url)) { card.target = "_blank"; card.rel = "noopener"; }
+    }
+    else { card.setAttribute("aria-disabled", "true"); }
+    const title = document.createElement("strong");
+    title.setAttribute("data-sl", item.sl);
+    title.setAttribute("data-en", item.en);
+    title.textContent = item.sl;
+    const desc = document.createElement("span");
+    desc.setAttribute("data-sl", item.descSl);
+    desc.setAttribute("data-en", item.descEn);
+    desc.textContent = item.descSl;
+    card.append(title, desc);
+    if (!item.url) {
+      const soon = document.createElement("em");
+      soon.className = "soon";
+      soon.setAttribute("data-sl", "kmalu");
+      soon.setAttribute("data-en", "soon");
+      soon.textContent = "kmalu";
+      card.append(soon);
+    }
+    cardsEl.append(card);
+  }
+
+  const I18N_ATTRS = { sl: "data-sl", en: "data-en" };
+  function setLang(lang) {
+    document.querySelectorAll("[data-sl]").forEach(el => {
+      el.textContent = el.getAttribute(I18N_ATTRS[lang]);
+    });
+    document.documentElement.lang = lang;
+    document.getElementById("btn-sl").classList.toggle("active", lang === "sl");
+    document.getElementById("btn-en").classList.toggle("active", lang === "en");
+    document.getElementById("btn-sl").setAttribute("aria-pressed", String(lang === "sl"));
+    document.getElementById("btn-en").setAttribute("aria-pressed", String(lang === "en"));
+    try { localStorage.setItem("lang", lang); } catch (e) {}
+  }
+  document.getElementById("btn-sl").addEventListener("click", () => setLang("sl"));
+  document.getElementById("btn-en").addEventListener("click", () => setLang("en"));
+  let saved = null;
+  try { saved = localStorage.getItem("lang"); } catch (e) {}
+  if (saved === "en") setLang("en");
+
+  // Pointer-driven effects — desktop with a real cursor and motion allowed only.
+  const fine = matchMedia("(hover:hover) and (pointer:fine)").matches;
+  const motionOk = matchMedia("(prefers-reduced-motion: no-preference)").matches;
+
+  if (fine && motionOk) {
+    // ——— Three-layer eased parallax + cursor grid glow (one rAF loop) ———
+    // Far grid drifts a little, mid squares drift more, content counter-drifts.
+    const PAD = 64;          // layers are inset by -64px so edges never show
+    const F_GRID = 12, F_MID = 26, F_FORE = -9;
+    const glow = document.getElementById("bg-glow");
+    const layerGrid = document.getElementById("layer-grid");
+    const layerMid = document.getElementById("layer-mid");
+    const hero = document.getElementById("hero");
+
+    let gx = -500, gy = -500;     // raw cursor for the glow
+    let tx = 0, ty = 0;           // parallax target (-.5 .. .5)
+    let cx = 0, cy = 0;           // eased current
+    let running = false;
+
+    function frame() {
+      cx += (tx - cx) * 0.07;
+      cy += (ty - cy) * 0.07;
+      layerGrid.style.transform = `translate3d(${(cx * F_GRID).toFixed(2)}px,${(cy * F_GRID).toFixed(2)}px,0)`;
+      layerMid.style.transform = `translate3d(${(cx * F_MID).toFixed(2)}px,${(cy * F_MID).toFixed(2)}px,0)`;
+      hero.style.transform = `translate3d(${(cx * F_FORE).toFixed(2)}px,${(cy * F_FORE).toFixed(2)}px,0)`;
+      // compensate glow for layer inset + drift so the lit grid tracks the cursor exactly
+      glow.style.setProperty("--mx", (gx + PAD - cx * F_GRID).toFixed(1) + "px");
+      glow.style.setProperty("--my", (gy + PAD - cy * F_GRID).toFixed(1) + "px");
+      if (Math.abs(tx - cx) + Math.abs(ty - cy) > 0.0004) requestAnimationFrame(frame);
+      else running = false;
+    }
+    addEventListener("pointermove", e => {
+      gx = e.clientX; gy = e.clientY;
+      tx = e.clientX / innerWidth - 0.5;
+      ty = e.clientY / innerHeight - 0.5;
+      if (!running) { running = true; requestAnimationFrame(frame); }
+    }, { passive: true });
+
+    // ——— Portrait: deeper-perspective tilt + moving specular highlight ———
+    const portrait = document.querySelector(".portrait");
+    const shine = portrait.querySelector(".shine");
+    portrait.addEventListener("pointermove", e => {
+      const r = portrait.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - .5;
+      const py = (e.clientY - r.top) / r.height - .5;
+      portrait.style.transform = `perspective(680px) rotateY(${(px * 9).toFixed(2)}deg) rotateX(${(-py * 9).toFixed(2)}deg)`;
+      shine.style.setProperty("--sx", `${50 + px * 90}%`);
+      shine.style.setProperty("--sy", `${50 + py * 90}%`);
+    });
+    portrait.addEventListener("pointerleave", () => {
+      portrait.style.transition = "transform .4s cubic-bezier(.16,1,.3,1)";
+      portrait.style.transform = "";
+      setTimeout(() => { portrait.style.transition = ""; }, 400);
+    });
+
+    // ——— Magnetic buttons ———
+    document.querySelectorAll(".btn").forEach(b => {
+      b.addEventListener("pointermove", e => {
+        if (b.classList.contains("pending")) return;
+        const r = b.getBoundingClientRect();
+        b.style.transform = `translate(${((e.clientX - r.left - r.width / 2) * .12).toFixed(1)}px, ${((e.clientY - r.top - r.height / 2) * .25).toFixed(1)}px)`;
+      });
+      b.addEventListener("pointerleave", () => { b.style.transform = ""; });
+    });
+  }
+</script>
+</body>
+</html>

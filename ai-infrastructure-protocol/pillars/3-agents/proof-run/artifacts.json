@@ -1,0 +1,26 @@
+[
+  {
+    "id": "invoice-chaser",
+    "pillar": "3-agents",
+    "type": "integration-automation",
+    "blueprintRef": "BL-014",
+    "builtWith": [
+      "anthropic:messages",
+      "(prod: composio gmail:draft + stripe:read)"
+    ],
+    "trigger": "schedule: daily 08:00 Europe/Ljubljana",
+    "tools": [
+      "anthropic:messages",
+      "gmail:draft",
+      "stripe:read"
+    ],
+    "outputs": "reminder drafts for human approval",
+    "hitl": [
+      "send step: human approves + sends each draft; agent never sends"
+    ],
+    "verify": ".protocol/agents/invoice-chaser/verify.json",
+    "verifyResult": "green",
+    "security": "green",
+    "shipped": true
+  }
+]

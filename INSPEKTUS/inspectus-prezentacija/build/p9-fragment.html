@@ -1,0 +1,132 @@
+<style>
+  #page-9 .p9-wrap { display:flex; flex-direction:column; height:100%; padding-top:6mm; }
+  #page-9 .p9-main { display:flex; gap:9mm; flex:1 1 auto; min-height:0; }
+
+  /* ---- left: assumptions ---- */
+  #page-9 .p9-assum {
+    flex:0 0 76mm; background:var(--bg-soft); border:1px solid var(--border);
+    border-radius:10px; padding:5.5mm 6mm 5mm; display:flex; flex-direction:column;
+  }
+  #page-9 .p9-assum h3 { margin:0; font-size:9pt; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--navy-deep); }
+  #page-9 .p9-assum p.lead { margin:1.5mm 0 0; font-size:8.5pt; color:var(--muted); line-height:1.4; }
+  #page-9 .p9-assum ul { list-style:none; margin:4mm 0 0; padding:0; }
+  #page-9 .p9-assum li {
+    font-size:10pt; color:var(--ink); line-height:1.4; font-weight:600;
+    padding:3.4mm 0; border-top:1px solid var(--border);
+  }
+  #page-9 .p9-assum li small { display:block; font-size:8pt; font-weight:400; color:var(--muted); margin-top:.5mm; }
+  #page-9 .p9-assum .foot { margin-top:auto; padding-top:3mm; border-top:1px solid var(--border); font-size:8pt; color:var(--muted); }
+
+  /* ---- right column ---- */
+  #page-9 .p9-right { flex:1 1 auto; display:flex; flex-direction:column; min-width:0; }
+
+  /* before/after bars */
+  #page-9 .p9-bars { display:flex; align-items:center; gap:8mm; margin-top:3mm; }
+  #page-9 .p9-barrows { flex:1 1 auto; min-width:0; }
+  #page-9 .p9-brow { display:flex; align-items:center; gap:4mm; }
+  #page-9 .p9-brow + .p9-brow { margin-top:5mm; }
+  #page-9 .p9-blab { flex:0 0 14mm; font-size:8pt; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+  #page-9 .p9-track { flex:1 1 auto; display:flex; align-items:center; gap:3mm; min-width:0; }
+  #page-9 .p9-bar { height:10mm; border-radius:5px; display:flex; align-items:center; }
+  #page-9 .p9-bar--navy {
+    width:100%; background:var(--navy); color:#fff;
+    font-size:9.5pt; font-weight:600; padding:0 4.5mm; white-space:nowrap;
+  }
+  #page-9 .p9-bar--green { width:9%; min-width:5mm; background:var(--success); }
+  #page-9 .p9-glab { font-size:9pt; font-weight:600; color:var(--success); white-space:nowrap; }
+  #page-9 .p9-hero { flex:0 0 auto; text-align:right; }
+  #page-9 .p9-hero b { display:block; font-size:44pt; font-weight:800; color:var(--accent); line-height:1; letter-spacing:-.01em; }
+  #page-9 .p9-hero small { display:block; font-size:8.5pt; font-weight:600; color:var(--muted); margin-top:1.5mm; }
+
+  /* monthly table */
+  #page-9 .p9-table { width:100%; border-collapse:collapse; margin-top:12mm; }
+  #page-9 .p9-table caption {
+    caption-side:top; text-align:left; font-size:9pt; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--navy-deep); padding-bottom:3.5mm;
+  }
+  #page-9 .p9-table th {
+    font-size:9pt; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
+    text-align:left; padding:0 0 2.6mm; border-bottom:1px solid var(--navy);
+  }
+  #page-9 .p9-table td {
+    font-size:11pt; color:var(--ink); padding:4.6mm 0; border-bottom:1px solid var(--border);
+    font-variant-numeric:tabular-nums;
+  }
+  #page-9 .p9-table td:first-child { font-weight:700; color:var(--navy-deep); }
+  #page-9 .p9-table td:last-child, #page-9 .p9-table th:last-child { text-align:right; }
+  #page-9 .p9-table td:last-child { font-weight:600; }
+  #page-9 .p9-table .cnum { width:32%; }
+
+  /* bottom line */
+  #page-9 .p9-bottom {
+    flex:0 0 auto; margin-top:5mm; padding-top:3.5mm; border-top:1px solid var(--border);
+    font-size:10.5pt; color:var(--navy); line-height:1.45;
+  }
+  #page-9 .p9-bottom b { color:var(--navy-deep); }
+</style>
+
+<div class="p9-wrap">
+  <div class="p9-main">
+
+    <!-- LEFT · assumptions -->
+    <aside class="p9-assum">
+      <h3>Predpostavke</h3>
+      <p class="lead">Preverite in zamenjamo z vašimi podatki.</p>
+      <ul>
+        <li>200 vozil na ladjo</li>
+        <li>~30 fotografij na vozilo <small>skupaj ≈ 6.000 fotografij</small></li>
+        <li>3 min ročnega razvrščanja in vnosa na vozilo</li>
+        <li>15–25 € polna cena pisarniške ure</li>
+        <li>N ladij na mesec <small>vstavimo vašo številko</small></li>
+      </ul>
+      <p class="foot">Ocena je namerno konzervativna.</p>
+    </aside>
+
+    <!-- RIGHT · bars + table -->
+    <div class="p9-right">
+
+      <div class="p9-bars">
+        <div class="p9-barrows">
+          <div class="p9-brow">
+            <span class="p9-blab">Danes</span>
+            <div class="p9-track">
+              <div class="p9-bar p9-bar--navy">≈ 11 ur na ladjo (razvrščanje + vnos + urejanje)</div>
+            </div>
+          </div>
+          <div class="p9-brow">
+            <span class="p9-blab">Jutri</span>
+            <div class="p9-track">
+              <div class="p9-bar p9-bar--green"></div>
+              <span class="p9-glab">0,5–1 h — pregled opozoril</span>
+            </div>
+          </div>
+        </div>
+        <div class="p9-hero">
+          <b>− 90&nbsp;%</b>
+          <small>manj ročnega dela na ladjo</small>
+        </div>
+      </div>
+
+      <table class="p9-table">
+        <caption>Mesečni prihranek</caption>
+        <thead>
+          <tr>
+            <th class="cnum">Ladij na mesec</th>
+            <th class="cnum">Prihranjene ure na mesec</th>
+            <th>Vrednost prihranka na mesec</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>2</td><td>20 ur</td><td>300–500 €</td></tr>
+          <tr><td>4</td><td>40 ur</td><td>600–1.000 €</td></tr>
+          <tr><td>6</td><td>60 ur</td><td>900–1.500 €</td></tr>
+          <tr><td>8</td><td>80 ur</td><td>1.200–2.000 €</td></tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+
+  <!-- full-width bottom line -->
+  <p class="p9-bottom">Poleg ur: vsaka zamenjava vozila pomeni sporno poročilo za naročnika. <b>Dvojna kontrola — VIN in seznam ladje</b> — to tveganje praktično odpravi.</p>
+</div>

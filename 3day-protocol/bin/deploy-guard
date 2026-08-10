@@ -1,0 +1,452 @@
+#!/usr/bin/env node
+/**
+ * deploy-guard — Claude Code PreToolUse hook for the 3-Day App Protocol.
+ *
+ * Zero-dependency stock Node (CommonJS). Reads a PreToolUse event as JSON on
+ * stdin:  {"tool_name":"Bash","tool_input":{"command":"..."},"cwd":"..."}
+ *
+ * Exit codes (Claude Code hook contract):
+ *   0 = allow the tool call (stderr may carry non-blocking warnings)
+ *   2 = BLOCK the tool call; stderr is fed back to the model as the reason
+ *
+ * Behavior (plan: Enforcement section, decisions 1A + fixes #1/#2/#4):
+ *   - Detects deploy INTENT in Bash commands, scanning compound commands
+ *     segment-wise (split on &&, ||, ;, |, newline). Tracks `cd` segments so
+ *     "cd app && vercel --prod" is evaluated against the right directory.
+ *   - Deploy intent = vercel deploy / vercel --prod / bare `vercel` /
+ *     npx|bunx vercel (deploy forms) / npm|pnpm|bun|yarn run deploy* /
+ *     git push when the effective project is Vercel-linked
+ *     (.vercel/project.json found walking up).
+ *   - Non-deploy vercel subcommands (env, link, whoami, pull, ls, ...) pass.
+ *     UNKNOWN vercel subcommands are treated as deploy intent (fail closed).
+ *   - On deploy intent: locate the run project by walking up from the
+ *     effective cwd to the dir containing `.protocol/`, then read
+ *     .protocol/gates/gate-2.json:
+ *       status "green"    -> allow ONLY if recorded `head` === current git
+ *                            HEAD of the run project AND worktree is clean;
+ *                            otherwise STALE -> block.
+ *       status "attested" -> allow, but print a loud warning (break-glass).
+ *       anything else, missing file, malformed JSON, missing .protocol,
+ *       git failure -> BLOCK (fail closed).
+ *
+ * Known accepted limitation (spike-documented): segment splitting is not
+ * quote-aware, so a deploy-looking string INSIDE quotes (e.g. in a commit
+ * message) can false-positive. That errs closed, never open.
+ */
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+const { execFileSync } = require('child_process');
+
+// ---------------------------------------------------------------- helpers
+
+function die(reason) {
+  process.stderr.write(`deploy-guard BLOCKED: ${reason}\n`);
+  process.exit(2);
+}
+
+function readStdin() {
+  try {
+    return fs.readFileSync(0, 'utf8');
+  } catch {
+    return '';
+  }
+}
+
+/** Walk up from startDir looking for relPath; return containing dir or null. */
+function findUp(startDir, relPath) {
+  let dir = path.resolve(startDir);
+  for (;;) {
+    if (fs.existsSync(path.join(dir, relPath))) return dir;
+    const parent = path.dirname(dir);
+    if (parent === dir) return null;
+    dir = parent;
+  }
+}
+
+function expandTilde(p) {
+  if (p === '~') return os.homedir();
+  if (p.startsWith('~/')) return path.join(os.homedir(), p.slice(2));
+  return p;
+}
+
+/** Split a compound shell command into segments. NOT quote-aware (see header). */
+function splitSegments(command) {
+  return command
+    .split(/\|\||&&|;|\n|\|/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/** Whitespace tokenize; strip simple surrounding quotes per token. */
+function tokenize(segment) {
+  return segment
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((t) => t.replace(/^['"]|['"]$/g, ''));
+}
+
+/** Drop leading VAR=value environment assignments. */
+function stripEnvAssignments(tokens) {
+  let i = 0;
+  while (i < tokens.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(tokens[i])) i++;
+  return tokens.slice(i);
+}
+
+// Command wrappers whose real payload is a following token/argument, not the
+// wrapper itself. Without unwrapping these, `sh -c "vercel --prod"`,
+// `env vercel --prod`, and `echo --prod | xargs vercel` all slip past
+// detection because tokens[0] is the wrapper, never `vercel` (fix: bypass).
+const SHELL_INTERPRETERS = new Set(['sh', 'bash', 'zsh', 'dash', 'ksh']);
+// Prefixes that just exec the command sitting after their own options.
+const EXEC_PREFIXES = new Set(['env', 'xargs', 'command', 'nohup', 'nice', 'time', 'stdbuf', 'setsid']);
+
+/**
+ * Peel wrapper prefixes off a token list so detection sees the real command:
+ *   - `sh -c "<cmd>"` / `bash -lc "<cmd>"` → the tokens after the -c flag
+ *     (the payload was whitespace-split by tokenize(), so it lands as the tail)
+ *   - `env [VAR=val ...] <cmd> ...`        → strip `env` + any assignments/flags
+ *   - `xargs [flags] <cmd> ...`            → the command xargs will exec
+ *   - `command` / `nohup` / `nice` / ...   → strip the prefix, keep the rest
+ * Re-applies until no wrapper remains. Env assignments are stripped between
+ * peels so `FOO=1 sh -c "vercel --prod"` is still unwrapped. Fails closed:
+ * an unrecognized shape is left as-is for the normal matchers.
+ */
+function unwrapCommandPrefix(tokens) {
+  let cur = stripEnvAssignments(tokens);
+  for (let guard = 0; guard < 8 && cur.length > 0; guard++) {
+    const cmd = basenameCmd(cur[0]);
+
+    // Shell interpreter with a -c payload: skip the interpreter and the flag
+    // token that carries `c` (e.g. -c, -lc, -xc). The rest is the inner command.
+    if (SHELL_INTERPRETERS.has(cmd)) {
+      const flagIdx = cur.findIndex((t, i) => i > 0 && /^-\w*c\w*$/.test(t));
+      if (flagIdx !== -1) {
+        cur = stripEnvAssignments(cur.slice(flagIdx + 1));
+        continue;
+      }
+      return cur; // shell without -c (interactive/script file): not a wrapper
+    }
+
+    // Bare exec prefixes: drop the prefix + its own leading flags/assignments.
+    if (EXEC_PREFIXES.has(cmd)) {
+      let i = 1;
+      while (i < cur.length && (cur[i].startsWith('-') || /^[A-Za-z_][A-Za-z0-9_]*=/.test(cur[i]))) i++;
+      const next = cur.slice(i);
+      if (next.length === 0) return cur; // nothing wrapped (e.g. bare `env`)
+      cur = stripEnvAssignments(next);
+      continue;
+    }
+
+    return cur; // no recognized wrapper — done
+  }
+  return cur;
+}
+
+function basenameCmd(token) {
+  return path.basename(token || '');
+}
+
+// ------------------------------------------------------- deploy detection
+
+// vercel subcommands that are NOT deploys — allowed without gate checks.
+// `alias` is deliberately NOT here: `vercel alias set <deploy> <prod-domain>`
+// re-points a production custom domain onto an already-built deployment, which
+// puts arbitrary code live on the prod hostname — a deploy-equivalent cutover.
+const VERCEL_SAFE_SUBCOMMANDS = new Set([
+  'env', 'link', 'whoami', 'login', 'logout', 'ls', 'list', 'inspect',
+  'logs', 'log', 'domains', 'dns', 'certs', 'secrets', 'teams', 'switch',
+  'projects', 'project', 'pull', 'dev', 'build', 'bisect', 'git', 'help',
+  'init', 'telemetry', 'integration', 'remove', 'rm',
+]);
+
+// vercel subcommands that ARE deploys (plus bare `vercel` / `vercel --prod`).
+// `alias` is a live prod-domain cutover, so it's gated like a deploy.
+const VERCEL_DEPLOY_SUBCOMMANDS = new Set([
+  'deploy', 'redeploy', 'promote', 'rollback', 'alias',
+]);
+
+/**
+ * Given tokens AFTER the `vercel` token, decide deploy intent.
+ * Bare `vercel` (flags only, e.g. `vercel --prod`) deploys by default.
+ * Unknown subcommands => deploy intent (fail closed).
+ */
+function vercelArgsAreDeploy(args) {
+  const sub = args.find((t) => !t.startsWith('-'));
+  if (sub === undefined) return true; // bare vercel / vercel --prod
+  if (VERCEL_DEPLOY_SUBCOMMANDS.has(sub)) return true;
+  if (VERCEL_SAFE_SUBCOMMANDS.has(sub)) return false;
+  return true; // unknown subcommand: fail closed
+}
+
+/** Skip npx/bunx runner flags to find the invoked package token index. */
+function npxTargetIndex(tokens) {
+  let i = 1;
+  while (i < tokens.length) {
+    const t = tokens[i];
+    if (t === '-p' || t === '--package' || t === '-c' || t === '--call') {
+      i += 2;
+    } else if (t.startsWith('-')) {
+      i += 1;
+    } else {
+      return i;
+    }
+  }
+  return -1;
+}
+
+/**
+ * Detect deploy intent for one segment.
+ * Returns null (no intent) or { kind, needsVercelLink, gitDir } descriptor.
+ */
+function detectDeployIntent(segment) {
+  let tokens = unwrapCommandPrefix(tokenize(segment));
+  if (tokens.length === 0) return null;
+  const cmd = basenameCmd(tokens[0]);
+
+  // vercel ...
+  if (cmd === 'vercel' || cmd === 'vc') {
+    return vercelArgsAreDeploy(tokens.slice(1))
+      ? { kind: `vercel deploy ("${segment}")` }
+      : null;
+  }
+
+  // npx vercel ... / bunx vercel ...
+  if (cmd === 'npx' || cmd === 'bunx') {
+    const ti = npxTargetIndex(tokens);
+    if (ti !== -1) {
+      const target = tokens[ti].split('@')[0];
+      if (target === 'vercel' || target === 'vc') {
+        return vercelArgsAreDeploy(tokens.slice(ti + 1))
+          ? { kind: `npx vercel deploy ("${segment}")` }
+          : null;
+      }
+    }
+    return null;
+  }
+
+  // npm|pnpm|bun|yarn run deploy*
+  if (['npm', 'pnpm', 'bun', 'yarn'].includes(cmd)) {
+    const rest = tokens.slice(1);
+    const runIdx = rest.findIndex((t) => t === 'run' || t === 'run-script');
+    if (runIdx !== -1) {
+      const script = rest.slice(runIdx + 1).find((t) => !t.startsWith('-'));
+      if (script && /^deploy([:._-]|$)/.test(script)) {
+        return { kind: `${cmd} run ${script} ("${segment}")` };
+      }
+    }
+    return null;
+  }
+
+  // git push (deploy intent only when the project is Vercel-linked)
+  if (cmd === 'git') {
+    let i = 1;
+    let gitDir = null;
+    let sub = null;
+    while (i < tokens.length) {
+      const t = tokens[i];
+      if (t === '-C') {
+        gitDir = tokens[i + 1];
+        i += 2;
+      } else if (t === '-c') {
+        i += 2;
+      } else if (t.startsWith('-')) {
+        i += 1;
+      } else {
+        sub = t;
+        break;
+      }
+    }
+    if (sub === 'push') {
+      return { kind: `git push ("${segment}")`, needsVercelLink: true, gitDir };
+    }
+    return null;
+  }
+
+  return null;
+}
+
+// ------------------------------------------------------- gate enforcement
+
+function gitOut(args, cwd) {
+  return execFileSync('git', args, {
+    cwd,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  }).trim();
+}
+
+/**
+ * Enforce gate-2 for a deploy-intent segment.
+ * Returns a warning string for attested allows; blocks (exit 2) otherwise
+ * unless the gate is properly green and fresh.
+ */
+function enforceGate(effectiveCwd, kind) {
+  const runProject = findUp(effectiveCwd, '.protocol');
+  if (!runProject) {
+    die(
+      `deploy intent detected (${kind}) but no .protocol/ run-state found ` +
+        `walking up from ${effectiveCwd}. Run \`gate-check init\` or move ` +
+        `into the run project. Failing closed.`
+    );
+  }
+
+  const gatePath = path.join(runProject, '.protocol', 'gates', 'gate-2.json');
+  if (!fs.existsSync(gatePath)) {
+    die(
+      `deploy intent detected (${kind}) but Gate 2 has never been run ` +
+        `(missing ${gatePath}). Run \`gate-check 2\` first. Failing closed.`
+    );
+  }
+
+  let gate;
+  try {
+    gate = JSON.parse(fs.readFileSync(gatePath, 'utf8'));
+  } catch (e) {
+    die(
+      `deploy intent detected (${kind}) but ${gatePath} is malformed JSON ` +
+        `(${e.message}). Failing closed — re-run \`gate-check 2\`.`
+    );
+  }
+
+  const status = gate && typeof gate === 'object' ? gate.status : undefined;
+
+  if (status === 'attested') {
+    return (
+      `deploy-guard WARNING: Gate 2 is ATTESTED, not verified ` +
+      `(break-glass by ${gate.approver || 'unknown'}${
+        gate.reason ? `: ${gate.reason}` : ''
+      }). Deploy allowed for (${kind}) but the SHIP-REPORT will carry a red ` +
+      `attestation banner. Re-run \`gate-check 2\` with tooling up as soon ` +
+      `as possible.`
+    );
+  }
+
+  if (status !== 'green') {
+    die(
+      `Gate 2 is "${status ?? 'unknown'}" — deploy intent (${kind}) requires ` +
+        `Gate 2 green. Run \`gate-check 2\` and fix findings first.`
+    );
+  }
+
+  // green: verify freshness (fix #4 — stale-gate detection)
+  let currentHead;
+  let porcelain;
+  try {
+    currentHead = gitOut(['rev-parse', 'HEAD'], runProject);
+    porcelain = gitOut(['status', '--porcelain'], runProject);
+  } catch (e) {
+    die(
+      `Gate 2 is green but git state of ${runProject} could not be read ` +
+        `(${e.message.split('\n')[0]}). Failing closed.`
+    );
+  }
+
+  const recordedHead = gate.head || gate.git_head || gate.commit;
+  if (!recordedHead) {
+    die(
+      `Gate 2 is green but records no git HEAD — cannot prove freshness. ` +
+        `Re-run \`gate-check 2\`. Failing closed.`
+    );
+  }
+  if (recordedHead !== currentHead) {
+    die(
+      `Gate 2 is STALE: it was green at ${recordedHead.slice(0, 12)} but ` +
+        `HEAD is now ${currentHead.slice(0, 12)}. Code drifted after the ` +
+        `security pass — re-run \`gate-check 2\` before deploying (${kind}).`
+    );
+  }
+  if (porcelain !== '') {
+    die(
+      `Gate 2 is STALE: working tree of ${runProject} is dirty ` +
+        `(uncommitted changes since the security pass). Commit and re-run ` +
+        `\`gate-check 2\` before deploying (${kind}).`
+    );
+  }
+
+  // A genuine `gate-check 2` green always records the security-pass evidence:
+  // the pgTAP RLS summary AND a non-empty evidence[] array. A hand-edited
+  // {"status":"green","head":"<HEAD>"} passes the freshness checks above but
+  // carries neither — it is not a verified pass. Block it so a silent
+  // hand-edit cannot masquerade as a real green (attested gates were already
+  // handled above and legitimately carry no rls summary).
+  const hasRlsSummary = gate.rls && typeof gate.rls === 'object';
+  const hasEvidence = Array.isArray(gate.evidence) && gate.evidence.length > 0;
+  if (!hasRlsSummary || !hasEvidence) {
+    die(
+      `Gate 2 claims green but carries no verification evidence ` +
+        `(missing ${!hasRlsSummary ? 'RLS summary' : 'evidence paths'}). A real ` +
+        `\`gate-check 2\` green records both — this gate-2.json looks hand-edited. ` +
+        `Run \`gate-check 2\` for real (or \`gate-check 2 --attest\` to ` +
+        `break-glass). Failing closed.`
+    );
+  }
+
+  return null; // clean green — allow silently
+}
+
+// ------------------------------------------------------------------ main
+
+function main() {
+  const raw = readStdin();
+  let event;
+  try {
+    event = JSON.parse(raw);
+  } catch {
+    // Unreadable event: this hook only guards Bash deploys; without an event
+    // we cannot even tell the tool. Do not brick the session — allow, warn.
+    process.stderr.write('deploy-guard: unparseable hook event, ignoring.\n');
+    process.exit(0);
+  }
+
+  if (event.tool_name !== 'Bash') process.exit(0);
+  const command =
+    event.tool_input && typeof event.tool_input.command === 'string'
+      ? event.tool_input.command
+      : null;
+  if (!command) process.exit(0);
+
+  const startCwd = event.cwd || process.cwd();
+  let effectiveCwd = startCwd;
+  const warnings = [];
+
+  for (const segment of splitSegments(command)) {
+    const tokens = stripEnvAssignments(tokenize(segment));
+    if (tokens.length === 0) continue;
+
+    // Track directory changes so later segments are judged from the right dir.
+    if (basenameCmd(tokens[0]) === 'cd' || tokens[0] === 'cd') {
+      const target = tokens[1] ? expandTilde(tokens[1]) : os.homedir();
+      effectiveCwd = path.resolve(effectiveCwd, target);
+      continue;
+    }
+    if (tokens[0] === 'pushd' && tokens[1]) {
+      effectiveCwd = path.resolve(effectiveCwd, expandTilde(tokens[1]));
+      continue;
+    }
+
+    const intent = detectDeployIntent(segment);
+    if (!intent) continue;
+
+    // git push only counts as deploy intent when the project is Vercel-linked.
+    if (intent.needsVercelLink) {
+      const baseDir = intent.gitDir
+        ? path.resolve(effectiveCwd, expandTilde(intent.gitDir))
+        : effectiveCwd;
+      const linked = findUp(baseDir, path.join('.vercel', 'project.json'));
+      if (!linked) continue; // not Vercel-linked: plain git push, allow
+    }
+
+    const warning = enforceGate(effectiveCwd, intent.kind);
+    if (warning) warnings.push(warning);
+  }
+
+  if (warnings.length > 0) {
+    process.stderr.write(warnings.join('\n') + '\n');
+  }
+  process.exit(0);
+}
+
+main();
