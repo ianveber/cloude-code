@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INSPECTUS · Pametni filter (demo)</title>
+  <style>
+    :root { --navy:#425060; --navy-deep:#2a3340; --border:#dddddd; --ink:#333; }
+    body { font-family: system-ui, sans-serif; color: var(--ink); margin: 0; padding: 20px; background: #fafafa; }
+    h1 { color: var(--navy-deep); font-size: 22px; margin: 0 0 8px; }
+    .lead { color: #6b7280; font-size: 14px; max-width: 720px; }
+    textarea, input[type=file] { width: 100%; }
+    textarea { font-family: ui-monospace, monospace; font-size: 12px; min-height: 90px; padding: 8px; border: 1px solid var(--border); border-radius: 8px; }
+    button { background: var(--navy); color: #fff; border: 0; border-radius: 8px; padding: 10px 16px; font-weight: 700; cursor: pointer; }
+    .box { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin: 14px 0; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+    .card { border: 1px solid var(--border); border-radius: 10px; padding: 10px; background: #fff; }
+    code { font-size: 12px; }
+    img { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; margin: 2px; }
+    .warn { background: #fdf0ee; color: #a01f0a; padding: 10px; border-radius: 8px; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h1>Pametni filter — 9 avtomatizacij</h1>
+  <p class="lead">
+    Samostojni demo (ista pravila kot Center). Naloži seznam ladje in mapo fotografij.
+    Filter ne ugiba: 17 znakov brez I/O/Q; neuspešno branje zapre prejšnje vozilo.
+  </p>
+  <div class="box">
+    <b>Seznam razkladanja</b>
+    <p class="lead">Prilepi VIN-e ali naloži <a href="sample-ship-list.txt">sample-ship-list.txt</a>.</p>
+    <textarea id="list" placeholder="WVWZZZ3CZWE123456"></textarea>
+  </div>
+  <div class="box">
+    <b>Fotografije (EXIF vrstni red)</b>
+    <input id="files" type="file" accept="image/*" multiple />
+  </div>
+  <p><button id="run" type="button">Zaženi filter</button> <span id="status"></span></p>
+  <div id="alerts"></div>
+  <div id="vehicles" class="grid"></div>
+  <div class="box" id="unsorted"><b>Nerazvrščeno</b><div id="unsorted-thumbs"></div></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="filter-engine.js"></script>
+  <script src="ingest.js"></script>
+  <script src="local-reader.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    $("run").onclick = async () => {
+      const files = Array.from($("files").files || []);
+      const shipList = PametniFilter.extractAllVins($("list").value);
+      $("status").textContent = "Berem EXIF…";
+      const ordered = await PametniIngest.orderByExif(files);
+      const photos = [];
+      const reads = {};
+      for (let i = 0; i < ordered.length; i++) {
+        const { file, capturedAt } = ordered[i];
+        $("status").textContent = "OCR " + (i + 1) + "/" + ordered.length;
+        const dataUrl = await new Promise((res, rej) => {
+          const r = new FileReader();
+          r.onload = () => res(r.result);
+          r.onerror = rej;
+          r.readAsDataURL(file);
+        });
+        const id = "p" + i;
+        photos.push({ id, name: file.name, capturedAt, dataUrl });
+        reads[id] = await PametniReader.readVinTesseract(dataUrl);
+      }
+      const result = PametniFilter.runFilter({ photos, reads, shipList, mode: "exif-stream" });
+      $("status").textContent = result.vehicles.length + " vozil, " + result.unsorted.length + " nerazvrščenih";
+      $("alerts").innerHTML = result.alerts.length
+        ? '<div class="warn">' + result.alerts.map(a => a.message).join("<br>") + "</div>"
+        : "";
+      const byId = Object.fromEntries(photos.map(p => [p.id, p]));
+      $("vehicles").innerHTML = result.vehicles.map(v =>
+        '<div class="card"><code>' + (v.vin || "—") + "</code><div>" +
+        v.photoIds.map(id => byId[id] ? '<img src="' + byId[id].dataUrl + '" alt="">' : "").join("") +
+        "</div></div>"
+      ).join("");
+      $("unsorted-thumbs").innerHTML = result.unsorted.map(u => {
+        const p = byId[u.photoId];
+        return p ? '<img src="' + p.dataUrl + '" title="' + u.reason + '" alt="">' : "";
+      }).join("") || "<span class='lead'>Prazno.</span>";
+    };
+  </script>
+</body>
+</html>

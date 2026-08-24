@@ -23,6 +23,22 @@ export const AUTOMATIONS: Automation[] = [
     href: "/obdelava",
   },
   {
+    id: "zajem",
+    name: "Zajem na terenu",
+    description: "Seja ladje na telefonu: VIN, nato poškodbe. Dva inšpektorja, ločeni seji.",
+    icon: "📱",
+    status: "active",
+    href: "/avtomatizacije/zajem",
+  },
+  {
+    id: "pametni-filter",
+    name: "Pametni filter",
+    description: "Mapa fotografij + seznam razkladanja → vozila, Nerazvrščeno in opozorila.",
+    icon: "🗂️",
+    status: "active",
+    href: "/avtomatizacije/pametni-filter",
+  },
+  {
     id: "vin",
     name: "VIN sortirnik fotografij",
     description: "Prebere VIN iz vsake fotografije in razvrsti poškodbe po vozilih.",

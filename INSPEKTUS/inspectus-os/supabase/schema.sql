@@ -125,6 +125,11 @@ create policy runs_delete_owner_admin on public.runs
     or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin')
   );
 
--- Done. Next: Settings → API → copy Project URL + anon (publishable) key into inspectus-os/.env.local:
+-- Done (init). Field capture + pametni filter tables are in
+-- migrations/20260824140000_vin_field_and_filter.sql — paste that file next
+-- if you use the SQL Editor instead of `supabase db push`.
+--
+-- App env (no new secrets; leave .env.local uncommitted):
 --   NEXT_PUBLIC_SUPABASE_URL=...
 --   NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+--   ANTHROPIC_API_KEY=...   # optional cloud VIN fallback for the filter / field app

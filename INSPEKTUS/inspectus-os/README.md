@@ -33,6 +33,8 @@ ANTHROPIC_API_KEY=sk-ant-...      # required for the AI tabs (Povzetek, AI Valid
 
 **Seed mode:** when `NEXT_PUBLIC_SUPABASE_URL` is unset, the app boots with sample data and **no login** — this is the Phase-1 demo state. Supabase auth + saved runs arrive in Phase 2.
 
+VIN field capture + pametni filter: see `NAVODILA-PAMETNI-FILTER.md`. Optional `ANTHROPIC_API_KEY` is the cloud VIN fallback (same `/api/claude/vin` as the photo sorter).
+
 ## Structure
 
 ```

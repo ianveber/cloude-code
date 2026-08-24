@@ -1,0 +1,13 @@
+{
+  "name": "INSPECTUS Zajem",
+  "short_name": "Zajem",
+  "description": "Teren — VIN in poškodbe, brez namestitve iz trgovine.",
+  "start_url": "/avtomatizacije/zajem",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#425060",
+  "lang": "sl",
+  "icons": [
+    { "src": "/inspectus-logo.png", "sizes": "192x192", "type": "image/png" }
+  ]
+}
