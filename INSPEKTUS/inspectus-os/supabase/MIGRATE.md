@@ -15,7 +15,8 @@ runbook.
 | File | Role |
 |---|---|
 | `migrations/20260615120000_init.sql` | **Canonical** schema — tables, RLS, the `@inspectus.si` signup gate, triggers. Applied with `supabase db push`. |
-| `schema.sql` | Identical convenience copy for zero-tooling **dashboard paste**. Keep in sync with the migration. |
+| `migrations/20260824140000_vin_field_and_filter.sql` | Field capture (`ships`, `field_vehicles`, `field_photos`) + `filter_runs`. |
+| `schema.sql` | Convenience copy of the **init** schema for dashboard paste. Apply the VIN migration after it. |
 | `config.toml` | Supabase CLI project config (ports, auth rules). Lets anyone reproduce the project. |
 
 There is **no Storage and no Edge Functions** — every payload (vehicles, raw rows, AI output)

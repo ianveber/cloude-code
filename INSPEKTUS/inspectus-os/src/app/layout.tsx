@@ -1,9 +1,21 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "INSPECTUS Center",
   description: "INSPECTUS d.o.o. — command center",
+  manifest: "/zajem-manifest.json",
+  appleWebApp: {
+    capable: true,
+    title: "INSPECTUS Zajem",
+    statusBarStyle: "default",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#425060",
 };
 
 export default function RootLayout({
