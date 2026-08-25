@@ -162,3 +162,5 @@ Year 1 honest scope: **CoatingMind on the mix/QC bench** + a research humanoid h
 | 42–45 | If a robot vendor is in the room: 54–61 only. |
 
 Cheat sheet: **pot life, DFT, viscosity, booth zone, defect #1, € of scrap.** If you leave with those six, the meeting worked.
+
+Deeper process/QC/TCP questions: `delivery/coating-technical-questions.md`.
