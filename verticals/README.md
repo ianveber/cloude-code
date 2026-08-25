@@ -9,6 +9,7 @@ Each subdirectory is a vertical playbook — the agency's accumulated knowledge 
 | [Specialty Dental](specialty-dental/playbook.md) | Implant, OMS, ortho, perio | Complete (baseline) | 0 |
 | [Specialty Legal](specialty-legal/playbook.md) | Immigration, estate planning, IP | Complete (baseline) | 0 |
 | [Aesthetic Medicine](aesthetic-medicine/playbook.md) | MedSpa, surgical plastics, derm | Complete (baseline) | 0 |
+| [Robotics](robotics/playbook.md) | OEM service/inspection/logistics robots — Veta owns the software brain | Complete (baseline) | 0 |
 
 ## Roadmap verticals (not yet built)
 

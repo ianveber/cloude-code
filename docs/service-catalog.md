@@ -94,6 +94,7 @@ We stay embedded as the client's ongoing agent operations partner. We run the mo
 | Software seats or licenses | We don't build platforms. |
 | Staff augmentation | We build systems that reduce need for staff, not staff-shaped services. |
 | "AI readiness assessment" | Consulting theater. We do real discovery as part of a scoped build only. |
+| Robot hardware / motor controllers | We own the brain (Veta Cortex), not the chassis. |
 | Social media management | Not our domain. |
 | Training and education | Not a scalable business for us. Refer out. |
 

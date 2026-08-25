@@ -19,6 +19,13 @@ agents/
 │   ├── content-strategy.md
 │   └── partnership-outreach.md
 │
+├── robotics-cortex/              # Veta Cortex — software brain on OEM robots
+│   ├── architecture.md
+│   ├── agent-spec-supervisor-robotics-safety.md
+│   ├── agent-spec-cortex-robotics-plan.md
+│   ├── agent-spec-operator-robotics-exception.md
+│   └── tool-manifest-robot-hal.md
+│
 └── {vertical}-{client}/          # Client-specific agent systems (created per engagement)
     ├── agent-spec-{agent-name}.md
     ├── tool-manifest-{tool-name}.md

@@ -13,6 +13,7 @@ This is the agency's internal operating repo. It contains:
 - **Agency OS** — positioning, principles, and service catalog (`docs/`)
 - **Agent architecture** — base templates, tool manifests, evaluation rubrics (`agents/`)
 - **Vertical playbooks** — specific breakdown of each target vertical (`verticals/`)
+- **Veta Cortex** — software brain for OEM robots (`robot_brain/`, `agents/robotics-cortex/`, `verticals/robotics/`)
 - **Client delivery system** — discovery, scoping, onboarding, handoff (`delivery/`)
 - **Business ops** — pricing, KPIs, daily run-book (`ops/`)
 - **Acquirer agent** — organic acquisition system (SEO, GEO, content, partnerships) (`agents/acquirer/`)
@@ -28,6 +29,7 @@ This repo is also the working environment for the Veta Business Manager agent, w
 | SOW template | `delivery/sow-template.md` |
 | How to specify a new agent | `agents/_base/agent-spec-template.md` |
 | Vertical-specific playbook | `verticals/{vertical}/playbook.md` |
+| Robot software brain (Cortex) | `agents/robotics-cortex/architecture.md` + `python -m robot_brain` |
 | Agency positioning (for pitches) | `docs/positioning.md` |
 | Daily ops + run-book | `ops/run-book.md` |
 | How we acquire clients (organic) | `agents/acquirer/` |
@@ -38,7 +40,7 @@ This repo is also the working environment for the Veta Business Manager agent, w
 |---|---|---|
 | Phase 1 — Agency OS | Complete | `docs/`, `README.md` |
 | Phase 2 — Agent architecture | Pending | `agents/_base/` |
-| Phase 3 — Vertical playbooks | Pending | `verticals/` |
+| Phase 3 — Vertical playbooks | In progress | `verticals/` (dental, legal, aesthetics complete; robotics baseline) |
 | Phase 4 — Client delivery | Pending | `delivery/` |
 | Phase 5 — Business ops | Pending | `ops/` |
 | Phase 6 — Acquirer agent | Pending | `agents/acquirer/` |
