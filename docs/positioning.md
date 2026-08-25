@@ -72,6 +72,8 @@ The gap is real: there is no category of firm that shows up to a specialty denta
 - Fintech back-office (lending, compliance)
 - B2B SaaS ops (CS, onboarding, RevOps)
 
+**Product adjacent to verticals:** **Veta Cortex** — we install our own software brain on robots the business already owns. OEM keeps locomotion and firmware. We own work orders, safety policy, skill runtime, and exception routing. See `verticals/robotics/playbook.md`.
+
 ---
 
 ## The pitch in plain language
