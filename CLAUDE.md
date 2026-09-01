@@ -80,17 +80,20 @@ Compile a structured markdown report at ./reports/YYYY-MM-DD-daily-briefing.md u
 </memory_instructions>
 
 <obsidian_memory>
-Obsidian vault: /Users/ianveber/Documents/Obsidian Vault
-Memory folder: /Users/ianveber/Documents/Obsidian Vault/_claude-memory/
+Shared memory (Claude Code + Cursor): ./_claude-memory/ in this repo.
+Obsidian vault (Mac UI): /Users/ianveber/Documents/Obsidian Vault
+Those two must be the same folder. On a Mac, run ./scripts/link-obsidian-memory.sh so the vault _claude-memory path is a symlink to this repo. Protocol: ./_claude-memory/SYNC.md and AGENTS.md.
 
-At the start of EVERY session, before doing anything else, read these three files in order:
-1. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/context.md
-2. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/ethospheres.md
-3. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/decisions-log.md
+At the start of EVERY session, before doing anything else, read these files from the REPO copy first:
+1. ./_claude-memory/🗺️ Master MOC.md
+2. ./_claude-memory/context.md
+3. ./_claude-memory/decisions-log.md
+
+Fallback only if the repo folder is missing: /Users/ianveber/Documents/Obsidian Vault/_claude-memory/
 
 This restores full working memory of the user's business, active projects, and all decisions already made. Do not ask the user to re-explain context that is already in these files. After reading, confirm with one line: "Memory loaded — [brief summary of what's active]."
 
-When a session produces new decisions, completed tasks, or major project updates — write them to the relevant memory file before ending the session.
+When a session produces new decisions, completed tasks, or major project updates — write them to ./_claude-memory/ before ending the session (that is what Cursor Cloud can see after git push).
 </obsidian_memory>
 
 <error_handling>
@@ -136,26 +139,32 @@ NEW CLIENT OR PROJECT:
 - Follow the same structure as ethospheres.md
 - Add the client to context.md under Active Clients
 
-Memory files (read in this order at session start):
+Memory files (read in this order at session start). Prefer ./_claude-memory/ so Claude and Cursor stay in sync. The Obsidian path is the same folder after symlink.
+
 CORE (read every session):
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/🗺️ Master MOC.md       ← START HERE
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/context.md
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/decisions-log.md
+- ./_claude-memory/🗺️ Master MOC.md       ← START HERE
+- ./_claude-memory/context.md
+- ./_claude-memory/decisions-log.md
 
 CLIENTS (read when relevant):
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/ethospheres.md           ← PRIMARY
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/clients/autoflow.md
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/clients/other-projects.md
+- ./_claude-memory/ethospheres.md           ← PRIMARY
+- ./_claude-memory/clients/autoflow.md
+- ./_claude-memory/clients/other-projects.md
+- ./_claude-memory/zalife.md
 
 VETA INTERNAL:
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-agency.md
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-internal/veta-positioning.md
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-internal/veta-services.md
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-internal/veta-principles.md
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-internal/veta-kpis.md
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-internal/vertical-aesthetic-medicine.md
+- ./_claude-memory/veta-agency.md
+- ./_claude-memory/agentic-os.md
+- ./_claude-memory/veta-internal/veta-positioning.md
+- ./_claude-memory/veta-internal/veta-services.md
+- ./_claude-memory/veta-internal/veta-principles.md
+- ./_claude-memory/veta-internal/veta-kpis.md
+- ./_claude-memory/veta-internal/vertical-aesthetic-medicine.md
 
 KNOWLEDGE BASE:
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/knowledge/ethosome-technology.md
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/knowledge/geo-strategy.md
+- ./_claude-memory/knowledge/ethosome-technology.md
+- ./_claude-memory/knowledge/geo-strategy.md
+
+Mac fallback (only if repo copy is missing):
+- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/
 </memory_update_protocol>

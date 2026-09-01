@@ -1,0 +1,16 @@
+---
+description: Shared Claude/Cursor/Obsidian memory — load at session start, write at session end
+alwaysApply: true
+---
+
+# Shared memory
+
+You and Claude Code use the same notes. They live in `_claude-memory/` at the repo root (also edited in Obsidian via symlink — see `_claude-memory/SYNC.md`).
+
+At the start of a session, read `_claude-memory/🗺️ Master MOC.md`, `_claude-memory/context.md`, and `_claude-memory/decisions-log.md` before asking Ian for background. Confirm: `Memory loaded — [one line].`
+
+At the end of a session that produced decisions, status changes, or new files, update the matching `_claude-memory/` file and its `Last updated` date. Confirm: `Memory updated.`
+
+Never invent client progress. If the local Obsidian vault has extra notes not in git, merge them into `_claude-memory/` rather than keeping a second copy.
+
+Hard rules in `CLAUDE.md` and `AGENTS.md` still apply (no unsolicited email, no GitHub issue writes, no Calendar edits).

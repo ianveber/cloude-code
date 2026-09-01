@@ -19,6 +19,8 @@ This is the agency's internal operating repo. It contains:
 
 This repo is also the working environment for the Veta Business Manager agent, which runs daily briefings pulling from GitHub Issues, Notion, Calendar, and Gmail. See `CLAUDE.md` for that agent's configuration.
 
+**Shared memory (Claude + Cursor + Obsidian):** `_claude-memory/`. Both agents read and write those files. On a Mac, run `./scripts/link-obsidian-memory.sh` so Obsidian uses the same folder. Details: `_claude-memory/SYNC.md` and `AGENTS.md`.
+
 ## Quick navigation
 
 | What you need | Where to look |
@@ -31,6 +33,7 @@ This repo is also the working environment for the Veta Business Manager agent, w
 | Agency positioning (for pitches) | `docs/positioning.md` |
 | Daily ops + run-book | `ops/run-book.md` |
 | How we acquire clients (organic) | `agents/acquirer/` |
+| Shared Claude / Cursor / Obsidian memory | `_claude-memory/` + `AGENTS.md` |
 
 ## Build status
 

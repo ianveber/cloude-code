@@ -5,7 +5,10 @@
 ## Prompt
 Sync and audit the Obsidian vault for Agentic OS.
 
-Vault location: /Users/ianveber/Documents/Obsidian Vault/
+Shared memory (Claude + Cursor): ./_claude-memory/ in this repo. That is the source of truth.
+
+Obsidian vault (Mac): /Users/ianveber/Documents/Obsidian Vault/
+After `./scripts/link-obsidian-memory.sh`, vault `_claude-memory/` is a symlink to the repo folder. See `_claude-memory/SYNC.md`.
 
 Check the following:
 1. **Agentic-OS folder** — are all 6 subfolders present and accessible?
@@ -19,7 +22,7 @@ Check the following:
 
 2. **Recent agent outputs** — list any new files in 00-Inbox/ that need Ian's attention
 
-3. **Memory files** — confirm all _claude-memory/ files are up to date (check Last updated dates)
+3. **Memory files** — confirm all ./_claude-memory/ files are up to date (check Last updated dates). If the Mac vault folder is a real directory instead of a symlink, flag it and run scripts/link-obsidian-memory.sh.
 
 4. **Log files** — summarise recent agent runs from 04-Agent-Logs/
 
