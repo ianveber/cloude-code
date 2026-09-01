@@ -1747,9 +1747,10 @@ Based on what you know about Ian's current priorities, provide:
     sub: 'os · memory',
     accentColor: '#bf5af2',
     type: 'os',
-    prompt: `Update the Obsidian memory files with what happened in this session.
+    prompt: `Update the shared memory files with what happened in this session.
 
-Obsidian vault: /Users/ianveber/Documents/Obsidian Vault/_claude-memory/
+Source of truth: ./_claude-memory/ in this repo (same files Obsidian shows after ./scripts/link-obsidian-memory.sh).
+Mac fallback only if the repo folder is missing: /Users/ianveber/Documents/Obsidian Vault/_claude-memory/
 
 Review this conversation and:
 1. Identify any new decisions made → decisions-log.md
@@ -1810,14 +1811,14 @@ Report status for each agent: ✅ running / ⚠️ warning / ❌ error`
     sub: 'os · obsidian',
     accentColor: '#bf5af2',
     type: 'os',
-    prompt: `Read the current state of all Obsidian memory files and give me a full context summary.
+    prompt: `Read the current state of all shared memory files and give me a full context summary.
 
-Read in this order:
-1. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/🗺️ Master MOC.md
-2. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/context.md
-3. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/ethospheres.md
-4. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/decisions-log.md
-5. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/agentic-os.md
+Read in this order from ./_claude-memory/ (repo). After the Obsidian symlink these are the same files as the vault.
+1. ./_claude-memory/🗺️ Master MOC.md
+2. ./_claude-memory/context.md
+3. ./_claude-memory/ethospheres.md
+4. ./_claude-memory/decisions-log.md
+5. ./_claude-memory/agentic-os.md
 
 Then summarize:
 - What's the current state of each active project?

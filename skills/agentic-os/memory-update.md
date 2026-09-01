@@ -7,13 +7,13 @@ You are the memory keeper for Ian Veber's Agentic OS. Review this session and up
 
 Session summary: [PASTE WHAT WAS ACCOMPLISHED THIS SESSION]
 
-Update the following files as needed:
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/🗺️ Master MOC.md — if new files/projects created
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/context.md — if Ian shared new personal/business context
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/ethospheres.md — if Ethospheres work was done
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/clients/autoflow.md — if AutoFlow work was done
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/agentic-os.md — if agents were built/modified
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/decisions-log.md — if decisions were made
+Update the following files in ./_claude-memory/ (same files Obsidian shows after the symlink):
+- ./_claude-memory/🗺️ Master MOC.md — if new files/projects created
+- ./_claude-memory/context.md — if Ian shared new personal/business context
+- ./_claude-memory/ethospheres.md — if Ethospheres work was done
+- ./_claude-memory/clients/autoflow.md — if AutoFlow work was done
+- ./_claude-memory/agentic-os.md — if agents were built/modified
+- ./_claude-memory/decisions-log.md — if decisions were made
 
 For each file that needs updating:
 1. State what changed
