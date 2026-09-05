@@ -174,17 +174,17 @@ ${decor([{ art: 'talk', place: 'right', size: 'lg', accent: 'violet' }])}
       ${each(
         services,
         (s) => `
-      <article class="${cls('agent', accentMod('agent', s.accent))}">
-        <span class="agent__mark" aria-hidden="true">${serviceGlyph(s.slug)}</span>
-        <h3 class="agent__name">${esc(s.name)}</h3>
-        <p class="agent__role">${esc(s.role)}</p>
-        <p class="agent__summary">${esc(s.summary)}</p>
-        <ul class="agent__tags">
+      <article class="${cls('svc', accentMod('svc', s.accent))}">
+        <span class="svc__mark" aria-hidden="true">${serviceGlyph(s.slug)}</span>
+        <h3 class="svc__name">${esc(s.name)}</h3>
+        <p class="svc__role">${esc(s.role)}</p>
+        <p class="svc__summary">${esc(s.summary)}</p>
+        <ul class="svc__tags">
           ${each(s.tags, (t) => `<li class="${cls('chip', accentMod('chip', s.accent))}">${esc(t)}</li>`)}
         </ul>
         ${
           linkToDetail
-            ? `<div class="agent__foot">
+            ? `<div class="svc__foot">
           <a class="${cls('link', s.accent !== 'blue' ? `link--${s.accent}` : '')}" href="/storitve/${esc(s.slug)}/">Več o storitvi <span aria-hidden="true">&rarr;</span></a>
         </div>`
             : ''

@@ -146,13 +146,13 @@ function servicesIndexPage() {
   </div>
 </section>`,
 
-    servicesSection({ eyebrow: 'Agenti', title: 'Trije specializirani AI agenti', lead: '' }, C.services),
+    servicesSection({ eyebrow: 'Področja', title: 'Tri področja avtomatizacije', lead: '' }, C.services),
 
     `<section class="section">
   <div class="shell">
     ${sectionHead({
       eyebrow: 'Primerjava',
-      title: 'Kateri agent rešuje kateri problem',
+      title: 'Katera storitev rešuje kateri problem',
       lead: 'Hiter pregled, če še niste prepričani, kje začeti.',
       accent: 'teal',
     })}
@@ -244,7 +244,7 @@ function servicePage(service) {
     path: `/storitve/${service.slug}/`,
     title: service.metaTitle,
     description: service.metaDescription,
-    keywords: [service.name, service.role, 'AI agent Slovenija'],
+    keywords: [service.name, service.role, 'AI avtomatizacija Slovenija'],
     breadcrumbs: [
       HOME_CRUMB,
       { label: 'Storitve', href: '/storitve/' },
@@ -568,7 +568,7 @@ ${site.facts.map((f) => `- ${f}`).join('\n')}
 - Telefon: ${site.contact.phone}
 - Lokacija: ${site.contact.city}, ${site.contact.country}
 
-## AI agenti
+## Storitve
 
 ${C.services.map((s) => `- **${s.name}** (${s.role}): ${s.answer}`).join('\n')}
 

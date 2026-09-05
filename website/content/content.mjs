@@ -2,7 +2,7 @@
  * All site copy, structured as data.
  *
  * The wording here is carried over from the original ais-slovenia.si. Where the
- * original had no text at all (FAQ answers, meta descriptions, per-agent detail),
+ * original had no text at all (FAQ answers, meta descriptions, per-service detail),
  * new copy was written in the same voice and stays consistent with the facts in
  * site.mjs. Edit this file and re-run `npm run build` — pages, navigation,
  * sitemap and structured data all regenerate from it.
@@ -129,7 +129,7 @@ export const processMeta = {
   lead: 'Osem natančnih korakov. Nič manj, nič več.',
 };
 
-/* ── Services / AI agents ─────────────────────────────────────────────── */
+/* ── Services ─────────────────────────────────────────────────────────── */
 
 export const servicesMeta = {
   eyebrow: 'Storitve',

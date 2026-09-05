@@ -305,7 +305,7 @@ export function decorSprite(bodyHtml) {
 const G = 'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"';
 
 /**
- * A 28×28 line glyph per service, replacing the old two-letter agent monogram.
+ * A 28×28 line glyph per service, keyed by slug.
  * Keyed by service slug, with a neutral fallback.
  */
 export const SERVICE_GLYPHS = {
