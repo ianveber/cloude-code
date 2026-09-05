@@ -80,7 +80,7 @@ export function organizationNode() {
         itemOffered: {
           '@type': 'Service',
           '@id': url(`/storitve/${s.slug}/#service`),
-          name: `${s.name} — ${s.role}`,
+          name: s.name,
           description: s.summary,
         },
       })),
@@ -148,8 +148,8 @@ export function serviceNode(service) {
   return {
     '@type': 'Service',
     '@id': url(`/storitve/${service.slug}/#service`),
-    name: `${service.name} — ${service.role}`,
-    alternateName: service.name,
+    name: service.name,
+    alternateName: `${service.name} — ${service.role}`,
     serviceType: service.role,
     description: service.answer,
     url: url(`/storitve/${service.slug}/`),
@@ -158,7 +158,7 @@ export function serviceNode(service) {
     availableLanguage: ['sl'],
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
-      name: `Zmožnosti agenta ${service.name}`,
+      name: `Zmožnosti — ${service.name}`,
       itemListElement: service.capabilities.map((c) => ({
         '@type': 'Offer',
         itemOffered: { '@type': 'Service', name: c.title, description: c.body },

@@ -87,7 +87,7 @@ function homePage() {
   <div class="shell">
     ${takeaway({
       label: 'Kaj počnemo',
-      text: 'AIS Slovenia postavlja AI sisteme za avtomatizacijo poslovnih procesov. Razvijamo tri AI agente — AVA za administracijo, LUCY za prodajo in LILY za spremljanje trga — ter jih po osemstopenjskem procesu povežemo z orodji, ki jih podjetje že uporablja.',
+      text: 'AIS Slovenia postavlja AI sisteme za avtomatizacijo poslovnih procesov. Pokrivamo tri področja — administracijo in operacije, prodajo in komunikacijo s strankami ter spremljanje trga — sisteme pa po osemstopenjskem procesu povežemo z orodji, ki jih podjetje že uporablja.',
     })}
   </div>
 </section>`,
@@ -130,7 +130,7 @@ function servicesIndexPage() {
   const body = [
     pageHero({
       eyebrow: C.servicesMeta.eyebrow,
-      title: 'AI sistemi za podjetja: AVA, LUCY in LILY',
+      title: 'AI sistemi za podjetja: administracija, prodaja in trg',
       lead: C.servicesMeta.lead,
       accent: 'violet',
       cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
@@ -141,7 +141,7 @@ function servicesIndexPage() {
     ${takeaway({
       accent: 'violet',
       label: 'Na kratko',
-      text: 'AIS Slovenia ponuja tri AI agente. AVA avtomatizira administrativne procese, LUCY na spletni strani prodaja in odgovarja strankam 24/7, LILY pa spremlja trg in dostavlja priložnosti. Vsak agent deluje samostojno, skupaj pa tvorijo celovit sistem za avtomatizacijo poslovanja.',
+      text: 'AIS Slovenia pokriva tri področja avtomatizacije. Avtomatizacija administracije prevzame ponavljajoče se operativne naloge, avtomatizacija prodaje na spletni strani odgovarja strankam 24/7, spremljanje trga pa dostavlja relevantne priložnosti. Vsak sistem deluje samostojno, skupaj pa tvorijo celovito rešitev za avtomatizacijo poslovanja.',
     })}
   </div>
 </section>`,
@@ -171,9 +171,9 @@ function servicesIndexPage() {
 
   return {
     path: '/storitve/',
-    title: 'AI agenti za podjetja: AVA, LUCY in LILY | AIS Slovenia',
+    title: 'AI sistemi za podjetja — storitve | AIS Slovenia',
     description:
-      'Trije AI agenti za podjetja: AVA za administrativne procese, LUCY za prodajo na spletni strani in LILY za spremljanje trga. Vsi delujejo v slovenščini.',
+      'Tri področja avtomatizacije za podjetja: administracija in operacije, prodaja in komunikacija s strankami ter spremljanje trga. Vse v slovenščini.',
     keywords: ['AI agenti za podjetja', 'AI chatbot za spletno stran', 'voice AI agent slovenščina'],
     breadcrumbs: [HOME_CRUMB, { label: 'Storitve', href: '/storitve/' }],
     priority: '0.9',
@@ -187,7 +187,7 @@ function servicePage(service) {
   const body = [
     pageHero({
       eyebrow: service.role,
-      title: `${service.name} — ${service.role}`,
+      title: service.name,
       lead: service.summary,
       accent: service.accent,
       cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
@@ -195,7 +195,7 @@ function servicePage(service) {
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
-    ${takeaway({ accent: service.accent, label: `Kaj je ${service.name}`, text: service.answer })}
+    ${takeaway({ accent: service.accent, label: 'Na kratko', text: service.answer })}
   </div>
 </section>`,
 
@@ -203,8 +203,8 @@ function servicePage(service) {
   <div class="shell">
     ${sectionHead({
       eyebrow: 'Zmožnosti',
-      title: `Kaj ${service.name} počne`,
-      lead: `Štiri naloge, ki jih agent ${service.name} prevzame od vaše ekipe.`,
+      title: 'Kaj sistem prevzame',
+      lead: 'Štiri naloge, ki jih sistem prevzame od vaše ekipe.',
       accent: service.accent,
     })}
     ${capabilityGrid(service.capabilities, service.accent)}
@@ -215,11 +215,11 @@ function servicePage(service) {
   <div class="shell">
     ${sectionHead({
       eyebrow: 'Podrobnosti',
-      title: `${service.name} na kratko`,
+      title: 'Storitev na kratko',
       accent: service.accent,
     })}
     ${definitionList([
-      { term: 'Vrsta agenta', definition: service.role },
+      { term: 'Področje', definition: service.role },
       { term: 'Jezik', definition: 'Slovenščina' },
       { term: 'Razpoložljivost', definition: '24 ur na dan, vse dni v letu' },
       { term: 'Primerno za', definition: service.bestFor },
@@ -231,7 +231,7 @@ function servicePage(service) {
     processSection(
       {
         eyebrow: 'Uvedba',
-        title: `Kako uvedemo agenta ${service.name}`,
+        title: 'Kako sistem uvedemo',
         lead: C.processMeta.lead,
       },
       C.processSteps
@@ -618,7 +618,7 @@ function ogImageSvg() {
   <text x="80" y="336" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="62" font-weight="700" letter-spacing="-2" fill="#15171d">ki želijo hitrejše procese</text>
   <text x="80" y="410" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="62" font-weight="700" letter-spacing="-2" fill="#15171d">in manj ročnega dela.</text>
 
-  <text x="80" y="486" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="26" font-weight="500" fill="#666d7d">AVA &#183; LUCY &#183; LILY &#8212; AI agenti v slovenščini</text>
+  <text x="80" y="486" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="26" font-weight="500" fill="#666d7d">Administracija &#183; Prodaja &#183; Trg &#8212; AI sistemi v slovenščini</text>
 
   <g font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="22" font-weight="600" fill="#3d434f">
     <circle cx="88" cy="551" r="6" fill="#1d77fe"/>

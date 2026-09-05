@@ -134,64 +134,65 @@ export const processMeta = {
 export const servicesMeta = {
   eyebrow: 'Storitve',
   title: 'AI sistemi za podjetja',
-  lead: 'Vsak naš AI pomočnik (AI chatboti in voice AI agenti v slovenščini) je specializiran za določeno področje, skupaj pa tvorijo celovito rešitev za avtomatizacijo poslovanja.',
+  lead: 'Vsako področje pokriva namenski sistem — AI chatboti in voice AI agenti v slovenščini — skupaj pa tvorijo celovito rešitev za avtomatizacijo poslovanja.',
 };
 
+/* Services are described by what they do, not as named characters. */
 export const services = [
   {
-    slug: 'ava',
-    name: 'AVA',
-    role: 'AI operativni in administrativni agent',
+    slug: 'avtomatizacija-administracije',
+    name: 'Avtomatizacija administracije',
+    role: 'Administracija in operacije',
     summary:
-      'Ava je vaša digitalna sodelavka, ki avtomatizira administrativne procese. Deluje 24/7 in poskrbi, da operacije tečejo brez napak, zamud in ročnega dela.',
+      'Avtomatiziramo administrativne procese, ki danes tečejo ročno. Sistem deluje 24/7 in poskrbi, da operacije tečejo brez napak, zamud in ročnega dela.',
     accent: 'blue',
-    tags: ['Pripravljena za uvedbo', 'Sinhronizacija 24/7'],
-    metaTitle: 'AVA — AI operativni in administrativni agent | AIS Slovenia',
+    tags: ['Delovanje 24/7', 'Brez ročnega vnosa'],
+    metaTitle: 'Avtomatizacija administracije in operacij | AIS Slovenia',
     metaDescription:
-      'AVA je AI agent za avtomatizacijo administracije: obdeluje dokumente, sinhronizira podatke med orodji in prevzame ponavljajoče se operativne naloge 24/7.',
+      'Avtomatizacija administrativnih procesov: obdelava dokumentov, sinhronizacija podatkov med orodji in prevzem ponavljajočih se operativnih nalog 24/7.',
     /* Answer-first paragraph: written so AI answer engines can quote it directly. */
     answer:
-      'AVA je AI operativni in administrativni agent podjetja AIS Slovenia. Prevzame ponavljajoče se administrativne naloge — obdelavo dokumentov, vnos in sinhronizacijo podatkov ter interno poročanje — in jih izvaja neprekinjeno, brez ročnega dela.',
+      'Avtomatizacija administracije prevzame ponavljajoče se administrativne naloge — obdelavo dokumentov, vnos in sinhronizacijo podatkov ter interno poročanje — in jih izvaja neprekinjeno, brez ročnega dela.',
     capabilities: [
-      { title: 'Obdelava dokumentov', body: 'Prebere, razvrsti in povzame vhodne dokumente ter jih pošlje v pravi sistem.' },
-      { title: 'Sinhronizacija podatkov', body: 'Podatke drži usklajene med CRM, e-pošto, preglednicami in internimi orodji.' },
-      { title: 'Interna poročila', body: 'Redna poročila pripravi in dostavi po urniku, brez opomnikov.' },
+      { title: 'Obdelava dokumentov', body: 'Sistem prebere, razvrsti in povzame vhodne dokumente ter jih pošlje v pravi sistem.' },
+      { title: 'Sinhronizacija podatkov', body: 'Podatki ostanejo usklajeni med CRM, e-pošto, preglednicami in internimi orodji.' },
+      { title: 'Interna poročila', body: 'Redna poročila se pripravijo in dostavijo po urniku, brez opomnikov.' },
       { title: 'Neprekinjeno delovanje', body: 'Deluje 24 ur na dan, tudi izven delovnega časa in med odsotnostmi.' },
     ],
     bestFor: 'Podjetja z veliko administracije, kjer ekipa dnevno prepisuje podatke med orodji.',
   },
   {
-    slug: 'lucy',
-    name: 'LUCY',
-    role: 'AI prodajni agent',
+    slug: 'avtomatizacija-prodaje',
+    name: 'Avtomatizacija prodaje',
+    role: 'Prodaja in komunikacija',
     summary: 'Na spletni strani komunicira s strankami 24/7 in odgovarja na vprašanja.',
     accent: 'violet',
     tags: ['Višja konverzija', 'Slovenščina'],
-    metaTitle: 'LUCY — AI prodajni agent za spletno stran | AIS Slovenia',
+    metaTitle: 'Avtomatizacija prodaje in komunikacije s strankami | AIS Slovenia',
     metaDescription:
-      'LUCY je AI prodajni agent za spletne strani. Odgovarja obiskovalcem v slovenščini 24/7, kvalificira povpraševanja in jih preda vaši prodajni ekipi.',
+      'AI sistem za prodajo na spletni strani: odgovarja obiskovalcem v slovenščini 24/7, kvalificira povpraševanja in jih preda vaši prodajni ekipi.',
     answer:
-      'LUCY je AI prodajni agent podjetja AIS Slovenia. Na spletni strani komunicira z obiskovalci v slovenščini 24 ur na dan, odgovarja na vprašanja o storitvah, kvalificira povpraševanja in jih preda prodajni ekipi.',
+      'Avtomatizacija prodaje pokriva komunikacijo s strankami na spletni strani. Sistem odgovarja obiskovalcem v slovenščini 24 ur na dan, odgovarja na vprašanja o storitvah, kvalificira povpraševanja in jih preda prodajni ekipi.',
     capabilities: [
-      { title: 'Pogovor v slovenščini', body: 'Z obiskovalci se pogovarja naravno, v jeziku vaše stranke.' },
+      { title: 'Pogovor v slovenščini', body: 'Z obiskovalci komunicira naravno, v jeziku vaše stranke.' },
       { title: 'Odgovori 24/7', body: 'Na vprašanja odgovori takoj, tudi ponoči in ob vikendih.' },
       { title: 'Kvalifikacija povpraševanj', body: 'Prepozna resne priložnosti in zbere podatke, ki jih prodaja potrebuje.' },
-      { title: 'Predaja ekipi', body: 'Pogovor s celotnim kontekstom preda pravi osebi v vaši ekipi.' },
+      { title: 'Predaja ekipi', body: 'Povpraševanje s celotnim kontekstom preda pravi osebi v vaši ekipi.' },
     ],
     bestFor: 'Podjetja, ki prejemajo veliko podobnih vprašanj prek spletne strani.',
   },
   {
-    slug: 'lily',
-    name: 'LILY',
-    role: 'AI scout agent',
+    slug: 'spremljanje-trga',
+    name: 'Spremljanje trga',
+    role: 'Tržna analiza',
     summary: 'Neprestano pregleduje trg in vam dostavlja najboljše priložnosti.',
     accent: 'teal',
     tags: ['Tržna analiza', 'Dnevni pregled'],
-    metaTitle: 'LILY — AI scout agent za spremljanje trga | AIS Slovenia',
+    metaTitle: 'Spremljanje trga in tržna analiza z AI | AIS Slovenia',
     metaDescription:
-      'LILY je AI scout agent, ki neprestano spremlja trg, razpise in konkurenco ter vam dostavi le relevantne priložnosti — brez ročnega iskanja.',
+      'AI sistem, ki neprestano spremlja trg, razpise in konkurenco ter vam dostavi le relevantne priložnosti — brez ročnega iskanja.',
     answer:
-      'LILY je AI scout agent podjetja AIS Slovenia. Neprestano pregleduje trg, javne razpise in aktivnosti konkurence ter vam dostavlja le priložnosti, ki ustrezajo vašim merilom.',
+      'Spremljanje trga je AI sistem, ki neprestano pregleduje trg, javne razpise in aktivnosti konkurence ter dostavlja le priložnosti, ki ustrezajo vnaprej določenim merilom.',
     capabilities: [
       { title: 'Spremljanje trga', body: 'Redno pregleduje vire, ki so pomembni za vašo panogo.' },
       { title: 'Filtriranje priložnosti', body: 'Dostavi le tisto, kar ustreza vašim vnaprej določenim merilom.' },
@@ -302,8 +303,8 @@ export const faq = {
       a: 'AIS Slovenia (Artificial Intelligence Slovenia) je slovensko podjetje za avtomatizacijo poslovnih procesov z umetno inteligenco. Razvijamo AI chatbote, voice AI agente in interne sisteme, ki povežejo komunikacijo, podatke in operacije. Delujemo iz Ljubljane, storitve pa izvajamo v slovenskem jeziku.',
     },
     {
-      q: 'Katere AI agente ponujate?',
-      a: 'Ponujamo tri AI agente. AVA je operativni in administrativni agent, ki prevzame ponavljajoče se administrativne naloge. LUCY je prodajni agent, ki na spletni strani komunicira s strankami 24/7. LILY je scout agent, ki spremlja trg in dostavlja relevantne priložnosti.',
+      q: 'Katera področja avtomatizirate?',
+      a: 'Pokrivamo tri področja. Avtomatizacija administracije prevzame ponavljajoče se administrativne in operativne naloge. Avtomatizacija prodaje pokriva komunikacijo s strankami na spletni strani 24/7. Spremljanje trga neprestano pregleduje trg in dostavlja relevantne priložnosti.',
     },
     {
       q: 'Kako poteka uvedba AI sistema?',
@@ -314,8 +315,8 @@ export const faq = {
       a: 'Odvisno od obsega. Diagnostika traja 3 do 5 dni, potopitev in arhitektura po en teden, prototip 2 do 3 tedne, kalibracija 3 do 5 tednov, sama uvedba pa 1 do 2 tedna. Faza evolucije z mesečno analitiko in optimizacijo teče nenehno.',
     },
     {
-      q: 'Ali AI agenti govorijo slovensko?',
-      a: 'Da. Naši AI chatboti in voice AI agenti komunicirajo v slovenščini. LUCY se z obiskovalci spletne strani pogovarja v slovenskem jeziku 24 ur na dan.',
+      q: 'Ali AI sistemi govorijo slovensko?',
+      a: 'Da. Naši AI chatboti in voice AI agenti komunicirajo v slovenščini. Sistem za komunikacijo s strankami se z obiskovalci spletne strani pogovarja v slovenskem jeziku 24 ur na dan.',
     },
     {
       q: 'Za katera podjetja je AI avtomatizacija smiselna?',
