@@ -1,4 +1,4 @@
-name: Website — build & SEO/GEO audit
+name: Website — build, audit & render check
 
 on:
   push:
@@ -26,12 +26,24 @@ jobs:
         with:
           node-version: '20'
 
-      # The generator has no dependencies, so there is nothing to install.
+      # The generator itself has no dependencies; the dev dependency is
+      # puppeteer-core, used only by the render check below.
+      - name: Install dev dependencies
+        run: npm ci
+
       - name: Build static site
         run: npm run build
 
       - name: SEO / GEO audit
         run: npm run audit
+
+      # Renders every page across desktop, laptop, tablet and phone widths and
+      # fails if a decorative drawing lands behind copy or a page scrolls
+      # sideways. ubuntu-latest ships Chrome at this path.
+      - name: Render check
+        run: npm run render-check
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
 
       - name: Upload build output
         if: always()

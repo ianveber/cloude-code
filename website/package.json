@@ -2,16 +2,20 @@
   "name": "ais-slovenia-website",
   "version": "1.0.0",
   "private": true,
-  "description": "Static, SEO- and GEO-optimised website for AIS Slovenia. Zero runtime dependencies.",
+  "description": "Static, SEO- and GEO-optimised website for AIS Slovenia. No runtime dependencies; the only dev dependency is puppeteer-core, used by the render check.",
   "type": "module",
   "engines": {
     "node": ">=18"
   },
   "scripts": {
     "build": "node build.mjs",
-    "check": "node build.mjs && node audit.mjs",
+    "check": "node build.mjs && node audit.mjs && node render-check.mjs",
     "audit": "node audit.mjs",
     "dev": "node build.mjs --serve",
-    "serve": "node build.mjs --serve"
+    "serve": "node build.mjs --serve",
+    "render-check": "node render-check.mjs"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^24.43.1"
   }
 }
