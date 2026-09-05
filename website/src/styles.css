@@ -81,10 +81,16 @@ body {
   font-size: var(--text-base);
   line-height: 1.65;
   color: var(--ink-soft);
-  background: var(--canvas);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+
+  /* Faint blueprint dot grid across the whole page. At 1px per 26px and ~5%
+     alpha it reads as paper texture rather than as a visible grid. */
+  background-color: var(--canvas);
+  background-image: radial-gradient(rgba(21, 23, 29, 0.055) 1px, transparent 1px);
+  background-size: 26px 26px;
+  background-position: -1px -1px;
 }
 
 img {
@@ -112,8 +118,31 @@ a {
 }
 
 .section {
+  position: relative;
   padding-block: var(--section-y);
-  border-top: 1px solid var(--line-soft);
+  border-top: 1px solid transparent;
+}
+
+/* Section rule. A hairline that fades out toward both ends instead of running
+   edge to edge — softer than a hard divider, and it reads as drawn. */
+.section::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line) 18%, var(--line) 82%, transparent);
+}
+
+.section--plain::before,
+.section--flush-top::before { display: none; }
+
+/* Content always sits above the decorative layer. */
+.section > .shell,
+.hero > .shell,
+.cta-band > .shell {
+  position: relative;
+  z-index: 1;
 }
 
 .section--plain {
@@ -138,6 +167,84 @@ a {
 }
 
 .stack > * + * { margin-top: 1rem; }
+
+/* ── Decorative line art ──────────────────────────────────────────────────
+   Abstract corporate drawings sitting behind the content as texture. They are
+   deliberately faint: the strongest is 9% opacity. `pointer-events: none` and
+   `aria-hidden` keep them out of interaction and the accessibility tree, and
+   `overflow: hidden` on the layer lets pieces bleed off the section edge. */
+
+.decor {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.decor__item {
+  position: absolute;
+  display: block;
+  opacity: 0.075;
+}
+
+.decor__item svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Sprite holder — defines the symbols, renders nothing itself. */
+.decor-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Accent tints — the SVGs stroke with currentColor */
+.decor__item--ink { color: var(--ink); }
+.decor__item--blue { color: var(--blue); }
+.decor__item--violet { color: var(--violet); }
+.decor__item--teal { color: var(--teal); }
+.decor__item--amber { color: var(--amber); opacity: 0.09; }
+.decor__item--rose { color: var(--rose); }
+
+/* Sizes */
+.decor__item--sm { width: 9rem; height: 9rem; }
+.decor__item--md { width: 14rem; height: 14rem; }
+.decor__item--lg { width: 20rem; height: 20rem; }
+.decor__item--xl { width: 27rem; height: 27rem; }
+.decor__item--plate { width: 30rem; height: 26.5rem; }
+
+/* Placements. All sit in the outer margins, clear of the text column, and are
+   allowed to bleed past the section edge for a more incidental, sketched feel. */
+.decor__item--right { right: -4rem; top: 50%; transform: translateY(-50%) rotate(-6deg); }
+.decor__item--right-top { right: -3.5rem; top: -3rem; transform: rotate(8deg); }
+.decor__item--left-low { left: -5rem; bottom: -4rem; transform: rotate(-10deg); }
+/* The hero composition is meant to be read as a whole, so it is not cropped
+   and sits a touch stronger than the cropped motifs — there is no text under
+   it on desktop. */
+.decor__item--hero-plate {
+  right: 2.5rem;
+  top: 50%;
+  transform: translateY(-52%);
+  opacity: 0.1;
+}
+
+.decor__item--hero-low { left: -4rem; bottom: -5rem; transform: rotate(-12deg); opacity: 0.05; }
+
+/* Below 1180px the text column reaches into the hero art's space. */
+@media (max-width: 1180px) {
+  .decor__item--hero-plate { opacity: 0.05; right: -6rem; }
+}
+
+/* Below this width there is no free margin, so the art would sit under the
+   text column. Drop it rather than compete with the copy. */
+@media (max-width: 900px) {
+  .decor { display: none; }
+}
 
 /* ── Typography ───────────────────────────────────────────────────────── */
 
@@ -440,6 +547,23 @@ p { text-wrap: pretty; }
 .card--amber::before { background: linear-gradient(90deg, var(--amber), var(--rose)); }
 .card--rose::before { background: linear-gradient(90deg, var(--rose), var(--violet)); }
 
+/* Blueprint registration mark in the card's bottom-right corner — two short
+   rules meeting at a right angle. Drawn with a single element and a gradient,
+   so it costs nothing and never touches the content flow. */
+.card::after {
+  content: '';
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0.85rem;
+  width: 0.85rem;
+  height: 0.85rem;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  border-bottom-right-radius: 3px;
+  opacity: 0.75;
+  pointer-events: none;
+}
+
 .card h3 { margin-bottom: 0.4rem; }
 .card p { font-size: var(--text-sm); color: var(--muted); }
 .card__foot { margin-top: 1rem; }
@@ -560,22 +684,33 @@ p { text-wrap: pretty; }
   transform: translateY(-2px);
 }
 
+/* Line glyph in a tinted, hand-drawn-feeling frame. Replaces the old
+   two-letter monogram now that the services have no character names. */
 .agent__mark {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 10px;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 12px;
   display: grid;
   place-items: center;
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: #fff;
-  background: linear-gradient(135deg, var(--blue), var(--violet));
-  margin-bottom: 1rem;
+  color: var(--blue);
+  background: var(--blue-wash);
+  border: 1px solid rgba(29, 119, 254, 0.18);
+  margin-bottom: 1.1rem;
 }
 
-.agent--violet .agent__mark { background: linear-gradient(135deg, var(--violet), var(--rose)); }
-.agent--teal .agent__mark { background: linear-gradient(135deg, var(--teal), var(--blue)); }
+.agent__mark svg { width: 1.4rem; height: 1.4rem; }
+
+.agent--violet .agent__mark {
+  color: var(--violet);
+  background: var(--violet-wash);
+  border-color: rgba(115, 88, 245, 0.18);
+}
+
+.agent--teal .agent__mark {
+  color: var(--teal);
+  background: var(--teal-wash);
+  border-color: rgba(14, 165, 160, 0.18);
+}
 
 .agent__name {
   font-size: 1.15rem;

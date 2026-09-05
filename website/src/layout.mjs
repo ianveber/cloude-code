@@ -8,6 +8,7 @@
 
 import { esc, join, each, jsonLd, absolute } from './html.mjs';
 import { buildGraph } from './schema.mjs';
+import { decorSprite } from './decor.mjs';
 import site from '../content/site.mjs';
 
 const url = (path) => absolute(site.origin, path);
@@ -185,6 +186,7 @@ ${breadcrumbs(page)}
 ${page.body}
 </main>
 ${footer()}
+${decorSprite(page.body)}
 </body>
 </html>
 `;

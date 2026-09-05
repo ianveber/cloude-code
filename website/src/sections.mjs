@@ -8,6 +8,7 @@
  */
 
 import { esc, each, cls, accentMod } from './html.mjs';
+import { decor, serviceGlyph } from './decor.mjs';
 import site from '../content/site.mjs';
 
 /** Section heading block: eyebrow + h2 + lead. */
@@ -35,6 +36,10 @@ export function takeaway({ label = 'Na kratko', text, accent = 'blue' }) {
 export function hero({ eyebrow, headline, lead, primaryCta, secondaryCta, chips = [] }) {
   return `
 <section class="hero">
+${decor([
+  { art: 'blueprint', place: 'hero-plate', size: 'plate', accent: 'blue' },
+  { art: 'orbit', place: 'hero-low', size: 'md', accent: 'violet' },
+])}
   <div class="shell">
     <div class="hero__inner">
       ${eyebrow ? `<p class="eyebrow">${esc(eyebrow)}</p>` : ''}
@@ -57,9 +62,13 @@ export function hero({ eyebrow, headline, lead, primaryCta, secondaryCta, chips 
 }
 
 /** Sub-page hero: same rhythm as the home hero, one level quieter. */
-export function pageHero({ eyebrow, title, lead, accent = 'blue', cta }) {
+export function pageHero({ eyebrow, title, lead, accent = 'blue', cta, art = 'layers' }) {
   return `
-<section class="hero">
+<section class="hero hero--page">
+${decor([
+  { art: 'blueprint', place: 'hero-plate', size: 'plate', accent },
+  { art, place: 'hero-low', size: 'md', accent: 'blue' },
+])}
   <div class="shell">
     <div class="hero__inner">
       <p class="${cls('eyebrow', accentMod('eyebrow', accent))}">${esc(eyebrow)}</p>
@@ -80,6 +89,7 @@ export function pageHero({ eyebrow, title, lead, accent = 'blue', cta }) {
 export function optimizationSection(data) {
   return `
 <section class="section section--tint-blue" aria-labelledby="optimizacija">
+${decor([{ art: 'gears', place: 'right', size: 'lg', accent: 'blue' }])}
   <div class="shell">
     ${sectionHead({ ...data, id: 'optimizacija' })}
     <div class="grid grid--4">
@@ -102,6 +112,7 @@ export function optimizationSection(data) {
 export function problemsSection(data) {
   return `
 <section class="section" aria-labelledby="izzivi">
+${decor([{ art: 'clock', place: 'left-low', size: 'lg', accent: 'amber' }])}
   <div class="shell">
     ${sectionHead({ ...data, accent: 'amber', id: 'izzivi' })}
     <div class="grid grid--4">
@@ -123,6 +134,7 @@ export function problemsSection(data) {
 export function processSection(meta, steps, { headingLevel = 2, showCta = true } = {}) {
   return `
 <section class="section section--paper" aria-labelledby="proces">
+${decor([{ art: 'path', place: 'right-top', size: 'lg', accent: 'teal' }])}
   <div class="shell">
     ${sectionHead({ ...meta, accent: 'teal', level: headingLevel, id: 'proces' })}
     <ol class="steps">
@@ -155,6 +167,7 @@ export function processSection(meta, steps, { headingLevel = 2, showCta = true }
 export function servicesSection(meta, services, { linkToDetail = true } = {}) {
   return `
 <section class="section section--tint-violet" aria-labelledby="storitve">
+${decor([{ art: 'talk', place: 'right', size: 'lg', accent: 'violet' }])}
   <div class="shell">
     ${sectionHead({ ...meta, accent: 'violet', id: 'storitve' })}
     <div class="grid grid--3">
@@ -162,7 +175,7 @@ export function servicesSection(meta, services, { linkToDetail = true } = {}) {
         services,
         (s) => `
       <article class="${cls('agent', accentMod('agent', s.accent))}">
-        <span class="agent__mark" aria-hidden="true">${esc(s.name.slice(0, 2))}</span>
+        <span class="agent__mark" aria-hidden="true">${serviceGlyph(s.slug)}</span>
         <h3 class="agent__name">${esc(s.name)}</h3>
         <p class="agent__role">${esc(s.role)}</p>
         <p class="agent__summary">${esc(s.summary)}</p>
@@ -172,7 +185,7 @@ export function servicesSection(meta, services, { linkToDetail = true } = {}) {
         ${
           linkToDetail
             ? `<div class="agent__foot">
-          <a class="${cls('link', s.accent !== 'blue' ? `link--${s.accent}` : '')}" href="/storitve/${esc(s.slug)}/">Več o agentu ${esc(s.name)} <span aria-hidden="true">&rarr;</span></a>
+          <a class="${cls('link', s.accent !== 'blue' ? `link--${s.accent}` : '')}" href="/storitve/${esc(s.slug)}/">Več o storitvi <span aria-hidden="true">&rarr;</span></a>
         </div>`
             : ''
         }
@@ -188,6 +201,7 @@ export function servicesSection(meta, services, { linkToDetail = true } = {}) {
 export function outcomesSection(data) {
   return `
 <section class="section" aria-labelledby="rezultat">
+${decor([{ art: 'chart', place: 'right', size: 'lg', accent: 'teal' }])}
   <div class="shell">
     ${sectionHead({ ...data, accent: 'teal', id: 'rezultat' })}
     <div class="grid grid--3">
@@ -217,6 +231,7 @@ export function outcomesSection(data) {
 export function statsSection(stats) {
   return `
 <section class="section section--paper" aria-label="Ključne številke">
+${decor([{ art: 'layers', place: 'left-low', size: 'md', accent: 'blue' }])}
   <div class="shell">
     <ul class="stats">
       ${each(
@@ -238,6 +253,7 @@ export function statsSection(stats) {
 export function aboutSection(data, { headingLevel = 2 } = {}) {
   return `
 <section class="section section--tint-violet" aria-labelledby="pristop">
+${decor([{ art: 'flow', place: 'right', size: 'xl', accent: 'violet' }])}
   <div class="shell">
     ${sectionHead({
       eyebrow: data.eyebrow,
@@ -265,6 +281,7 @@ export function aboutSection(data, { headingLevel = 2 } = {}) {
 export function teamSection(data, { headingLevel = 2 } = {}) {
   return `
 <section class="section" aria-labelledby="ekipa">
+${decor([{ art: 'network', place: 'right-top', size: 'lg', accent: 'amber' }])}
   <div class="shell">
     ${sectionHead({ ...data, accent: 'amber', level: headingLevel, id: 'ekipa' })}
     <div class="grid grid--3">
@@ -322,6 +339,7 @@ export function faqSection(data, { headingLevel = 2, items, variant = 'disclosur
 
   return `
 <section class="section section--paper" aria-labelledby="pogosta-vprasanja">
+${decor([{ art: 'docs', place: 'right', size: 'lg', accent: 'teal' }])}
   <div class="shell">
     ${sectionHead({
       eyebrow: data.eyebrow,
@@ -359,6 +377,7 @@ function field(f) {
 export function contactSection(data, { headingLevel = 2 } = {}) {
   return `
 <section class="section" aria-labelledby="kontakt">
+${decor([{ art: 'talk', place: 'left-low', size: 'lg', accent: 'blue' }])}
   <div class="shell">
     ${sectionHead({ ...data, level: headingLevel, id: 'kontakt' })}
     <div class="contact-grid">
@@ -451,6 +470,7 @@ function formScript() {
 export function ctaBand({ title, lead, primary, secondary }) {
   return `
 <section class="cta-band">
+${decor([{ art: 'orbit', place: 'left-low', size: 'lg', accent: 'blue' }, { art: 'gears', place: 'right-top', size: 'md', accent: 'violet' }])}
   <div class="shell cta-band__inner">
     <h2>${esc(title)}</h2>
     <p class="lead">${esc(lead)}</p>
