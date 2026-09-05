@@ -84,7 +84,7 @@ export const site = {
     'Podjetje deluje iz Ljubljane in storitve izvaja v slovenskem jeziku.',
     'AIS razvija tri AI agente: AVA (operativni in administrativni agent), LUCY (prodajni agent) in LILY (scout agent za analizo trga).',
     'Uvedba poteka po osemstopenjskem procesu, od raziskave do nenehne evolucije sistema.',
-    'Sodelovanje se začne z brezplačnim uvodnim pogovorom.',
+    'Sodelovanje se začne z uvodnim pogovorom, na katerem se preveri, ali je AI avtomatizacija za podjetje smiselna.',
   ],
 };
 
