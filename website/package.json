@@ -1,0 +1,17 @@
+{
+  "name": "ais-slovenia-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static, SEO- and GEO-optimised website for AIS Slovenia. Zero runtime dependencies.",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node build.mjs && node audit.mjs",
+    "audit": "node audit.mjs",
+    "dev": "node build.mjs --serve",
+    "serve": "node build.mjs --serve"
+  }
+}

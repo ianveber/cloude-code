@@ -1,0 +1,42 @@
+name: Website — build & SEO/GEO audit
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'website/**'
+      - '.github/workflows/website.yml'
+  pull_request:
+    paths:
+      - 'website/**'
+      - '.github/workflows/website.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: website
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # The generator has no dependencies, so there is nothing to install.
+      - name: Build static site
+        run: npm run build
+
+      - name: SEO / GEO audit
+        run: npm run audit
+
+      - name: Upload build output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: website-dist
+          path: website/dist
+          retention-days: 7
