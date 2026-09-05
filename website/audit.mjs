@@ -120,6 +120,13 @@ function auditPage(route, html) {
     fail(route, `Premalo besedila v HTML (${words} besed, minimum ${LIMITS.minWords}).`);
   }
 
+  /* FAQ answers must render. Text inside a closed <details> is in the HTML but
+     is not rendered, so anything reading the rendered page would miss it. */
+  const collapsed = [...html.matchAll(/<details class="faq-item"(?![^>]*\bopen\b)/gi)];
+  if (collapsed.length) {
+    fail(route, `${collapsed.length} FAQ odgovorov je skritih v zaprtem <details>.`);
+  }
+
   /* Images need alt text */
   const imgs = [...html.matchAll(/<img\b[^>]*>/gi)].map((m) => m[0]);
   const missingAlt = imgs.filter((t) => !/\balt=/.test(t));

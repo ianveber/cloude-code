@@ -207,7 +207,11 @@ export const services = [
 export const outcomes = {
   eyebrow: 'Rezultat',
   title: 'Kaj prinaša avtomatizacija?',
-  lead: 'Sodelujemo s podjetji, kjer ima AI implementacija dejanski poslovni vpliv.',
+  lead: 'Pet sprememb, ki jih podjetja opazijo najprej.',
+  audience: {
+    title: 'Za koga je to',
+    body: 'Sodelujemo s podjetji, kjer ima AI implementacija dejanski poslovni vpliv.',
+  },
   items: [
     { title: 'Hitrejši odzivi', body: 'Povpraševanja in interne zahteve dobijo odgovor takoj.', accent: 'blue' },
     { title: 'Manj administracije', body: 'Ponavljajoče se naloge prevzame sistem namesto ekipe.', accent: 'violet' },

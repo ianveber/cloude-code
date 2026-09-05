@@ -610,6 +610,24 @@ p { text-wrap: pretty; }
 
 .agent__foot { margin-top: auto; padding-top: 1.25rem; }
 
+/* "Za koga je to" — closing note under the outcomes grid */
+.audience {
+  margin-top: 1rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.35rem 1.5rem;
+  box-shadow: var(--shadow-sm);
+  background-image: linear-gradient(120deg, var(--teal-wash), transparent 58%);
+}
+
+.audience p {
+  margin-top: 0.35rem;
+  font-size: var(--text-sm);
+  color: var(--muted);
+  max-width: 66ch;
+}
+
 /* ── Stats ────────────────────────────────────────────────────────────── */
 
 .stats {
@@ -771,6 +789,32 @@ p { text-wrap: pretty; }
   font-size: var(--text-sm);
   color: var(--muted);
   max-width: 72ch;
+}
+
+/* Always-visible variant, used on the dedicated FAQ page. Real <h3> headings
+   give each question its own keyword-bearing landmark. */
+.faq-entry {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--teal);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 1.15rem 1.35rem 1.3rem;
+}
+
+.faq-entry:nth-child(3n + 2) { border-left-color: var(--blue); }
+.faq-entry:nth-child(3n + 3) { border-left-color: var(--violet); }
+
+.faq-entry__q {
+  font-size: var(--text-base);
+  letter-spacing: -0.014em;
+}
+
+.faq-entry__a {
+  margin-top: 0.45rem;
+  font-size: var(--text-sm);
+  color: var(--muted);
+  max-width: 74ch;
 }
 
 /* ── Contact ──────────────────────────────────────────────────────────── */

@@ -200,6 +200,14 @@ export function outcomesSection(data) {
       </article>`
       )}
     </div>
+    ${
+      data.audience
+        ? `<div class="audience">
+      <h3>${esc(data.audience.title)}</h3>
+      <p>${esc(data.audience.body)}</p>
+    </div>`
+        : ''
+    }
   </div>
 </section>`;
 }
@@ -281,12 +289,37 @@ export function teamSection(data, { headingLevel = 2 } = {}) {
 }
 
 /* ── FAQ ──────────────────────────────────────────────────────────────────
-   Rendered as <details>/<summary>. The answer text is present in the HTML
-   whether or not the item is expanded, so crawlers and answer engines read it
-   without executing any JavaScript. */
+   Answers are always visible rather than hidden behind a collapsed
+   disclosure. Text inside a closed <details> is in the HTML but is not
+   *rendered*, so anything that reads the rendered page — including several AI
+   answer engines — sees nothing. Since the FAQ is the most quotable content on
+   the site, its answers stay on the page.
 
-export function faqSection(data, { headingLevel = 2, items } = {}) {
+   'list'       — plain headings and paragraphs, for the dedicated FAQ page.
+   'disclosure' — <details> rendered open, collapsible for scanning. */
+
+export function faqSection(data, { headingLevel = 2, items, variant = 'disclosure' } = {}) {
   const list = items ?? data.items;
+
+  const body =
+    variant === 'list'
+      ? each(
+          list,
+          (item) => `
+      <article class="faq-entry">
+        <h3 class="faq-entry__q">${esc(item.q)}</h3>
+        <p class="faq-entry__a">${esc(item.a)}</p>
+      </article>`
+        )
+      : each(
+          list,
+          (item) => `
+      <details class="faq-item" open>
+        <summary>${esc(item.q)}</summary>
+        <div class="faq-item__answer"><p>${esc(item.a)}</p></div>
+      </details>`
+        );
+
   return `
 <section class="section section--paper" aria-labelledby="pogosta-vprasanja">
   <div class="shell">
@@ -299,14 +332,7 @@ export function faqSection(data, { headingLevel = 2, items } = {}) {
       id: 'pogosta-vprasanja',
     })}
     <div class="faq-list">
-      ${each(
-        list,
-        (item, i) => `
-      <details class="faq-item"${i === 0 ? ' open' : ''}>
-        <summary>${esc(item.q)}</summary>
-        <div class="faq-item__answer"><p>${esc(item.a)}</p></div>
-      </details>`
-      )}
+      ${body}
     </div>
   </div>
 </section>`;

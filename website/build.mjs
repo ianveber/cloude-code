@@ -389,7 +389,7 @@ function faqPage() {
       accent: 'teal',
       cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
     }),
-    faqSection({ ...C.faq, eyebrow: 'Odgovori', title: 'Vprašanja in odgovori', lead: '' }),
+    faqSection({ ...C.faq, eyebrow: 'Odgovori', title: 'Vprašanja in odgovori', lead: '' }, { variant: 'list' }),
     closingCta,
   ].join('\n');
 
