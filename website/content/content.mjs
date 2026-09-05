@@ -18,6 +18,62 @@ export const hero = {
   secondaryCta: { label: 'Poglejte storitve', href: '/storitve/' },
 };
 
+/* One-sentence manifesto, used as the constellation / statement band. */
+export const statement = {
+  line: 'AIS Slovenia postavlja AI sisteme za avtomatizacijo poslovnih procesov.',
+  echo: 'AIS Slovenia postavlja AI sisteme za avtomatizacijo poslovnih procesov.',
+};
+
+/* Audience cards for the horizontal use-case slider. */
+export const useCases = {
+  eyebrow: 'Za koga',
+  title: 'Zgrajeno za ekipe, ki jih ročno delo zadržuje',
+  lead: 'Sodelujemo s podjetji, kjer ima AI implementacija dejanski poslovni vpliv — torej tam, kjer se ponavljajoče se naloge še vedno izvajajo ročno.',
+  items: [
+    {
+      title: 'Administracija',
+      kicker: 'Operacije',
+      body: 'Podjetja z veliko administracije, kjer ekipa dnevno prepisuje podatke med orodji.',
+      href: '/storitve/avtomatizacija-administracije/',
+      accent: 'blue',
+    },
+    {
+      title: 'Prodaja',
+      kicker: 'Komunikacija',
+      body: 'Podjetja, ki prejemajo veliko podobnih vprašanj prek spletne strani in jih želijo obravnavati 24/7.',
+      href: '/storitve/avtomatizacija-prodaje/',
+      accent: 'violet',
+    },
+    {
+      title: 'Trg',
+      kicker: 'Priložnosti',
+      body: 'Ekipe, ki priložnosti danes iščejo ročno in jih pogosto opazijo prepozno.',
+      href: '/storitve/spremljanje-trga/',
+      accent: 'teal',
+    },
+  ],
+};
+
+export const twinCta = {
+  eyebrow: 'Naslednji korak',
+  items: [
+    {
+      kicker: 'Za podjetja',
+      title: 'Preverimo, ali je avtomatizacija smiselna',
+      body: 'Uvodni pogovor. Pregledamo procese in povemo, kje sistem sploh ima smisel.',
+      cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
+      accent: 'blue',
+    },
+    {
+      kicker: 'Za raziskovanje',
+      title: 'Oglejte si, kako poteka uvedba',
+      body: 'Osem korakov, od raziskave do nenehne evolucije. Brez presenečenj na poti.',
+      cta: { label: 'Poglejte proces', href: '/proces/' },
+      accent: 'violet',
+    },
+  ],
+};
+
 /* ── "System" band: what each capability replaces ─────────────────────── */
 
 export const optimization = {

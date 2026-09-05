@@ -30,6 +30,10 @@ import {
   faqSection,
   contactSection,
   ctaBand,
+  statementBand,
+  featureExplorer,
+  useCaseSlider,
+  twinCtaSection,
   sectionHead,
   takeaway,
   capabilityGrid,
@@ -81,25 +85,12 @@ function homePage() {
       ],
     }),
 
-    /* Answer-first summary, placed high on the page so answer engines and
-       readers both get the core claim before any scrolling. */
-    `<section class="section section--plain section--flush-top">
-  <div class="shell">
-    ${takeaway({
-      label: 'Kaj počnemo',
-      text: 'AIS Slovenia postavlja AI sisteme za avtomatizacijo poslovnih procesov. Pokrivamo tri področja — administracijo in operacije, prodajo in komunikacijo s strankami ter spremljanje trga — sisteme pa po osemstopenjskem procesu povežemo z orodji, ki jih podjetje že uporablja.',
-    })}
-  </div>
-</section>`,
-
-    optimizationSection(C.optimization),
-    problemsSection(C.problems),
-    servicesSection(C.servicesMeta, C.services),
+    statementBand(C.statement),
+    featureExplorer(C.services),
+    useCaseSlider(C.useCases),
+    twinCtaSection(C.twinCta),
     processSection(C.processMeta, C.processSteps),
-    outcomesSection(C.outcomes),
     statsSection(C.stats),
-    aboutSection(C.about),
-    teamSection(C.team),
     faqSection(C.faq, { items: C.faq.items.slice(0, 5) }),
     closingCta,
   ].join('\n');
@@ -457,7 +448,7 @@ function notFoundPage() {
     path: '/404.html',
     title: 'Strani ni — AIS Slovenia',
     description:
-      'Iskane strani ni bilo mogoče najti. Vrnite se na domačo stran AIS Slovenia ali si oglejte naše AI agente za avtomatizacijo poslovnih procesov.',
+      'Iskane strani ni bilo mogoče najti. Vrnite se na domačo stran AIS Slovenia ali si oglejte naše storitve za avtomatizacijo poslovnih procesov.',
     breadcrumbs: [HOME_CRUMB],
     noindex: true,
     body,

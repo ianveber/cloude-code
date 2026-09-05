@@ -47,7 +47,15 @@ export const site = {
      now a real, crawlable URL instead of a hash anchor. */
   nav: [
     { label: 'Domov', href: '/' },
-    { label: 'Storitve', href: '/storitve/' },
+    {
+      label: 'Storitve',
+      href: '/storitve/',
+      children: [
+        { label: 'Avtomatizacija administracije', href: '/storitve/avtomatizacija-administracije/', note: 'Administracija in operacije' },
+        { label: 'Avtomatizacija prodaje', href: '/storitve/avtomatizacija-prodaje/', note: 'Prodaja in komunikacija' },
+        { label: 'Spremljanje trga', href: '/storitve/spremljanje-trga/', note: 'Tržna analiza' },
+      ],
+    },
     { label: 'Proces', href: '/proces/' },
     { label: 'O podjetju', href: '/o-podjetju/' },
     { label: 'Pogosta vprašanja', href: '/pogosta-vprasanja/' },

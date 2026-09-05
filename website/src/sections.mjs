@@ -8,7 +8,7 @@
  */
 
 import { esc, each, cls, accentMod } from './html.mjs';
-import { decor, serviceGlyph } from './decor.mjs';
+import { decor, serviceGlyph, stageScene } from './decor.mjs';
 import site from '../content/site.mjs';
 
 /** Section heading block: eyebrow + h2 + lead. */
@@ -35,11 +35,8 @@ export function takeaway({ label = 'Na kratko', text, accent = 'blue' }) {
 
 export function hero({ eyebrow, headline, lead, primaryCta, secondaryCta, chips = [] }) {
   return `
-<section class="hero">
-${decor([
-  { art: 'blueprint', place: 'hero-plate', size: 'plate', accent: 'blue' },
-  { art: 'orbit', place: 'hero-low', size: 'md', accent: 'violet' },
-])}
+<section class="hero hero--cinematic">
+  <canvas class="hero__field" data-particles aria-hidden="true"></canvas>
   <div class="shell">
     <div class="hero__inner">
       ${eyebrow ? `<p class="eyebrow">${esc(eyebrow)}</p>` : ''}
@@ -56,6 +53,7 @@ ${decor([
       </ul>`
           : ''
       }
+      <p class="hero__mark" aria-hidden="true">${esc(site.name)}</p>
     </div>
   </div>
 </section>`;
@@ -65,10 +63,7 @@ ${decor([
 export function pageHero({ eyebrow, title, lead, accent = 'blue', cta, art = 'layers' }) {
   return `
 <section class="hero hero--page">
-${decor([
-  { art: 'blueprint', place: 'hero-plate', size: 'plate', accent },
-  { art, place: 'hero-low', size: 'md', accent: 'blue' },
-])}
+  <canvas class="hero__field" data-particles aria-hidden="true"></canvas>
   <div class="shell">
     <div class="hero__inner">
       <p class="${cls('eyebrow', accentMod('eyebrow', accent))}">${esc(eyebrow)}</p>
@@ -80,6 +75,117 @@ ${decor([
           : ''
       }
     </div>
+  </div>
+</section>`;
+}
+
+/* ── Statement / constellation ────────────────────────────────────────── */
+
+export function statementBand({ line, echo }) {
+  return `
+<section class="statement" aria-labelledby="izjava">
+  <div class="statement__sky" aria-hidden="true">
+    <span class="statement__icon statement__icon--a">${serviceGlyph('avtomatizacija-administracije')}</span>
+    <span class="statement__icon statement__icon--b">${serviceGlyph('avtomatizacija-prodaje')}</span>
+    <span class="statement__icon statement__icon--c">${serviceGlyph('spremljanje-trga')}</span>
+    <span class="statement__icon statement__icon--d">${DRAWINGS_ORBIT()}</span>
+  </div>
+  <div class="shell">
+    <p class="statement__echo" aria-hidden="true">${esc(echo ?? line)}</p>
+    <p class="statement__line" id="izjava">${esc(line)}</p>
+    <p class="statement__more">Pokrivamo tri področja — administracijo in operacije, prodajo in komunikacijo s strankami ter spremljanje trga — sisteme pa po osemstopenjskem procesu povežemo z orodji, ki jih podjetje že uporablja.</p>
+  </div>
+</section>`;
+}
+
+function DRAWINGS_ORBIT() {
+  return `<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <circle cx="14" cy="14" r="9" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="14" cy="14" r="3" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M14 2v4M14 22v4M2 14h4M22 14h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>`;
+}
+
+/* ── Feature explorer ─────────────────────────────────────────────────── */
+
+export function featureExplorer(services) {
+  return `
+<section class="explorer" id="storitve" aria-labelledby="explorer-title">
+  <div class="shell explorer__head">
+    <p class="eyebrow eyebrow--violet">Storitve</p>
+    <h2 id="explorer-title">Tri področja, en sistem</h2>
+    <p class="lead">Vsako področje ima svoj oder. Skupaj pokrivajo administracijo, prodajo in trg.</p>
+  </div>
+  <div class="shell explorer__grid">
+    <ol class="explorer__list">
+      ${each(
+        services,
+        (s, i) => `
+      <li class="${cls('explorer__item', i === 0 ? 'is-active' : '')}" data-explorer-item="${esc(s.slug)}">
+        <a class="explorer__copy" href="/storitve/${esc(s.slug)}/">
+          <span class="explorer__kicker">${esc(s.role)}</span>
+          <h3>${esc(s.name)}</h3>
+          <p>${esc(s.summary)}</p>
+        </a>
+      </li>`
+      )}
+    </ol>
+    <div class="explorer__stage" aria-hidden="true">
+      ${each(
+        services,
+        (s, i) => `
+      <figure class="${cls('explorer__scene', accentMod('explorer__scene', s.accent), i === 0 ? 'is-active' : '')}" data-explorer-scene="${esc(s.slug)}">
+        ${stageScene(s.slug)}
+      </figure>`
+      )}
+    </div>
+  </div>
+</section>`;
+}
+
+/* ── Use-case slider ──────────────────────────────────────────────────── */
+
+export function useCaseSlider(data) {
+  return `
+<section class="usecases" aria-labelledby="usecases-title">
+  <div class="shell usecases__top">
+    ${sectionHead({ ...data, accent: 'teal', id: 'usecases-title' })}
+    <div class="usecases__nav" hidden>
+      <button type="button" class="usecases__btn" data-slide="-1" aria-label="Prejšnji primer">‹</button>
+      <button type="button" class="usecases__btn" data-slide="1" aria-label="Naslednji primer">›</button>
+    </div>
+  </div>
+  <div class="usecases__track" data-slider>
+    ${each(
+      data.items,
+      (item) => `
+    <article class="${cls('usecase', accentMod('usecase', item.accent))}">
+      <p class="usecase__kicker">${esc(item.kicker)}</p>
+      <h3>${esc(item.title)}</h3>
+      <p>${esc(item.body)}</p>
+      <a class="link" href="${esc(item.href)}">Odpri storitev <span aria-hidden="true">&rarr;</span></a>
+    </article>`
+    )}
+  </div>
+</section>`;
+}
+
+/* ── Twin CTA cards ───────────────────────────────────────────────────── */
+
+export function twinCtaSection(data) {
+  return `
+<section class="twin" aria-label="${esc(data.eyebrow)}">
+  <div class="shell twin__grid">
+    ${each(
+      data.items,
+      (item) => `
+    <article class="${cls('twin__card', accentMod('twin__card', item.accent))}">
+      <p class="twin__kicker">${esc(item.kicker)}</p>
+      <h2>${esc(item.title)}</h2>
+      <p>${esc(item.body)}</p>
+      <a class="btn ${item.accent === 'blue' ? 'btn--primary' : 'btn--secondary'}" href="${esc(item.cta.href)}">${esc(item.cta.label)}</a>
+    </article>`
+    )}
   </div>
 </section>`;
 }

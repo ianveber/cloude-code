@@ -81,6 +81,29 @@ function navLink(item, currentPath) {
   return `<a href="${esc(item.href)}"${current}>${esc(item.label)}</a>`;
 }
 
+function navItem(item, currentPath) {
+  if (!item.children?.length) return navLink(item, currentPath);
+
+  const open =
+    currentPath === item.href || item.children.some((c) => currentPath.startsWith(c.href))
+      ? ' aria-current="page"'
+      : '';
+
+  return `
+    <details class="nav-dd">
+      <summary${open}>${esc(item.label)}</summary>
+      <div class="nav-dd__panel">
+        <a href="${esc(item.href)}">Vse storitve</a>
+        ${each(
+          item.children,
+          (child) => `<a href="${esc(child.href)}"><strong>${esc(child.label)}</strong>${
+            child.note ? `<span>${esc(child.note)}</span>` : ''
+          }</a>`
+        )}
+      </div>
+    </details>`;
+}
+
 function header(page) {
   return `
 <header class="site-header">
@@ -91,7 +114,7 @@ function header(page) {
     </a>
 
     <nav class="nav" aria-label="Glavna navigacija">
-      ${each(site.nav, (item) => navLink(item, page.path))}
+      ${each(site.nav, (item) => navItem(item, page.path))}
     </nav>
 
     <a class="btn btn--primary header-cta" href="/kontakt/">Rezervirajte posvet</a>
@@ -99,7 +122,11 @@ function header(page) {
     <details class="nav-toggle">
       <summary aria-label="Odpri meni">Meni</summary>
       <nav class="nav-panel" aria-label="Mobilna navigacija">
-        ${each(site.nav, (item) => navLink(item, page.path))}
+        ${each(site.nav, (item) =>
+          item.children?.length
+            ? `${navLink(item, page.path)}${each(item.children, (c) => navLink(c, page.path))}`
+            : navLink(item, page.path)
+        )}
         <a href="/kontakt/">Rezervirajte posvet</a>
       </nav>
     </details>
@@ -187,6 +214,7 @@ ${page.body}
 </main>
 ${footer()}
 ${decorSprite(page.body)}
+<script src="/js/motion.js" defer></script>
 </body>
 </html>
 `;
