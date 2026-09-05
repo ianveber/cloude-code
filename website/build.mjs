@@ -415,7 +415,14 @@ function contactPage() {
       lead: C.contact.lead,
       accent: 'blue',
     }),
-    contactSection({ ...C.contact, eyebrow: 'Pišite nam', title: 'Kontaktni podatki in obrazec' }),
+    contactSection({
+      ...C.contact,
+      eyebrow: 'Pišite nam',
+      title: 'Kontaktni podatki in obrazec',
+      /* The hero above already carries C.contact.lead; repeating it here read
+         as a duplicated paragraph. */
+      lead: 'Odgovorimo v enem delovnem dnevu. Pišite nam po e-pošti, pokličite ali izpolnite obrazec.',
+    }),
   ].join('\n');
 
   return {
