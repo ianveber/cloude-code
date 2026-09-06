@@ -20,17 +20,38 @@
     return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
+  /* Each character needs its own box to be animated, but adjacent inline-blocks
+     are break opportunities, so a bare run of them lets the browser split a word
+     down the middle. Grouping the characters into words leaves the spaces as the
+     only places a line can break. */
   function splitChars(el) {
     if (!el || el.dataset.split === '1') return el ? el.querySelectorAll('.char') : [];
     var text = el.textContent;
     el.dataset.original = text;
-    el.innerHTML = Array.from(text)
-      .map(function (ch) {
-        if (ch === ' ') return '<span class="char char--space"> </span>';
-        if (ch === '\n') return '<br>';
-        return '<span class="char">' + escapeHtml(ch) + '</span>';
-      })
-      .join('');
+
+    var html = '';
+    var word = '';
+
+    function flush() {
+      if (!word) return;
+      html += '<span class="word">' + word + '</span>';
+      word = '';
+    }
+
+    Array.from(text).forEach(function (ch) {
+      if (ch === ' ') {
+        flush();
+        html += '<span class="char char--space"> </span>';
+      } else if (ch === '\n') {
+        flush();
+        html += '<br>';
+      } else {
+        word += '<span class="char">' + escapeHtml(ch) + '</span>';
+      }
+    });
+    flush();
+
+    el.innerHTML = html;
     el.dataset.split = '1';
     return el.querySelectorAll('.char');
   }
@@ -585,7 +606,7 @@
         var a = project(-1500, zz);
         var b = project(1500, zz);
         var fade = Math.max(0, 1 - zz / 1500);
-        ctx.strokeStyle = 'rgba(120, 150, 220,' + fade * 0.11 + ')';
+        ctx.strokeStyle = 'rgba(140, 170, 235,' + fade * 0.26 + ')';
         ctx.beginPath();
         ctx.moveTo(a.x, a.y);
         ctx.lineTo(b.x, b.y);
@@ -595,7 +616,7 @@
       for (var x = -1500; x <= 1500; x += 150) {
         var near = project(x, 0);
         var far = project(x, 1450);
-        ctx.strokeStyle = 'rgba(120, 150, 220, 0.07)';
+        ctx.strokeStyle = 'rgba(140, 170, 235, 0.15)';
         ctx.beginPath();
         ctx.moveTo(near.x, near.y);
         ctx.lineTo(far.x, far.y);
@@ -606,8 +627,8 @@
       for (var i = 0; i < 3; i++) {
         var ang = t * 0.004 + i * 2.1;
         var p = project(Math.cos(ang) * 520, 420 + Math.sin(ang * 0.7) * 320);
-        var r = 2.2 * p.d;
-        ctx.fillStyle = ['rgba(61,139,255,0.30)', 'rgba(139,115,255,0.26)', 'rgba(43,212,196,0.24)'][i];
+        var r = 2.6 * p.d;
+        ctx.fillStyle = ['rgba(61,139,255,0.50)', 'rgba(139,115,255,0.44)', 'rgba(43,212,196,0.40)'][i];
         ctx.beginPath();
         ctx.arc(p.x, p.y, Math.max(1, r), 0, Math.PI * 2);
         ctx.fill();

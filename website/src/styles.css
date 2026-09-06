@@ -1898,9 +1898,16 @@ html:not(.is-intro) .hero__intro { display: none; }
 }
 
 /* A lone space inside an inline-block collapses to nothing, which would run
-   every revealed word together. */
+   every revealed word together. It still has to allow a line break, so the
+   text wraps between words rather than overflowing. */
 .char--space {
-  white-space: pre;
+  white-space: pre-wrap;
+}
+
+/* Holds the characters of one word together so a line can only break at a
+   space. Without this the browser breaks between any two characters. */
+.word {
+  white-space: nowrap;
 }
 
 .js.motion-on [data-type-in].is-typed .char,

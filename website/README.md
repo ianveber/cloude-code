@@ -202,6 +202,23 @@ internal link resolves to a page that was actually generated.
 
 CI runs this on every push touching `website/` (`.github/workflows/website.yml`).
 
+### Checks that need a browser
+
+Two extra tools run against a live server (`npm run serve`) rather than the built
+files, so they are not part of `npm run check`:
+
+```bash
+node tools/head-check.mjs   # animated text still reads correctly
+node tools/shots.mjs        # preview screenshots
+```
+
+`head-check.mjs` guards the text that gets split into per-character spans for the
+reveal animation. Those spans are inline-blocks, and a browser may break a line
+between any two of them, so an unguarded split lets a word snap in half
+mid-word. The tool loads ten pages at four widths and fails if any word's
+characters land on two different lines, or if the visible text no longer matches
+the original string.
+
 ---
 
 ## Design
