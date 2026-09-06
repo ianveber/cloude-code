@@ -12,8 +12,8 @@
 
 export const hero = {
   eyebrow: 'AIS — Artificial Intelligence Slovenia',
-  headline: 'AI avtomatizacija za podjetja, ki želijo hitrejše procese in manj ročnega dela.',
-  lead: 'Povežemo komunikacijo, podatke in operacije v sistem, ki deluje učinkovito — brez nepotrebnih zastojev.',
+  headline: 'AI avtomatizacija. Hitrejši procesi.',
+  lead: 'Komunikacija, podatki in operacije v enem sistemu — brez zastojev.',
   primaryCta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
   secondaryCta: { label: 'Poglejte storitve', href: '/storitve/' },
 };

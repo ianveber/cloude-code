@@ -42,13 +42,26 @@
       return;
     }
     chars.forEach(function (ch, i) {
-      ch.style.transitionDelay = (i * (each || 0.028)) + 's';
+      ch.style.transitionDelay = (i * (each || 0.018)) + 's';
     });
     requestAnimationFrame(function () {
       el.classList.add('is-typed');
     });
-    var total = chars.length * (each || 0.028) * 1000 + 180;
+    var total = chars.length * (each || 0.018) * 1000 + 180;
     if (then) window.setTimeout(then, total);
+  }
+
+  function paintHeadline(el, text) {
+    var parts = text.split(/(?<=\.)\s+/);
+    if (parts.length < 2) {
+      el.textContent = text;
+      return;
+    }
+    el.innerHTML =
+      escapeHtml(parts[0]) +
+      ' <span class="gradient-text">' +
+      escapeHtml(parts.slice(1).join(' ')) +
+      '</span>';
   }
 
   /* Character-by-character typewriter for the white homepage intro. */
@@ -65,9 +78,9 @@
       if (done) return;
       done = true;
       if (timer) window.clearTimeout(timer);
-      el.textContent = text;
+      paintHeadline(el, text);
       el.classList.remove('is-typing');
-      el.classList.add('is-typed');
+      el.classList.add('is-typed', 'is-struck');
       if (then) then();
     }
 
@@ -81,12 +94,13 @@
       }
       var wait = ms;
       var ch = text.charAt(i - 1);
-      if (ch === ',' || ch === '.' || ch === '—' || ch === '–') wait += 160;
-      else if (ch === ' ') wait += 20;
+      if (ch === '.' || ch === '!' || ch === '?') wait += 280;
+      else if (ch === ',' || ch === '—' || ch === '–') wait += 120;
+      else if (ch === ' ') wait += 8;
       timer = window.setTimeout(tick, wait);
     }
 
-    timer = window.setTimeout(tick, 420);
+    timer = window.setTimeout(tick, 160);
     return complete;
   }
 
@@ -166,9 +180,9 @@
       hero.removeEventListener('click', finishIntro);
       if (finishType) finishType();
       else if (headline) {
-        headline.textContent = headline.dataset.original || headline.textContent;
+        paintHeadline(headline, headline.dataset.original || headline.textContent);
         headline.classList.remove('is-typing');
-        headline.classList.add('is-typed');
+        headline.classList.add('is-typed', 'is-struck');
       }
       openSite(hero);
     }
@@ -178,12 +192,12 @@
       hero.addEventListener('click', finishIntro);
 
       if (headline) {
-        finishType = typewriter(headline, 38, function () {
+        finishType = typewriter(headline, 24, function () {
           finishType = null;
           if (opened) return;
           window.setTimeout(function () {
             if (!opened) finishIntro();
-          }, 720);
+          }, 480);
         });
       } else {
         finishIntro();
@@ -191,7 +205,7 @@
       return;
     }
 
-    if (headline) typeChars(headline, 0.024, function () {
+    if (headline) typeChars(headline, 0.016, function () {
       revealHeroRest(hero);
     });
     else revealHeroRest(hero);
@@ -220,6 +234,7 @@
       var mx = 0.5;
       var my = 0.5;
       var t = 0;
+      var burst = 1;
 
       function resize() {
         var rect = canvas.parentElement.getBoundingClientRect();
@@ -238,8 +253,8 @@
         var cx = width * 0.62;
         var cy = height * 0.48;
         var rings = [
-          { rx: Math.min(width, height) * 0.22, ry: Math.min(width, height) * 0.16, n: 28, speed: 0.0032 },
-          { rx: Math.min(width, height) * 0.38, ry: Math.min(width, height) * 0.28, n: 42, speed: -0.002 },
+          { rx: Math.min(width, height) * 0.22, ry: Math.min(width, height) * 0.16, n: 34, speed: 0.0044 },
+          { rx: Math.min(width, height) * 0.38, ry: Math.min(width, height) * 0.28, n: 52, speed: -0.0028 },
         ];
 
         rings.forEach(function (ring, ri) {
@@ -284,10 +299,13 @@
       function step() {
         if (!running) return;
         t += 1;
+        var root = document.documentElement;
+        if (root.classList.contains('is-intro-out')) burst += (2.35 - burst) * 0.12;
+        else if (!root.classList.contains('is-intro')) burst += (1 - burst) * 0.035;
         ctx.clearRect(0, 0, width, height);
 
-        var pullX = (mx - 0.5) * 36;
-        var pullY = (my - 0.5) * 24;
+        var pullX = (mx - 0.5) * 48 * burst;
+        var pullY = (my - 0.5) * 32 * burst;
 
         var positions = [];
 
@@ -296,7 +314,7 @@
           var x;
           var y;
           if (d.kind === 'ring') {
-            d.a += d.speed;
+            d.a += d.speed * (0.85 + burst * 0.35);
             x = d.cx + Math.cos(d.a) * d.rx + pullX;
             y = d.cy + Math.sin(d.a) * d.ry + pullY;
           } else {
@@ -319,10 +337,10 @@
             var dx = pa.x - pb.x;
             var dy = pa.y - pb.y;
             var dist = dx * dx + dy * dy;
-            if (dist < 100 * 100) {
-              var fade = 1 - Math.sqrt(dist) / 100;
-              ctx.strokeStyle = 'rgba(' + pa.c[0] + ',' + pa.c[1] + ',' + pa.c[2] + ',' + fade * 0.16 + ')';
-              ctx.lineWidth = 1;
+            if (dist < 118 * 118) {
+              var fade = 1 - Math.sqrt(dist) / 118;
+              ctx.strokeStyle = 'rgba(' + pa.c[0] + ',' + pa.c[1] + ',' + pa.c[2] + ',' + fade * 0.2 * burst + ')';
+              ctx.lineWidth = burst > 1.2 ? 1.35 : 1;
               ctx.beginPath();
               ctx.moveTo(pa.x, pa.y);
               ctx.lineTo(pb.x, pb.y);
@@ -334,8 +352,8 @@
         for (var k = 0; k < positions.length; k++) {
           var p = positions[k];
           ctx.beginPath();
-          ctx.fillStyle = 'rgba(' + p.c[0] + ',' + p.c[1] + ',' + p.c[2] + ',' + p.a + ')';
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(' + p.c[0] + ',' + p.c[1] + ',' + p.c[2] + ',' + Math.min(1, p.a * burst) + ')';
+          ctx.arc(p.x, p.y, p.r * (0.9 + burst * 0.12), 0, Math.PI * 2);
           ctx.fill();
         }
 
@@ -429,7 +447,7 @@
       var seen = new IntersectionObserver(
         function (entries) {
           if (entries[0].isIntersecting) {
-            typeChars(statement, 0.02);
+            typeChars(statement, 0.014);
             seen.disconnect();
           }
         },
@@ -448,8 +466,8 @@
     function frame(now) {
       var t = (now - start) / 1000;
       chips.forEach(function (chip, i) {
-        var y = Math.sin(t * 1.6 + i * 0.7) * 10;
-        var r = Math.sin(t * 0.9 + i) * 6;
+        var y = Math.sin(t * 2.15 + i * 0.7) * 16;
+        var r = Math.sin(t * 1.15 + i) * 10;
         chip.style.transform = 'translateY(' + y + 'px) rotate(' + r + 'deg)';
       });
       requestAnimationFrame(frame);
@@ -502,7 +520,7 @@
         var r = btn.getBoundingClientRect();
         var dx = event.clientX - (r.left + r.width / 2);
         var dy = event.clientY - (r.top + r.height / 2);
-        btn.style.transform = 'translate(' + dx * 0.18 + 'px,' + dy * 0.22 + 'px)';
+        btn.style.transform = 'translate(' + dx * 0.26 + 'px,' + dy * 0.32 + 'px)';
       });
       btn.addEventListener('pointerleave', function () {
         btn.style.transform = '';

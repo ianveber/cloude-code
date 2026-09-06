@@ -612,9 +612,8 @@ function ogImageSvg() {
 
   <text x="80" y="152" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="23" font-weight="600" letter-spacing="3.4" fill="#666d7d">AIS — ARTIFICIAL INTELLIGENCE SLOVENIA</text>
 
-  <text x="80" y="262" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="62" font-weight="700" letter-spacing="-2" fill="#15171d">AI avtomatizacija za podjetja,</text>
-  <text x="80" y="336" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="62" font-weight="700" letter-spacing="-2" fill="#15171d">ki želijo hitrejše procese</text>
-  <text x="80" y="410" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="62" font-weight="700" letter-spacing="-2" fill="#15171d">in manj ročnega dela.</text>
+  <text x="80" y="286" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="72" font-weight="700" letter-spacing="-2.4" fill="#15171d">AI avtomatizacija.</text>
+  <text x="80" y="376" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="72" font-weight="700" letter-spacing="-2.4" fill="#15171d">Hitrejši procesi.</text>
 
   <text x="80" y="486" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="26" font-weight="500" fill="#666d7d">Administracija &#183; Prodaja &#183; Trg &#8212; AI sistemi v slovenščini</text>
 
