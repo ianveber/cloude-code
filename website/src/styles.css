@@ -2136,9 +2136,15 @@ html:not(.is-intro) .hero__intro { display: none; }
 }
 
 html.motion-on .converge__panel,
-html.motion-on .converge__frame,
-html.motion-on .converge__caption {
+html.motion-on .converge__frame {
   transition: transform 0.35s linear, opacity 0.35s linear;
+}
+
+/* The caption gets no easing on purpose. Smoothing it on the same 0.35s curve
+   as the panels made its fade lag the movement, so a fast scroll left three
+   captions legible while the panels were already sliding over one another. */
+html.motion-on .converge__caption {
+  transition: none;
 }
 
 .converge__frame {
@@ -2159,11 +2165,12 @@ html.motion-on .converge__caption {
 }
 
 /* Captions clear early: once the panels start closing they would slide over
-   one another, and three overlapping captions read as a rendering fault. */
+   one another, and three overlapping captions read as a rendering fault. Gone
+   by --converge 0.31, where the panels have barely begun to move. */
 .converge__caption {
   display: block;
   margin-top: 1rem;
-  opacity: calc(1 - var(--converge, 0) * 2.4);
+  opacity: calc(1 - var(--converge, 0) * 3.2);
 }
 
 .converge__label {
