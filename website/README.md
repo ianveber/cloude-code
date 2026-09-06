@@ -204,12 +204,13 @@ CI runs this on every push touching `website/` (`.github/workflows/website.yml`)
 
 ### Checks that need a browser
 
-Two extra tools run against a live server (`npm run serve`) rather than the built
+These tools run against a live server (`npm run serve`) rather than the built
 files, so they are not part of `npm run check`:
 
 ```bash
 node tools/head-check.mjs   # animated text still reads correctly
 node tools/shots.mjs        # preview screenshots
+node tools/walkthrough.mjs  # records a scroll-through of the home page
 ```
 
 `head-check.mjs` guards the text that gets split into per-character spans for the
@@ -218,6 +219,11 @@ between any two of them, so an unguarded split lets a word snap in half
 mid-word. The tool loads ten pages at four widths and fails if any word's
 characters land on two different lines, or if the visible text no longer matches
 the original string.
+
+`walkthrough.mjs` clears the session flag first, so the opening sequence actually
+plays in the recording rather than being skipped as it is for a returning
+visitor, and steps the scroll so the converge band and the reading line render
+intermediate frames.
 
 ---
 
