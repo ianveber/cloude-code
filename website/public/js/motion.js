@@ -51,86 +51,48 @@
     if (then) window.setTimeout(then, total);
   }
 
+  /* Split the headline on its first full stop so the two halves stack, with the
+     second half carrying the gradient. Each half is a block so it can be
+     animated on its own. */
   function paintHeadline(el, text) {
     var dot = text.indexOf('.');
     var parts = dot === -1 || dot === text.length - 1
       ? [text]
       : [text.slice(0, dot + 1), text.slice(dot + 1).trim()];
+
     if (parts.length < 2) {
-      el.textContent = text;
+      el.innerHTML = '<span class="hero__line">' + escapeHtml(text) + '</span>';
       return;
     }
+
     el.innerHTML =
-      escapeHtml(parts[0]) +
-      '<br><span class="gradient-text">' +
-      escapeHtml(parts.slice(1).join(' ')) +
-      '</span>';
-  }
-
-  function showTyped(el, text, n) {
-    var typed = text.slice(0, n);
-    var dot = typed.indexOf('.');
-    if (dot !== -1 && n > dot + 1) {
-      el.innerHTML = escapeHtml(typed.slice(0, dot + 1)) + '<br>' + escapeHtml(typed.slice(dot + 1).replace(/^\s+/, ''));
-    } else {
-      el.textContent = typed;
-    }
-  }
-
-  /* Realistic typewriter: slightly uneven cadence, a breath after the period. */
-  function typewriter(el, then) {
-    var text = (el.dataset.original || el.textContent || '').trim();
-    el.dataset.original = text;
-    el.classList.add('is-typing');
-    el.textContent = '';
-    var i = 0;
-    var timer = 0;
-    var done = false;
-
-    function complete() {
-      if (done) return;
-      done = true;
-      if (timer) window.clearTimeout(timer);
-      paintHeadline(el, text);
-      el.classList.remove('is-typing');
-      el.classList.add('is-typed');
-      if (then) then();
-    }
-
-    function tick() {
-      if (done) return;
-      i += 1;
-      showTyped(el, text, i);
-      if (i >= text.length) {
-        complete();
-        return;
-      }
-      var wait = 42 + Math.floor(Math.random() * 36);
-      var ch = text.charAt(i - 1);
-      if (ch === '.' || ch === '!' || ch === '?') wait += 260;
-      else if (ch === ',' || ch === '—' || ch === '–') wait += 90;
-      else if (ch === ' ') wait += 24;
-      if (Math.random() < 0.05) wait += 70;
-      timer = window.setTimeout(tick, wait);
-    }
-
-    timer = window.setTimeout(tick, 280);
-    return complete;
+      '<span class="hero__line">' + escapeHtml(parts[0]) + '</span>' +
+      '<span class="hero__line gradient-text">' + escapeHtml(parts.slice(1).join(' ')) + '</span>';
   }
 
   ready(function () {
     headerState();
     slider();
+    contactForms();
+    lazyVideo();
+
     if (reduce) {
       document.documentElement.classList.add('motion-off');
       document.documentElement.classList.remove('is-intro');
+      heroEntrance();
       return;
     }
+
     document.documentElement.classList.add('motion-on');
+    introSequence();
     heroEntrance();
+    brainTilt();
     particles();
     explorer();
     reveals();
+    converge();
+    readline();
+    ctaField();
     bouncers();
     if (finePointer) {
       cursor();
@@ -154,82 +116,116 @@
     });
   }
 
-  function openSite(hero) {
+  /* ── Opening sequence ────────────────────────────────────────────────────
+     Brain mark alone on white, then the wordmark writes itself in beside it,
+     then the site loads in behind. Runs once per session; a click, Escape,
+     Enter or Space jumps straight to the end. */
+  function introSequence() {
     var root = document.documentElement;
-    root.classList.add('is-intro-out');
-    revealHeroRest(hero);
-    window.setTimeout(function () {
-      root.classList.remove('is-intro');
-      try {
-        sessionStorage.setItem('ais-intro', '1');
-      } catch (e) {}
-    }, 80);
-    window.setTimeout(function () {
-      root.classList.remove('is-intro-out');
-    }, 900);
+    var stage = document.querySelector('[data-intro-stage]');
+    if (!stage || !root.classList.contains('is-intro')) return;
+
+    var timers = [];
+    var opened = false;
+
+    function at(ms, fn) {
+      timers.push(window.setTimeout(fn, ms));
+    }
+
+    function open() {
+      if (opened) return;
+      opened = true;
+      timers.forEach(window.clearTimeout);
+      window.removeEventListener('keydown', onKey);
+      stage.removeEventListener('click', open);
+
+      /* Make sure the finished state is on screen even when skipped early. */
+      stage.classList.add('is-logo', 'is-word');
+
+      root.classList.add('is-intro-out');
+      window.setTimeout(function () {
+        root.classList.remove('is-intro');
+        try {
+          sessionStorage.setItem('ais-intro', '1');
+        } catch (e) {}
+      }, 60);
+      window.setTimeout(function () {
+        root.classList.remove('is-intro-out');
+        stage.remove();
+      }, 1000);
+    }
+
+    function onKey(event) {
+      if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        open();
+      }
+    }
+
+    window.addEventListener('keydown', onKey);
+    stage.addEventListener('click', open);
+
+    at(120, function () { stage.classList.add('is-logo'); });
+    at(900, function () { stage.classList.add('is-word'); });
+    at(2350, open);
   }
 
   function heroEntrance() {
-    var intro = document.querySelector('[data-intro]');
-    var hero = intro || document.querySelector('.hero');
+    var hero = document.querySelector('[data-intro]') || document.querySelector('.hero');
     if (!hero) return;
     hero.classList.add('is-live');
 
     var headline = hero.querySelector('[data-type-in]');
-    var isIntro = intro && document.documentElement.classList.contains('is-intro');
-    var opened = false;
-    var finishType = null;
-
-    function onSkipKey(event) {
-      if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        finishIntro();
-      }
-    }
-
-    function finishIntro() {
-      if (opened) return;
-      opened = true;
-      window.removeEventListener('keydown', onSkipKey);
-      hero.removeEventListener('click', finishIntro);
-      if (finishType) finishType();
-      else if (headline) {
-        paintHeadline(headline, headline.dataset.original || headline.textContent);
-        headline.classList.remove('is-typing');
-        headline.classList.add('is-typed');
-      }
-      openSite(hero);
-    }
-
-    if (isIntro) {
-      window.addEventListener('keydown', onSkipKey);
-      hero.addEventListener('click', finishIntro);
-
-      if (headline) {
-        finishType = typewriter(headline, function () {
-          finishType = null;
-          if (opened) return;
-          window.setTimeout(function () {
-            if (!opened) finishIntro();
-          }, 520);
-        });
-      } else {
-        finishIntro();
-      }
+    if (!headline) {
+      revealHeroRest(hero);
       return;
     }
 
-    if (headline && headline.closest('[data-intro]')) {
+    /* On the home page the headline is already final — the opening sequence
+       carries the motion, so the headline only needs its entrance. */
+    if (hero.classList.contains('hero--brain')) {
       paintHeadline(headline, headline.textContent.trim());
       headline.classList.add('is-typed');
-      revealHeroRest(hero);
-    } else if (headline) {
-      typeChars(headline, 0.016, function () {
-        revealHeroRest(hero);
+      requestAnimationFrame(function () {
+        headline.classList.add('is-entered');
       });
-    } else {
       revealHeroRest(hero);
+      return;
     }
+
+    if (reduce) {
+      revealHeroRest(hero);
+      return;
+    }
+
+    typeChars(headline, 0.016, function () {
+      revealHeroRest(hero);
+    });
+  }
+
+  /* The block leans toward the pointer, within a few degrees. */
+  function brainTilt() {
+    var brain = document.querySelector('[data-brain]');
+    if (!brain || !finePointer) return;
+    var rig = brain.querySelector('.brain3d__rig');
+    if (!rig) return;
+
+    brain.addEventListener(
+      'pointermove',
+      function (event) {
+        var rect = brain.getBoundingClientRect();
+        var px = (event.clientX - rect.left) / rect.width - 0.5;
+        var py = (event.clientY - rect.top) / rect.height - 0.5;
+        rig.style.setProperty('--tilt', (-py * 10).toFixed(2) + 'deg');
+        rig.style.setProperty('--turn', (px * 12).toFixed(2) + 'deg');
+      },
+      { passive: true }
+    );
+
+    brain.addEventListener('pointerleave', function () {
+      rig.style.setProperty('--tilt', '0deg');
+      rig.style.setProperty('--turn', '0deg');
+    });
   }
 
   /* Orbital field: two slow rings plus free dots, nudged by the pointer. */
@@ -442,7 +438,9 @@
   }
 
   function reveals() {
-    var nodes = document.querySelectorAll('[data-reveal], .statement__more, .usecase, .svc, .card, .step, .stat');
+    var nodes = document.querySelectorAll(
+      '[data-reveal], .usecase, .svc, .card, .step, .stat, .capitem, .product, .postcard, .newsitem, .eventitem'
+    );
     if (!nodes.length || !('IntersectionObserver' in window)) return;
 
     var observer = new IntersectionObserver(
@@ -462,20 +460,244 @@
       el.classList.add('will-reveal');
       observer.observe(el);
     });
+  }
 
-    var statement = document.querySelector('.statement [data-type-in]');
-    if (statement) {
-      var seen = new IntersectionObserver(
-        function (entries) {
-          if (entries[0].isIntersecting) {
-            typeChars(statement, 0.014);
-            seen.disconnect();
-          }
-        },
-        { threshold: 0.4 }
-      );
-      seen.observe(statement);
+  /* ── Converge band ───────────────────────────────────────────────────────
+     Drives one custom property from 0 (three panels apart) to 1 (closed into
+     one). All the movement itself lives in CSS. */
+  function converge() {
+    var section = document.querySelector('[data-converge]');
+    if (!section) return;
+
+    var ticking = false;
+
+    function sync() {
+      ticking = false;
+      var rect = section.getBoundingClientRect();
+      var vh = window.innerHeight || 1;
+
+      /* 0 while the band is entering, 1 once its middle has passed the middle
+         of the viewport. */
+      var travel = rect.height + vh;
+      var seen = vh - rect.top;
+      var p = seen / travel;
+      p = (p - 0.36) / 0.34;
+      p = p < 0 ? 0 : p > 1 ? 1 : p;
+
+      section.style.setProperty('--converge', p.toFixed(3));
     }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(sync);
+    }
+
+    sync();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+  }
+
+  /* ── Reading line ────────────────────────────────────────────────────────
+     Words brighten one after another as the band scrolls, so the sentence
+     reads as if it is still being written. Words start dim, never hidden. */
+  function readline() {
+    var line = document.querySelector('[data-readline]');
+    if (!line) return;
+
+    var words = line.querySelectorAll('.readline__w');
+    if (!words.length) return;
+
+    var ticking = false;
+
+    function sync() {
+      ticking = false;
+      var rect = line.getBoundingClientRect();
+      var vh = window.innerHeight || 1;
+
+      var p = (vh * 0.82 - rect.top) / (vh * 0.5);
+      p = p < 0 ? 0 : p > 1 ? 1 : p;
+
+      var lit = Math.round(p * words.length);
+      for (var i = 0; i < words.length; i++) {
+        words[i].classList.toggle('is-read', i < lit);
+      }
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(sync);
+    }
+
+    sync();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+  }
+
+  /* ── CTA field ───────────────────────────────────────────────────────────
+     A slow wireframe grid tilted in perspective, drifting behind the panel.
+     Deliberately low contrast: it is background, not decoration to look at. */
+  function ctaField() {
+    var canvas = document.querySelector('[data-cta-field]');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    var parent = canvas.parentElement;
+    var w = 0;
+    var h = 0;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var running = false;
+    var t = 0;
+
+    function resize() {
+      var rect = parent.getBoundingClientRect();
+      w = Math.max(1, Math.floor(rect.width));
+      h = Math.max(1, Math.floor(rect.height));
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    /* Project a point on a ground plane into screen space. */
+    function project(x, z) {
+      var d = 1 / (z * 0.0016 + 0.42);
+      return {
+        x: w / 2 + x * d * 0.5,
+        y: h * 0.62 + (170 - z * 0.09) * d * 0.5,
+        d: d,
+      };
+    }
+
+    function step() {
+      if (!running) return;
+      t += 1;
+      ctx.clearRect(0, 0, w, h);
+
+      var drift = (t * 0.55) % 90;
+
+      ctx.lineWidth = 1;
+      for (var z = 0; z < 1500; z += 90) {
+        var zz = z - drift;
+        var a = project(-1500, zz);
+        var b = project(1500, zz);
+        var fade = Math.max(0, 1 - zz / 1500);
+        ctx.strokeStyle = 'rgba(120, 150, 220,' + fade * 0.11 + ')';
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+
+      for (var x = -1500; x <= 1500; x += 150) {
+        var near = project(x, 0);
+        var far = project(x, 1450);
+        ctx.strokeStyle = 'rgba(120, 150, 220, 0.07)';
+        ctx.beginPath();
+        ctx.moveTo(near.x, near.y);
+        ctx.lineTo(far.x, far.y);
+        ctx.stroke();
+      }
+
+      /* Three slow nodes drifting above the plane. */
+      for (var i = 0; i < 3; i++) {
+        var ang = t * 0.004 + i * 2.1;
+        var p = project(Math.cos(ang) * 520, 420 + Math.sin(ang * 0.7) * 320);
+        var r = 2.2 * p.d;
+        ctx.fillStyle = ['rgba(61,139,255,0.30)', 'rgba(139,115,255,0.26)', 'rgba(43,212,196,0.24)'][i];
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, Math.max(1, r), 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      requestAnimationFrame(step);
+    }
+
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+
+    if (!('IntersectionObserver' in window)) return;
+    var observer = new IntersectionObserver(
+      function (entries) {
+        running = entries[0].isIntersecting;
+        if (running) requestAnimationFrame(step);
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(parent);
+  }
+
+  /* Clips are decorative: nothing downloads until the band is on screen, and
+     playback stops again once it leaves. */
+  function lazyVideo() {
+    var videos = document.querySelectorAll('[data-lazy-video]');
+    if (!videos.length) return;
+
+    if (reduce || !('IntersectionObserver' in window)) return;
+
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          var video = entry.target;
+          if (entry.isIntersecting) {
+            if (!video.dataset.started) {
+              video.dataset.started = '1';
+              video.load();
+            }
+            var played = video.play();
+            if (played && played.catch) played.catch(function () {});
+          } else if (!video.paused) {
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    videos.forEach(function (video) {
+      observer.observe(video);
+    });
+  }
+
+  /* Background submit for any form that has an endpoint configured. Without
+     one the form keeps its mailto action and this does nothing. */
+  function contactForms() {
+    document.querySelectorAll('[data-contact-form][data-endpoint]').forEach(function (form) {
+      var status = form.querySelector('[data-form-status]');
+      var button = form.querySelector('button[type="submit"]');
+      var label = button ? button.textContent : '';
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (button) {
+          button.disabled = true;
+          button.textContent = 'Pošiljam…';
+        }
+
+        fetch(form.dataset.endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(Object.fromEntries(new FormData(form))),
+        })
+          .then(function (res) {
+            if (!res.ok) throw new Error(res.status);
+            form.reset();
+            if (status) status.textContent = 'Poslano. Odgovorimo v enem delovnem dnevu.';
+          })
+          .catch(function () {
+            if (status) status.textContent = 'Pošiljanje ni uspelo. Pišite nam neposredno na e-pošto.';
+          })
+          .finally(function () {
+            if (button) {
+              button.disabled = false;
+              button.textContent = label;
+            }
+          });
+      });
+    });
   }
 
   function bouncers() {

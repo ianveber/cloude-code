@@ -46,7 +46,7 @@ export const site = {
   /* Primary navigation — mirrors the original site's sections, but every entry is
      now a real, crawlable URL instead of a hash anchor. */
   nav: [
-    { label: 'Domov', href: '/' },
+    { label: 'Izdelki', href: '/produkti/' },
     {
       label: 'Storitve',
       href: '/storitve/',
@@ -56,9 +56,19 @@ export const site = {
         { label: 'Spremljanje trga', href: '/storitve/spremljanje-trga/', note: 'Tržna analiza' },
       ],
     },
-    { label: 'Proces', href: '/proces/' },
-    { label: 'O podjetju', href: '/o-podjetju/' },
-    { label: 'Pogosta vprašanja', href: '/pogosta-vprasanja/' },
+    { label: 'Novice', href: '/novice/' },
+    { label: 'Dogodki', href: '/dogodki/' },
+    { label: 'Blog', href: '/blog/' },
+    {
+      label: 'Podjetje',
+      href: '/o-podjetju/',
+      children: [
+        { label: 'O podjetju', href: '/o-podjetju/', note: 'Kdo smo' },
+        { label: 'Ekipa', href: '/ekipa/', note: 'Ljudje za sistemi' },
+        { label: 'Proces', href: '/proces/', note: 'Osem korakov uvedbe' },
+        { label: 'Pogosta vprašanja', href: '/pogosta-vprasanja/', note: 'Odgovori pred začetkom' },
+      ],
+    },
     { label: 'Kontakt', href: '/kontakt/' },
   ],
 
@@ -77,9 +87,18 @@ export const site = {
       {
         title: 'Povezave',
         links: [
+          { label: 'Izdelki', href: '/produkti/' },
           { label: 'Storitve', href: '/storitve/' },
           { label: 'Proces', href: '/proces/' },
           { label: 'Pogosta vprašanja', href: '/pogosta-vprasanja/' },
+        ],
+      },
+      {
+        title: 'Objave',
+        links: [
+          { label: 'Novice', href: '/novice/' },
+          { label: 'Dogodki', href: '/dogodki/' },
+          { label: 'Blog', href: '/blog/' },
         ],
       },
     ],

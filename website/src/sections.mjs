@@ -31,21 +31,9 @@ export function takeaway({ label = 'Na kratko', text, accent = 'blue' }) {
     </div>`;
 }
 
-/* ── Hero ─────────────────────────────────────────────────────────────── */
-
-export function hero({ headline }) {
-  return `
-<section class="hero hero--cinematic" data-intro>
-  <canvas class="hero__field" data-particles aria-hidden="true"></canvas>
-  <div class="shell">
-    <div class="hero__inner">
-      <h1 data-type-in>${esc(headline)}</h1>
-    </div>
-  </div>
-</section>`;
-}
-
-/** Sub-page hero: same rhythm as the home hero, one level quieter. */
+/* ── Hero ─────────────────────────────────────────────────────────────────
+   The home page uses brainHero() from showcase.mjs. This is the quieter
+   sub-page variant. */
 export function pageHero({ eyebrow, title, lead, accent = 'blue', cta, art = 'layers' }) {
   return `
 <section class="hero hero--page">
@@ -63,31 +51,6 @@ export function pageHero({ eyebrow, title, lead, accent = 'blue', cta, art = 'la
     </div>
   </div>
 </section>`;
-}
-
-/* ── Statement / constellation ────────────────────────────────────────── */
-
-export function statementBand({ line }) {
-  return `
-<section class="statement" aria-labelledby="izjava">
-  <div class="statement__sky" aria-hidden="true">
-    <span class="statement__icon statement__icon--a">${serviceGlyph('avtomatizacija-administracije')}</span>
-    <span class="statement__icon statement__icon--b">${serviceGlyph('avtomatizacija-prodaje')}</span>
-    <span class="statement__icon statement__icon--c">${serviceGlyph('spremljanje-trga')}</span>
-    <span class="statement__icon statement__icon--d">${DRAWINGS_ORBIT()}</span>
-  </div>
-  <div class="shell">
-    <p class="statement__line" id="izjava" data-type-in>${esc(line)}</p>
-  </div>
-</section>`;
-}
-
-function DRAWINGS_ORBIT() {
-  return `<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-    <circle cx="14" cy="14" r="9" stroke="currentColor" stroke-width="1.5"/>
-    <circle cx="14" cy="14" r="3" stroke="currentColor" stroke-width="1.5"/>
-    <path d="M14 2v4M14 22v4M2 14h4M22 14h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-  </svg>`;
 }
 
 /* ── Feature explorer ─────────────────────────────────────────────────── */

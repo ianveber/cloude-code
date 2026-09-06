@@ -13,6 +13,9 @@
 export const hero = {
   headline: 'AI avtomatizacija. Hitrejši procesi.',
   seoHeadline: 'AI avtomatizacija za podjetja. Hitrejši procesi in manj ročnega dela.',
+  /* Shown during the opening sequence: the brain mark appears alone, then this
+     wordmark completes the logo, then the site loads in behind it. */
+  intro: 'AIS Slovenia',
 };
 
 /* One-sentence manifesto, used as the constellation / statement band. */

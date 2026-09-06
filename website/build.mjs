@@ -17,7 +17,6 @@ import { fileURLToPath } from 'node:url';
 
 import site from './content/site.mjs';
 import {
-  hero,
   pageHero,
   optimizationSection,
   problemsSection,
@@ -30,7 +29,6 @@ import {
   faqSection,
   contactSection,
   ctaBand,
-  statementBand,
   featureExplorer,
   useCaseSlider,
   twinCtaSection,
@@ -41,6 +39,19 @@ import {
 } from './src/sections.mjs';
 import { renderPage } from './src/layout.mjs';
 import {
+  brainHero,
+  convergeBand,
+  caseStudiesBand,
+  capabilityBand,
+  teamBand,
+  immersiveCta,
+  blogTeaser,
+  blogGrid,
+  productGrid,
+  newsList,
+  eventList,
+} from './src/showcase.mjs';
+import {
   faqNode,
   serviceNode,
   howToNode,
@@ -49,6 +60,7 @@ import {
 } from './src/schema.mjs';
 import { esc, absolute } from './src/html.mjs';
 import * as C from './content/content.mjs';
+import * as S from './content/showcase.mjs';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.join(ROOT, 'dist');
@@ -71,18 +83,26 @@ const closingCta = ctaBand({
 
 function homePage() {
   const body = [
-    hero({
+    brainHero({
       headline: C.hero.headline,
+      intro: C.hero.intro,
     }),
 
-    statementBand(C.statement),
+    /* Three screens becoming one product — the story of how work gets built. */
+    convergeBand(S.converge),
+
+    caseStudiesBand(S.caseStudies),
+    capabilityBand(S.capabilities),
+
     featureExplorer(C.services),
     useCaseSlider(C.useCases),
-    twinCtaSection(C.twinCta),
     processSection(C.processMeta, C.processSteps),
     statsSection(C.stats),
+
+    teamBand(S.teamShowcase, C.team.members),
     faqSection(C.faq, { items: C.faq.items.slice(0, 5) }),
-    closingCta,
+    immersiveCta(S.ctaBlock),
+    blogTeaser(S.blog),
   ].join('\n');
 
   return {
@@ -448,12 +468,151 @@ function notFoundPage() {
 
 /* ── Page registry ────────────────────────────────────────────────────── */
 
+/* ── Products, news, events, blog ─────────────────────────────────────────
+   Each follows the same shape as the older pages: a hero, an answer-first
+   summary an AI engine can quote, then the listing itself.
+
+   News, events and blog entries are sample data (see content/showcase.mjs).
+   They deliberately carry no Article or Event structured data — marking up
+   entries that have not actually been published would feed search engines
+   claims the business has not made. Add that markup once the copy is real. */
+
+function productsPage() {
+  const body = [
+    pageHero({
+      eyebrow: S.products.eyebrow,
+      title: S.products.title,
+      lead: S.products.lead,
+      accent: 'blue',
+      cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
+    }),
+
+    `<section class="section section--plain section--flush-top">
+  <div class="shell">
+    ${takeaway({ accent: 'blue', label: 'Na kratko', text: S.products.answer })}
+  </div>
+</section>`,
+
+    productGrid(S.products),
+    twinCtaSection(C.twinCta),
+    closingCta,
+  ].join('\n');
+
+  return {
+    path: '/produkti/',
+    title: S.products.metaTitle,
+    description: S.products.metaDescription,
+    keywords: ['SaaS izdelki', 'AI izdelki za podjetja', 'avtomatizacija dokumentov', 'programska oprema po meri'],
+    breadcrumbs: [HOME_CRUMB, { label: 'Izdelki', href: '/produkti/' }],
+    priority: '0.9',
+    changefreq: 'monthly',
+    body,
+  };
+}
+
+function newsPage() {
+  const body = [
+    pageHero({
+      eyebrow: S.news.eyebrow,
+      title: S.news.title,
+      lead: S.news.lead,
+      accent: 'violet',
+    }),
+
+    `<section class="section section--plain section--flush-top">
+  <div class="shell">
+    ${takeaway({ accent: 'violet', label: 'Na kratko', text: S.news.answer })}
+  </div>
+</section>`,
+
+    newsList(S.news),
+    closingCta,
+  ].join('\n');
+
+  return {
+    path: '/novice/',
+    title: S.news.metaTitle,
+    description: S.news.metaDescription,
+    keywords: ['novice AIS Slovenia', 'AI novice', 'obvestila podjetja'],
+    breadcrumbs: [HOME_CRUMB, { label: 'Novice', href: '/novice/' }],
+    priority: '0.7',
+    changefreq: 'weekly',
+    body,
+  };
+}
+
+function eventsPage() {
+  const body = [
+    pageHero({
+      eyebrow: S.events.eyebrow,
+      title: S.events.title,
+      lead: S.events.lead,
+      accent: 'teal',
+    }),
+
+    `<section class="section section--plain section--flush-top">
+  <div class="shell">
+    ${takeaway({ accent: 'teal', label: 'Na kratko', text: S.events.answer })}
+  </div>
+</section>`,
+
+    eventList(S.events),
+    closingCta,
+  ].join('\n');
+
+  return {
+    path: '/dogodki/',
+    title: S.events.metaTitle,
+    description: S.events.metaDescription,
+    keywords: ['dogodki', 'delavnica AI', 'predstavitev avtomatizacije', 'AI dogodki Ljubljana'],
+    breadcrumbs: [HOME_CRUMB, { label: 'Dogodki', href: '/dogodki/' }],
+    priority: '0.7',
+    changefreq: 'weekly',
+    body,
+  };
+}
+
+function blogPage() {
+  const body = [
+    pageHero({
+      eyebrow: S.blog.eyebrow,
+      title: S.blog.title,
+      lead: S.blog.lead,
+      accent: 'amber',
+    }),
+
+    `<section class="section section--plain section--flush-top">
+  <div class="shell">
+    ${takeaway({ accent: 'amber', label: 'Na kratko', text: S.blog.answer })}
+  </div>
+</section>`,
+
+    blogGrid(S.blog),
+    closingCta,
+  ].join('\n');
+
+  return {
+    path: '/blog/',
+    title: S.blog.metaTitle,
+    description: S.blog.metaDescription,
+    keywords: ['blog o AI', 'avtomatizacija poslovnih procesov', 'AI agenti', 'nasveti za podjetja'],
+    breadcrumbs: [HOME_CRUMB, { label: 'Blog', href: '/blog/' }],
+    priority: '0.7',
+    changefreq: 'weekly',
+    body,
+  };
+}
+
 export function collectPages() {
   return [
     homePage(),
+    productsPage(),
     servicesIndexPage(),
     ...C.services.map(servicePage),
     processPage(),
+    newsPage(),
+    eventsPage(),
+    blogPage(),
     aboutPage(),
     teamPage(),
     faqPage(),

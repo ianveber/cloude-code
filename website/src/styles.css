@@ -549,11 +549,21 @@ p { text-wrap: pretty; }
     radial-gradient(38rem 22rem at 60% 108%, rgba(14, 165, 160, 0.07), transparent 62%);
 }
 
-.hero--cinematic {
+/* Home hero: white stage, headline on the left, the brain block on the right. */
+.hero--brain {
   min-height: calc(100svh - 72px);
   display: flex;
   align-items: center;
-  padding-block: clamp(4rem, 10vw, 7rem);
+  padding-block: clamp(3rem, 7vw, 5.5rem);
+  background: var(--paper);
+  background-image: none;
+}
+
+.hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  align-items: center;
+  gap: clamp(1.5rem, 5vw, 4rem);
 }
 
 .hero__field {
@@ -566,11 +576,6 @@ p { text-wrap: pretty; }
 }
 
 .hero__inner { max-width: 46rem; }
-.hero--cinematic .hero__inner {
-  max-width: 44rem;
-  text-align: center;
-  margin-inline: auto;
-}
 .hero h1 {
   margin-top: 1rem;
   font-weight: 560;
@@ -578,22 +583,33 @@ p { text-wrap: pretty; }
   line-height: 1.08;
   color: var(--ink);
 }
-.hero--cinematic h1 {
+.hero--brain h1 {
   margin-top: 0;
   font-weight: 640;
   letter-spacing: -0.042em;
-  line-height: 1.05;
+  line-height: 1.04;
+}
+
+.hero__line { display: block; }
+
+/* Each half of the headline rises in on its own beat once the site loads. */
+html.motion-on .hero--brain h1 .hero__line {
+  opacity: 0;
+  transform: translateY(0.32em);
+}
+
+html.motion-on .hero--brain h1.is-entered .hero__line {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.85s cubic-bezier(0.16, 1.25, 0.3, 1);
+}
+
+html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
+  transition-delay: 0.11s;
 }
 .hero .lead { margin-top: 1.25rem; max-width: 38rem; }
-
-.hero__mark {
-  margin-top: 3.5rem;
-  font-size: clamp(1.6rem, 1rem + 3vw, 3rem);
-  font-weight: 560;
-  letter-spacing: -0.04em;
-  color: var(--ink);
-  opacity: 0.14;
-}
 
 .hero__facts {
   display: flex;
@@ -602,6 +618,97 @@ p { text-wrap: pretty; }
   margin-top: 1.9rem;
   padding: 0;
   list-style: none;
+}
+
+/* ── The brain mark ───────────────────────────────────────────────────────
+   One SVG, two treatments: an outline for the intro lockup, and a filled face
+   for the top of the extruded block. */
+
+.brain-mark { width: 100%; height: auto; display: block; }
+.brain-mark__body { fill: none; stroke: var(--blue); stroke-width: 4; }
+.brain-mark__circuit { color: #9aa3b4; }
+.brain-mark__folds { color: var(--blue); }
+.brain-mark__nodes { color: var(--blue); }
+.brain-mark__circuit + .brain-mark__nodes { color: #9aa3b4; }
+
+.brain-mark--face .brain-mark__body {
+  fill: rgba(255, 255, 255, 0.96);
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 2;
+}
+.brain-mark--face .brain-mark__circuit { color: rgba(29, 119, 254, 0.55); }
+.brain-mark--face .brain-mark__folds { color: var(--blue); }
+.brain-mark--face .brain-mark__nodes { color: var(--violet); }
+
+/* ── 3D brain block ───────────────────────────────────────────────────────
+   The block is a stack of copies of the same silhouette, each pushed a little
+   further along Z. Lying back at 58° and turned 30°, the stack reads as a
+   solid extruded object rather than a picture of one. */
+
+.brain3d {
+  perspective: 1500px;
+  perspective-origin: 52% 42%;
+  display: grid;
+  place-items: center;
+  width: 100%;
+}
+
+.brain3d__rig {
+  position: relative;
+  width: min(100%, 32rem);
+  aspect-ratio: 240 / 190;
+  transform-style: preserve-3d;
+  /* --tilt/--turn are nudged by the pointer in motion.js. */
+  transform:
+    rotateX(calc(58deg + var(--tilt, 0deg)))
+    rotateZ(calc(-30deg + var(--turn, 0deg)))
+    translateZ(0);
+}
+
+.brain3d__block {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.brain3d__slice,
+.brain3d__face {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(calc(var(--i, 0) * var(--slice, 2.1px)));
+}
+
+.brain3d__slice {
+  /* Hue walks blue → violet up the stack; the lowest slices sit in shadow. */
+  color: hsl(calc(214 + var(--i) * 2.6) 88% calc(37% + var(--i) * 1.15%));
+}
+.brain3d__slice svg { width: 100%; height: auto; display: block; }
+
+.brain3d__face {
+  --i: 16;
+  filter: drop-shadow(0 2px 5px rgba(18, 32, 64, 0.28));
+}
+
+.brain3d__shadow {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -6%;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(24, 48, 104, 0.26), transparent 72%);
+  transform: translateZ(-14px);
+  filter: blur(6px);
+}
+
+html.motion-on .brain3d__rig {
+  animation: brain-float 9s ease-in-out infinite;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes brain-float {
+  0%, 100% { translate: 0 -0.4%; }
+  50% { translate: 0 1.6%; }
 }
 
 /* ── Chips ────────────────────────────────────────────────────────────── */
@@ -1451,79 +1558,6 @@ p { text-wrap: pretty; }
   .header-cta { display: none; }
 }
 
-/* ── Statement constellation ──────────────────────────────────────────── */
-
-.statement {
-  position: relative;
-  overflow: hidden;
-  padding-block: clamp(5rem, 12vw, 9rem);
-  text-align: center;
-}
-
-.statement__sky {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.statement__icon {
-  position: absolute;
-  width: 3.4rem;
-  height: 3.4rem;
-  color: var(--blue);
-  opacity: 0.32;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.7);
-  animation: float-icon 8s ease-in-out infinite;
-}
-
-@keyframes float-icon {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-.statement__icon--b { animation-delay: -2s; }
-.statement__icon--c { animation-delay: -4s; }
-.statement__icon--d { animation-delay: -6s; }
-
-.statement__icon svg { width: 1.6rem; height: 1.6rem; }
-.statement__icon--a { left: 12%; top: 18%; color: var(--blue); }
-.statement__icon--b { right: 16%; top: 22%; color: var(--violet); }
-.statement__icon--c { left: 20%; bottom: 16%; color: var(--teal); }
-.statement__icon--d { right: 12%; bottom: 20%; color: var(--amber); }
-
-.statement .shell { position: relative; z-index: 1; }
-
-.statement__echo {
-  font-size: clamp(1.6rem, 1rem + 3.2vw, 3.4rem);
-  font-weight: 560;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
-  color: var(--ink);
-  opacity: 0.1;
-  margin-bottom: 0.85rem;
-}
-
-.statement__line {
-  font-size: clamp(1.55rem, 1rem + 2.4vw, 2.6rem);
-  font-weight: 560;
-  letter-spacing: -0.03em;
-  line-height: 1.2;
-  color: var(--ink);
-  max-width: 28ch;
-  margin-inline: auto;
-}
-
-.statement__more {
-  max-width: 52ch;
-  margin: 1.25rem auto 0;
-  color: var(--muted);
-}
-
 /* ── Feature explorer ─────────────────────────────────────────────────── */
 
 .explorer {
@@ -1722,10 +1756,16 @@ p { text-wrap: pretty; }
   .statement__icon { display: none; }
 }
 
-/* ── White intro ────────────────────────────────────────────────────────
-   First paint on the homepage is a white card: only the headline types.
-   After it finishes, the class comes off and the rest of the site fades in.
-   The class is set in <head> so there is no flash of the full page. */
+/* ── Opening sequence ───────────────────────────────────────────────────
+   First paint on the home page is a white screen holding only the brain mark.
+   The wordmark then writes itself in beside it, completing the logo, and the
+   site loads in behind. The `is-intro` class is set in <head>, so the full page
+   never flashes first.
+
+   The overlay is its own fixed layer, so nothing in the page below has to be
+   re-positioned while it is on screen. */
+
+.hero__intro { display: none; }
 
 html.is-intro,
 html.is-intro body {
@@ -1734,9 +1774,7 @@ html.is-intro body {
   background-image: none;
 }
 
-html.is-intro body::after {
-  opacity: 0;
-}
+html.is-intro body::after { opacity: 0; }
 
 html.is-intro .site-header,
 html.is-intro .site-footer,
@@ -1744,88 +1782,73 @@ html.is-intro .skip-link,
 html.is-intro .breadcrumbs,
 html.is-intro .decor,
 html.is-intro .cursor,
-html.is-intro main > :not(.hero--cinematic) {
+html.is-intro main {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
 }
 
-html.is-intro .site-header {
-  transform: translateY(-22px);
-}
+html.is-intro .site-header { transform: translateY(-22px); }
 
-/* Overlay the hero on the viewport so the two lines sit in the true
-   centre. The sticky header still occupies flow below this layer;
-   it must not push the intro down. */
-html.is-intro:not(.is-intro-out) .hero--cinematic {
+html.is-intro .hero__intro {
   position: fixed;
   inset: 0;
-  z-index: 40;
-  min-height: 100svh;
-  padding: 0;
-  background: #fff;
-  background-image: none;
-  cursor: pointer;
-}
-
-html.is-intro .hero--cinematic {
-  background: #fff;
-  background-image: none;
-  cursor: pointer;
-}
-
-html.is-intro:not(.is-intro-out) .hero--cinematic .shell {
+  z-index: 60;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100svh;
-  padding: 0;
+  gap: clamp(0.75rem, 1.8vw, 1.5rem);
+  background: #fff;
+  cursor: pointer;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
-html.is-intro:not(.is-intro-out) .hero--cinematic .hero__inner {
-  width: max-content;
-  max-width: min(92vw, 44rem);
-  text-align: center;
-  margin-inline: auto;
-}
-
-html.is-intro:not(.is-intro-out) .hero--cinematic h1 {
-  margin: 0;
-  white-space: nowrap;
-}
-
-html.is-intro .hero__field {
+.hero__logo {
+  display: block;
+  width: clamp(4.25rem, 9vw, 6.75rem);
+  flex: none;
   opacity: 0;
-  transform: scale(1.16);
+  transform: scale(0.86);
 }
 
-html.is-intro .hero--cinematic [data-enter] {
-  display: none !important;
-}
-
-/* Keep the headline in its final layout box so the site can fade in
-   around it. Hidden [data-enter] siblings stay in flow. */
-
-/* Hide the full headline until the typewriter starts — otherwise first
-   paint shows the complete sentence, then it vanishes and types again. */
-html.is-intro .hero [data-type-in]:not(.is-typing):not(.is-typed) {
-  color: transparent;
-}
-
-html.is-intro .hero [data-type-in].is-typing,
-html.is-intro .hero [data-type-in].is-typed {
+.hero__introline {
+  font-size: clamp(1.75rem, 1rem + 4vw, 3.75rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1;
   color: var(--ink);
+  white-space: nowrap;
+  /* Revealed left to right, so the wordmark reads as being written. */
+  clip-path: inset(0 100% 0 0);
+  opacity: 0;
 }
 
-html.is-intro .hero [data-type-in].is-typing::after {
-  content: '';
-  display: inline-block;
-  width: 2px;
-  height: 0.82em;
-  margin-left: 4px;
-  background: var(--ink);
-  vertical-align: -0.06em;
-  animation: caret 0.7s steps(1) infinite;
+html.is-intro .hero__intro.is-logo .hero__logo {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1.25, 0.3, 1);
+}
+
+html.is-intro .hero__intro.is-word .hero__introline {
+  opacity: 1;
+  clip-path: inset(0 0 0 0);
+  transition:
+    clip-path 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s linear;
+}
+
+/* Overlay lifts away; the site is already composed underneath. */
+html.is-intro-out .hero__intro {
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
+  transition:
+    opacity 0.62s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 html.motion-on .site-header {
@@ -1836,35 +1859,12 @@ html.motion-on .site-header {
 }
 
 html.motion-on .site-footer,
-html.motion-on main > :not(.hero--cinematic),
-html.motion-on .hero--cinematic {
+html.motion-on main {
   transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.7s;
 }
 
-html.motion-on .hero__field {
-  transition:
-    opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-html.is-intro-out .hero__field {
-  transform: scale(1);
-}
-
-html.is-intro .hero [data-type-in].is-struck {
-  transform-origin: center center;
-}
-
-.hero [data-type-in].is-struck {
-  transform-origin: left center;
-  animation: hero-strike 0.58s cubic-bezier(0.16, 1.35, 0.3, 1);
-}
-
-@keyframes hero-strike {
-  0% { transform: scale(0.97); letter-spacing: -0.02em; }
-  42% { transform: scale(1.045); letter-spacing: -0.05em; }
-  100% { transform: scale(1); letter-spacing: -0.042em; }
-}
+/* No-JS and reduced-motion visitors never see the overlay at all. */
+html:not(.is-intro) .hero__intro { display: none; }
 
 
 /* ── Motion (only when JS is present and motion is allowed) ───────────── */
@@ -2018,8 +2018,768 @@ html.is-intro .hero [data-type-in].is-struck {
 }
 
 @media print {
-  .site-header, .cta-band, .skip-link, .decor, .hero__field, .statement__sky, .cursor, .bouncers { display: none; }
+  .site-header, .cta-band, .skip-link, .decor, .hero__field, .cursor, .bouncers { display: none; }
   body { background: #fff; }
   body::after { display: none; } /* grain overlay */
   .card, .svc, .step, .form { box-shadow: none; }
+}
+
+/* ==========================================================================
+   Dark bands
+
+   Two sections invert the page: the converge band and the capability band.
+   They share one set of tokens so the inversion is consistent, and both keep
+   text on flat colour — never on top of a moving layer.
+   ========================================================================== */
+
+.converge,
+.capband,
+.ctaband {
+  --d-bg: #06070b;
+  --d-panel: #10131c;
+  --d-line: #232838;
+  --d-ink: #f2f4fa;
+  --d-dim: #8f97ad;
+
+  position: relative;
+  background: var(--d-bg);
+  color: var(--d-dim);
+  overflow: hidden;
+}
+
+.converge h2,
+.capband h2,
+.ctaband h2 {
+  color: var(--d-ink);
+}
+
+.eyebrow--onDark { color: var(--d-dim); }
+.eyebrow--onDark::before { background: var(--blue); }
+.lead--onDark { color: var(--d-dim); }
+
+/* ── Converge band ────────────────────────────────────────────────────────
+   Three clips sit side by side, then close into one frame as the section
+   scrolls. --converge is written by motion.js from 0 (apart) to 1 (merged);
+   with no JS the panels simply stay side by side, which is a valid layout. */
+
+.converge {
+  padding-block: clamp(4rem, 9vw, 7rem);
+}
+
+.converge__head {
+  text-align: center;
+  max-width: 46rem;
+  margin-inline: auto;
+}
+
+.converge__head .lead { margin-top: 0.9rem; }
+
+.converge__stage {
+  margin-top: clamp(2.5rem, 6vw, 4.5rem);
+  padding-inline: var(--gutter);
+}
+
+.converge__rail {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.75rem, 3vw, 2rem);
+  max-width: 1320px;
+  margin-inline: auto;
+  perspective: 1600px;
+}
+
+.converge__panel {
+  margin: 0;
+  min-width: 0;
+  /* Outer panels slide toward the middle and drop behind the centre one. */
+  transform:
+    translateX(calc(var(--dir, 0) * var(--converge, 0) * 33%))
+    translateZ(calc(var(--converge, 0) * -80px))
+    scale(calc(1 - var(--converge, 0) * 0.06));
+  transform-origin: center;
+}
+
+.converge__panel[data-converge-panel='0'] { --dir: 1; }
+.converge__panel[data-converge-panel='1'] { --dir: 0; z-index: 2; }
+.converge__panel[data-converge-panel='2'] { --dir: -1; }
+
+.converge__panel[data-converge-panel='1'] {
+  transform: scale(calc(1 + var(--converge, 0) * 0.06));
+}
+
+.converge__panel[data-converge-panel='0'] .converge__frame,
+.converge__panel[data-converge-panel='2'] .converge__frame {
+  opacity: calc(1 - var(--converge, 0) * 0.55);
+}
+
+html.motion-on .converge__panel,
+html.motion-on .converge__frame,
+html.motion-on .converge__caption {
+  transition: transform 0.35s linear, opacity 0.35s linear;
+}
+
+.converge__frame {
+  position: relative;
+  border: 1px solid var(--d-line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--d-panel);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
+}
+
+.converge__video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.converge__caption {
+  display: block;
+  margin-top: 1rem;
+  opacity: calc(1 - var(--converge, 0) * 0.85);
+}
+
+.converge__label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--d-ink);
+}
+
+.converge__text {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: var(--text-sm);
+  color: var(--d-dim);
+}
+
+.converge__outro {
+  margin-top: clamp(2rem, 5vw, 3.25rem);
+  text-align: center;
+  font-size: clamp(1.15rem, 0.9rem + 1.2vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--d-ink);
+  opacity: calc(0.25 + var(--converge, 0) * 0.75);
+}
+
+/* ── Capability band ──────────────────────────────────────────────────────
+   The opening sentence brightens word by word as the band scrolls. Words are
+   dim, not hidden: the sentence is legible even before the effect runs, and
+   completely legible with no JS at all. */
+
+.capband {
+  padding-block: clamp(4rem, 9vw, 7rem);
+  border-top: 1px solid var(--d-line);
+}
+
+.readline {
+  margin-top: 1.1rem;
+  max-width: 30ch;
+  font-size: clamp(1.5rem, 1rem + 2.6vw, 2.9rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.28;
+  color: var(--d-ink);
+}
+
+.readline__w {
+  color: #3b4256;
+  transition: color 0.25s linear;
+}
+
+html:not(.motion-on) .readline__w,
+.readline__w.is-read {
+  color: var(--d-ink);
+}
+
+.capband__list {
+  margin-top: clamp(3rem, 7vw, 5.5rem);
+  display: grid;
+  gap: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+.capitem {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  padding-top: clamp(2rem, 5vw, 3rem);
+  border-top: 1px solid var(--d-line);
+}
+
+/* Alternate which side the drawing sits on. */
+.capitem:nth-child(even) .capitem__copy { order: 2; }
+
+.capitem__index {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  color: var(--cap-accent, var(--blue));
+}
+
+.capitem__label {
+  margin-top: 0.75rem;
+  font-size: clamp(1.35rem, 1rem + 1.4vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--d-ink);
+}
+
+/* Deliberately small: the drawing carries the section, the words annotate it. */
+.capitem__body {
+  margin-top: 0.65rem;
+  max-width: 34ch;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--d-dim);
+}
+
+.capitem--violet { --cap-accent: var(--violet); }
+.capitem--teal { --cap-accent: var(--teal); }
+.capitem--amber { --cap-accent: var(--amber); }
+
+.capitem__art {
+  border: 1px solid var(--d-line);
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(255, 255, 255, 0.045), transparent 70%),
+    var(--d-panel);
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+}
+
+.capitem__art svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  color: var(--cap-accent, var(--blue));
+}
+
+.art__panel { stroke: #313852; }
+.art__tile { fill: rgba(255, 255, 255, 0.05); stroke: #313852; stroke-width: 1.4; }
+.art__tile--hot { fill: color-mix(in srgb, currentColor 16%, transparent); stroke: currentColor; }
+.art__edge { stroke: #3b4360; }
+.art__spark { color: currentColor; }
+.art__pip { color: currentColor; }
+
+html.motion-on .art__spark {
+  stroke-dasharray: 340;
+  stroke-dashoffset: 340;
+}
+
+html.motion-on .capitem.is-in .art__spark {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+}
+
+html.motion-on .art__pip { opacity: 0; }
+html.motion-on .capitem.is-in .art__pip {
+  opacity: 1;
+  transition: opacity 0.4s ease 1.2s;
+}
+
+/* ── Partners / case studies ──────────────────────────────────────────── */
+
+.partners {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(0.5rem, 1.6vw, 1rem);
+  margin-top: clamp(1.75rem, 4vw, 2.75rem);
+  padding: 0;
+  list-style: none;
+}
+
+.partners__item { min-width: 0; }
+
+.partners__slot,
+.partners__logo {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: clamp(3.5rem, 7vw, 4.75rem);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+}
+
+.partners__logo {
+  border-style: solid;
+  object-fit: contain;
+  padding: 0.75rem 1rem;
+  height: clamp(3.5rem, 7vw, 4.75rem);
+}
+
+.partners__mono {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+}
+
+html.motion-on .partners__item {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: partner-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--i) * 0.07s);
+}
+
+@keyframes partner-in {
+  to { opacity: 1; transform: none; }
+}
+
+.cases__note {
+  margin-top: 0.85rem;
+  font-size: var(--text-sm);
+  color: var(--faint);
+}
+
+.cases__work { margin-top: clamp(2.5rem, 6vw, 4rem); }
+
+/* ── Team band ────────────────────────────────────────────────────────── */
+
+.teamgrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+  margin-top: clamp(2rem, 5vw, 3rem);
+  padding: 0;
+  list-style: none;
+}
+
+.teamtile { min-width: 0; text-align: center; }
+
+.teamtile__photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--canvas);
+}
+
+.teamtile__photo--empty {
+  border-style: dashed;
+  background:
+    repeating-linear-gradient(
+      135deg,
+      transparent 0 8px,
+      rgba(21, 23, 29, 0.028) 8px 16px
+    );
+}
+
+.teamtile__name {
+  display: block;
+  margin-top: 0.6rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.teamtile__role,
+.teamtile__note {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: var(--text-xs);
+  color: var(--faint);
+}
+
+.teamtile__note { margin-top: 0.6rem; }
+
+/* ── Immersive CTA ────────────────────────────────────────────────────────
+   The canvas drifts behind the panel. It is a sibling of the content, never a
+   parent, so nothing is ever drawn on top of the form. */
+
+.ctaband {
+  padding-block: clamp(4rem, 9vw, 6.5rem);
+  border-top: 1px solid var(--d-line);
+}
+
+.ctaband__field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.ctaband__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+
+.ctaband__copy .lead { margin-top: 0.9rem; max-width: 34ch; }
+
+.ctaform {
+  background: rgba(12, 15, 22, 0.82);
+  border: 1px solid var(--d-line);
+  border-radius: var(--radius);
+  padding: clamp(1.5rem, 3.5vw, 2.25rem);
+  backdrop-filter: blur(8px);
+}
+
+.ctaform__row { display: grid; gap: 0.4rem; }
+.ctaform__row + .ctaform__row { margin-top: 1rem; }
+
+.ctaform label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--d-ink);
+}
+
+.ctaform__opt { color: var(--d-dim); font-weight: 400; }
+
+.ctaform input {
+  width: 100%;
+  font: inherit;
+  font-size: var(--text-base);
+  color: var(--d-ink);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--d-line);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.85rem;
+}
+
+.ctaform input:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.ctaform__actions { margin-top: 1.4rem; }
+
+.ctaform__actions .btn {
+  width: 100%;
+  justify-content: center;
+  background: var(--paper);
+  color: var(--ink);
+  border-color: var(--paper);
+}
+
+.ctaform__actions .btn:hover { background: #e9ecf5; border-color: #e9ecf5; }
+
+.ctaform__note {
+  margin-top: 0.85rem;
+  font-size: var(--text-xs);
+  color: var(--d-dim);
+}
+
+.ctaform__status:empty { display: none; }
+.ctaform__status {
+  margin-top: 0.75rem;
+  font-size: var(--text-sm);
+  color: var(--teal);
+}
+
+/* ── Products ─────────────────────────────────────────────────────────── */
+
+.product {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  padding: clamp(1.4rem, 3vw, 2rem);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.product::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--prod-accent, var(--blue));
+}
+
+.product--violet { --prod-accent: var(--violet); }
+.product--teal { --prod-accent: var(--teal); }
+.product--amber { --prod-accent: var(--amber); }
+
+.product__kicker {
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--prod-accent, var(--blue));
+}
+
+.product__name {
+  margin-top: 0.55rem;
+  font-size: 1.35rem;
+  font-weight: 620;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.product__body { margin-top: 0.6rem; color: var(--muted); }
+
+.product__points {
+  margin-top: 1rem;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.product__points li {
+  position: relative;
+  padding-left: 1.15rem;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.product__points li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--prod-accent, var(--blue));
+}
+
+.product__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.4rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--line-soft);
+}
+
+/* ── News ─────────────────────────────────────────────────────────────── */
+
+.newslist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0;
+}
+
+.newsitem {
+  border-top: 1px solid var(--line);
+  padding-block: clamp(1.4rem, 3vw, 2rem);
+}
+
+.newsitem:last-child { border-bottom: 1px solid var(--line); }
+
+.newsitem__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  font-size: var(--text-sm);
+  color: var(--faint);
+}
+
+.newsitem__kicker {
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--news-accent, var(--blue));
+}
+
+.newsitem--violet { --news-accent: var(--violet); }
+.newsitem--teal { --news-accent: var(--teal); }
+.newsitem--amber { --news-accent: var(--amber); }
+
+.newsitem h3 {
+  margin-top: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: 620;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.newsitem p:last-child { margin-top: 0.5rem; max-width: 62ch; color: var(--muted); }
+
+.newsitem--empty {
+  display: grid;
+  place-items: center;
+  min-height: 6rem;
+  border-top-style: dashed;
+}
+
+.newsitem__note,
+.eventitem__note,
+.postcard__note {
+  font-size: var(--text-sm);
+  color: var(--faint);
+}
+
+/* ── Events ───────────────────────────────────────────────────────────── */
+
+.eventlist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.eventitem {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  padding: clamp(1.25rem, 3vw, 1.85rem);
+  box-shadow: var(--shadow-sm);
+}
+
+.eventitem > article {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: start;
+}
+
+.eventitem__when {
+  display: grid;
+  gap: 0.15rem;
+  font-size: var(--text-sm);
+  color: var(--faint);
+}
+
+.eventitem__when time {
+  font-size: var(--text-base);
+  font-weight: 620;
+  color: var(--ink);
+}
+
+.eventitem__kicker {
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ev-accent, var(--blue));
+}
+
+.eventitem--violet { --ev-accent: var(--violet); }
+.eventitem--teal { --ev-accent: var(--teal); }
+.eventitem--amber { --ev-accent: var(--amber); }
+
+.eventitem h3 {
+  margin-top: 0.45rem;
+  font-size: 1.25rem;
+  font-weight: 620;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.eventitem__body > p { margin-top: 0.5rem; color: var(--muted); max-width: 60ch; }
+
+.eventitem__where {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+  font-size: var(--text-sm);
+  color: var(--faint);
+}
+
+.eventitem--empty {
+  display: grid;
+  place-items: center;
+  min-height: 7rem;
+  border-style: dashed;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* ── Blog ─────────────────────────────────────────────────────────────── */
+
+.postgrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+  margin-top: clamp(2rem, 5vw, 3rem);
+  padding: 0;
+  list-style: none;
+}
+
+.postcard {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  box-shadow: var(--shadow-sm);
+}
+
+.postcard__meta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  font-size: var(--text-sm);
+  color: var(--faint);
+}
+
+.postcard h3 {
+  margin-top: 0.5rem;
+  font-size: 1.15rem;
+  font-weight: 620;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.postcard p:last-child { margin-top: 0.5rem; color: var(--muted); }
+
+.postcard--empty {
+  display: grid;
+  place-items: center;
+  gap: 0.9rem;
+  min-height: 12rem;
+  border-style: dashed;
+  background: transparent;
+  box-shadow: none;
+}
+
+.postcard__art {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--line);
+  background:
+    repeating-linear-gradient(
+      135deg,
+      transparent 0 6px,
+      rgba(21, 23, 29, 0.03) 6px 12px
+    );
+}
+
+/* ── Responsive for the new blocks ────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .hero__grid { grid-template-columns: 1fr; }
+  .hero__art { order: -1; }
+  .brain3d__rig { width: min(78%, 24rem); }
+  .capitem { grid-template-columns: 1fr; }
+  .capitem:nth-child(even) .capitem__copy { order: 0; }
+  .ctaband__inner { grid-template-columns: 1fr; }
+  .partners, .teamgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .postgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .converge__rail { grid-template-columns: 1fr; gap: 1.5rem; }
+  /* Merging three panels into one has no meaning in a single column. */
+  .converge__panel { transform: none !important; }
+  .converge__panel .converge__frame,
+  .converge__caption { opacity: 1 !important; }
+  .converge__outro { opacity: 1; }
+  .eventitem > article { grid-template-columns: 1fr; }
+  .postgrid, .partners, .teamgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero__introline { font-size: clamp(1.5rem, 8vw, 2.25rem); }
 }
