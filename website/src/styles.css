@@ -1749,28 +1749,42 @@ html.is-intro .site-header {
   transform: translateY(-22px);
 }
 
-html.is-intro .hero--cinematic {
+/* Overlay the hero on the viewport so the two lines sit in the true
+   centre. The sticky header still occupies flow below this layer;
+   it must not push the intro down. */
+html.is-intro:not(.is-intro-out) .hero--cinematic {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
   min-height: 100svh;
+  padding: 0;
   background: #fff;
   background-image: none;
   cursor: pointer;
 }
 
-html.is-intro .hero--cinematic .shell {
+html.is-intro .hero--cinematic {
+  background: #fff;
+  background-image: none;
+  cursor: pointer;
+}
+
+html.is-intro:not(.is-intro-out) .hero--cinematic .shell {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100svh;
+  padding: 0;
 }
 
-html.is-intro .hero--cinematic .hero__inner {
+html.is-intro:not(.is-intro-out) .hero--cinematic .hero__inner {
   width: max-content;
   max-width: min(92vw, 44rem);
   text-align: center;
   margin-inline: auto;
 }
 
-html.is-intro .hero--cinematic h1 {
+html.is-intro:not(.is-intro-out) .hero--cinematic h1 {
   margin: 0;
   white-space: nowrap;
 }

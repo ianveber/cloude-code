@@ -52,7 +52,10 @@
   }
 
   function paintHeadline(el, text) {
-    var parts = text.split(/(?<=\.)\s+/);
+    var dot = text.indexOf('.');
+    var parts = dot === -1 || dot === text.length - 1
+      ? [text]
+      : [text.slice(0, dot + 1), text.slice(dot + 1).trim()];
     if (parts.length < 2) {
       el.textContent = text;
       return;
