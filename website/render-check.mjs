@@ -151,6 +151,13 @@ async function main() {
 
   for (const width of WIDTHS) {
     const page = await browser.newPage();
+    await page.evaluateOnNewDocument(() => {
+      try {
+        sessionStorage.setItem('ais-intro', '1');
+      } catch {
+        /* ignore */
+      }
+    });
     await page.setViewport({ width, height: 1000 });
 
     for (const path of PATHS) {

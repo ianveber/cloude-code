@@ -1712,11 +1712,108 @@ p { text-wrap: pretty; }
   .statement__icon { display: none; }
 }
 
+/* ── White intro ────────────────────────────────────────────────────────
+   First paint on the homepage is a white card: only the headline types.
+   After it finishes, the class comes off and the rest of the site fades in.
+   The class is set in <head> so there is no flash of the full page. */
+
+html.is-intro,
+html.is-intro body {
+  overflow: hidden;
+  background: #fff;
+  background-image: none;
+}
+
+html.is-intro body::after {
+  opacity: 0;
+}
+
+html.is-intro .site-header,
+html.is-intro .site-footer,
+html.is-intro .skip-link,
+html.is-intro .breadcrumbs,
+html.is-intro .decor,
+html.is-intro .cursor,
+html.is-intro main > :not(.hero--cinematic) {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+html.is-intro .hero--cinematic {
+  min-height: 100svh;
+  background: #fff;
+  background-image: none;
+  cursor: pointer;
+}
+
+html.is-intro .hero__field {
+  opacity: 0;
+}
+
+html.is-intro .hero--cinematic [data-enter] {
+  opacity: 0 !important;
+  visibility: hidden;
+}
+
+html.is-intro .hero--cinematic .hero__inner {
+  max-width: 40rem;
+  text-align: center;
+  margin-inline: auto;
+}
+
+html.is-intro .hero--cinematic h1 {
+  margin-top: 0;
+}
+
+/* Hide the full headline until the typewriter starts — otherwise first
+   paint shows the complete sentence, then it vanishes and types again. */
+html.is-intro .hero [data-type-in]:not(.is-typing):not(.is-typed) {
+  color: transparent;
+}
+
+html.is-intro .hero [data-type-in].is-typing,
+html.is-intro .hero [data-type-in].is-typed {
+  color: var(--ink);
+}
+
+html.is-intro .hero [data-type-in].is-typing::after {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 0.82em;
+  margin-left: 4px;
+  background: var(--ink);
+  vertical-align: -0.06em;
+  animation: caret 0.72s steps(1) infinite;
+}
+
+html.motion-on .site-header,
+html.motion-on .site-footer,
+html.motion-on main > :not(.hero--cinematic),
+html.motion-on .hero__field,
+html.motion-on .hero--cinematic {
+  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.9s;
+}
+
+html.motion-on .hero--cinematic .hero__inner {
+  transition: max-width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.is-intro-out .hero--cinematic h1 {
+  transition: margin-top 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 /* ── Motion (only when JS is present and motion is allowed) ───────────── */
 
-.js.motion-on .hero [data-type-in],
-.js.motion-on .statement [data-type-in] {
+.js.motion-on .hero [data-type-in]:not(.is-typing):not(.is-typed),
+.js.motion-on .statement [data-type-in]:not(.is-typed) {
   color: transparent;
+}
+
+.js.motion-on .hero [data-type-in].is-typing,
+.js.motion-on .hero [data-type-in].is-typed {
+  color: var(--ink);
 }
 
 .js.motion-on [data-type-in] .char,
@@ -1732,7 +1829,8 @@ p { text-wrap: pretty; }
   transition: opacity 0.08s linear;
 }
 
-.js.motion-on .hero [data-type-in]:not(.is-typed)::after {
+.js.motion-on .hero [data-type-in].is-typing::after,
+.js.motion-on .hero [data-type-in]:not(.is-typed):not(.is-typing)::after {
   content: '';
   display: inline-block;
   width: 2px;

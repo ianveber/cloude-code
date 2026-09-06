@@ -26,7 +26,7 @@
     el.dataset.original = text;
     el.innerHTML = Array.from(text)
       .map(function (ch) {
-        if (ch === ' ') return ' ';
+        if (ch === ' ') return '<span class="char char--space"> </span>';
         if (ch === '\n') return '<br>';
         return '<span class="char">' + escapeHtml(ch) + '</span>';
       })
@@ -51,11 +51,51 @@
     if (then) window.setTimeout(then, total);
   }
 
+  /* Character-by-character typewriter for the white homepage intro. */
+  function typewriter(el, ms, then) {
+    var text = el.dataset.original || el.textContent;
+    el.dataset.original = text;
+    el.classList.add('is-typing');
+    el.textContent = '';
+    var i = 0;
+    var timer = 0;
+    var done = false;
+
+    function complete() {
+      if (done) return;
+      done = true;
+      if (timer) window.clearTimeout(timer);
+      el.textContent = text;
+      el.classList.remove('is-typing');
+      el.classList.add('is-typed');
+      if (then) then();
+    }
+
+    function tick() {
+      if (done) return;
+      i += 1;
+      el.textContent = text.slice(0, i);
+      if (i >= text.length) {
+        complete();
+        return;
+      }
+      var wait = ms;
+      var ch = text.charAt(i - 1);
+      if (ch === ',' || ch === '.' || ch === '—' || ch === '–') wait += 160;
+      else if (ch === ' ') wait += 20;
+      timer = window.setTimeout(tick, wait);
+    }
+
+    timer = window.setTimeout(tick, 420);
+    return complete;
+  }
+
   ready(function () {
     headerState();
     slider();
     if (reduce) {
       document.documentElement.classList.add('motion-off');
+      document.documentElement.classList.remove('is-intro');
       return;
     }
     document.documentElement.classList.add('motion-on');
@@ -80,20 +120,81 @@
     window.addEventListener('scroll', sync, { passive: true });
   }
 
+  function revealHeroRest(hero) {
+    hero.querySelectorAll('[data-enter]').forEach(function (el) {
+      el.classList.add('is-in');
+    });
+  }
+
+  function openSite(hero) {
+    var root = document.documentElement;
+    root.classList.add('is-intro-out');
+    revealHeroRest(hero);
+    window.setTimeout(function () {
+      root.classList.remove('is-intro');
+      try {
+        sessionStorage.setItem('ais-intro', '1');
+      } catch (e) {}
+    }, 80);
+    window.setTimeout(function () {
+      root.classList.remove('is-intro-out');
+    }, 1200);
+  }
+
   function heroEntrance() {
-    var hero = document.querySelector('.hero');
+    var intro = document.querySelector('[data-intro]');
+    var hero = intro || document.querySelector('.hero');
     if (!hero) return;
     hero.classList.add('is-live');
 
     var headline = hero.querySelector('[data-type-in]');
-    var after = function () {
-      hero.querySelectorAll('[data-enter]').forEach(function (el) {
-        el.classList.add('is-in');
-      });
-    };
+    var isIntro = intro && document.documentElement.classList.contains('is-intro');
+    var opened = false;
+    var finishType = null;
 
-    if (headline) typeChars(headline, 0.026, after);
-    else after();
+    function onSkipKey(event) {
+      if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        finishIntro();
+      }
+    }
+
+    function finishIntro() {
+      if (opened) return;
+      opened = true;
+      window.removeEventListener('keydown', onSkipKey);
+      hero.removeEventListener('click', finishIntro);
+      if (finishType) finishType();
+      else if (headline) {
+        headline.textContent = headline.dataset.original || headline.textContent;
+        headline.classList.remove('is-typing');
+        headline.classList.add('is-typed');
+      }
+      openSite(hero);
+    }
+
+    if (isIntro) {
+      window.addEventListener('keydown', onSkipKey);
+      hero.addEventListener('click', finishIntro);
+
+      if (headline) {
+        finishType = typewriter(headline, 38, function () {
+          finishType = null;
+          if (opened) return;
+          window.setTimeout(function () {
+            if (!opened) finishIntro();
+          }, 720);
+        });
+      } else {
+        finishIntro();
+      }
+      return;
+    }
+
+    if (headline) typeChars(headline, 0.024, function () {
+      revealHeroRest(hero);
+    });
+    else revealHeroRest(hero);
   }
 
   /* Orbital field: two slow rings plus free dots, nudged by the pointer. */

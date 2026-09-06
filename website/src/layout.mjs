@@ -71,7 +71,19 @@ function head(page) {
     /* Marks the document as script-capable before first paint so entrance
        animations can start hidden. Without this class the page stays fully
        visible — that is the no-JS path. */
-    '<script>document.documentElement.classList.add("js")</script>',
+    `<script>
+document.documentElement.classList.add('js');
+try {
+  var path = location.pathname;
+  var home = path === '/' || path === '' || path === '/index.html';
+  var seen = sessionStorage.getItem('ais-intro');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var skip = /(?:^|[?&])nointro(?:&|=|$)/.test(location.search);
+  if (home && !seen && !reduce && !skip) {
+    document.documentElement.classList.add('is-intro');
+  }
+} catch (e) {}
+</script>`,
     `<link rel="sitemap" type="application/xml" href="/sitemap.xml">`,
 
     `<script type="application/ld+json">${jsonLd(buildGraph(page))}</script>`,

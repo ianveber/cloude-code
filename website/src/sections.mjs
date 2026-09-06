@@ -35,7 +35,7 @@ export function takeaway({ label = 'Na kratko', text, accent = 'blue' }) {
 
 export function hero({ eyebrow, headline, lead, primaryCta, secondaryCta, chips = [] }) {
   return `
-<section class="hero hero--cinematic">
+<section class="hero hero--cinematic" data-intro>
   <canvas class="hero__field" data-particles aria-hidden="true"></canvas>
   <div class="shell">
     <div class="hero__inner">
