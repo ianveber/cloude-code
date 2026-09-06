@@ -72,18 +72,7 @@ const closingCta = ctaBand({
 function homePage() {
   const body = [
     hero({
-      eyebrow: C.hero.eyebrow,
       headline: C.hero.headline,
-      intro: C.hero.intro,
-      lead: C.hero.lead,
-      primaryCta: C.hero.primaryCta,
-      secondaryCta: C.hero.secondaryCta,
-      chips: [
-        { label: 'AI chatboti v slovenščini', accent: 'blue' },
-        { label: 'Voice AI agenti', accent: 'violet' },
-        { label: 'CRM integracije', accent: 'teal' },
-        { label: 'Ljubljana, Slovenija', accent: 'amber' },
-      ],
     }),
 
     statementBand(C.statement),
@@ -100,7 +89,7 @@ function homePage() {
     path: '/',
     title: 'AI avtomatizacija in AI chatboti za podjetja | AIS Slovenia',
     ogTitle: 'AI avtomatizacija. Hitrejši procesi. — AIS Slovenia',
-    headline: C.hero.headline,
+    headline: C.hero.seoHeadline,
     description:
       'AI avtomatizacija za podjetja v Sloveniji. AIS Slovenia iz Ljubljane gradi AI chatbote, voice AI agente in sisteme za hitrejše procese, v slovenščini.',
     keywords: [

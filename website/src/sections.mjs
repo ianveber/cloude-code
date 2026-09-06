@@ -33,28 +33,13 @@ export function takeaway({ label = 'Na kratko', text, accent = 'blue' }) {
 
 /* ── Hero ─────────────────────────────────────────────────────────────── */
 
-export function hero({ eyebrow, headline, intro, lead, primaryCta, secondaryCta, chips = [] }) {
-  const introAttr = intro ? ` data-intro-short="${esc(intro)}"` : '';
+export function hero({ headline }) {
   return `
 <section class="hero hero--cinematic" data-intro>
   <canvas class="hero__field" data-particles aria-hidden="true"></canvas>
   <div class="shell">
     <div class="hero__inner">
-      ${eyebrow ? `<p class="eyebrow" data-enter="1">${esc(eyebrow)}</p>` : ''}
-      <h1 data-type-in${introAttr}>${esc(headline)}</h1>
-      <p class="lead" data-enter="2">${esc(lead)}</p>
-      <div class="btn-row" data-enter="3">
-        <a class="btn btn--primary" href="${esc(primaryCta.href)}">${esc(primaryCta.label)}</a>
-        ${secondaryCta ? `<a class="btn btn--secondary" href="${esc(secondaryCta.href)}">${esc(secondaryCta.label)}</a>` : ''}
-      </div>
-      ${
-        chips.length
-          ? `<ul class="hero__facts" data-enter="4">
-        ${each(chips, (c) => `<li class="${cls('chip', accentMod('chip', c.accent))}">${esc(c.label)}</li>`)}
-      </ul>`
-          : ''
-      }
-      <p class="hero__mark" aria-hidden="true" data-enter="5">${esc(site.name)}</p>
+      <h1 data-type-in>${esc(headline)}</h1>
     </div>
   </div>
 </section>`;
@@ -82,7 +67,7 @@ export function pageHero({ eyebrow, title, lead, accent = 'blue', cta, art = 'la
 
 /* ── Statement / constellation ────────────────────────────────────────── */
 
-export function statementBand({ line, echo }) {
+export function statementBand({ line }) {
   return `
 <section class="statement" aria-labelledby="izjava">
   <div class="statement__sky" aria-hidden="true">
@@ -92,19 +77,7 @@ export function statementBand({ line, echo }) {
     <span class="statement__icon statement__icon--d">${DRAWINGS_ORBIT()}</span>
   </div>
   <div class="shell">
-    <p class="statement__echo" aria-hidden="true">${esc(echo ?? line)}</p>
     <p class="statement__line" id="izjava" data-type-in>${esc(line)}</p>
-    <p class="statement__more" data-enter>Pokrivamo tri področja — administracijo in operacije, prodajo in komunikacijo s strankami ter spremljanje trga — sisteme pa po osemstopenjskem procesu povežemo z orodji, ki jih podjetje že uporablja.</p>
-    <ul class="bouncers" aria-hidden="true">
-      <li class="bouncer">${serviceGlyph('avtomatizacija-administracije')}</li>
-      <li class="bouncer">${serviceGlyph('avtomatizacija-prodaje')}</li>
-      <li class="bouncer">${DRAWINGS_ORBIT()}</li>
-      <li class="bouncer">${serviceGlyph('spremljanje-trga')}</li>
-      <li class="bouncer">${serviceGlyph('avtomatizacija-administracije')}</li>
-      <li class="bouncer">${DRAWINGS_ORBIT()}</li>
-      <li class="bouncer">${serviceGlyph('avtomatizacija-prodaje')}</li>
-      <li class="bouncer">${serviceGlyph('spremljanje-trga')}</li>
-    </ul>
   </div>
 </section>`;
 }

@@ -77,11 +77,9 @@
     }
   }
 
-  /* Character-by-character typewriter for the white homepage intro. */
-  function typewriter(el, ms, then) {
-    var full = (el.dataset.full || el.textContent || '').trim();
-    var text = (el.getAttribute('data-intro-short') || el.dataset.original || full).trim();
-    el.dataset.full = full;
+  /* Realistic typewriter: slightly uneven cadence, a breath after the period. */
+  function typewriter(el, then) {
+    var text = (el.dataset.original || el.textContent || '').trim();
     el.dataset.original = text;
     el.classList.add('is-typing');
     el.textContent = '';
@@ -95,7 +93,7 @@
       if (timer) window.clearTimeout(timer);
       paintHeadline(el, text);
       el.classList.remove('is-typing');
-      el.classList.add('is-typed', 'is-struck');
+      el.classList.add('is-typed');
       if (then) then();
     }
 
@@ -107,23 +105,17 @@
         complete();
         return;
       }
-      var wait = ms;
+      var wait = 42 + Math.floor(Math.random() * 36);
       var ch = text.charAt(i - 1);
-      if (ch === '.' || ch === '!' || ch === '?') wait += 280;
-      else if (ch === ',' || ch === '—' || ch === '–') wait += 120;
-      else if (ch === ' ') wait += 8;
+      if (ch === '.' || ch === '!' || ch === '?') wait += 260;
+      else if (ch === ',' || ch === '—' || ch === '–') wait += 90;
+      else if (ch === ' ') wait += 24;
+      if (Math.random() < 0.05) wait += 70;
       timer = window.setTimeout(tick, wait);
     }
 
-    timer = window.setTimeout(tick, 160);
+    timer = window.setTimeout(tick, 280);
     return complete;
-  }
-
-  function expandHeadline(el) {
-    var full = el.dataset.full;
-    if (!full) return;
-    paintHeadline(el, full);
-    el.classList.add('is-expanded');
   }
 
   ready(function () {
@@ -164,9 +156,7 @@
 
   function openSite(hero) {
     var root = document.documentElement;
-    var headline = hero.querySelector('[data-type-in]');
     root.classList.add('is-intro-out');
-    if (headline) expandHeadline(headline);
     revealHeroRest(hero);
     window.setTimeout(function () {
       root.classList.remove('is-intro');
@@ -176,7 +166,7 @@
     }, 80);
     window.setTimeout(function () {
       root.classList.remove('is-intro-out');
-    }, 1200);
+    }, 900);
   }
 
   function heroEntrance() {
@@ -204,11 +194,9 @@
       hero.removeEventListener('click', finishIntro);
       if (finishType) finishType();
       else if (headline) {
-        var short = headline.getAttribute('data-intro-short') || headline.dataset.original || headline.textContent;
-        if (!headline.dataset.full) headline.dataset.full = headline.textContent.trim();
-        paintHeadline(headline, short);
+        paintHeadline(headline, headline.dataset.original || headline.textContent);
         headline.classList.remove('is-typing');
-        headline.classList.add('is-typed', 'is-struck');
+        headline.classList.add('is-typed');
       }
       openSite(hero);
     }
@@ -218,12 +206,12 @@
       hero.addEventListener('click', finishIntro);
 
       if (headline) {
-        finishType = typewriter(headline, 24, function () {
+        finishType = typewriter(headline, function () {
           finishType = null;
           if (opened) return;
           window.setTimeout(function () {
             if (!opened) finishIntro();
-          }, 720);
+          }, 520);
         });
       } else {
         finishIntro();
@@ -231,10 +219,9 @@
       return;
     }
 
-    if (headline && headline.getAttribute('data-intro-short')) {
-      headline.dataset.full = headline.textContent.trim();
-      paintHeadline(headline, headline.dataset.full);
-      headline.classList.add('is-typed', 'is-expanded');
+    if (headline && headline.closest('[data-intro]')) {
+      paintHeadline(headline, headline.textContent.trim());
+      headline.classList.add('is-typed');
       revealHeroRest(hero);
     } else if (headline) {
       typeChars(headline, 0.016, function () {
@@ -334,7 +321,7 @@
         if (!running) return;
         t += 1;
         var root = document.documentElement;
-        if (root.classList.contains('is-intro-out')) burst += (2.35 - burst) * 0.12;
+        if (root.classList.contains('is-intro-out')) burst += (1.35 - burst) * 0.08;
         else if (!root.classList.contains('is-intro')) burst += (1 - burst) * 0.035;
         ctx.clearRect(0, 0, width, height);
 

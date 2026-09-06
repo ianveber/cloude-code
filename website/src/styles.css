@@ -566,7 +566,11 @@ p { text-wrap: pretty; }
 }
 
 .hero__inner { max-width: 46rem; }
-.hero--cinematic .hero__inner { max-width: 52rem; }
+.hero--cinematic .hero__inner {
+  max-width: 44rem;
+  text-align: center;
+  margin-inline: auto;
+}
 .hero h1 {
   margin-top: 1rem;
   font-weight: 560;
@@ -575,9 +579,10 @@ p { text-wrap: pretty; }
   color: var(--ink);
 }
 .hero--cinematic h1 {
+  margin-top: 0;
   font-weight: 640;
   letter-spacing: -0.042em;
-  line-height: 1.02;
+  line-height: 1.05;
 }
 .hero .lead { margin-top: 1.25rem; max-width: 38rem; }
 
@@ -1815,12 +1820,12 @@ html.is-intro .hero [data-type-in].is-typed {
 html.is-intro .hero [data-type-in].is-typing::after {
   content: '';
   display: inline-block;
-  width: 3px;
-  height: 0.9em;
-  margin-left: 5px;
-  background: var(--blue);
-  vertical-align: -0.08em;
-  animation: caret 0.48s steps(1) infinite;
+  width: 2px;
+  height: 0.82em;
+  margin-left: 4px;
+  background: var(--ink);
+  vertical-align: -0.06em;
+  animation: caret 0.7s steps(1) infinite;
 }
 
 html.motion-on .site-header {
@@ -1895,12 +1900,12 @@ html.is-intro .hero [data-type-in].is-struck {
 .js.motion-on .hero [data-type-in]:not(.is-typed):not(.is-typing)::after {
   content: '';
   display: inline-block;
-  width: 3px;
-  height: 0.86em;
-  margin-left: 4px;
-  background: var(--blue);
-  vertical-align: -0.06em;
-  animation: caret 0.5s steps(1) infinite;
+  width: 2px;
+  height: 0.8em;
+  margin-left: 3px;
+  background: var(--ink);
+  vertical-align: -0.05em;
+  animation: caret 0.7s steps(1) infinite;
 }
 
 @keyframes caret {
