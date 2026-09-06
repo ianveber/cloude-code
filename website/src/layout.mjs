@@ -9,6 +9,7 @@
 import { esc, join, each, jsonLd, absolute } from './html.mjs';
 import { buildGraph } from './schema.mjs';
 import { decorSprite } from './decor.mjs';
+import { introOverlay } from './showcase.mjs';
 import site from '../content/site.mjs';
 
 const url = (path) => absolute(site.origin, path);
@@ -224,6 +225,7 @@ ${head(page)}
 </head>
 <body>
 <a class="skip-link" href="#main">Preskoči na vsebino</a>
+${page.intro ? introOverlay(page.intro) : ''}
 ${header(page)}
 ${breadcrumbs(page)}
 <main id="main">

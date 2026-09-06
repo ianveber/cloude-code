@@ -18,7 +18,22 @@ const BRAIN_DEPTH = 16;
    back at 30°. The block is stacked from copies of the same silhouette, so the
    "extrusion" is real geometry rather than a picture of one. */
 
-export function brainHero({ headline, intro }) {
+/**
+ * The opening overlay.
+ *
+ * Rendered by the layout *outside* `<main>`: while the intro runs, the whole
+ * page below is faded out, and an element inside a faded parent cannot be
+ * shown again by any rule of its own.
+ */
+export function introOverlay(text) {
+  return `
+<div class="hero__intro" data-intro-stage aria-hidden="true">
+  <span class="hero__logo">${brainMark(' class="brain-mark"')}</span>
+  <p class="hero__introline">${esc(text)}</p>
+</div>`;
+}
+
+export function brainHero({ headline }) {
   const slices = Array.from(
     { length: BRAIN_DEPTH },
     (_, i) => `<span class="brain3d__slice" style="--i:${i}">${brainSlice()}</span>`
@@ -26,11 +41,6 @@ export function brainHero({ headline, intro }) {
 
   return `
 <section class="hero hero--brain" data-intro>
-  <div class="hero__intro" data-intro-stage aria-hidden="true">
-    <span class="hero__logo" data-intro-logo>${brainMark(' class="brain-mark"')}</span>
-    <p class="hero__introline" data-intro-line>${esc(intro)}</p>
-  </div>
-
   <div class="shell hero__grid">
     <div class="hero__copy">
       <h1 data-type-in>${esc(headline)}</h1>

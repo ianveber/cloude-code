@@ -561,9 +561,9 @@ p { text-wrap: pretty; }
 
 .hero__grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
   align-items: center;
-  gap: clamp(1.5rem, 5vw, 4rem);
+  gap: clamp(1.5rem, 4vw, 3rem);
 }
 
 .hero__field {
@@ -583,11 +583,15 @@ p { text-wrap: pretty; }
   line-height: 1.08;
   color: var(--ink);
 }
+/* Capped below --h1: beside the block there is less width than on a full-bleed
+   hero, and the headline has to stay on two lines. */
 .hero--brain h1 {
   margin-top: 0;
+  font-size: clamp(2.1rem, 1.1rem + 3.1vw, 3.85rem);
   font-weight: 640;
   letter-spacing: -0.042em;
-  line-height: 1.04;
+  line-height: 1.05;
+  text-wrap: balance;
 }
 
 .hero__line { display: block; }
@@ -625,20 +629,25 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
    for the top of the extruded block. */
 
 .brain-mark { width: 100%; height: auto; display: block; }
-.brain-mark__body { fill: none; stroke: var(--blue); stroke-width: 4; }
-.brain-mark__circuit { color: #9aa3b4; }
+.brain-mark__body { fill: none; stroke: var(--ink); stroke-width: 4; }
+.brain-mark__spine { color: var(--ink); }
+.brain-mark__circuit { color: var(--ink); }
 .brain-mark__folds { color: var(--blue); }
 .brain-mark__nodes { color: var(--blue); }
-.brain-mark__circuit + .brain-mark__nodes { color: #9aa3b4; }
+.brain-mark__nodes--circuit { color: var(--ink); }
 
+/* The block face is seen at a steep angle, which flattens contrast — so the
+   mark is drawn harder here than in the flat lockup, not softer. */
 .brain-mark--face .brain-mark__body {
-  fill: rgba(255, 255, 255, 0.96);
-  stroke: rgba(255, 255, 255, 0.9);
-  stroke-width: 2;
+  fill: #ffffff;
+  stroke: #8ba3c6;
+  stroke-width: 2.6;
 }
-.brain-mark--face .brain-mark__circuit { color: rgba(29, 119, 254, 0.55); }
+.brain-mark--face .brain-mark__spine { color: #90a4c2; }
+.brain-mark--face .brain-mark__circuit { color: #2f3a4d; }
+.brain-mark--face .brain-mark__nodes--circuit { color: #2f3a4d; }
 .brain-mark--face .brain-mark__folds { color: var(--blue); }
-.brain-mark--face .brain-mark__nodes { color: var(--violet); }
+.brain-mark--face .brain-mark__nodes { color: var(--blue); }
 
 /* ── 3D brain block ───────────────────────────────────────────────────────
    The block is a stack of copies of the same silhouette, each pushed a little
@@ -655,12 +664,13 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
 
 .brain3d__rig {
   position: relative;
-  width: min(100%, 32rem);
-  aspect-ratio: 240 / 190;
+  width: min(100%, 31rem);
+  aspect-ratio: 224 / 186;
   transform-style: preserve-3d;
-  /* --tilt/--turn are nudged by the pointer in motion.js. */
+  /* Lying back, turned 30°. --tilt/--turn are nudged by the pointer in
+     motion.js. */
   transform:
-    rotateX(calc(58deg + var(--tilt, 0deg)))
+    rotateX(calc(52deg + var(--tilt, 0deg)))
     rotateZ(calc(-30deg + var(--turn, 0deg)))
     translateZ(0);
 }
@@ -1887,6 +1897,12 @@ html:not(.is-intro) .hero__intro { display: none; }
   transform: translateY(0.42em);
 }
 
+/* A lone space inside an inline-block collapses to nothing, which would run
+   every revealed word together. */
+.char--space {
+  white-space: pre;
+}
+
 .js.motion-on [data-type-in].is-typed .char,
 .js.motion-on [data-type-chars].is-typed .char {
   opacity: 1;
@@ -2135,10 +2151,12 @@ html.motion-on .converge__caption {
   object-fit: cover;
 }
 
+/* Captions clear early: once the panels start closing they would slide over
+   one another, and three overlapping captions read as a rendering fault. */
 .converge__caption {
   display: block;
   margin-top: 1rem;
-  opacity: calc(1 - var(--converge, 0) * 0.85);
+  opacity: calc(1 - var(--converge, 0) * 2.4);
 }
 
 .converge__label {
@@ -2210,7 +2228,11 @@ html:not(.motion-on) .readline__w,
   border-top: 1px solid var(--d-line);
 }
 
-/* Alternate which side the drawing sits on. */
+/* Alternate which side the drawing sits on, swapping the track widths with it
+   so the drawing always keeps the wider column. */
+.capitem:nth-child(even) {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+}
 .capitem:nth-child(even) .capitem__copy { order: 2; }
 
 .capitem__index {

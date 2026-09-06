@@ -17,58 +17,84 @@ const SVG_OPEN = (viewBox, extra = '') =>
    folds on the other. Drawn once and reused at every size — as the flat mark in
    the intro, and as the extruded face of the 3D block in the hero. */
 
-/** Outer contour. Used on its own for the extruded side walls. */
+/* Outer contour. Bumpy across the top where the lobes are, smoother underneath,
+   with a notch at the bottom right for the cerebellum — that asymmetry is what
+   keeps the shape reading as a brain rather than as a cloud. */
 export const BRAIN_SILHOUETTE =
-  'M120 18 C138 6 166 10 172 30 C194 30 208 48 202 68 C218 82 214 108 196 116 ' +
-  'C202 138 186 156 166 152 C158 172 132 178 120 164 C108 178 82 172 74 152 ' +
-  'C54 156 38 138 44 116 C26 108 22 82 38 68 C32 48 46 30 68 30 C74 10 102 6 120 18 Z';
+  'M84 24 ' +
+  /* Two unequal lobes over the top. Evenly sized bumps all the way round is
+     what makes a shape read as a cloud, so the rest of the outline is long
+     and smooth. */
+  'C92 8 116 4 128 18 ' +
+  'C144 6 172 12 174 34 ' +
+  'C196 40 204 64 192 82 ' +
+  'C206 100 196 126 176 130 ' +
+  /* Cerebellum notch at the lower right. */
+  'C178 150 162 164 142 158 ' +
+  'C122 176 78 174 62 150 ' +
+  'C34 142 22 104 40 80 ' +
+  'C40 50 60 30 84 24 Z';
 
 const TRACE = 'stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" fill="none"';
 
-/** Left half: circuit-board traces terminating in nodes. */
+/** The split down the middle, as in the logo. */
+const BRAIN_SPINE = `
+  <g class="brain-mark__spine" stroke="currentColor" ${TRACE}>
+    <path d="M110 22 C104 60 116 100 108 162"/>
+  </g>`;
+
+/* Both halves are drawn densely enough to fill the shape. Sparse detail leaves
+   flat areas, and flat areas are what read as a cloud. */
+
+/** Left half: circuit-board traces, right angles, terminating in nodes. */
 const BRAIN_CIRCUIT = `
   <g class="brain-mark__circuit" stroke="currentColor" ${TRACE}>
-    <path d="M120 30 V158"/>
-    <path d="M108 52 H80 V74"/>
-    <path d="M108 78 H62"/>
-    <path d="M108 104 H74 V128"/>
-    <path d="M108 132 H88"/>
-    <path d="M80 96 V116 H56"/>
-    <path d="M96 146 H72"/>
+    <path d="M105 40 H84 V60 H62"/>
+    <path d="M108 70 H74 V92 H52"/>
+    <path d="M106 98 H80 V120 H58"/>
+    <path d="M104 128 H88 V148 H70"/>
+    <path d="M84 60 V44"/>
+    <path d="M74 92 V110"/>
+    <path d="M62 60 H46"/>
   </g>
-  <g class="brain-mark__nodes" fill="currentColor">
-    <circle cx="80" cy="74" r="6"/>
-    <circle cx="62" cy="78" r="6"/>
-    <circle cx="74" cy="128" r="6"/>
-    <circle cx="88" cy="132" r="6"/>
-    <circle cx="56" cy="116" r="6"/>
-    <circle cx="72" cy="146" r="6"/>
+  <g class="brain-mark__nodes brain-mark__nodes--circuit" fill="currentColor">
+    <circle cx="46" cy="60" r="6"/>
+    <circle cx="52" cy="92" r="6"/>
+    <circle cx="58" cy="120" r="6"/>
+    <circle cx="70" cy="148" r="6"/>
+    <circle cx="84" cy="44" r="6"/>
+    <circle cx="74" cy="110" r="6"/>
   </g>`;
 
-/** Right half: the organic folds of the logo's blue side. */
+/** Right half: nested organic folds, as on the logo's blue side. */
 const BRAIN_FOLDS = `
   <g class="brain-mark__folds" stroke="currentColor" ${TRACE}>
-    <path d="M132 40 C158 40 166 58 152 70 C140 80 146 96 162 96"/>
-    <path d="M134 108 C154 104 172 114 168 130 C165 142 150 146 138 140"/>
-    <path d="M132 62 C146 62 150 74 140 80"/>
-    <path d="M136 152 C150 154 158 148 158 140"/>
+    <path d="M118 28 C150 20 174 38 164 58 C156 74 134 74 133 90 C132 108 156 116 178 106"/>
+    <path d="M124 50 C142 44 154 54 150 66"/>
+    <path d="M126 118 C148 110 170 122 166 140"/>
+    <path d="M122 150 C142 162 164 154 166 140"/>
+    <path d="M140 90 C154 86 166 92 168 102"/>
   </g>
   <g class="brain-mark__nodes" fill="currentColor">
-    <circle cx="162" cy="96" r="6"/>
-    <circle cx="152" cy="70" r="6"/>
-    <circle cx="168" cy="130" r="6"/>
-    <circle cx="138" cy="140" r="6"/>
+    <circle cx="178" cy="106" r="6"/>
+    <circle cx="150" cy="66" r="6"/>
+    <circle cx="166" cy="140" r="6"/>
+    <circle cx="133" cy="90" r="6"/>
+    <circle cx="168" cy="102" r="6"/>
   </g>`;
 
+const BRAIN_BOX = '0 0 224 186';
+
 /** The complete flat brain mark. */
-export const brainMark = (extra = '') => `${SVG_OPEN('0 0 240 190', extra)}
+export const brainMark = (extra = '') => `${SVG_OPEN(BRAIN_BOX, extra)}
   <path class="brain-mark__body" d="${BRAIN_SILHOUETTE}"/>
+  ${BRAIN_SPINE}
   ${BRAIN_CIRCUIT}
   ${BRAIN_FOLDS}
 </svg>`;
 
 /** Silhouette only — one slice of the extruded block. */
-export const brainSlice = () => `${SVG_OPEN('0 0 240 190')}
+export const brainSlice = () => `${SVG_OPEN(BRAIN_BOX)}
   <path d="${BRAIN_SILHOUETTE}" fill="currentColor"/>
 </svg>`;
 

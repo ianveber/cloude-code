@@ -83,10 +83,7 @@ const closingCta = ctaBand({
 
 function homePage() {
   const body = [
-    brainHero({
-      headline: C.hero.headline,
-      intro: C.hero.intro,
-    }),
+    brainHero({ headline: C.hero.headline }),
 
     /* Three screens becoming one product — the story of how work gets built. */
     convergeBand(S.converge),
@@ -110,6 +107,8 @@ function homePage() {
     title: 'AI avtomatizacija in AI chatboti za podjetja | AIS Slovenia',
     ogTitle: 'AI avtomatizacija. Hitrejši procesi. — AIS Slovenia',
     headline: C.hero.seoHeadline,
+    /* Only the home page opens with the logo sequence. */
+    intro: C.hero.intro,
     description:
       'AI avtomatizacija za podjetja v Sloveniji. AIS Slovenia iz Ljubljane gradi AI chatbote, voice AI agente in sisteme za hitrejše procese, v slovenščini.',
     keywords: [

@@ -55,21 +55,28 @@ downloaded and initialised WebGL. Everything below follows from that.
 website/
 ├── content/            ← edit here
 │   ├── site.mjs        brand, contact details, navigation, SEO defaults
-│   └── content.mjs     all page copy: hero, services, process, team, FAQ
+│   ├── content.mjs     hero, services, process, team, FAQ
+│   └── showcase.mjs    home-page bands + products, news, events, blog
 ├── src/
 │   ├── styles.css      the design system
 │   ├── layout.mjs      <head>, header, footer, document shell
 │   ├── sections.mjs    section components
+│   ├── showcase.mjs    home-page bands and the newer listing blocks
+│   ├── art.mjs         the brain mark and the capability drawings
+│   ├── decor.mjs       faint background line art
 │   ├── schema.mjs      JSON-LD structured data
 │   └── html.mjs        escaping helpers
 ├── public/             static assets, copied to dist as-is
+│   └── video/          generated clips — see tools/video
+├── tools/video/        clip source + renderer (not part of the build)
 ├── build.mjs           page definitions + generator
 ├── audit.mjs           SEO/GEO checks
 └── vercel.json         deployment config
 ```
 
-**To change wording, edit `content/content.mjs`.** Pages, navigation, sitemap,
-`llms.txt` and structured data all regenerate from it.
+**To change wording, edit `content/content.mjs` or `content/showcase.mjs`.**
+Pages, navigation, sitemap, `llms.txt` and structured data all regenerate
+from them.
 
 ---
 
@@ -77,19 +84,61 @@ website/
 
 | URL | Purpose |
 |---|---|
-| `/` | Home — full narrative, mirrors the original single page |
-| `/storitve/` | Services overview: AVA, LUCY, LILY |
-| `/storitve/ava/` | AVA — operational and administrative agent |
-| `/storitve/lucy/` | LUCY — sales agent |
-| `/storitve/lily/` | LILY — market scout agent |
+| `/` | Home — the full narrative |
+| `/produkti/` | Products — the four SaaS products |
+| `/storitve/` | Services overview: the three areas of automation |
+| `/storitve/avtomatizacija-administracije/` | Administration and operations |
+| `/storitve/avtomatizacija-prodaje/` | Sales and customer communication |
+| `/storitve/spremljanje-trga/` | Market monitoring |
 | `/proces/` | The eight-step delivery process |
+| `/novice/` | News |
+| `/dogodki/` | Events |
+| `/blog/` | Blog |
 | `/o-podjetju/` | About the company |
 | `/ekipa/` | Team |
 | `/pogosta-vprasanja/` | FAQ — ten questions and answers |
 | `/kontakt/` | Contact details and form |
 
-Splitting the original single page into ten URLs means each one can rank for its
-own query instead of one page competing for everything.
+Splitting the original single page into fourteen URLs means each one can rank
+for its own query instead of one page competing for everything.
+
+---
+
+## Reserved slots
+
+Some blocks are waiting on material that does not exist yet. They render as
+reserved slots rather than being hidden, so the layout is already the final
+layout and dropping the real data in is the only remaining step.
+
+| What | Where to edit |
+|---|---|
+| Partner logos and case studies | `caseStudies.partners` in `content/showcase.mjs` — add `logo: '/partners/name.svg'` to a partner to swap the monogram tile for the image |
+| Team photographs | `team.members` in `content/content.mjs`; `teamShowcase.slots` sets how many tiles the band reserves |
+| Blog posts | `blog.items` in `content/showcase.mjs`; empty tiles fill the rest of the grid |
+
+News and events currently hold **sample entries**. Replace them with real ones
+before launch. They deliberately carry no `Article` or `Event` structured data —
+marking up entries that were never published would feed search engines claims
+the business has not made. Add that markup once the copy is real.
+
+---
+
+## The clips in the converge band
+
+The three clips under the hero — a workflow diagram, the code, the finished
+product — are generated, not filmed. The source is one HTML file that exposes
+`renderFrame(t)` as a pure function of time, so a capture is reproducible and
+never lands mid-transition.
+
+```bash
+node tools/video/render.mjs          # all three clips
+node tools/video/render.mjs code     # just one
+```
+
+Frames are captured with headless Chrome and encoded by ffmpeg to mp4 and webm,
+plus a poster frame each — about 690 kB for all nine files. The encoded clips are
+committed, so this only needs re-running when `tools/video/scene.html` changes.
+Requires Chrome (`CHROME_PATH` to override) and `ffmpeg` on the machine.
 
 ---
 
