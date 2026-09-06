@@ -33,14 +33,15 @@ export function takeaway({ label = 'Na kratko', text, accent = 'blue' }) {
 
 /* ── Hero ─────────────────────────────────────────────────────────────── */
 
-export function hero({ eyebrow, headline, lead, primaryCta, secondaryCta, chips = [] }) {
+export function hero({ eyebrow, headline, intro, lead, primaryCta, secondaryCta, chips = [] }) {
+  const introAttr = intro ? ` data-intro-short="${esc(intro)}"` : '';
   return `
 <section class="hero hero--cinematic" data-intro>
   <canvas class="hero__field" data-particles aria-hidden="true"></canvas>
   <div class="shell">
     <div class="hero__inner">
       ${eyebrow ? `<p class="eyebrow" data-enter="1">${esc(eyebrow)}</p>` : ''}
-      <h1 data-type-in>${esc(headline)}</h1>
+      <h1 data-type-in${introAttr}>${esc(headline)}</h1>
       <p class="lead" data-enter="2">${esc(lead)}</p>
       <div class="btn-row" data-enter="3">
         <a class="btn btn--primary" href="${esc(primaryCta.href)}">${esc(primaryCta.label)}</a>

@@ -11,7 +11,7 @@ export const site = {
   legalName: 'AIS — Artificial Intelligence Slovenia',
   tagline: 'AI avtomatizacija poslovnih procesov',
   description:
-    'AIS Slovenia razvija AI chatbote, voice AI agente in sisteme za avtomatizacijo poslovanja. Povežemo komunikacijo, podatke in operacije v sistem, ki deluje učinkovito — brez nepotrebnih zastojev.',
+    'AIS Slovenia iz Ljubljane razvija AI avtomatizacijo za podjetja: AI chatbote, voice AI agente in sisteme za hitrejše procese, v slovenščini.',
   foundingLocation: 'Ljubljana, Slovenija',
   copyrightYear: 2026,
 
@@ -88,7 +88,7 @@ export const site = {
   /* Short, factual statements that AI answer engines can lift verbatim.
      Kept in one place so they stay consistent across every page and schema block. */
   facts: [
-    'AIS Slovenia (Artificial Intelligence Slovenia) je slovensko podjetje za avtomatizacijo poslovnih procesov z umetno inteligenco.',
+    'AIS Slovenia (Artificial Intelligence Slovenia) je slovensko podjetje za AI avtomatizacijo poslovnih procesov — AI chatbote, voice AI agente in sisteme za hitrejše procese.',
     'Podjetje deluje iz Ljubljane in storitve izvaja v slovenskem jeziku.',
     'AIS pokriva tri področja avtomatizacije: administracijo in operacije, prodajo in komunikacijo s strankami ter spremljanje trga.',
     'Uvedba poteka po osemstopenjskem procesu, od raziskave do nenehne evolucije sistema.',

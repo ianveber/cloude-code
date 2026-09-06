@@ -59,14 +59,26 @@
     }
     el.innerHTML =
       escapeHtml(parts[0]) +
-      ' <span class="gradient-text">' +
+      '<br><span class="gradient-text">' +
       escapeHtml(parts.slice(1).join(' ')) +
       '</span>';
   }
 
+  function showTyped(el, text, n) {
+    var typed = text.slice(0, n);
+    var dot = typed.indexOf('.');
+    if (dot !== -1 && n > dot + 1) {
+      el.innerHTML = escapeHtml(typed.slice(0, dot + 1)) + '<br>' + escapeHtml(typed.slice(dot + 1).replace(/^\s+/, ''));
+    } else {
+      el.textContent = typed;
+    }
+  }
+
   /* Character-by-character typewriter for the white homepage intro. */
   function typewriter(el, ms, then) {
-    var text = el.dataset.original || el.textContent;
+    var full = (el.dataset.full || el.textContent || '').trim();
+    var text = (el.getAttribute('data-intro-short') || el.dataset.original || full).trim();
+    el.dataset.full = full;
     el.dataset.original = text;
     el.classList.add('is-typing');
     el.textContent = '';
@@ -87,7 +99,7 @@
     function tick() {
       if (done) return;
       i += 1;
-      el.textContent = text.slice(0, i);
+      showTyped(el, text, i);
       if (i >= text.length) {
         complete();
         return;
@@ -102,6 +114,13 @@
 
     timer = window.setTimeout(tick, 160);
     return complete;
+  }
+
+  function expandHeadline(el) {
+    var full = el.dataset.full;
+    if (!full) return;
+    paintHeadline(el, full);
+    el.classList.add('is-expanded');
   }
 
   ready(function () {
@@ -142,7 +161,9 @@
 
   function openSite(hero) {
     var root = document.documentElement;
+    var headline = hero.querySelector('[data-type-in]');
     root.classList.add('is-intro-out');
+    if (headline) expandHeadline(headline);
     revealHeroRest(hero);
     window.setTimeout(function () {
       root.classList.remove('is-intro');
@@ -180,7 +201,9 @@
       hero.removeEventListener('click', finishIntro);
       if (finishType) finishType();
       else if (headline) {
-        paintHeadline(headline, headline.dataset.original || headline.textContent);
+        var short = headline.getAttribute('data-intro-short') || headline.dataset.original || headline.textContent;
+        if (!headline.dataset.full) headline.dataset.full = headline.textContent.trim();
+        paintHeadline(headline, short);
         headline.classList.remove('is-typing');
         headline.classList.add('is-typed', 'is-struck');
       }
@@ -197,7 +220,7 @@
           if (opened) return;
           window.setTimeout(function () {
             if (!opened) finishIntro();
-          }, 480);
+          }, 720);
         });
       } else {
         finishIntro();
@@ -205,10 +228,18 @@
       return;
     }
 
-    if (headline) typeChars(headline, 0.016, function () {
+    if (headline && headline.getAttribute('data-intro-short')) {
+      headline.dataset.full = headline.textContent.trim();
+      paintHeadline(headline, headline.dataset.full);
+      headline.classList.add('is-typed', 'is-expanded');
       revealHeroRest(hero);
-    });
-    else revealHeroRest(hero);
+    } else if (headline) {
+      typeChars(headline, 0.016, function () {
+        revealHeroRest(hero);
+      });
+    } else {
+      revealHeroRest(hero);
+    }
   }
 
   /* Orbital field: two slow rings plus free dots, nudged by the pointer. */

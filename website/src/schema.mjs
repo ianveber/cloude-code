@@ -106,6 +106,7 @@ function webPageNode(page) {
     '@id': `${url(page.path)}#webpage`,
     url: url(page.path),
     name: page.title,
+    headline: page.headline || page.ogTitle || page.title,
     description: page.description,
     inLanguage: site.lang,
     isPartOf: { '@id': IDS.website },

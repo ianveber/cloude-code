@@ -12,8 +12,11 @@
 
 export const hero = {
   eyebrow: 'AIS — Artificial Intelligence Slovenia',
-  headline: 'AI avtomatizacija. Hitrejši procesi.',
-  lead: 'Komunikacija, podatki in operacije v enem sistemu — brez zastojev.',
+  /* Short pair typed on the white intro. The full headline stays in the
+     <h1> so crawlers and no-JS visitors get the keyword-rich line. */
+  intro: 'AI avtomatizacija. Hitrejši procesi.',
+  headline: 'AI avtomatizacija za podjetja. Hitrejši procesi in manj ročnega dela.',
+  lead: 'AI sistemi za podjetja v Sloveniji: chatboti, voice AI in avtomatizacija procesov — v slovenščini, brez zastojev.',
   primaryCta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
   secondaryCta: { label: 'Poglejte storitve', href: '/storitve/' },
 };

@@ -79,7 +79,8 @@ try {
   var seen = sessionStorage.getItem('ais-intro');
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var skip = /(?:^|[?&])nointro(?:&|=|$)/.test(location.search);
-  if (home && !seen && !reduce && !skip) {
+  var bot = /googlebot|bingbot|slurp|duckduckbot|baiduspider|yandex|sogou|exabot|facebot|ia_archiver|crawler|spider/i.test(navigator.userAgent);
+  if (home && !seen && !reduce && !skip && !bot) {
     document.documentElement.classList.add('is-intro');
   }
 } catch (e) {}

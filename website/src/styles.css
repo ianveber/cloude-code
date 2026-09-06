@@ -1750,9 +1750,29 @@ html.is-intro .site-header {
 }
 
 html.is-intro .hero--cinematic {
+  min-height: 100svh;
   background: #fff;
   background-image: none;
   cursor: pointer;
+}
+
+html.is-intro .hero--cinematic .shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100svh;
+}
+
+html.is-intro .hero--cinematic .hero__inner {
+  width: max-content;
+  max-width: min(92vw, 44rem);
+  text-align: center;
+  margin-inline: auto;
+}
+
+html.is-intro .hero--cinematic h1 {
+  margin: 0;
+  white-space: nowrap;
 }
 
 html.is-intro .hero__field {
@@ -1761,8 +1781,7 @@ html.is-intro .hero__field {
 }
 
 html.is-intro .hero--cinematic [data-enter] {
-  opacity: 0 !important;
-  visibility: hidden;
+  display: none !important;
 }
 
 /* Keep the headline in its final layout box so the site can fade in
@@ -1811,6 +1830,10 @@ html.motion-on .hero__field {
 
 html.is-intro-out .hero__field {
   transform: scale(1);
+}
+
+html.is-intro .hero [data-type-in].is-struck {
+  transform-origin: center center;
 }
 
 .hero [data-type-in].is-struck {
