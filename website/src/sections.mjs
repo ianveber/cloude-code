@@ -15,7 +15,7 @@ import site from '../content/site.mjs';
 export function sectionHead({ eyebrow, title, lead, accent = 'blue', level = 2, id }) {
   const H = `h${level}`;
   return `
-    <div class="section-head">
+    <div class="section-head" data-reveal>
       ${eyebrow ? `<p class="${cls('eyebrow', accentMod('eyebrow', accent))}">${esc(eyebrow)}</p>` : ''}
       <${H}${id ? ` id="${esc(id)}"` : ''}>${esc(title)}</${H}>
       ${lead ? `<p class="lead">${esc(lead)}</p>` : ''}
@@ -39,21 +39,21 @@ export function hero({ eyebrow, headline, lead, primaryCta, secondaryCta, chips 
   <canvas class="hero__field" data-particles aria-hidden="true"></canvas>
   <div class="shell">
     <div class="hero__inner">
-      ${eyebrow ? `<p class="eyebrow">${esc(eyebrow)}</p>` : ''}
-      <h1>${esc(headline)}</h1>
-      <p class="lead">${esc(lead)}</p>
-      <div class="btn-row">
+      ${eyebrow ? `<p class="eyebrow" data-enter="1">${esc(eyebrow)}</p>` : ''}
+      <h1 data-type-in>${esc(headline)}</h1>
+      <p class="lead" data-enter="2">${esc(lead)}</p>
+      <div class="btn-row" data-enter="3">
         <a class="btn btn--primary" href="${esc(primaryCta.href)}">${esc(primaryCta.label)}</a>
         ${secondaryCta ? `<a class="btn btn--secondary" href="${esc(secondaryCta.href)}">${esc(secondaryCta.label)}</a>` : ''}
       </div>
       ${
         chips.length
-          ? `<ul class="hero__facts">
+          ? `<ul class="hero__facts" data-enter="4">
         ${each(chips, (c) => `<li class="${cls('chip', accentMod('chip', c.accent))}">${esc(c.label)}</li>`)}
       </ul>`
           : ''
       }
-      <p class="hero__mark" aria-hidden="true">${esc(site.name)}</p>
+      <p class="hero__mark" aria-hidden="true" data-enter="5">${esc(site.name)}</p>
     </div>
   </div>
 </section>`;
@@ -66,9 +66,9 @@ export function pageHero({ eyebrow, title, lead, accent = 'blue', cta, art = 'la
   <canvas class="hero__field" data-particles aria-hidden="true"></canvas>
   <div class="shell">
     <div class="hero__inner">
-      <p class="${cls('eyebrow', accentMod('eyebrow', accent))}">${esc(eyebrow)}</p>
-      <h1>${esc(title)}</h1>
-      <p class="lead">${esc(lead)}</p>
+      <p class="${cls('eyebrow', accentMod('eyebrow', accent))}" data-enter="1">${esc(eyebrow)}</p>
+      <h1 data-type-in>${esc(title)}</h1>
+      <p class="lead" data-enter="2">${esc(lead)}</p>
       ${
         cta
           ? `<div class="btn-row"><a class="btn btn--primary" href="${esc(cta.href)}">${esc(cta.label)}</a></div>`
@@ -92,8 +92,18 @@ export function statementBand({ line, echo }) {
   </div>
   <div class="shell">
     <p class="statement__echo" aria-hidden="true">${esc(echo ?? line)}</p>
-    <p class="statement__line" id="izjava">${esc(line)}</p>
-    <p class="statement__more">Pokrivamo tri področja — administracijo in operacije, prodajo in komunikacijo s strankami ter spremljanje trga — sisteme pa po osemstopenjskem procesu povežemo z orodji, ki jih podjetje že uporablja.</p>
+    <p class="statement__line" id="izjava" data-type-in>${esc(line)}</p>
+    <p class="statement__more" data-enter>Pokrivamo tri področja — administracijo in operacije, prodajo in komunikacijo s strankami ter spremljanje trga — sisteme pa po osemstopenjskem procesu povežemo z orodji, ki jih podjetje že uporablja.</p>
+    <ul class="bouncers" aria-hidden="true">
+      <li class="bouncer">${serviceGlyph('avtomatizacija-administracije')}</li>
+      <li class="bouncer">${serviceGlyph('avtomatizacija-prodaje')}</li>
+      <li class="bouncer">${DRAWINGS_ORBIT()}</li>
+      <li class="bouncer">${serviceGlyph('spremljanje-trga')}</li>
+      <li class="bouncer">${serviceGlyph('avtomatizacija-administracije')}</li>
+      <li class="bouncer">${DRAWINGS_ORBIT()}</li>
+      <li class="bouncer">${serviceGlyph('avtomatizacija-prodaje')}</li>
+      <li class="bouncer">${serviceGlyph('spremljanje-trga')}</li>
+    </ul>
   </div>
 </section>`;
 }
@@ -125,7 +135,7 @@ export function featureExplorer(services) {
         <a class="explorer__copy" href="/storitve/${esc(s.slug)}/">
           <span class="explorer__kicker">${esc(s.role)}</span>
           <h3>${esc(s.name)}</h3>
-          <p>${esc(s.summary)}</p>
+          <p data-type-chars>${esc(s.summary)}</p>
         </a>
       </li>`
       )}
@@ -179,7 +189,7 @@ export function twinCtaSection(data) {
     ${each(
       data.items,
       (item) => `
-    <article class="${cls('twin__card', accentMod('twin__card', item.accent))}">
+    <article class="${cls('twin__card', accentMod('twin__card', item.accent))}" data-reveal>
       <p class="twin__kicker">${esc(item.kicker)}</p>
       <h2>${esc(item.title)}</h2>
       <p>${esc(item.body)}</p>

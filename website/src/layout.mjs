@@ -68,6 +68,10 @@ function head(page) {
     '<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"></noscript>',
 
     '<link rel="stylesheet" href="/styles.css">',
+    /* Marks the document as script-capable before first paint so entrance
+       animations can start hidden. Without this class the page stays fully
+       visible — that is the no-JS path. */
+    '<script>document.documentElement.classList.add("js")</script>',
     `<link rel="sitemap" type="application/xml" href="/sitemap.xml">`,
 
     `<script type="application/ld+json">${jsonLd(buildGraph(page))}</script>`,
