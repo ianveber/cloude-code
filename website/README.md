@@ -13,13 +13,15 @@ static HTML to `dist/`.
 ## Quick start
 
 ```bash
-cd website
-npm run dev      # build + serve on http://localhost:4321
-npm run build    # build into ./dist
+npm run serve    # from the repo root, or from website/
+                 # builds, then serves on http://localhost:4321
+npm run build    # build into website/dist
 npm run check    # build, then run the SEO/GEO audit
 ```
 
-Node 18 or newer. Nothing to install.
+Node 18 or newer. Nothing to install. If `http://localhost:4321` fails to
+open, use `http://127.0.0.1:4321` — some machines resolve `localhost` to IPv6
+only. The server binds both `0.0.0.0` and `::` so either URL works.
 
 ---
 

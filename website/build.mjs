@@ -662,7 +662,7 @@ async function build() {
 
 /* ── Dev server ───────────────────────────────────────────────────────── */
 
-async function serve(port = 4321) {
+async function serve(port = Number(process.env.PORT) || 4321) {
   const { createServer } = await import('node:http');
   const { readFile: read, stat } = await import('node:fs/promises');
 
@@ -677,9 +677,17 @@ async function serve(port = 4321) {
     '.txt': 'text/plain; charset=utf-8',
   };
 
-  createServer(async (req, res) => {
-    let rel = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-    let file = path.join(DIST, rel);
+  const distRoot = DIST.endsWith(path.sep) ? DIST : DIST + path.sep;
+
+  const handler = async (req, res) => {
+    const raw = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+    const rel = raw.replace(/^\/+/, '');
+    let file = path.resolve(DIST, rel);
+
+    if (file !== DIST && !file.startsWith(distRoot)) {
+      res.writeHead(403).end('Forbidden');
+      return;
+    }
 
     try {
       const info = await stat(file).catch(() => null);
@@ -692,7 +700,35 @@ async function serve(port = 4321) {
       res.writeHead(404, { 'content-type': 'text/html; charset=utf-8' });
       res.end(body);
     }
-  }).listen(port, () => console.log(`Serving ${DIST} on http://localhost:${port}`));
+  };
+
+  const listen = (host, extras = {}) =>
+    new Promise((resolve, reject) => {
+      const server = createServer(handler);
+      server.once('error', reject);
+      server.listen({ port, host, ...extras }, () => resolve(server));
+    });
+
+  const hosts = process.env.HOST
+    ? [process.env.HOST]
+    : ['0.0.0.0', '::'];
+
+  for (const host of hosts) {
+    try {
+      await listen(host, host === '::' ? { ipv6Only: true } : {});
+    } catch (err) {
+      if (host === '::' && !process.env.HOST) continue;
+      console.error(`Could not bind ${host}:${port} — ${err.message}`);
+      if (err.code === 'EADDRINUSE') {
+        console.error(`Port ${port} is already in use. Stop the other process or run PORT=4322 npm run serve`);
+      }
+      process.exit(1);
+    }
+  }
+
+  console.log(`Serving ${DIST}`);
+  console.log(`  http://localhost:${port}`);
+  console.log(`  http://127.0.0.1:${port}`);
 }
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));

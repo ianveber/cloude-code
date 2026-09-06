@@ -1,0 +1,10 @@
+{
+  "name": "cloude-code",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix website",
+    "serve": "npm run serve --prefix website",
+    "build": "npm run build --prefix website",
+    "check": "npm run check --prefix website"
+  }
+}
