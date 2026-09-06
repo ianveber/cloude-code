@@ -1741,7 +1741,6 @@ html.is-intro main > :not(.hero--cinematic) {
 }
 
 html.is-intro .hero--cinematic {
-  min-height: 100svh;
   background: #fff;
   background-image: none;
   cursor: pointer;
@@ -1756,15 +1755,8 @@ html.is-intro .hero--cinematic [data-enter] {
   visibility: hidden;
 }
 
-html.is-intro .hero--cinematic .hero__inner {
-  max-width: 40rem;
-  text-align: center;
-  margin-inline: auto;
-}
-
-html.is-intro .hero--cinematic h1 {
-  margin-top: 0;
-}
+/* Keep the headline in its final layout box so the site can fade in
+   around it. Hidden [data-enter] siblings stay in flow. */
 
 /* Hide the full headline until the typewriter starts — otherwise first
    paint shows the complete sentence, then it vanishes and types again. */
@@ -1796,13 +1788,6 @@ html.motion-on .hero--cinematic {
   transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.9s;
 }
 
-html.motion-on .hero--cinematic .hero__inner {
-  transition: max-width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-html.is-intro-out .hero--cinematic h1 {
-  transition: margin-top 0.9s cubic-bezier(0.22, 1, 0.36, 1);
-}
 
 /* ── Motion (only when JS is present and motion is allowed) ───────────── */
 
