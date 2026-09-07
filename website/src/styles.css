@@ -613,7 +613,17 @@ html.motion-on .hero--brain h1.is-entered .hero__line {
 html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
   transition-delay: 0.11s;
 }
-.hero .lead { margin-top: 1.25rem; max-width: 38rem; }
+.hero .lead,
+.hero__lead {
+  margin-top: 1.25rem;
+  max-width: 38rem;
+}
+
+.hero__lead {
+  font-size: var(--text-lead);
+  color: var(--muted);
+  line-height: 1.62;
+}
 
 .hero__facts {
   display: flex;
@@ -624,101 +634,59 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
   list-style: none;
 }
 
-/* ── The brain mark ───────────────────────────────────────────────────────
-   One SVG, two treatments: an outline for the intro lockup, and a filled face
-   for the top of the extruded block. */
+/* ── Official brand brain ─────────────────────────────────────────────── */
 
-.brain-mark { width: 100%; height: auto; display: block; }
-.brain-mark__body { fill: none; stroke: var(--ink); stroke-width: 4; }
-.brain-mark__spine { color: var(--ink); }
-.brain-mark__circuit { color: var(--ink); }
-.brain-mark__folds { color: var(--blue); }
-.brain-mark__nodes { color: var(--blue); }
-.brain-mark__nodes--circuit { color: var(--ink); }
-
-/* The block face is seen at a steep angle, which flattens contrast — so the
-   mark is drawn harder here than in the flat lockup, not softer. */
-.brain-mark--face .brain-mark__body {
-  fill: #ffffff;
-  stroke: #8ba3c6;
-  stroke-width: 2.6;
-}
-.brain-mark--face .brain-mark__spine { color: #90a4c2; }
-.brain-mark--face .brain-mark__circuit { color: #2f3a4d; }
-.brain-mark--face .brain-mark__nodes--circuit { color: #2f3a4d; }
-.brain-mark--face .brain-mark__folds { color: var(--blue); }
-.brain-mark--face .brain-mark__nodes { color: var(--blue); }
-
-/* ── 3D brain block ───────────────────────────────────────────────────────
-   The block is a stack of copies of the same silhouette, each pushed a little
-   further along Z. Lying back at 58° and turned 30°, the stack reads as a
-   solid extruded object rather than a picture of one. */
-
-.brain3d {
-  perspective: 1500px;
-  perspective-origin: 52% 42%;
+.brand-brain {
   display: grid;
+  min-height: 24rem;
   place-items: center;
-  width: 100%;
+  perspective: 1100px;
 }
 
-.brain3d__rig {
+.brand-brain__rig {
+  --tilt-x: 58deg;
+  --tilt-z: -30deg;
+  --pointer-x: 0deg;
+  --pointer-y: 0deg;
   position: relative;
-  width: min(100%, 31rem);
-  aspect-ratio: 224 / 186;
-  transform-style: preserve-3d;
-  /* Lying back, turned 30°. --tilt/--turn are nudged by the pointer in
-     motion.js. */
+  width: min(21rem, 72vw);
+  aspect-ratio: 1;
   transform:
-    rotateX(calc(52deg + var(--tilt, 0deg)))
-    rotateZ(calc(-30deg + var(--turn, 0deg)))
-    translateZ(0);
-}
-
-.brain3d__block {
-  position: absolute;
-  inset: 0;
+    rotateX(calc(var(--tilt-x) + var(--pointer-y)))
+    rotateZ(calc(var(--tilt-z) + var(--pointer-x)));
   transform-style: preserve-3d;
+  transition: transform 500ms cubic-bezier(.2,.8,.2,1);
 }
 
-.brain3d__slice,
-.brain3d__face {
+.brand-brain__rig > img,
+.brand-brain__edge {
   position: absolute;
   inset: 0;
-  transform: translateZ(calc(var(--i, 0) * var(--slice, 2.1px)));
+  width: 100%;
+  height: 100%;
 }
 
-.brain3d__slice {
-  /* Hue walks blue → violet up the stack; the lowest slices sit in shadow. */
-  color: hsl(calc(214 + var(--i) * 2.6) 88% calc(37% + var(--i) * 1.15%));
-}
-.brain3d__slice svg { width: 100%; height: auto; display: block; }
-
-.brain3d__face {
-  --i: 16;
-  filter: drop-shadow(0 2px 5px rgba(18, 32, 64, 0.28));
+.brand-brain__rig > img {
+  z-index: 2;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 1px rgba(7, 15, 31, .12));
 }
 
-.brain3d__shadow {
+.brand-brain__edge {
+  z-index: 1;
+  background: url('/brand/favicon.png') center / contain no-repeat;
+  filter: saturate(1.1) drop-shadow(0 8px 0 rgba(29, 119, 254, .34));
+  transform: translate3d(0, 8px, -1px);
+}
+
+.brand-brain__shadow {
   position: absolute;
-  left: 8%;
-  right: 8%;
-  bottom: -6%;
-  height: 22%;
+  inset: 20% 9% 2%;
+  z-index: 0;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(24, 48, 104, 0.26), transparent 72%);
-  transform: translateZ(-14px);
-  filter: blur(6px);
-}
-
-html.motion-on .brain3d__rig {
-  animation: brain-float 9s ease-in-out infinite;
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes brain-float {
-  0%, 100% { translate: 0 -0.4%; }
-  50% { translate: 0 1.6%; }
+  background: rgba(10, 21, 43, .18);
+  filter: blur(28px);
+  transform: translate3d(26px, 42px, -20px) rotateX(-58deg);
 }
 
 /* ── Chips ────────────────────────────────────────────────────────────── */
@@ -1768,9 +1736,9 @@ html.motion-on .brain3d__rig {
 
 /* ── Opening sequence ───────────────────────────────────────────────────
    First paint on the home page is a white screen holding only the brain mark.
-   The wordmark then writes itself in beside it, completing the logo, and the
-   site loads in behind. The `is-intro` class is set in <head>, so the full page
-   never flashes first.
+   The mark then crossfades to the official lockup, and the site loads in
+   behind. The `is-intro` class is set in <head>, so the full page never flashes
+   first.
 
    The overlay is its own fixed layer, so nothing in the page below has to be
    re-positioned while it is on screen. */
@@ -1801,13 +1769,12 @@ html.is-intro main {
 html.is-intro .site-header { transform: translateY(-22px); }
 
 html.is-intro .hero__intro {
+  --intro-lockup-width: clamp(10rem, 24vw, 16rem);
   position: fixed;
   inset: 0;
   z-index: 60;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(0.75rem, 1.8vw, 1.5rem);
+  display: grid;
+  place-items: center;
   background: #fff;
   cursor: pointer;
   opacity: 1;
@@ -1815,27 +1782,26 @@ html.is-intro .hero__intro {
   pointer-events: auto;
 }
 
-.hero__logo {
-  display: block;
-  width: clamp(4.25rem, 9vw, 6.75rem);
-  flex: none;
+.hero__intro-brain,
+.hero__intro-lockup {
+  grid-area: 1 / 1;
+  width: var(--intro-lockup-width);
   opacity: 0;
+}
+
+.hero__intro-brain {
+  display: flex;
+  align-items: center;
+  aspect-ratio: 133 / 52;
   transform: scale(0.86);
 }
 
-.hero__introline {
-  font-size: clamp(1.75rem, 1rem + 4vw, 3.75rem);
-  font-weight: 700;
-  letter-spacing: -0.045em;
-  line-height: 1;
-  color: var(--ink);
-  white-space: nowrap;
-  /* Revealed left to right, so the wordmark reads as being written. */
-  clip-path: inset(0 100% 0 0);
-  opacity: 0;
+.hero__intro-brain img {
+  width: 39.1%;
+  height: auto;
 }
 
-html.is-intro .hero__intro.is-logo .hero__logo {
+html.is-intro .hero__intro.is-logo .hero__intro-brain {
   opacity: 1;
   transform: scale(1);
   transition:
@@ -1843,12 +1809,14 @@ html.is-intro .hero__intro.is-logo .hero__logo {
     transform 0.9s cubic-bezier(0.16, 1.25, 0.3, 1);
 }
 
-html.is-intro .hero__intro.is-word .hero__introline {
+html.is-intro .hero__intro.is-word .hero__intro-brain {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+html.is-intro .hero__intro.is-word .hero__intro-lockup {
   opacity: 1;
-  clip-path: inset(0 0 0 0);
-  transition:
-    clip-path 0.72s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.2s linear;
+  transition: opacity 0.45s ease 0.08s;
 }
 
 /* Overlay lifts away; the site is already composed underneath. */
@@ -2800,7 +2768,7 @@ html.motion-on .partners__item {
 @media (max-width: 1024px) {
   .hero__grid { grid-template-columns: 1fr; }
   .hero__art { order: -1; }
-  .brain3d__rig { width: min(78%, 24rem); }
+  .brand-brain { min-height: 20rem; }
   .capitem { grid-template-columns: 1fr; }
   .capitem:nth-child(even) .capitem__copy { order: 0; }
   .ctaband__inner { grid-template-columns: 1fr; }
@@ -2817,5 +2785,4 @@ html.motion-on .partners__item {
   .converge__outro { opacity: 1; }
   .eventitem > article { grid-template-columns: 1fr; }
   .postgrid, .partners, .teamgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .hero__introline { font-size: clamp(1.5rem, 8vw, 2.25rem); }
 }

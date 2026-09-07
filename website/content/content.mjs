@@ -13,8 +13,9 @@
 export const hero = {
   headline: 'AI avtomatizacija. Hitrejši procesi.',
   seoHeadline: 'AI avtomatizacija za podjetja. Hitrejši procesi in manj ročnega dela.',
-  /* Shown during the opening sequence: the brain mark appears alone, then this
-     wordmark completes the logo, then the site loads in behind it. */
+  lead: 'Načrtujemo in gradimo programske sisteme, ki prevzamejo ponavljajoče se delo.',
+  primary: { label: 'Rezervirajte posvet', href: '/kontakt/' },
+  secondary: { label: 'Poglejte izdelke', href: '/produkti/' },
   intro: 'AIS Slovenia',
 };
 

@@ -83,7 +83,7 @@ const closingCta = ctaBand({
 
 function homePage() {
   const body = [
-    brainHero({ headline: C.hero.headline }),
+    brainHero(C.hero),
 
     /* Three screens becoming one product — the story of how work gets built. */
     convergeBand(S.converge),

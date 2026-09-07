@@ -7,16 +7,10 @@
  */
 
 import { esc, each, cls, accentMod } from './html.mjs';
-import { brainMark, brainSlice, capabilityArt } from './art.mjs';
+import { capabilityArt } from './art.mjs';
 import site from '../content/site.mjs';
 
-/** Number of slices used to fake the depth of the extruded brain. */
-const BRAIN_DEPTH = 16;
-
-/* ── Hero ─────────────────────────────────────────────────────────────────
-   White stage, one headline, and the logo brain rebuilt as a solid block lying
-   back at 30°. The block is stacked from copies of the same silhouette, so the
-   "extrusion" is real geometry rather than a picture of one. */
+/* ── Hero ─────────────────────────────────────────────────────────────── */
 
 /**
  * The opening overlay.
@@ -25,35 +19,38 @@ const BRAIN_DEPTH = 16;
  * page below is faded out, and an element inside a faded parent cannot be
  * shown again by any rule of its own.
  */
-export function introOverlay(text) {
+export function introOverlay() {
   return `
 <div class="hero__intro" data-intro-stage aria-hidden="true">
-  <span class="hero__logo">${brainMark(' class="brain-mark"')}</span>
-  <p class="hero__introline">${esc(text)}</p>
+  <span class="hero__intro-brain">
+    <img data-brand-brain src="${esc(site.brand.brain)}" alt=""
+      width="${site.brand.brainWidth}" height="${site.brand.brainHeight}">
+  </span>
+  <img class="hero__intro-lockup" data-brand-lockup
+    src="${esc(site.brand.logo)}" alt=""
+    width="${site.brand.logoWidth}" height="${site.brand.logoHeight}">
 </div>`;
 }
 
-export function brainHero({ headline }) {
-  const slices = Array.from(
-    { length: BRAIN_DEPTH },
-    (_, i) => `<span class="brain3d__slice" style="--i:${i}">${brainSlice()}</span>`
-  ).join('\n        ');
-
+export function brainHero(data) {
   return `
 <section class="hero hero--brain" data-intro>
   <div class="shell hero__grid">
     <div class="hero__copy">
-      <h1 data-type-in>${esc(headline)}</h1>
+      <h1 data-type-in>${esc(data.headline)}</h1>
+      <p class="hero__lead" data-enter="1">${esc(data.lead)}</p>
+      <div class="btn-row" data-enter="2">
+        <a class="btn btn--primary" href="${esc(data.primary.href)}">${esc(data.primary.label)}</a>
+        <a class="btn btn--secondary" href="${esc(data.secondary.href)}">${esc(data.secondary.label)}</a>
+      </div>
     </div>
-
     <div class="hero__art" aria-hidden="true">
-      <div class="brain3d" data-brain>
-        <div class="brain3d__rig">
-          <div class="brain3d__block">
-        ${slices}
-            <span class="brain3d__face">${brainMark(' class="brain-mark brain-mark--face"')}</span>
-          </div>
-          <span class="brain3d__shadow"></span>
+      <div class="brand-brain" data-brain>
+        <div class="brand-brain__rig">
+          <span class="brand-brain__edge"></span>
+          <img data-brand-brain src="${esc(site.brand.brain)}" alt=""
+            width="${site.brand.brainWidth}" height="${site.brand.brainHeight}">
+          <span class="brand-brain__shadow"></span>
         </div>
       </div>
     </div>

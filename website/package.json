@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "node build.mjs",
-    "check": "node build.mjs && node audit.mjs && node render-check.mjs",
+    "check": "node build.mjs && node audit.mjs && node design-audit.mjs && node render-check.mjs",
     "audit": "node audit.mjs",
     "dev": "node build.mjs --serve",
     "serve": "node build.mjs --serve",

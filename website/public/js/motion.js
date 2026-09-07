@@ -138,9 +138,9 @@
   }
 
   /* ── Opening sequence ────────────────────────────────────────────────────
-     Brain mark alone on white, then the wordmark writes itself in beside it,
-     then the site loads in behind. Runs once per session; a click, Escape,
-     Enter or Space jumps straight to the end. */
+     Brain mark alone on white, then a crossfade to the official lockup, then
+     the site loads in behind. Runs once per session; a click, Escape, Enter or
+     Space jumps straight to the end. */
   function introSequence() {
     var root = document.documentElement;
     var stage = document.querySelector('[data-intro-stage]');
@@ -224,11 +224,11 @@
     });
   }
 
-  /* The block leans toward the pointer, within a few degrees. */
+  /* The official mark leans toward the pointer, within a few degrees. */
   function brainTilt() {
     var brain = document.querySelector('[data-brain]');
     if (!brain || !finePointer) return;
-    var rig = brain.querySelector('.brain3d__rig');
+    var rig = brain.querySelector('.brand-brain__rig');
     if (!rig) return;
 
     brain.addEventListener(
@@ -237,15 +237,15 @@
         var rect = brain.getBoundingClientRect();
         var px = (event.clientX - rect.left) / rect.width - 0.5;
         var py = (event.clientY - rect.top) / rect.height - 0.5;
-        rig.style.setProperty('--tilt', (-py * 10).toFixed(2) + 'deg');
-        rig.style.setProperty('--turn', (px * 12).toFixed(2) + 'deg');
+        rig.style.setProperty('--pointer-y', (-py * 3).toFixed(2) + 'deg');
+        rig.style.setProperty('--pointer-x', (px * 3).toFixed(2) + 'deg');
       },
       { passive: true }
     );
 
     brain.addEventListener('pointerleave', function () {
-      rig.style.setProperty('--tilt', '0deg');
-      rig.style.setProperty('--turn', '0deg');
+      rig.style.setProperty('--pointer-y', '0deg');
+      rig.style.setProperty('--pointer-x', '0deg');
     });
   }
 

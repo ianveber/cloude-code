@@ -37,8 +37,12 @@ export const site = {
     /* The original logo is white-on-dark and disappears on a light page.
        logo-light.png is the same mark with the wordmark recoloured to ink. */
     logo: '/brand/logo-light.png',
-    logoWidth: 67,
-    logoHeight: 26,
+    logoWidth: 133,
+    logoHeight: 52,
+    logoDark: '/brand/logo.png',
+    brain: '/brand/favicon.png',
+    brainWidth: 302,
+    brainHeight: 302,
     favicon: '/brand/favicon.png',
     ogImage: '/brand/og-default.png',
   },
