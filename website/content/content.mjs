@@ -16,7 +16,6 @@ export const hero = {
   lead: 'Načrtujemo in gradimo programske sisteme, ki prevzamejo ponavljajoče se delo.',
   primary: { label: 'Rezervirajte posvet', href: '/kontakt/' },
   secondary: { label: 'Poglejte izdelke', href: '/produkti/' },
-  intro: 'AIS Slovenia',
 };
 
 /* One-sentence manifesto, used as the constellation / statement band. */

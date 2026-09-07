@@ -225,7 +225,7 @@ ${head(page)}
 </head>
 <body>
 <a class="skip-link" href="#main">Preskoči na vsebino</a>
-${page.intro ? introOverlay(page.intro) : ''}
+${page.showIntro ? introOverlay() : ''}
 ${header(page)}
 ${breadcrumbs(page)}
 <main id="main">

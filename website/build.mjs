@@ -108,7 +108,7 @@ function homePage() {
     ogTitle: 'AI avtomatizacija. Hitrejši procesi. — AIS Slovenia',
     headline: C.hero.seoHeadline,
     /* Only the home page opens with the logo sequence. */
-    intro: C.hero.intro,
+    showIntro: true,
     description:
       'AI avtomatizacija za podjetja v Sloveniji. AIS Slovenia iz Ljubljane gradi AI chatbote, voice AI agente in sisteme za hitrejše procese, v slovenščini.',
     keywords: [

@@ -39,7 +39,6 @@ export const site = {
     logo: '/brand/logo-light.png',
     logoWidth: 133,
     logoHeight: 52,
-    logoDark: '/brand/logo.png',
     brain: '/brand/favicon.png',
     brainWidth: 302,
     brainHeight: 302,
