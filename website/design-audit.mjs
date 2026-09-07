@@ -66,7 +66,7 @@ for (const [route, html] of Object.entries({
   events: pages.events,
   blog: pages.blog,
 })) {
-  expect(html.includes('class="empty-state"'), `${route} must render one honest empty state.`);
+  expect(/class="[^"]*\bempty-state\b[^"]*"/.test(html), `${route} must render one honest empty state.`);
 }
 
 const order = [
@@ -81,7 +81,7 @@ const order = [
 ];
 let cursor = -1;
 for (const marker of order) {
-  const next = home.indexOf(marker);
+  const next = home.indexOf(marker, cursor + 1);
   expect(next > cursor, `Home marker is missing or out of order: ${marker}`);
   cursor = next;
 }
