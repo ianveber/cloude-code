@@ -16,6 +16,9 @@ const styles = await read('src/styles.css');
 const layout = await read('src/layout.mjs');
 const sections = await read('src/sections.mjs');
 const showcase = await read('src/showcase.mjs');
+const htmlHelpers = await read('src/html.mjs');
+const decorSource = await read('src/decor.mjs');
+const motion = await read('public/js/motion.js');
 const build = await read('build.mjs');
 const content = await read('content/content.mjs');
 const showcaseContent = await read('content/showcase.mjs');
@@ -28,6 +31,7 @@ const pages = {
   blog: await read('dist/blog/index.html'),
 };
 const allHtml = Object.values(pages).join('\n');
+const componentMarkup = `${layout}\n${sections}\n${showcase}`;
 
 expect(!/--violet:|--teal:|--amber:|--rose:/.test(styles), 'Arbitrary accent tokens remain.');
 expect(!/body::after/.test(styles), 'Fixed paper-grain overlay remains.');
@@ -35,9 +39,20 @@ expect(!/radial-gradient\(rgba\(21, 23, 29/.test(styles), 'Site-wide dot grid re
 expect(!/border-radius:\s*999/.test(styles), 'Unbounded pill radius remains outside explicit controls.');
 expect(
   /--blue:\s*#1d77fe;/.test(styles) &&
-    /--space-8:\s*7rem;/.test(styles) &&
     /--control-radius:\s*10px;/.test(styles),
   'The shared colour, spacing, and control-radius tokens are incomplete.'
+);
+const spacingTokens = [...styles.matchAll(/--space-\d+:\s*[^;]+;/g)].map(
+  ([declaration]) => declaration.match(/--space-\d+/)[0]
+);
+const spacingUses = spacingTokens.map(
+  (token) => (styles.match(new RegExp(`var\\(${token}\\)`, 'g')) ?? []).length
+);
+expect(
+  spacingTokens.length >= 5 &&
+    spacingUses.every((count) => count > 0) &&
+    spacingUses.reduce((sum, count) => sum + count, 0) >= 20,
+  'Spacing tokens must be meaningfully adopted; declaration-only tokens remain.'
 );
 expect(/body\s*\{[^}]*background:\s*var\(--paper\);/s.test(styles), 'Body must use the paper token.');
 expect(
@@ -51,10 +66,17 @@ expect(
 expect(/class="nav-toggle__icon"/.test(layout), 'Mobile navigation needs the composed menu icon.');
 expect(/class="faq-item__icon"/.test(sections), 'FAQ disclosures need an explicit affordance.');
 expect(/class="[^"]*\bprocess-overview\b/.test(home), 'Home process overview needs its visual-system class.');
-expect(/\.empty-state__inner\s*\{/.test(styles), 'Empty states need a deliberate composed treatment.');
 expect(
-  !/<span aria-hidden="true">&rarr;<\/span>/.test(`${sections}\n${showcase}`),
+  /class="shell empty-state__shell"[\s\S]*class="empty-state__inner"/.test(showcase),
+  'Empty-state gutters and card composition must use separate elements.'
+);
+expect(
+  !/(?:&(?:rarr|nearr|uarr|#8599|#x2197);|[→↗])/u.test(componentMarkup),
   'Inline links must use the shared CSS arrow instead of literal arrow spans.'
+);
+expect(
+  /\.link::after\s*\{[^}]*content:\s*'↗';/s.test(styles),
+  'Inline links must retain the shared CSS arrow glyph.'
 );
 expect(
   siteConfig.includes(
@@ -67,6 +89,61 @@ expect(
     !/export function caseStudiesBand/.test(showcase) &&
     !/export const caseStudies/.test(showcaseContent),
   'Dormant slider, stats, or case-study exports remain.'
+);
+expect(
+  !/\baccentMod\b/.test(`${htmlHelpers}\n${sections}\n${showcase}`) &&
+    !/--(?:cap|prod|news|ev)-accent/.test(styles),
+  'Dead accent modifiers or custom accent properties remain.'
+);
+expect(
+  !/\b(?:DRAWINGS|decorSprite|drawNetwork|drawBlueprint)\b/.test(decorSource) &&
+    !/export function decor\b/.test(decorSource) &&
+    !/\.decor(?:__|[\s,.{])/.test(styles),
+  'Unreachable decorative drawing infrastructure remains.'
+);
+expect(
+  /--success-ink:\s*#166534;/.test(styles) &&
+    /--success-bg:\s*#f0fdf4;/.test(styles) &&
+    /--error-ink:\s*#991b1b;/.test(styles) &&
+    /--error-bg:\s*#fef2f2;/.test(styles) &&
+    /\.form__status--ok\s*\{[^}]*var\(--success-ink\)[^}]*var\(--success-bg\)/s.test(styles) &&
+    /\.form__status--error\s*\{[^}]*var\(--error-ink\)[^}]*var\(--error-bg\)/s.test(styles),
+  'Form statuses need explicit semantic success and error tokens.'
+);
+expect(
+  /--shadow-base:/.test(styles) &&
+    /--shadow-card:/.test(styles) &&
+    /--shadow-card-hover:/.test(styles) &&
+    /--shadow-popover:/.test(styles) &&
+    !/--shadow-raised/.test(styles),
+  'Base, card, hover, and popover elevations must use distinct shadow tokens.'
+);
+expect(!/section--paper/.test(`${styles}\n${componentMarkup}\n${build}`), 'No-op section--paper remains.');
+expect(
+  /\.nav-dd__panel \.nav-dd__all:hover\s*\{[^}]*var\(--blue-soft\)/s.test(styles),
+  'The dropdown overview link needs a distinct hover state.'
+);
+expect(
+  !/\.gradient-text\b/.test(`${styles}\n${motion}`) &&
+    /\.text-blue\b/.test(styles) &&
+    /hero__line text-blue/.test(motion),
+  'The flat-blue hero class must use an accurate name.'
+);
+expect(/\.btn:disabled\s*\{[^}]*cursor:\s*not-allowed;/s.test(styles), 'Disabled controls need a not-allowed cursor.');
+expect(
+  /\.footer-nav\s*\{[^}]*repeat\(auto-fit,/s.test(styles),
+  'Footer navigation columns must adapt with auto-fit.'
+);
+expect(
+  /\.nav a\s*\{[^}]*min-height:\s*44px;/s.test(styles) &&
+    /\.nav-dd > summary\s*\{[^}]*min-height:\s*44px;/s.test(styles),
+  'Desktop navigation targets must be at least 44px high.'
+);
+expect(
+  /\.process-overview \.card\s*\{[^}]*display:\s*flex;[^}]*flex-direction:\s*column;/s.test(styles) &&
+    /\.process-overview \.card \.link\s*\{[^}]*margin-top:\s*auto;/s.test(styles) &&
+    !/\.process-overview \.card\s*\{[^}]*grid-template-rows:/s.test(styles),
+  'Process overview cards must use an intentional vertical layout with bottom-aligned links.'
 );
 
 expect(
@@ -113,7 +190,8 @@ for (const [route, html] of Object.entries({
   events: pages.events,
   blog: pages.blog,
 })) {
-  expect(/class="[^"]*\bempty-state\b[^"]*"/.test(html), `${route} must render one honest empty state.`);
+  const emptyStates = html.match(/class="[^"]*\bempty-state\b[^"]*"/g) ?? [];
+  expect(emptyStates.length === 1, `${route} must render exactly one honest empty state.`);
 }
 
 const order = [

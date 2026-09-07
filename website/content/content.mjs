@@ -32,14 +32,12 @@ export const twinCta = {
       title: 'Preverimo, ali je avtomatizacija smiselna',
       body: 'Uvodni pogovor. Pregledamo procese in povemo, kje sistem sploh ima smisel.',
       cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
-      accent: 'blue',
     },
     {
       kicker: 'Za raziskovanje',
       title: 'Oglejte si, kako poteka uvedba',
       body: 'Osem korakov, od raziskave do nenehne evolucije. Brez presenečenj na poti.',
       cta: { label: 'Poglejte proces', href: '/proces/' },
-      accent: 'blue',
     },
   ],
 };
@@ -51,10 +49,10 @@ export const optimization = {
   title: 'Kaj nadomestimo',
   lead: 'Vsak sistem, ki ga postavimo, odpravi eno konkretno oviro v vsakodnevnem delu.',
   pairs: [
-    { gain: 'Optimizacija', replaces: 'Stroški', accent: 'blue' },
-    { gain: 'Hitrost', replaces: 'Zamude', accent: 'blue' },
-    { gain: 'Natančnost', replaces: 'Napake', accent: 'blue' },
-    { gain: 'Struktura', replaces: 'Kaos', accent: 'blue' },
+    { gain: 'Optimizacija', replaces: 'Stroški' },
+    { gain: 'Hitrost', replaces: 'Zamude' },
+    { gain: 'Natančnost', replaces: 'Napake' },
+    { gain: 'Struktura', replaces: 'Kaos' },
   ],
 };
 
@@ -68,22 +66,18 @@ export const problems = {
     {
       title: 'Počasni odzivi',
       body: 'Povpraševanja čakajo na prostega človeka, namesto da bi bila obravnavana takoj.',
-      accent: 'blue',
     },
     {
       title: 'Ročni procesi',
       body: 'Prepisovanje podatkov med orodji porabi ure, ki jih nihče ne zaračuna.',
-      accent: 'blue',
     },
     {
       title: 'Ponavljajoče se napake',
       body: 'Iste pomanjkljivosti se vračajo, ker jih lovi človek in ne sistem.',
-      accent: 'blue',
     },
     {
       title: 'Preobremenjene ekipe',
       body: 'Ključni ljudje porabijo dan za administracijo namesto za delo, ki šteje.',
-      accent: 'blue',
     },
   ],
 };
@@ -96,52 +90,44 @@ export const processSteps = [
     id: 'razumevanje',
     title: 'Raziskava',
     body: 'Prvi stik. Razumevanje vaše vizije, izzivov in ambicij.',
-    accent: 'blue',
   },
   {
     number: '02',
     title: 'Diagnostika',
     body: 'Mapiranje vseh poslovnih procesov in identifikacija točk odpadanja.',
-    accent: 'blue',
   },
   {
     number: '03',
     title: 'Potopitev',
     body: 'Globoko razumevanje vaše kulture, tokov in odločitvenih mehanizmov.',
-    accent: 'blue',
   },
   {
     number: '04',
     id: 'nacrtovanje',
     title: 'Arhitektura',
     body: 'Oblikovanje popolnoma personalizirane AI strategije in tehnične arhitekture.',
-    accent: 'blue',
   },
   {
     number: '05',
     id: 'izvedba',
     title: 'Prototip',
     body: 'Funkcionalni demo vašega sistema — taktilna izkušnja pred investicijo.',
-    accent: 'blue',
   },
   {
     number: '06',
     title: 'Kalibracija',
     body: 'Testiranje v realnem času. Kalibracija na vaših podatkih in interakcijah.',
-    accent: 'blue',
   },
   {
     number: '07',
     title: 'Uvedba',
     body: 'Sistem uvedemo v delovno okolje in ekipo pripravimo na uporabo.',
-    accent: 'blue',
   },
   {
     number: '08',
     id: 'izboljsevanje',
     title: 'Evolucija',
     body: 'Po uvedbi spremljamo delovanje, zbiramo povratne informacije in sistem izboljšujemo.',
-    accent: 'blue',
   },
 ];
 
@@ -194,7 +180,6 @@ export const services = [
     role: 'Administracija in operacije',
     summary:
       'Avtomatiziramo administrativne procese, ki danes tečejo ročno. Sistem deluje 24/7 in poskrbi, da operacije tečejo brez napak, zamud in ročnega dela.',
-    accent: 'blue',
     tags: ['Delovanje 24/7', 'Brez ročnega vnosa'],
     metaTitle: 'Avtomatizacija administracije in operacij | AIS Slovenia',
     metaDescription:
@@ -215,7 +200,6 @@ export const services = [
     name: 'Avtomatizacija prodaje',
     role: 'Prodaja in komunikacija',
     summary: 'Na spletni strani komunicira s strankami 24/7 in odgovarja na vprašanja.',
-    accent: 'blue',
     tags: ['Višja konverzija', 'Slovenščina'],
     metaTitle: 'Avtomatizacija prodaje in komunikacije s strankami | AIS Slovenia',
     metaDescription:
@@ -235,7 +219,6 @@ export const services = [
     name: 'Spremljanje trga',
     role: 'Tržna analiza',
     summary: 'Neprestano pregleduje trg in vam dostavlja najboljše priložnosti.',
-    accent: 'blue',
     tags: ['Tržna analiza', 'Dnevni pregled'],
     metaTitle: 'Spremljanje trga in tržna analiza z AI | AIS Slovenia',
     metaDescription:
@@ -263,11 +246,11 @@ export const outcomes = {
     body: 'Sodelujemo s podjetji, kjer ima AI implementacija dejanski poslovni vpliv.',
   },
   items: [
-    { title: 'Hitrejši odzivi', body: 'Povpraševanja in interne zahteve dobijo odgovor takoj.', accent: 'blue' },
-    { title: 'Manj administracije', body: 'Ponavljajoče se naloge prevzame sistem namesto ekipe.', accent: 'blue' },
-    { title: 'Manj napak', body: 'Podatki tečejo po enem pravilu, ne po spominu posameznika.', accent: 'blue' },
-    { title: 'Večja učinkovitost', body: 'Isti ljudje obvladajo večji obseg dela brez dodatnih zaposlitev.', accent: 'blue' },
-    { title: 'Fokus na rast', body: 'Ekipa se vrne k delu, ki dejansko premika podjetje naprej.', accent: 'blue' },
+    { title: 'Hitrejši odzivi', body: 'Povpraševanja in interne zahteve dobijo odgovor takoj.' },
+    { title: 'Manj administracije', body: 'Ponavljajoče se naloge prevzame sistem namesto ekipe.' },
+    { title: 'Manj napak', body: 'Podatki tečejo po enem pravilu, ne po spominu posameznika.' },
+    { title: 'Večja učinkovitost', body: 'Isti ljudje obvladajo večji obseg dela brez dodatnih zaposlitev.' },
+    { title: 'Fokus na rast', body: 'Ekipa se vrne k delu, ki dejansko premika podjetje naprej.' },
   ],
 };
 

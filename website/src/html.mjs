@@ -20,9 +20,6 @@ export const each = (items, fn) => items.map(fn).join('\n');
 /** Build a `class` attribute, skipping falsy entries. */
 export const cls = (...names) => names.filter(Boolean).join(' ');
 
-/** Modifier suffix for accent colours, e.g. accentMod('card', 'violet') → 'card--violet'. */
-export const accentMod = (base, accent) => (accent && accent !== 'blue' ? `${base}--${accent}` : '');
-
 /**
  * Serialise a JSON-LD object for embedding in a <script> tag.
  * `<` is escaped so a stray value can never terminate the script element early.

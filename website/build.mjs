@@ -123,14 +123,12 @@ function servicesIndexPage() {
       eyebrow: C.servicesMeta.eyebrow,
       title: 'AI sistemi za podjetja: administracija, prodaja in trg',
       lead: C.servicesMeta.lead,
-      accent: 'blue',
       cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
     }),
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
     ${takeaway({
-      accent: 'blue',
       label: 'Na kratko',
       text: 'AIS Slovenia pokriva tri področja avtomatizacije. Avtomatizacija administracije prevzame ponavljajoče se operativne naloge, avtomatizacija prodaje na spletni strani odgovarja strankam 24/7, spremljanje trga pa dostavlja relevantne priložnosti. Vsak sistem deluje samostojno, skupaj pa tvorijo celovito rešitev za avtomatizacijo poslovanja.',
     })}
@@ -145,7 +143,6 @@ function servicesIndexPage() {
       eyebrow: 'Primerjava',
       title: 'Katera storitev rešuje kateri problem',
       lead: 'Hiter pregled, če še niste prepričani, kje začeti.',
-      accent: 'blue',
     })}
     ${definitionList(
       C.services.map((s) => ({
@@ -180,13 +177,12 @@ function servicePage(service) {
       eyebrow: service.role,
       title: service.name,
       lead: service.summary,
-      accent: service.accent,
       cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
     }),
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
-    ${takeaway({ accent: service.accent, label: 'Na kratko', text: service.answer })}
+    ${takeaway({ label: 'Na kratko', text: service.answer })}
   </div>
 </section>`,
 
@@ -196,18 +192,16 @@ function servicePage(service) {
       eyebrow: 'Zmožnosti',
       title: 'Kaj sistem prevzame',
       lead: 'Štiri naloge, ki jih sistem prevzame od vaše ekipe.',
-      accent: service.accent,
     })}
-    ${capabilityGrid(service.capabilities, service.accent)}
+    ${capabilityGrid(service.capabilities)}
   </div>
 </section>`,
 
-    `<section class="section section--paper">
+    `<section class="section">
   <div class="shell">
     ${sectionHead({
       eyebrow: 'Podrobnosti',
       title: 'Storitev na kratko',
-      accent: service.accent,
     })}
     ${definitionList([
       { term: 'Področje', definition: service.role },
@@ -254,14 +248,12 @@ function processPage() {
       eyebrow: C.processMeta.eyebrow,
       title: C.processMeta.title,
       lead: C.processMeta.lead,
-      accent: 'blue',
       cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
     }),
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
     ${takeaway({
-      accent: 'blue',
       label: 'Na kratko',
       text: 'Uvedba AI sistema poteka po osmih korakih: raziskava, diagnostika, potopitev, arhitektura, prototip, kalibracija, uvedba in evolucija. Prvi štirje koraki so namenjeni razumevanju in načrtovanju, peti prinese delujoč prototip, zadnji trije pa uvedbo v produkcijo in nenehno izboljševanje.',
     })}
@@ -297,14 +289,12 @@ function aboutPage() {
       eyebrow: 'O podjetju',
       title: 'Problem ni v ekipi. Problem je v sistemu.',
       lead: C.about.lead,
-      accent: 'blue',
       cta: { label: 'Spoznajte ekipo', href: '/ekipa/' },
     }),
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
     ${takeaway({
-      accent: 'blue',
       label: 'O nas',
       text: 'AIS Slovenia (Artificial Intelligence Slovenia) je slovensko podjetje za avtomatizacijo poslovnih procesov z umetno inteligenco. Delujemo iz Ljubljane, storitve izvajamo v slovenskem jeziku, sisteme pa gradimo okoli orodij, ki jih podjetje že uporablja.',
     })}
@@ -337,7 +327,6 @@ function teamPage() {
       eyebrow: C.team.eyebrow,
       title: C.team.title,
       lead: C.team.lead,
-      accent: 'blue',
       cta: { label: 'Kontaktirajte nas', href: '/kontakt/' },
     }),
     teamSection({ ...C.team, eyebrow: 'Ljudje', title: 'Kdo stoji za AIS', lead: '' }),
@@ -364,7 +353,6 @@ function faqPage() {
       eyebrow: C.faq.eyebrow,
       title: C.faq.title,
       lead: C.faq.lead,
-      accent: 'blue',
       cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
     }),
     faqSection({ ...C.faq, eyebrow: 'Odgovori', title: 'Vprašanja in odgovori', lead: '' }, { variant: 'list' }),
@@ -391,7 +379,6 @@ function contactPage() {
       eyebrow: C.contact.eyebrow,
       title: C.contact.title,
       lead: C.contact.lead,
-      accent: 'blue',
     }),
     contactSection({
       ...C.contact,
@@ -455,13 +442,12 @@ function productsPage() {
       eyebrow: S.products.eyebrow,
       title: S.products.title,
       lead: S.products.lead,
-      accent: 'blue',
       cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
     }),
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
-    ${takeaway({ accent: 'blue', label: 'Na kratko', text: S.products.answer })}
+    ${takeaway({ label: 'Na kratko', text: S.products.answer })}
   </div>
 </section>`,
 
@@ -488,12 +474,11 @@ function newsPage() {
       eyebrow: S.news.eyebrow,
       title: S.news.title,
       lead: S.news.lead,
-      accent: 'blue',
     }),
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
-    ${takeaway({ accent: 'blue', label: 'Na kratko', text: S.news.answer })}
+    ${takeaway({ label: 'Na kratko', text: S.news.answer })}
   </div>
 </section>`,
 
@@ -519,12 +504,11 @@ function eventsPage() {
       eyebrow: S.events.eyebrow,
       title: S.events.title,
       lead: S.events.lead,
-      accent: 'blue',
     }),
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
-    ${takeaway({ accent: 'blue', label: 'Na kratko', text: S.events.answer })}
+    ${takeaway({ label: 'Na kratko', text: S.events.answer })}
   </div>
 </section>`,
 
@@ -550,12 +534,11 @@ function blogPage() {
       eyebrow: S.blog.eyebrow,
       title: S.blog.title,
       lead: S.blog.lead,
-      accent: 'blue',
     }),
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
-    ${takeaway({ accent: 'blue', label: 'Na kratko', text: S.blog.answer })}
+    ${takeaway({ label: 'Na kratko', text: S.blog.answer })}
   </div>
 </section>`,
 

@@ -6,7 +6,7 @@
  * to read anything here — the text is complete in the HTML on first response.
  */
 
-import { esc, each, cls, accentMod } from './html.mjs';
+import { esc, each } from './html.mjs';
 import { capabilityArt } from './art.mjs';
 import site from '../content/site.mjs';
 
@@ -61,11 +61,13 @@ export function brainHero(data) {
 export function emptyState({ id, eyebrow, title, body, action }) {
   return `
 <section class="section empty-state" aria-labelledby="${esc(id)}">
-  <div class="shell empty-state__inner">
-    <p class="eyebrow">${esc(eyebrow)}</p>
-    <h2 id="${esc(id)}">${esc(title)}</h2>
-    <p>${esc(body)}</p>
-    <a class="btn btn--secondary" href="${esc(action.href)}">${esc(action.label)}</a>
+  <div class="shell empty-state__shell">
+    <div class="empty-state__inner">
+      <p class="eyebrow">${esc(eyebrow)}</p>
+      <h2 id="${esc(id)}">${esc(title)}</h2>
+      <p>${esc(body)}</p>
+      <a class="btn btn--secondary" href="${esc(action.href)}">${esc(action.label)}</a>
+    </div>
   </div>
 </section>`;
 }
@@ -144,7 +146,7 @@ export function capabilityBand(data) {
     ${each(
       data.items,
       (item, i) => `
-    <article class="${cls('capitem', accentMod('capitem', item.accent))}" id="${esc(item.id)}" data-capitem>
+    <article class="capitem" id="${esc(item.id)}" data-capitem>
       <div class="capitem__copy">
         <span class="capitem__index" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>
         <h3 class="capitem__label">${esc(item.label)}</h3>
@@ -169,7 +171,7 @@ export function teamBand(data, members) {
       </li>`).join('\n');
 
   return `
-<section class="section section--paper team-band" aria-labelledby="ekipa-band">
+<section class="section team-band" aria-labelledby="ekipa-band">
   <div class="shell">
     <div class="section-head" data-reveal>
       <p class="eyebrow">${esc(data.eyebrow)}</p>
@@ -307,7 +309,7 @@ export function productGrid(data) {
       ${each(
         data.items,
         (item) => `
-      <article class="${cls('product', accentMod('product', item.accent))}" data-reveal>
+      <article class="product" data-reveal>
         <p class="product__kicker">${esc(item.kicker)}</p>
         <h3 class="product__name">${esc(item.name)}</h3>
         <p class="product__body">${esc(item.body)}</p>
@@ -315,7 +317,7 @@ export function productGrid(data) {
           ${each(item.points, (p) => `<li>${esc(p)}</li>`)}
         </ul>
         <p class="product__foot">
-          <span class="${cls('chip', accentMod('chip', item.accent))}">${esc(item.status)}</span>
+          <span class="chip">${esc(item.status)}</span>
           <a class="link" href="${esc(item.href)}">Podrobneje</a>
         </p>
       </article>`
@@ -340,7 +342,7 @@ export function newsList(data) {
       ${each(
         data.items,
         (item, i) => `
-      <li class="${cls('newsitem', accentMod('newsitem', item.accent))}" style="--i:${i}">
+      <li class="newsitem" style="--i:${i}">
         <article>
           <p class="newsitem__meta">
             <time datetime="${esc(item.date)}">${esc(item.dateLabel)}</time>
@@ -371,7 +373,7 @@ export function eventList(data) {
       ${each(
         data.items,
         (item, i) => `
-      <li class="${cls('eventitem', accentMod('eventitem', item.accent))}" style="--i:${i}">
+      <li class="eventitem" style="--i:${i}">
         <article>
           <p class="eventitem__when">
             <time datetime="${esc(item.date)}">${esc(item.dateLabel)}</time>
@@ -382,7 +384,7 @@ export function eventList(data) {
             <h3>${esc(item.title)}</h3>
             <p>${esc(item.body)}</p>
             <p class="eventitem__where">
-              <span class="${cls('chip', accentMod('chip', item.accent))}">${esc(item.mode)}</span>
+              <span class="chip">${esc(item.mode)}</span>
               <span>${esc(item.place)}</span>
             </p>
           </div>

@@ -88,7 +88,7 @@
 
     el.innerHTML =
       '<span class="hero__line">' + escapeHtml(parts[0]) + '</span>' +
-      '<span class="hero__line gradient-text">' + escapeHtml(parts.slice(1).join(' ')) + '</span>';
+      '<span class="hero__line text-blue">' + escapeHtml(parts.slice(1).join(' ')) + '</span>';
   }
 
   ready(function () {

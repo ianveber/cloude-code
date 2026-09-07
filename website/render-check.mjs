@@ -2,14 +2,13 @@
  * Rendering check.
  *
  * `audit.mjs` reads the built HTML; this one renders it in a real browser and
- * asserts two layout guarantees that the static audit cannot see:
+ * asserts layout guarantees that the static audit cannot see:
  *
- *   1. No decorative drawing sits behind text at any width. The brief for this
- *      site was explicitly "no overlaying" — the art belongs in the page
- *      margins, and a careless placement change would put it under copy on some
- *      viewport nobody thought to open.
- *   2. Nothing overflows horizontally, which is the usual cause of an
+ *   1. Nothing overflows horizontally, which is the usual cause of an
  *      unexpected sideways scrollbar on mobile.
+ *   2. Empty-state cards preserve the responsive shell gutters.
+ *   3. Process cards keep copy together and links at the bottom.
+ *   4. Keyboard focus remains visible on FAQ and form controls.
  *
  * Needs a Chrome/Chromium binary and `puppeteer-core`. When neither is present
  * it skips rather than fails, so `npm run check` stays usable without them.
@@ -27,11 +26,15 @@ const DIST = fileURLToPath(new URL('./dist/', import.meta.url));
 
 const PATHS = [
   '/',
+  '/produkti/',
   '/storitve/',
   '/storitve/avtomatizacija-administracije/',
   '/storitve/avtomatizacija-prodaje/',
   '/storitve/spremljanje-trga/',
   '/proces/',
+  '/novice/',
+  '/dogodki/',
+  '/blog/',
   '/o-podjetju/',
   '/ekipa/',
   '/pogosta-vprasanja/',
@@ -83,42 +86,83 @@ function serve() {
   return new Promise((resolve) => server.listen(0, () => resolve(server)));
 }
 
-/** Runs in the page. Returns every decorative item whose box hits a text box. */
-function findProblems() {
-  const visible = (el) => {
-    const s = getComputedStyle(el);
-    return s.display !== 'none' && s.visibility !== 'hidden' && parseFloat(s.opacity) > 0;
-  };
-
-  const art = [...document.querySelectorAll('.decor__item')].filter(visible);
-  const text = [...document.querySelectorAll(
-    'h1,h2,h3,h4,h5,p,li,dt,dd,a,button,label,input,textarea,summary,blockquote,figcaption,span.chip'
-  )].filter((el) => el.textContent.trim() || ['INPUT', 'TEXTAREA'].includes(el.tagName));
-
-  const overlaps = [];
-  for (const a of art) {
-    const ar = a.getBoundingClientRect();
-    if (!ar.width || !ar.height) continue;
-    for (const t of text) {
-      const tr = t.getBoundingClientRect();
-      if (!tr.width || !tr.height) continue;
-      const hits = !(ar.right <= tr.left || ar.left >= tr.right || ar.bottom <= tr.top || ar.top >= tr.bottom);
-      if (hits) {
-        overlaps.push({
-          art: a.className.replace(/decor__item ?/g, '').trim(),
-          tag: t.tagName.toLowerCase(),
-          text: t.textContent.trim().slice(0, 48),
-        });
-        break; // one report per drawing is enough to locate it
-      }
-    }
-  }
-
+/** Runs in the page. Returns responsive layout and component-alignment defects. */
+function findProblems(path, width) {
   const overflow = document.documentElement.scrollWidth > window.innerWidth + 1
     ? { scrollWidth: document.documentElement.scrollWidth, innerWidth: window.innerWidth }
     : null;
 
-  return { overlaps, overflow };
+  const components = [];
+  const emptyCard = document.querySelector('.empty-state__inner');
+  if (emptyCard && [390, 768].includes(width)) {
+    const rect = emptyCard.getBoundingClientRect();
+    const expectedGutter = width === 390 ? 20 : 32;
+    const left = rect.left;
+    const right = window.innerWidth - rect.right;
+    if (left < expectedGutter - 1 || right < expectedGutter - 1) {
+      components.push(`empty-state gutters ${left.toFixed(1)}px/${right.toFixed(1)}px; expected ${expectedGutter}px`);
+    }
+  }
+
+  if (path === '/' && width >= 1024) {
+    document.querySelectorAll('.process-overview .card').forEach((card, index) => {
+      const title = card.querySelector('h3');
+      const body = card.querySelector('p');
+      const link = card.querySelector('.link');
+      if (!title || !body || !link) return;
+      const titleGap = body.getBoundingClientRect().top - title.getBoundingClientRect().bottom;
+      const bottomGap = card.getBoundingClientRect().bottom - link.getBoundingClientRect().bottom;
+      if (titleGap > 32 || bottomGap < 12 || bottomGap > 36) {
+        components.push(
+          `process card ${index + 1} alignment title/body=${titleGap.toFixed(1)}px link/bottom=${bottomGap.toFixed(1)}px`
+        );
+      }
+    });
+  }
+
+  return { overflow, components };
+}
+
+async function checkKeyboardFocus(page, base, { path, selector, label, unclipped = false }) {
+  await page.goto(base + path, { waitUntil: 'domcontentloaded' });
+
+  let found = false;
+  for (let i = 0; i < 80; i++) {
+    await page.keyboard.press('Tab');
+    found = await page.evaluate((target) => document.activeElement?.matches(target), selector);
+    if (found) break;
+  }
+  if (!found) return `${label} — keyboard Tab did not reach ${selector}`;
+
+  const state = await page.$eval(
+    selector,
+    (element, mustBeUnclipped) => {
+      const style = getComputedStyle(element);
+      const container = element.closest('.faq-item');
+      return {
+        focusVisible: element.matches(':focus-visible'),
+        outlineWidth: parseFloat(style.outlineWidth),
+        outlineStyle: style.outlineStyle,
+        outlineColor: style.outlineColor,
+        containerOverflow: container ? getComputedStyle(container).overflow : 'visible',
+        mustBeUnclipped,
+      };
+    },
+    unclipped
+  );
+
+  const clearOutline =
+    state.focusVisible &&
+    state.outlineWidth >= 2 &&
+    state.outlineStyle !== 'none' &&
+    state.outlineColor === 'rgb(29, 119, 254)';
+  if (!clearOutline) {
+    return `${label} — focus indicator is not a clear 2px AIS-blue outline (${JSON.stringify(state)})`;
+  }
+  if (state.mustBeUnclipped && ['hidden', 'clip'].includes(state.containerOverflow)) {
+    return `${label} — focus outline is clipped by overflow:${state.containerOverflow}`;
+  }
+  return null;
 }
 
 async function main() {
@@ -162,21 +206,40 @@ async function main() {
 
     for (const path of PATHS) {
       await page.goto(base + path, { waitUntil: 'domcontentloaded' });
-      const { overlaps, overflow } = await page.evaluate(findProblems);
+      const { overflow, components } = await page.evaluate(findProblems, path, width);
       checked++;
 
-      for (const o of overlaps) {
-        errors.push(`${width}px ${path} — okras "${o.art}" leži pod <${o.tag}> "${o.text}"`);
-      }
       if (overflow) {
         errors.push(
           `${width}px ${path} — vodoravno prelivanje (${overflow.scrollWidth}px > ${overflow.innerWidth}px)`
         );
       }
+      for (const component of components) {
+        errors.push(`${width}px ${path} — ${component}`);
+      }
     }
 
     await page.close();
   }
+
+  const focusPage = await browser.newPage();
+  await focusPage.evaluateOnNewDocument(() => {
+    try {
+      sessionStorage.setItem('ais-intro', '1');
+    } catch {
+      /* ignore */
+    }
+  });
+  await focusPage.setViewport({ width: 1024, height: 1000 });
+  for (const check of [
+    { path: '/', selector: '.faq-item > summary', label: 'FAQ summary', unclipped: true },
+    { path: '/kontakt/', selector: '.field input', label: 'Light contact input' },
+    { path: '/', selector: '.ctaform input', label: 'Dark CTA input' },
+  ]) {
+    const error = await checkKeyboardFocus(focusPage, base, check);
+    if (error) errors.push(error);
+  }
+  await focusPage.close();
 
   await browser.close();
   server.close();
@@ -192,7 +255,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log('Brez prekrivanja okrasa in brez vodoravnega prelivanja.\n');
+  console.log('Brez prelivanja ali regresij globalnih komponent.\n');
 }
 
 main().catch((err) => {

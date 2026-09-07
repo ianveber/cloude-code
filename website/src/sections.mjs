@@ -3,29 +3,28 @@
  *
  * Each function returns a self-contained block of static markup. They are
  * composed into pages in build.mjs. No component uses absolute positioning to
- * stack content — colour comes from gradient section backgrounds, card top
- * rules and accent dots, all of which stay in normal flow.
+ * stack content; restrained AIS-blue rules stay in normal flow.
  */
 
-import { esc, each, cls, accentMod } from './html.mjs';
+import { esc, each, cls } from './html.mjs';
 import { serviceGlyph, stageScene } from './decor.mjs';
 import site from '../content/site.mjs';
 
 /** Section heading block: eyebrow + h2 + lead. */
-export function sectionHead({ eyebrow, title, lead, accent = 'blue', level = 2, id }) {
+export function sectionHead({ eyebrow, title, lead, level = 2, id }) {
   const H = `h${level}`;
   return `
     <div class="section-head" data-reveal>
-      ${eyebrow ? `<p class="${cls('eyebrow', accentMod('eyebrow', accent))}">${esc(eyebrow)}</p>` : ''}
+      ${eyebrow ? `<p class="eyebrow">${esc(eyebrow)}</p>` : ''}
       <${H}${id ? ` id="${esc(id)}"` : ''}>${esc(title)}</${H}>
       ${lead ? `<p class="lead">${esc(lead)}</p>` : ''}
     </div>`;
 }
 
 /** Answer-first summary box. Written to be quotable by AI answer engines. */
-export function takeaway({ label = 'Na kratko', text, accent = 'blue' }) {
+export function takeaway({ label = 'Na kratko', text }) {
   return `
-    <div class="${cls('takeaway', accentMod('takeaway', accent))}">
+    <div class="takeaway">
       <p class="takeaway__label">${esc(label)}</p>
       <p>${esc(text)}</p>
     </div>`;
@@ -34,13 +33,13 @@ export function takeaway({ label = 'Na kratko', text, accent = 'blue' }) {
 /* ── Hero ─────────────────────────────────────────────────────────────────
    The home page uses brainHero() from showcase.mjs. This is the quieter
    sub-page variant. */
-export function pageHero({ eyebrow, title, lead, accent = 'blue', cta, art = 'layers' }) {
+export function pageHero({ eyebrow, title, lead, cta }) {
   return `
 <section class="hero hero--page">
   <canvas class="hero__field" data-particles aria-hidden="true"></canvas>
   <div class="shell">
     <div class="hero__inner">
-      <p class="${cls('eyebrow', accentMod('eyebrow', accent))}" data-enter="1">${esc(eyebrow)}</p>
+      <p class="eyebrow" data-enter="1">${esc(eyebrow)}</p>
       <h1 data-type-in>${esc(title)}</h1>
       <p class="lead" data-enter="2">${esc(lead)}</p>
       ${
@@ -81,7 +80,7 @@ export function featureExplorer(services) {
       ${each(
         services,
         (s, i) => `
-      <figure class="${cls('explorer__scene', accentMod('explorer__scene', s.accent), i === 0 ? 'is-active' : '')}" data-explorer-scene="${esc(s.slug)}">
+      <figure class="${cls('explorer__scene', i === 0 ? 'is-active' : '')}" data-explorer-scene="${esc(s.slug)}">
         ${stageScene(s.slug)}
       </figure>`
       )}
@@ -99,11 +98,11 @@ export function twinCtaSection(data) {
     ${each(
       data.items,
       (item) => `
-    <article class="${cls('twin__card', accentMod('twin__card', item.accent))}" data-reveal>
+    <article class="twin__card" data-reveal>
       <p class="twin__kicker">${esc(item.kicker)}</p>
       <h2>${esc(item.title)}</h2>
       <p>${esc(item.body)}</p>
-      <a class="btn ${item.accent === 'blue' ? 'btn--primary' : 'btn--secondary'}" href="${esc(item.cta.href)}">${esc(item.cta.label)}</a>
+      <a class="btn btn--primary" href="${esc(item.cta.href)}">${esc(item.cta.label)}</a>
     </article>`
     )}
   </div>
@@ -121,7 +120,7 @@ export function optimizationSection(data) {
       ${each(
         data.pairs,
         (p) => `
-      <div class="${cls('pair', accentMod('pair', p.accent))}">
+      <div class="pair">
         <p class="pair__gain">${esc(p.gain)}</p>
         <span class="pair__arrow" aria-hidden="true"></span>
         <p class="pair__replaces">${esc(p.replaces)}</p>
@@ -138,12 +137,12 @@ export function problemsSection(data) {
   return `
 <section class="section" aria-labelledby="izzivi">
   <div class="shell">
-    ${sectionHead({ ...data, accent: 'blue', id: 'izzivi' })}
+    ${sectionHead({ ...data, id: 'izzivi' })}
     <div class="grid grid--4">
       ${each(
         data.items,
         (item) => `
-      <article class="${cls('card', accentMod('card', item.accent))}">
+      <article class="card">
         <h3>${esc(item.title)}</h3>
         <p>${esc(item.body)}</p>
       </article>`
@@ -157,9 +156,9 @@ export function problemsSection(data) {
 
 export function processOverview(meta, phases) {
   return `
-<section class="section section--paper process-overview" aria-labelledby="proces-pregled" data-process-overview>
+<section class="section process-overview" aria-labelledby="proces-pregled" data-process-overview>
   <div class="shell">
-    ${sectionHead({ ...meta, accent: 'blue', id: 'proces-pregled' })}
+    ${sectionHead({ ...meta, id: 'proces-pregled' })}
     <ol class="grid grid--4">
       ${each(
         phases,
@@ -178,14 +177,14 @@ export function processOverview(meta, phases) {
 
 export function processSection(meta, steps, { headingLevel = 2, showCta = true } = {}) {
   return `
-<section class="section section--paper" aria-labelledby="proces">
+<section class="section" aria-labelledby="proces">
   <div class="shell">
-    ${sectionHead({ ...meta, accent: 'blue', level: headingLevel, id: 'proces' })}
+    ${sectionHead({ ...meta, level: headingLevel, id: 'proces' })}
     <ol class="steps">
       ${each(
         steps,
         (s) => `
-      <li class="${cls('step', accentMod('step', s.accent))}"${s.id ? ` id="${esc(s.id)}"` : ''}>
+      <li class="step"${s.id ? ` id="${esc(s.id)}"` : ''}>
         <span class="step__num" aria-hidden="true">${esc(s.number)}</span>
         <div>
           <div class="step__head">
@@ -211,18 +210,18 @@ export function servicesSection(meta, services, { linkToDetail = true } = {}) {
   return `
 <section class="section" aria-labelledby="storitve">
   <div class="shell">
-    ${sectionHead({ ...meta, accent: 'blue', id: 'storitve' })}
+    ${sectionHead({ ...meta, id: 'storitve' })}
     <div class="grid grid--3">
       ${each(
         services,
         (s) => `
-      <article class="${cls('svc', accentMod('svc', s.accent))}">
+      <article class="svc">
         <span class="svc__mark" aria-hidden="true">${serviceGlyph(s.slug)}</span>
         <h3 class="svc__name">${esc(s.name)}</h3>
         <p class="svc__role">${esc(s.role)}</p>
         <p class="svc__summary">${esc(s.summary)}</p>
         <ul class="svc__tags">
-          ${each(s.tags, (t) => `<li class="${cls('chip', accentMod('chip', s.accent))}">${esc(t)}</li>`)}
+          ${each(s.tags, (t) => `<li class="chip">${esc(t)}</li>`)}
         </ul>
         ${
           linkToDetail
@@ -244,12 +243,12 @@ export function outcomesSection(data) {
   return `
 <section class="section" aria-labelledby="rezultat">
   <div class="shell">
-    ${sectionHead({ ...data, accent: 'blue', id: 'rezultat' })}
+    ${sectionHead({ ...data, id: 'rezultat' })}
     <div class="grid grid--3">
       ${each(
         data.items,
         (item) => `
-      <article class="${cls('card', accentMod('card', item.accent))}">
+      <article class="card">
         <h3>${esc(item.title)}</h3>
         <p>${esc(item.body)}</p>
       </article>`
@@ -277,7 +276,6 @@ export function aboutSection(data, { headingLevel = 2 } = {}) {
       eyebrow: data.eyebrow,
       title: data.title,
       lead: data.lead,
-      accent: 'blue',
       level: headingLevel,
       id: 'pristop',
     })}
@@ -300,7 +298,7 @@ export function teamSection(data, { headingLevel = 2 } = {}) {
   return `
 <section class="section" aria-labelledby="ekipa">
   <div class="shell">
-    ${sectionHead({ ...data, accent: 'blue', level: headingLevel, id: 'ekipa' })}
+    ${sectionHead({ ...data, level: headingLevel, id: 'ekipa' })}
     <div class="grid grid--3">
       ${each(
         data.members,
@@ -355,13 +353,12 @@ export function faqSection(data, { headingLevel = 2, items, variant = 'disclosur
         );
 
   return `
-<section class="section section--paper" aria-labelledby="pogosta-vprasanja">
+<section class="section" aria-labelledby="pogosta-vprasanja">
   <div class="shell">
     ${sectionHead({
       eyebrow: data.eyebrow,
       title: data.title,
       lead: data.lead,
-      accent: 'blue',
       level: headingLevel,
       id: 'pogosta-vprasanja',
     })}
@@ -498,13 +495,13 @@ export function ctaBand({ title, lead, primary, secondary }) {
 
 /* ── Generic content blocks used by detail pages ──────────────────────── */
 
-export function capabilityGrid(capabilities, accent = 'blue') {
+export function capabilityGrid(capabilities) {
   return `
     <div class="grid grid--2">
       ${each(
         capabilities,
         (c) => `
-      <article class="${cls('card', accentMod('card', accent))}">
+      <article class="card">
         <h3>${esc(c.title)}</h3>
         <p>${esc(c.body)}</p>
       </article>`
