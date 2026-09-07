@@ -185,12 +185,31 @@ function findProblems(path, width) {
     const capabilityItems = [...document.querySelectorAll('.capitem')];
     capabilityItems.forEach((item, index) => {
       const copy = item.querySelector('.capitem__copy').getBoundingClientRect();
-      const art = item.querySelector('.capitem__art').getBoundingClientRect();
+      const artElement = item.querySelector('.capitem__art');
+      const art = artElement.getBoundingClientRect();
       const copyFirst = copy.left < art.left;
       if (copyFirst !== (index % 2 === 0)) {
         components.push(`capability chapter ${index + 1} does not alternate at desktop`);
       }
+      const body = item.querySelector('.capitem__body');
+      const probe = document.createElement('span');
+      probe.style.cssText = `position:absolute;width:1ch;font:${getComputedStyle(body).font}`;
+      document.body.append(probe);
+      const maxCopyCh = parseFloat(getComputedStyle(body).maxWidth) / probe.getBoundingClientRect().width;
+      probe.remove();
+      if (maxCopyCh < 56 || maxCopyCh > 68) {
+        components.push(`capability chapter ${index + 1} copy limit is ${maxCopyCh.toFixed(1)}ch`);
+      }
     });
+
+    const explorerTitle = document.querySelector('#explorer-title')?.textContent.trim();
+    const explorerLead = document.querySelector('.explorer__head .lead')?.textContent.trim();
+    if (
+      explorerTitle !== 'Tri področja. En odgovoren sistem.' ||
+      explorerLead !== 'Vsaka rešitev začne pri konkretnem delu, ki ga ekipa danes opravlja ročno.'
+    ) {
+      components.push('service explorer does not render the approved title and lead');
+    }
 
     const process = document.querySelector('.process-overview ol');
     const phases = process ? [...process.children] : [];
