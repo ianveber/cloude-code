@@ -76,8 +76,7 @@ export const site = {
   ],
 
   footer: {
-    blurb:
-      'Najnaprednejše AI rešitve za digitalno transformacijo vašega poslovanja. Ustvarjamo prihodnost z inteligenco.',
+    blurb: 'Programska oprema in avtomatizacija za delo, ki ne bi smelo ostati ročno.',
     columns: [
       {
         title: 'Podjetje',

@@ -8,7 +8,6 @@
 
 import { esc, join, each, jsonLd, absolute } from './html.mjs';
 import { buildGraph } from './schema.mjs';
-import { decorSprite } from './decor.mjs';
 import { introOverlay } from './showcase.mjs';
 import site from '../content/site.mjs';
 
@@ -111,7 +110,7 @@ function navItem(item, currentPath) {
     <details class="nav-dd">
       <summary${open}>${esc(item.label)}</summary>
       <div class="nav-dd__panel">
-        <a href="${esc(item.href)}">Vse storitve</a>
+        <a class="nav-dd__all" href="${esc(item.href)}">Vse storitve</a>
         ${each(
           item.children,
           (child) => `<a href="${esc(child.href)}"><strong>${esc(child.label)}</strong>${
@@ -138,7 +137,10 @@ function header(page) {
     <a class="btn btn--primary header-cta" href="/kontakt/">Rezervirajte posvet</a>
 
     <details class="nav-toggle">
-      <summary aria-label="Odpri meni">Meni</summary>
+      <summary aria-label="Odpri meni">
+        <span>Meni</span>
+        <span class="nav-toggle__icon" aria-hidden="true"><i></i><i></i></span>
+      </summary>
       <nav class="nav-panel" aria-label="Mobilna navigacija">
         ${each(site.nav, (item) =>
           item.children?.length
@@ -197,19 +199,21 @@ function footer() {
         </a>
         <p>${esc(site.footer.blurb)}</p>
       </div>
-      ${columns}
-      <div>
+      <div class="footer-nav">
+        ${columns}
+      </div>
+      <div class="footer-contact">
         <h4>Kontakt</h4>
         <ul class="footer-links">
           <li><a href="mailto:${esc(site.contact.email)}">${esc(site.contact.email)}</a></li>
           <li><a href="${esc(site.contact.phoneHref)}">${esc(site.contact.phone)}</a></li>
           <li><span>${esc(site.contact.city)}, ${esc(site.contact.country)}</span></li>
         </ul>
+        <p class="footer-legal">${esc(site.legalName)}</p>
       </div>
     </div>
     <div class="footer-bottom">
       <span>&copy; ${site.copyrightYear} ${esc(site.name)}. Vse pravice pridržane.</span>
-      <span>${esc(site.legalName)}</span>
     </div>
   </div>
 </footer>`;
@@ -232,7 +236,6 @@ ${breadcrumbs(page)}
 ${page.body}
 </main>
 ${footer()}
-${decorSprite(page.body)}
 <script src="/js/motion.js" defer></script>
 </body>
 </html>

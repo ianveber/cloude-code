@@ -24,36 +24,6 @@ export const statement = {
   echo: 'AIS Slovenia postavlja AI sisteme za avtomatizacijo poslovnih procesov.',
 };
 
-/* Audience cards for the horizontal use-case slider. */
-export const useCases = {
-  eyebrow: 'Za koga',
-  title: 'Zgrajeno za ekipe, ki jih ročno delo zadržuje',
-  lead: 'Sodelujemo s podjetji, kjer ima AI implementacija dejanski poslovni vpliv — torej tam, kjer se ponavljajoče se naloge še vedno izvajajo ročno.',
-  items: [
-    {
-      title: 'Administracija',
-      kicker: 'Operacije',
-      body: 'Podjetja z veliko administracije, kjer ekipa dnevno prepisuje podatke med orodji.',
-      href: '/storitve/avtomatizacija-administracije/',
-      accent: 'blue',
-    },
-    {
-      title: 'Prodaja',
-      kicker: 'Komunikacija',
-      body: 'Podjetja, ki prejemajo veliko podobnih vprašanj prek spletne strani in jih želijo obravnavati 24/7.',
-      href: '/storitve/avtomatizacija-prodaje/',
-      accent: 'violet',
-    },
-    {
-      title: 'Trg',
-      kicker: 'Priložnosti',
-      body: 'Ekipe, ki priložnosti danes iščejo ročno in jih pogosto opazijo prepozno.',
-      href: '/storitve/spremljanje-trga/',
-      accent: 'teal',
-    },
-  ],
-};
-
 export const twinCta = {
   eyebrow: 'Naslednji korak',
   items: [
@@ -69,7 +39,7 @@ export const twinCta = {
       title: 'Oglejte si, kako poteka uvedba',
       body: 'Osem korakov, od raziskave do nenehne evolucije. Brez presenečenj na poti.',
       cta: { label: 'Poglejte proces', href: '/proces/' },
-      accent: 'violet',
+      accent: 'blue',
     },
   ],
 };
@@ -82,9 +52,9 @@ export const optimization = {
   lead: 'Vsak sistem, ki ga postavimo, odpravi eno konkretno oviro v vsakodnevnem delu.',
   pairs: [
     { gain: 'Optimizacija', replaces: 'Stroški', accent: 'blue' },
-    { gain: 'Hitrost', replaces: 'Zamude', accent: 'violet' },
-    { gain: 'Natančnost', replaces: 'Napake', accent: 'teal' },
-    { gain: 'Struktura', replaces: 'Kaos', accent: 'amber' },
+    { gain: 'Hitrost', replaces: 'Zamude', accent: 'blue' },
+    { gain: 'Natančnost', replaces: 'Napake', accent: 'blue' },
+    { gain: 'Struktura', replaces: 'Kaos', accent: 'blue' },
   ],
 };
 
@@ -98,17 +68,17 @@ export const problems = {
     {
       title: 'Počasni odzivi',
       body: 'Povpraševanja čakajo na prostega človeka, namesto da bi bila obravnavana takoj.',
-      accent: 'rose',
+      accent: 'blue',
     },
     {
       title: 'Ročni procesi',
       body: 'Prepisovanje podatkov med orodji porabi ure, ki jih nihče ne zaračuna.',
-      accent: 'amber',
+      accent: 'blue',
     },
     {
       title: 'Ponavljajoče se napake',
       body: 'Iste pomanjkljivosti se vračajo, ker jih lovi človek in ne sistem.',
-      accent: 'violet',
+      accent: 'blue',
     },
     {
       title: 'Preobremenjene ekipe',
@@ -132,27 +102,27 @@ export const processSteps = [
     number: '02',
     title: 'Diagnostika',
     body: 'Mapiranje vseh poslovnih procesov in identifikacija točk odpadanja.',
-    accent: 'violet',
+    accent: 'blue',
   },
   {
     number: '03',
     title: 'Potopitev',
     body: 'Globoko razumevanje vaše kulture, tokov in odločitvenih mehanizmov.',
-    accent: 'teal',
+    accent: 'blue',
   },
   {
     number: '04',
     id: 'nacrtovanje',
     title: 'Arhitektura',
     body: 'Oblikovanje popolnoma personalizirane AI strategije in tehnične arhitekture.',
-    accent: 'amber',
+    accent: 'blue',
   },
   {
     number: '05',
     id: 'izvedba',
     title: 'Prototip',
     body: 'Funkcionalni demo vašega sistema — taktilna izkušnja pred investicijo.',
-    accent: 'rose',
+    accent: 'blue',
   },
   {
     number: '06',
@@ -164,14 +134,14 @@ export const processSteps = [
     number: '07',
     title: 'Uvedba',
     body: 'Sistem uvedemo v delovno okolje in ekipo pripravimo na uporabo.',
-    accent: 'violet',
+    accent: 'blue',
   },
   {
     number: '08',
     id: 'izboljsevanje',
     title: 'Evolucija',
     body: 'Po uvedbi spremljamo delovanje, zbiramo povratne informacije in sistem izboljšujemo.',
-    accent: 'teal',
+    accent: 'blue',
   },
 ];
 
@@ -245,7 +215,7 @@ export const services = [
     name: 'Avtomatizacija prodaje',
     role: 'Prodaja in komunikacija',
     summary: 'Na spletni strani komunicira s strankami 24/7 in odgovarja na vprašanja.',
-    accent: 'violet',
+    accent: 'blue',
     tags: ['Višja konverzija', 'Slovenščina'],
     metaTitle: 'Avtomatizacija prodaje in komunikacije s strankami | AIS Slovenia',
     metaDescription:
@@ -265,7 +235,7 @@ export const services = [
     name: 'Spremljanje trga',
     role: 'Tržna analiza',
     summary: 'Neprestano pregleduje trg in vam dostavlja najboljše priložnosti.',
-    accent: 'teal',
+    accent: 'blue',
     tags: ['Tržna analiza', 'Dnevni pregled'],
     metaTitle: 'Spremljanje trga in tržna analiza z AI | AIS Slovenia',
     metaDescription:
@@ -294,10 +264,10 @@ export const outcomes = {
   },
   items: [
     { title: 'Hitrejši odzivi', body: 'Povpraševanja in interne zahteve dobijo odgovor takoj.', accent: 'blue' },
-    { title: 'Manj administracije', body: 'Ponavljajoče se naloge prevzame sistem namesto ekipe.', accent: 'violet' },
-    { title: 'Manj napak', body: 'Podatki tečejo po enem pravilu, ne po spominu posameznika.', accent: 'teal' },
-    { title: 'Večja učinkovitost', body: 'Isti ljudje obvladajo večji obseg dela brez dodatnih zaposlitev.', accent: 'amber' },
-    { title: 'Fokus na rast', body: 'Ekipa se vrne k delu, ki dejansko premika podjetje naprej.', accent: 'rose' },
+    { title: 'Manj administracije', body: 'Ponavljajoče se naloge prevzame sistem namesto ekipe.', accent: 'blue' },
+    { title: 'Manj napak', body: 'Podatki tečejo po enem pravilu, ne po spominu posameznika.', accent: 'blue' },
+    { title: 'Večja učinkovitost', body: 'Isti ljudje obvladajo večji obseg dela brez dodatnih zaposlitev.', accent: 'blue' },
+    { title: 'Fokus na rast', body: 'Ekipa se vrne k delu, ki dejansko premika podjetje naprej.', accent: 'blue' },
   ],
 };
 

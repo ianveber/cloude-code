@@ -8,7 +8,7 @@
  */
 
 import { esc, each, cls, accentMod } from './html.mjs';
-import { decor, serviceGlyph, stageScene } from './decor.mjs';
+import { serviceGlyph, stageScene } from './decor.mjs';
 import site from '../content/site.mjs';
 
 /** Section heading block: eyebrow + h2 + lead. */
@@ -59,7 +59,7 @@ export function featureExplorer(services) {
   return `
 <section class="explorer" id="storitve" aria-labelledby="explorer-title" data-services>
   <div class="shell explorer__head">
-    <p class="eyebrow eyebrow--violet">Storitve</p>
+    <p class="eyebrow">Storitve</p>
     <h2 id="explorer-title">Tri področja, en sistem</h2>
     <p class="lead">Vsako področje ima svoj oder. Skupaj pokrivajo administracijo, prodajo in trg.</p>
   </div>
@@ -90,33 +90,6 @@ export function featureExplorer(services) {
 </section>`;
 }
 
-/* ── Use-case slider ──────────────────────────────────────────────────── */
-
-export function useCaseSlider(data) {
-  return `
-<section class="usecases" aria-labelledby="usecases-title">
-  <div class="shell usecases__top">
-    ${sectionHead({ ...data, accent: 'teal', id: 'usecases-title' })}
-    <div class="usecases__nav" hidden>
-      <button type="button" class="usecases__btn" data-slide="-1" aria-label="Prejšnji primer">‹</button>
-      <button type="button" class="usecases__btn" data-slide="1" aria-label="Naslednji primer">›</button>
-    </div>
-  </div>
-  <div class="usecases__track" data-slider>
-    ${each(
-      data.items,
-      (item) => `
-    <article class="${cls('usecase', accentMod('usecase', item.accent))}">
-      <p class="usecase__kicker">${esc(item.kicker)}</p>
-      <h3>${esc(item.title)}</h3>
-      <p>${esc(item.body)}</p>
-      <a class="link" href="${esc(item.href)}">Odpri storitev <span aria-hidden="true">&rarr;</span></a>
-    </article>`
-    )}
-  </div>
-</section>`;
-}
-
 /* ── Twin CTA cards ───────────────────────────────────────────────────── */
 
 export function twinCtaSection(data) {
@@ -141,8 +114,7 @@ export function twinCtaSection(data) {
 
 export function optimizationSection(data) {
   return `
-<section class="section section--tint-blue" aria-labelledby="optimizacija">
-${decor([{ art: 'gears', place: 'right', size: 'lg', accent: 'blue' }])}
+<section class="section" aria-labelledby="optimizacija">
   <div class="shell">
     ${sectionHead({ ...data, id: 'optimizacija' })}
     <div class="grid grid--4">
@@ -165,9 +137,8 @@ ${decor([{ art: 'gears', place: 'right', size: 'lg', accent: 'blue' }])}
 export function problemsSection(data) {
   return `
 <section class="section" aria-labelledby="izzivi">
-${decor([{ art: 'clock', place: 'left-low', size: 'lg', accent: 'amber' }])}
   <div class="shell">
-    ${sectionHead({ ...data, accent: 'amber', id: 'izzivi' })}
+    ${sectionHead({ ...data, accent: 'blue', id: 'izzivi' })}
     <div class="grid grid--4">
       ${each(
         data.items,
@@ -186,9 +157,9 @@ ${decor([{ art: 'clock', place: 'left-low', size: 'lg', accent: 'amber' }])}
 
 export function processOverview(meta, phases) {
   return `
-<section class="section section--paper" aria-labelledby="proces-pregled" data-process-overview>
+<section class="section section--paper process-overview" aria-labelledby="proces-pregled" data-process-overview>
   <div class="shell">
-    ${sectionHead({ ...meta, accent: 'teal', id: 'proces-pregled' })}
+    ${sectionHead({ ...meta, accent: 'blue', id: 'proces-pregled' })}
     <ol class="grid grid--4">
       ${each(
         phases,
@@ -197,7 +168,7 @@ export function processOverview(meta, phases) {
         <span class="step__num" aria-hidden="true">${esc(phase.number)}</span>
         <h3>${esc(phase.title)}</h3>
         <p>${esc(phase.body)}</p>
-        <a class="link" href="${esc(phase.href)}">Podrobneje <span aria-hidden="true">&rarr;</span></a>
+        <a class="link" href="${esc(phase.href)}">Podrobneje</a>
       </li>`
       )}
     </ol>
@@ -208,9 +179,8 @@ export function processOverview(meta, phases) {
 export function processSection(meta, steps, { headingLevel = 2, showCta = true } = {}) {
   return `
 <section class="section section--paper" aria-labelledby="proces">
-${decor([{ art: 'path', place: 'right-top', size: 'lg', accent: 'teal' }])}
   <div class="shell">
-    ${sectionHead({ ...meta, accent: 'teal', level: headingLevel, id: 'proces' })}
+    ${sectionHead({ ...meta, accent: 'blue', level: headingLevel, id: 'proces' })}
     <ol class="steps">
       ${each(
         steps,
@@ -239,10 +209,9 @@ ${decor([{ art: 'path', place: 'right-top', size: 'lg', accent: 'teal' }])}
 
 export function servicesSection(meta, services, { linkToDetail = true } = {}) {
   return `
-<section class="section section--tint-violet" aria-labelledby="storitve">
-${decor([{ art: 'talk', place: 'right', size: 'lg', accent: 'violet' }])}
+<section class="section" aria-labelledby="storitve">
   <div class="shell">
-    ${sectionHead({ ...meta, accent: 'violet', id: 'storitve' })}
+    ${sectionHead({ ...meta, accent: 'blue', id: 'storitve' })}
     <div class="grid grid--3">
       ${each(
         services,
@@ -258,7 +227,7 @@ ${decor([{ art: 'talk', place: 'right', size: 'lg', accent: 'violet' }])}
         ${
           linkToDetail
             ? `<div class="svc__foot">
-          <a class="${cls('link', s.accent !== 'blue' ? `link--${s.accent}` : '')}" href="/storitve/${esc(s.slug)}/">Več o storitvi <span aria-hidden="true">&rarr;</span></a>
+          <a class="link" href="/storitve/${esc(s.slug)}/">Več o storitvi</a>
         </div>`
             : ''
         }
@@ -274,9 +243,8 @@ ${decor([{ art: 'talk', place: 'right', size: 'lg', accent: 'violet' }])}
 export function outcomesSection(data) {
   return `
 <section class="section" aria-labelledby="rezultat">
-${decor([{ art: 'chart', place: 'right', size: 'lg', accent: 'teal' }])}
   <div class="shell">
-    ${sectionHead({ ...data, accent: 'teal', id: 'rezultat' })}
+    ${sectionHead({ ...data, accent: 'blue', id: 'rezultat' })}
     <div class="grid grid--3">
       ${each(
         data.items,
@@ -299,40 +267,17 @@ ${decor([{ art: 'chart', place: 'right', size: 'lg', accent: 'teal' }])}
 </section>`;
 }
 
-/* ── Stats ────────────────────────────────────────────────────────────── */
-
-export function statsSection(stats) {
-  return `
-<section class="section section--paper" aria-label="Ključne številke">
-${decor([{ art: 'layers', place: 'left-low', size: 'md', accent: 'blue' }])}
-  <div class="shell">
-    <ul class="stats">
-      ${each(
-        stats,
-        (s) => `
-      <li class="${cls('stat', accentMod('stat', s.accent))}">
-        <p class="stat__value">${esc(s.value)}</p>
-        <p class="stat__label">${esc(s.label)}</p>
-        <p class="stat__note">${esc(s.note)}</p>
-      </li>`
-      )}
-    </ul>
-  </div>
-</section>`;
-}
-
 /* ── About ────────────────────────────────────────────────────────────── */
 
 export function aboutSection(data, { headingLevel = 2 } = {}) {
   return `
-<section class="section section--tint-violet" aria-labelledby="pristop">
-${decor([{ art: 'flow', place: 'right', size: 'xl', accent: 'violet' }])}
+<section class="section" aria-labelledby="pristop">
   <div class="shell">
     ${sectionHead({
       eyebrow: data.eyebrow,
       title: data.title,
       lead: data.lead,
-      accent: 'violet',
+      accent: 'blue',
       level: headingLevel,
       id: 'pristop',
     })}
@@ -354,9 +299,8 @@ ${decor([{ art: 'flow', place: 'right', size: 'xl', accent: 'violet' }])}
 export function teamSection(data, { headingLevel = 2 } = {}) {
   return `
 <section class="section" aria-labelledby="ekipa">
-${decor([{ art: 'network', place: 'right-top', size: 'lg', accent: 'amber' }])}
   <div class="shell">
-    ${sectionHead({ ...data, accent: 'amber', level: headingLevel, id: 'ekipa' })}
+    ${sectionHead({ ...data, accent: 'blue', level: headingLevel, id: 'ekipa' })}
     <div class="grid grid--3">
       ${each(
         data.members,
@@ -405,20 +349,19 @@ export function faqSection(data, { headingLevel = 2, items, variant = 'disclosur
           list,
           (item) => `
       <details class="faq-item" open>
-        <summary>${esc(item.q)}</summary>
+        <summary>${esc(item.q)}<span class="faq-item__icon" aria-hidden="true"></span></summary>
         <div class="faq-item__answer"><p>${esc(item.a)}</p></div>
       </details>`
         );
 
   return `
 <section class="section section--paper" aria-labelledby="pogosta-vprasanja">
-${decor([{ art: 'docs', place: 'right', size: 'lg', accent: 'teal' }])}
   <div class="shell">
     ${sectionHead({
       eyebrow: data.eyebrow,
       title: data.title,
       lead: data.lead,
-      accent: 'teal',
+      accent: 'blue',
       level: headingLevel,
       id: 'pogosta-vprasanja',
     })}
@@ -450,7 +393,6 @@ function field(f) {
 export function contactSection(data, { headingLevel = 2 } = {}) {
   return `
 <section class="section" aria-labelledby="kontakt">
-${decor([{ art: 'talk', place: 'left-low', size: 'lg', accent: 'blue' }])}
   <div class="shell">
     ${sectionHead({ ...data, level: headingLevel, id: 'kontakt' })}
     <div class="contact-grid">
@@ -543,7 +485,6 @@ function formScript() {
 export function ctaBand({ title, lead, primary, secondary }) {
   return `
 <section class="cta-band">
-${decor([{ art: 'orbit', place: 'left-low', size: 'lg', accent: 'blue' }, { art: 'gears', place: 'right-top', size: 'md', accent: 'violet' }])}
   <div class="shell cta-band__inner">
     <h2>${esc(title)}</h2>
     <p class="lead">${esc(lead)}</p>

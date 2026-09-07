@@ -44,15 +44,6 @@ export const converge = {
   outro: 'Trije koraki, en sistem.',
 };
 
-/* ── Case studies / partners ──────────────────────────────────────────── */
-
-export const caseStudies = {
-  eyebrow: 'Reference',
-  title: 'Izbrana sodelovanja',
-  lead: 'Reference objavimo, ko so potrjene za javno predstavitev.',
-  partners: [],
-};
-
 /* ── Black capability band ────────────────────────────────────────────────
    The lead line is revealed word by word as the section scrolls, so the
    sentence reads as if it is still being written. The text is complete in the
@@ -75,21 +66,21 @@ export const capabilities = {
       art: 'flow',
       label: 'Avtomatizacija',
       body: 'Diagram poteka, ki teče sam. Sprožilci, pravila in izjeme na enem mestu.',
-      accent: 'violet',
+      accent: 'blue',
     },
     {
       id: 'varnost',
       art: 'shield',
       label: 'Kibernetska varnost',
       body: 'Nadzor dostopa, revizijska sled in šifrirani podatki. Varnost na poslovni ravni.',
-      accent: 'teal',
+      accent: 'blue',
     },
     {
       id: 'aplikacije',
       art: 'app',
       label: 'Aplikacije po meri',
       body: 'Ena aplikacija za en proces. Brez odvečnih funkcij, ki jih nihče ne uporablja.',
-      accent: 'amber',
+      accent: 'blue',
     },
   ],
 };

@@ -14,8 +14,11 @@ const home = await read('dist/index.html');
 const art = await read('src/art.mjs');
 const styles = await read('src/styles.css');
 const layout = await read('src/layout.mjs');
+const sections = await read('src/sections.mjs');
+const showcase = await read('src/showcase.mjs');
 const build = await read('build.mjs');
 const content = await read('content/content.mjs');
+const showcaseContent = await read('content/showcase.mjs');
 const siteConfig = await read('content/site.mjs');
 const pages = {
   home,
@@ -25,6 +28,46 @@ const pages = {
   blog: await read('dist/blog/index.html'),
 };
 const allHtml = Object.values(pages).join('\n');
+
+expect(!/--violet:|--teal:|--amber:|--rose:/.test(styles), 'Arbitrary accent tokens remain.');
+expect(!/body::after/.test(styles), 'Fixed paper-grain overlay remains.');
+expect(!/radial-gradient\(rgba\(21, 23, 29/.test(styles), 'Site-wide dot grid remains.');
+expect(!/border-radius:\s*999/.test(styles), 'Unbounded pill radius remains outside explicit controls.');
+expect(
+  /--blue:\s*#1d77fe;/.test(styles) &&
+    /--space-8:\s*7rem;/.test(styles) &&
+    /--control-radius:\s*10px;/.test(styles),
+  'The shared colour, spacing, and control-radius tokens are incomplete.'
+);
+expect(/body\s*\{[^}]*background:\s*var\(--paper\);/s.test(styles), 'Body must use the paper token.');
+expect(
+  !/var\(--(?:violet|teal|amber|rose)(?:-wash)?\)/.test(styles),
+  'Legacy accent references remain in the stylesheet.'
+);
+expect(
+  !/accent:\s*'(?!blue)[^']+'/.test([content, showcaseContent, sections, build].join('\n')),
+  'Content or section accents still diverge from AIS blue.'
+);
+expect(/class="nav-toggle__icon"/.test(layout), 'Mobile navigation needs the composed menu icon.');
+expect(/class="faq-item__icon"/.test(sections), 'FAQ disclosures need an explicit affordance.');
+expect(/class="[^"]*\bprocess-overview\b/.test(home), 'Home process overview needs its visual-system class.');
+expect(/\.empty-state__inner\s*\{/.test(styles), 'Empty states need a deliberate composed treatment.');
+expect(
+  !/<span aria-hidden="true">&rarr;<\/span>/.test(`${sections}\n${showcase}`),
+  'Inline links must use the shared CSS arrow instead of literal arrow spans.'
+);
+expect(
+  siteConfig.includes(
+    "blurb: 'Programska oprema in avtomatizacija za delo, ki ne bi smelo ostati ročno.'"
+  ),
+  'Footer must use the approved factual brand statement.'
+);
+expect(
+  !/export function (?:useCaseSlider|statsSection)/.test(sections) &&
+    !/export function caseStudiesBand/.test(showcase) &&
+    !/export const caseStudies/.test(showcaseContent),
+  'Dormant slider, stats, or case-study exports remain.'
+);
 
 expect(
   /data-brand-brain[^>]+src="\/brand\/favicon\.png"/.test(home),

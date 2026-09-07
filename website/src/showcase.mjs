@@ -120,36 +120,6 @@ export function convergeBand(data) {
 </section>`;
 }
 
-/* ── Case studies / partners ──────────────────────────────────────────── */
-
-export function caseStudiesBand(data) {
-  const partners = data.partners.filter((partner) => partner.logo);
-  if (partners.length === 0) return '';
-
-  const tiles = each(
-    partners,
-    (p, i) => `
-      <li class="partners__item" style="--i:${i}">
-        <img class="partners__logo" src="${esc(p.logo)}" alt="${esc(p.name)}" loading="lazy" width="150" height="48">
-      </li>`
-  );
-
-  return `
-<section class="section cases" aria-labelledby="reference">
-  <div class="shell">
-    <div class="section-head" data-reveal>
-      <p class="eyebrow eyebrow--violet">${esc(data.eyebrow)}</p>
-      <h2 id="reference">${esc(data.title)}</h2>
-      <p class="lead">${esc(data.lead)}</p>
-    </div>
-
-    <ul class="partners" data-marquee>
-      ${tiles}
-    </ul>
-  </div>
-</section>`;
-}
-
 /* ── Capability band ──────────────────────────────────────────────────────
    Dark band. The opening sentence is split into words that brighten as the
    section scrolls, so it reads as though it is still being written. Splitting
@@ -202,7 +172,7 @@ export function teamBand(data, members) {
 <section class="section section--paper team-band" aria-labelledby="ekipa-band">
   <div class="shell">
     <div class="section-head" data-reveal>
-      <p class="eyebrow eyebrow--teal">${esc(data.eyebrow)}</p>
+      <p class="eyebrow">${esc(data.eyebrow)}</p>
       <h2 id="ekipa-band">${esc(data.title)}</h2>
       <p class="lead">${esc(data.lead)}</p>
     </div>
@@ -291,7 +261,7 @@ export function blogTeaser(data) {
 <section class="section blog-band" aria-labelledby="blog-band">
   <div class="shell">
     <div class="section-head" data-reveal>
-      <p class="eyebrow eyebrow--amber">${esc(data.eyebrow)}</p>
+      <p class="eyebrow">${esc(data.eyebrow)}</p>
       <h2 id="blog-band">${esc(data.homeTitle)}</h2>
       <p class="lead">${esc(data.homeLead)}</p>
     </div>
@@ -346,7 +316,7 @@ export function productGrid(data) {
         </ul>
         <p class="product__foot">
           <span class="${cls('chip', accentMod('chip', item.accent))}">${esc(item.status)}</span>
-          <a class="${cls('link', item.accent !== 'blue' ? `link--${item.accent}` : '')}" href="${esc(item.href)}">Podrobneje <span aria-hidden="true">&rarr;</span></a>
+          <a class="link" href="${esc(item.href)}">Podrobneje</a>
         </p>
       </article>`
       )}

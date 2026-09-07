@@ -123,14 +123,14 @@ function servicesIndexPage() {
       eyebrow: C.servicesMeta.eyebrow,
       title: 'AI sistemi za podjetja: administracija, prodaja in trg',
       lead: C.servicesMeta.lead,
-      accent: 'violet',
+      accent: 'blue',
       cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
     }),
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
     ${takeaway({
-      accent: 'violet',
+      accent: 'blue',
       label: 'Na kratko',
       text: 'AIS Slovenia pokriva tri področja avtomatizacije. Avtomatizacija administracije prevzame ponavljajoče se operativne naloge, avtomatizacija prodaje na spletni strani odgovarja strankam 24/7, spremljanje trga pa dostavlja relevantne priložnosti. Vsak sistem deluje samostojno, skupaj pa tvorijo celovito rešitev za avtomatizacijo poslovanja.',
     })}
@@ -145,7 +145,7 @@ function servicesIndexPage() {
       eyebrow: 'Primerjava',
       title: 'Katera storitev rešuje kateri problem',
       lead: 'Hiter pregled, če še niste prepričani, kje začeti.',
-      accent: 'teal',
+      accent: 'blue',
     })}
     ${definitionList(
       C.services.map((s) => ({
@@ -254,14 +254,14 @@ function processPage() {
       eyebrow: C.processMeta.eyebrow,
       title: C.processMeta.title,
       lead: C.processMeta.lead,
-      accent: 'teal',
+      accent: 'blue',
       cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
     }),
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
     ${takeaway({
-      accent: 'teal',
+      accent: 'blue',
       label: 'Na kratko',
       text: 'Uvedba AI sistema poteka po osmih korakih: raziskava, diagnostika, potopitev, arhitektura, prototip, kalibracija, uvedba in evolucija. Prvi štirje koraki so namenjeni razumevanju in načrtovanju, peti prinese delujoč prototip, zadnji trije pa uvedbo v produkcijo in nenehno izboljševanje.',
     })}
@@ -297,14 +297,14 @@ function aboutPage() {
       eyebrow: 'O podjetju',
       title: 'Problem ni v ekipi. Problem je v sistemu.',
       lead: C.about.lead,
-      accent: 'violet',
+      accent: 'blue',
       cta: { label: 'Spoznajte ekipo', href: '/ekipa/' },
     }),
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
     ${takeaway({
-      accent: 'violet',
+      accent: 'blue',
       label: 'O nas',
       text: 'AIS Slovenia (Artificial Intelligence Slovenia) je slovensko podjetje za avtomatizacijo poslovnih procesov z umetno inteligenco. Delujemo iz Ljubljane, storitve izvajamo v slovenskem jeziku, sisteme pa gradimo okoli orodij, ki jih podjetje že uporablja.',
     })}
@@ -337,7 +337,7 @@ function teamPage() {
       eyebrow: C.team.eyebrow,
       title: C.team.title,
       lead: C.team.lead,
-      accent: 'amber',
+      accent: 'blue',
       cta: { label: 'Kontaktirajte nas', href: '/kontakt/' },
     }),
     teamSection({ ...C.team, eyebrow: 'Ljudje', title: 'Kdo stoji za AIS', lead: '' }),
@@ -364,7 +364,7 @@ function faqPage() {
       eyebrow: C.faq.eyebrow,
       title: C.faq.title,
       lead: C.faq.lead,
-      accent: 'teal',
+      accent: 'blue',
       cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
     }),
     faqSection({ ...C.faq, eyebrow: 'Odgovori', title: 'Vprašanja in odgovori', lead: '' }, { variant: 'list' }),
@@ -488,12 +488,12 @@ function newsPage() {
       eyebrow: S.news.eyebrow,
       title: S.news.title,
       lead: S.news.lead,
-      accent: 'violet',
+      accent: 'blue',
     }),
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
-    ${takeaway({ accent: 'violet', label: 'Na kratko', text: S.news.answer })}
+    ${takeaway({ accent: 'blue', label: 'Na kratko', text: S.news.answer })}
   </div>
 </section>`,
 
@@ -519,12 +519,12 @@ function eventsPage() {
       eyebrow: S.events.eyebrow,
       title: S.events.title,
       lead: S.events.lead,
-      accent: 'teal',
+      accent: 'blue',
     }),
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
-    ${takeaway({ accent: 'teal', label: 'Na kratko', text: S.events.answer })}
+    ${takeaway({ accent: 'blue', label: 'Na kratko', text: S.events.answer })}
   </div>
 </section>`,
 
@@ -550,12 +550,12 @@ function blogPage() {
       eyebrow: S.blog.eyebrow,
       title: S.blog.title,
       lead: S.blog.lead,
-      accent: 'amber',
+      accent: 'blue',
     }),
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
-    ${takeaway({ accent: 'amber', label: 'Na kratko', text: S.blog.answer })}
+    ${takeaway({ accent: 'blue', label: 'Na kratko', text: S.blog.answer })}
   </div>
 </section>`,
 
@@ -703,34 +703,9 @@ ${C.faq.items.map((i) => `### ${i.q}\n\n${i.a}`).join('\n\n')}
 
 function ogImageSvg() {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="${esc(site.name)}">
-  <defs>
-    <linearGradient id="rule" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#1d77fe"/>
-      <stop offset="34%" stop-color="#7358f5"/>
-      <stop offset="62%" stop-color="#0ea5a0"/>
-      <stop offset="84%" stop-color="#d98218"/>
-      <stop offset="100%" stop-color="#e2506e"/>
-    </linearGradient>
-    <radialGradient id="washA" cx="0.14" cy="0.02" r="0.7">
-      <stop offset="0%" stop-color="#1d77fe" stop-opacity="0.16"/>
-      <stop offset="100%" stop-color="#1d77fe" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="washB" cx="0.9" cy="0.1" r="0.65">
-      <stop offset="0%" stop-color="#7358f5" stop-opacity="0.15"/>
-      <stop offset="100%" stop-color="#7358f5" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="washC" cx="0.62" cy="1" r="0.6">
-      <stop offset="0%" stop-color="#0ea5a0" stop-opacity="0.13"/>
-      <stop offset="100%" stop-color="#0ea5a0" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
+  <rect width="1200" height="630" fill="#f8f9fb"/>
 
-  <rect width="1200" height="630" fill="#fbfbfd"/>
-  <rect width="1200" height="630" fill="url(#washA)"/>
-  <rect width="1200" height="630" fill="url(#washB)"/>
-  <rect width="1200" height="630" fill="url(#washC)"/>
-
-  <rect x="80" y="92" width="132" height="5" rx="2.5" fill="url(#rule)"/>
+  <rect x="80" y="92" width="132" height="5" rx="2.5" fill="#1d77fe"/>
 
   <text x="80" y="152" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="23" font-weight="600" letter-spacing="3.4" fill="#666d7d">AIS — ARTIFICIAL INTELLIGENCE SLOVENIA</text>
 
@@ -742,7 +717,7 @@ function ogImageSvg() {
   <g font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="22" font-weight="600" fill="#3d434f">
     <circle cx="88" cy="551" r="6" fill="#1d77fe"/>
     <text x="106" y="559">ais-slovenia.si</text>
-    <circle cx="330" cy="551" r="6" fill="#7358f5"/>
+    <circle cx="330" cy="551" r="6" fill="#1d77fe"/>
     <text x="348" y="559">Ljubljana, Slovenija</text>
   </g>
 </svg>
