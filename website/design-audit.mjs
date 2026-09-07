@@ -56,6 +56,7 @@ for (const forbidden of [
   'Obdelava dokumentov zdaj usklajuje tudi dobavnice',
   'Zmapirajte svoj proces v treh urah',
   'Prostor za naslednji zapis',
+  '"totalTime":"P10W"',
 ]) {
   expect(!allHtml.includes(forbidden), `Fabricated or placeholder content remains: ${forbidden}`);
 }
