@@ -41,9 +41,11 @@ const PATHS = [
   '/kontakt/',
 ];
 
-/* Common desktop, laptop, tablet and phone widths, plus the exact breakpoints
-   where the decorative layer changes state. */
-const WIDTHS = [1920, 1600, 1440, 1366, 1281, 1280, 1180, 1024, 900, 768, 414, 390, 360];
+/* Common desktop, laptop, tablet and phone widths, plus the exact widths
+   immediately around the 960px global-chrome breakpoint. */
+const WIDTHS = [
+  1920, 1600, 1440, 1366, 1281, 1280, 1180, 1100, 1024, 1000, 961, 960, 959, 900, 768, 414, 390, 360,
+];
 
 const CHROME_CANDIDATES = [
   process.env.CHROME_PATH,
@@ -118,6 +120,16 @@ function findProblems(path, width) {
         );
       }
     });
+  }
+
+  if (path === '/' && [1000, 1024].includes(width)) {
+    const footerNav = document.querySelector('.footer-nav');
+    if (footerNav) {
+      const columnCount = getComputedStyle(footerNav).gridTemplateColumns.split(' ').length;
+      if (columnCount < 2) {
+        components.push(`footer navigation collapsed to ${columnCount} column`);
+      }
+    }
   }
 
   return { overflow, components };

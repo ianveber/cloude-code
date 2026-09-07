@@ -51,7 +51,7 @@ const spacingUses = spacingTokens.map(
 expect(
   spacingTokens.length >= 5 &&
     spacingUses.every((count) => count > 0) &&
-    spacingUses.reduce((sum, count) => sum + count, 0) >= 20,
+    spacingUses.reduce((sum, count) => sum + count, 0) >= 65,
   'Spacing tokens must be meaningfully adopted; declaration-only tokens remain.'
 );
 expect(/body\s*\{[^}]*background:\s*var\(--paper\);/s.test(styles), 'Body must use the paper token.');
@@ -69,6 +69,10 @@ expect(/class="[^"]*\bprocess-overview\b/.test(home), 'Home process overview nee
 expect(
   /class="shell empty-state__shell"[\s\S]*class="empty-state__inner"/.test(showcase),
   'Empty-state gutters and card composition must use separate elements.'
+);
+expect(
+  /\/\* [^*]*gutter wrapper[^*]*independent card[^*]*\*\//i.test(showcase),
+  'Empty-state shell needs a narrow source comment explaining its gutter role.'
 );
 expect(
   !/(?:&(?:rarr|nearr|uarr|#8599|#x2197);|[→↗])/u.test(componentMarkup),
@@ -142,8 +146,25 @@ expect(
 expect(
   /\.process-overview \.card\s*\{[^}]*display:\s*flex;[^}]*flex-direction:\s*column;/s.test(styles) &&
     /\.process-overview \.card \.link\s*\{[^}]*margin-top:\s*auto;/s.test(styles) &&
+    !/\.process-overview \.card \.link\s*\{[^}]*justify-self:/s.test(styles) &&
     !/\.process-overview \.card\s*\{[^}]*grid-template-rows:/s.test(styles),
   'Process overview cards must use an intentional vertical layout with bottom-aligned links.'
+);
+expect(
+  !/--radius-sm:|var\(--radius-sm\)/.test(styles) &&
+    /--radius:\s*16px;/.test(styles) &&
+    /--control-radius:\s*10px;/.test(styles),
+  'Card and control radii must use two distinct, non-duplicated tokens.'
+);
+
+const twinButtons = [...pages.products.matchAll(
+  /<article class="twin__card"[\s\S]*?<a class="btn (btn--(?:primary|secondary))"/g
+)].map((match) => match[1]);
+expect(
+  twinButtons.length === 2 &&
+    twinButtons[0] === 'btn--primary' &&
+    twinButtons[1] === 'btn--secondary',
+  'Twin CTA cards must render primary then secondary button hierarchy.'
 );
 
 expect(

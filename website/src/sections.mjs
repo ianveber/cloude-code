@@ -97,12 +97,12 @@ export function twinCtaSection(data) {
   <div class="shell twin__grid">
     ${each(
       data.items,
-      (item) => `
+      (item, i) => `
     <article class="twin__card" data-reveal>
       <p class="twin__kicker">${esc(item.kicker)}</p>
       <h2>${esc(item.title)}</h2>
       <p>${esc(item.body)}</p>
-      <a class="btn btn--primary" href="${esc(item.cta.href)}">${esc(item.cta.label)}</a>
+      <a class="btn ${i === 0 ? 'btn--primary' : 'btn--secondary'}" href="${esc(item.cta.href)}">${esc(item.cta.label)}</a>
     </article>`
     )}
   </div>

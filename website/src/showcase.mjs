@@ -58,6 +58,7 @@ export function brainHero(data) {
 </section>`;
 }
 
+/* The outer shell is the gutter wrapper around the independent card. */
 export function emptyState({ id, eyebrow, title, body, action }) {
   return `
 <section class="section empty-state" aria-labelledby="${esc(id)}">
