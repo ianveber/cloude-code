@@ -90,9 +90,31 @@ function serve() {
 
 /** Runs in the page. Returns responsive layout and component-alignment defects. */
 function findProblems(path, width) {
+  const visible = (element) => {
+    const style = getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+  };
+  const embeddedBodyLink = (element) => {
+    if (element.tagName !== 'A' || getComputedStyle(element).display !== 'inline') return false;
+    const line = element.closest('p,dd');
+    return Boolean(line && line.textContent.trim() !== element.textContent.trim());
+  };
+
   const overflow = document.documentElement.scrollWidth > window.innerWidth + 1
     ? { scrollWidth: document.documentElement.scrollWidth, innerWidth: window.innerWidth }
     : null;
+  const tooDim = [...document.querySelectorAll('main h1, main h2, main h3, main p')]
+    .filter((element) => visible(element) && parseFloat(getComputedStyle(element).opacity) < 0.45)
+    .map((element) => element.textContent.trim().slice(0, 48));
+  const smallTargets = [...document.querySelectorAll('a,button,summary,input,textarea')]
+    .filter((element) => visible(element) && !embeddedBodyLink(element))
+    .map((element) => ({ element, rect: element.getBoundingClientRect() }))
+    .filter(({ rect }) => rect.width < 44 || rect.height < 44)
+    .map(
+      ({ element, rect }) =>
+        `${element.tagName.toLowerCase()} "${element.textContent.trim().slice(0, 24)}" ${Math.round(rect.width)}×${Math.round(rect.height)}`
+    );
 
   const components = [];
   const emptyCard = document.querySelector('.empty-state__inner');
@@ -132,7 +154,170 @@ function findProblems(path, width) {
     }
   }
 
-  return { overflow, components };
+  if (path === '/' && width === 1440) {
+    const capabilitySvgs = [...document.querySelectorAll('.capitem__art svg')];
+    if (capabilitySvgs.length !== 4) {
+      components.push(`capability artwork count ${capabilitySvgs.length}; expected 4`);
+    }
+    capabilitySvgs.forEach((svg, index) => {
+      const box = svg.viewBox.baseVal;
+      if (box.x !== 0 || box.y !== 0 || box.width !== 320 || box.height !== 200) {
+        components.push(`capability artwork ${index + 1} viewBox is not 0 0 320 200`);
+      }
+      if (svg.querySelector('linearGradient, radialGradient')) {
+        components.push(`capability artwork ${index + 1} contains a filled gradient`);
+      }
+      const inconsistent = [...svg.querySelectorAll('path,rect,circle,line,polyline,polygon')]
+        .filter((element) => getComputedStyle(element).stroke !== 'none')
+        .find((element) => {
+          const style = getComputedStyle(element);
+          return (
+            Math.abs(parseFloat(style.strokeWidth) - 1.5) > 0.01 ||
+            style.strokeLinecap !== 'round' ||
+            style.strokeLinejoin !== 'round'
+          );
+        });
+      if (inconsistent) {
+        components.push(`capability artwork ${index + 1} breaks the 1.5px round line grammar`);
+      }
+    });
+
+    const capabilityItems = [...document.querySelectorAll('.capitem')];
+    capabilityItems.forEach((item, index) => {
+      const copy = item.querySelector('.capitem__copy').getBoundingClientRect();
+      const art = item.querySelector('.capitem__art').getBoundingClientRect();
+      const copyFirst = copy.left < art.left;
+      if (copyFirst !== (index % 2 === 0)) {
+        components.push(`capability chapter ${index + 1} does not alternate at desktop`);
+      }
+    });
+
+    const process = document.querySelector('.process-overview ol');
+    const phases = process ? [...process.children] : [];
+    if (phases.length !== 4) {
+      components.push(`process phase count ${phases.length}; expected 4`);
+    } else {
+      const baseline = getComputedStyle(process, '::before');
+      const phaseTops = new Set(phases.map((phase) => Math.round(phase.getBoundingClientRect().top)));
+      if (
+        baseline.content === 'none' ||
+        parseFloat(baseline.height) < 1 ||
+        baseline.backgroundColor !== 'rgb(29, 119, 254)' ||
+        phaseTops.size !== 1
+      ) {
+        components.push('process phases do not form one horizontal sequence with an AIS-blue baseline');
+      }
+    }
+
+    const team = document.querySelector('.teamgrid');
+    const members = team ? [...team.children] : [];
+    const teamColumns = team ? getComputedStyle(team).gridTemplateColumns.split(' ').length : 0;
+    const crops = new Set(
+      members.map((member) => {
+        const photo = member.querySelector('img').getBoundingClientRect();
+        return (photo.width / photo.height).toFixed(3);
+      })
+    );
+    if (members.length !== 3 || teamColumns !== 3 || crops.size !== 1) {
+      components.push(
+        `team composition has ${members.length} members, ${teamColumns} columns and ${crops.size} crop ratios`
+      );
+    }
+
+    document.querySelectorAll('.explorer__item').forEach((item, index) => {
+      if (parseFloat(getComputedStyle(item).opacity) < 0.95) {
+        components.push(`explorer item ${index + 1} relies on low opacity`);
+      }
+    });
+  }
+
+  if (path === '/' && width === 390) {
+    document.querySelectorAll('.capitem').forEach((item, index) => {
+      const copy = item.querySelector('.capitem__copy').getBoundingClientRect();
+      const art = item.querySelector('.capitem__art').getBoundingClientRect();
+      if (copy.top >= art.top) {
+        components.push(`capability chapter ${index + 1} does not put copy before art on mobile`);
+      }
+    });
+  }
+
+  return { overflow, components, tooDim, smallTargets };
+}
+
+async function checkExplorerFocus(page, base) {
+  await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
+  await page.$eval('.explorer__item:nth-child(2) .explorer__copy', (link) => link.focus());
+  await new Promise((resolve) => setTimeout(resolve, 50));
+  const state = await page.evaluate(() => ({
+    item: document.querySelector('.explorer__item:nth-child(2)')?.classList.contains('is-active'),
+    scene: document.querySelector('.explorer__scene:nth-child(2)')?.classList.contains('is-active'),
+  }));
+  return state.item && state.scene
+    ? null
+    : `Service explorer — keyboard focus did not activate matching item and media (${JSON.stringify(state)})`;
+}
+
+async function checkConvergePacing(page, base) {
+  await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
+
+  async function stateAt(progress) {
+    await page.evaluate((value) => {
+      const section = document.querySelector('[data-converge]');
+      const top = window.scrollY + section.getBoundingClientRect().top;
+      const target = top - window.innerHeight * 0.58 + value * window.innerHeight * 0.72;
+      window.scrollTo(0, target);
+    }, progress);
+    await new Promise((resolve) => setTimeout(resolve, 450));
+    return page.evaluate(() => {
+      const section = document.querySelector('[data-converge]');
+      const panels = [...section.querySelectorAll('.converge__frame')].map((frame) => {
+        const rect = frame.getBoundingClientRect();
+        return { left: rect.left, right: rect.right };
+      });
+      return {
+        progress: parseFloat(section.style.getPropertyValue('--converge')),
+        settled: parseFloat(section.style.getPropertyValue('--settled')),
+        captions: [...section.querySelectorAll('.converge__caption')].map((caption) =>
+          parseFloat(getComputedStyle(caption).opacity)
+        ),
+        panels,
+        tail: section.getBoundingClientRect().bottom -
+          section.querySelector('.converge__outro').getBoundingClientRect().bottom,
+      };
+    });
+  }
+
+  const opening = await stateAt(0.18);
+  const cleared = await stateAt(0.28);
+  const merged = await stateAt(0.65);
+  const held = await stateAt(1);
+  const aligned = (state) =>
+    Math.max(...state.panels.map((panel) => panel.left)) -
+      Math.min(...state.panels.map((panel) => panel.left)) <=
+    2;
+
+  if (
+    opening.captions.some((opacity) => opacity < 0.45) ||
+    opening.panels[0].right > opening.panels[1].left + 1
+  ) {
+    return 'Converge — opening frames are not independently readable';
+  }
+  if (
+    cleared.captions.some((opacity) => opacity > 0.05) ||
+    cleared.panels[0].right > cleared.panels[1].left + 1
+  ) {
+    return 'Converge — captions do not clear before frame collision';
+  }
+  if (!aligned(merged) || !aligned(held)) {
+    return 'Converge — merged frame is not held for the final 35% of active travel';
+  }
+  if (Math.abs(held.progress - 1) > 0.01 || Math.abs(held.settled - 1) > 0.01) {
+    return `Converge — active range did not clamp with a separate settled value (${JSON.stringify(held)})`;
+  }
+  if (held.tail > 40) {
+    return `Converge — outro leaves a ${held.tail.toFixed(1)}px empty tail`;
+  }
+  return null;
 }
 
 async function checkKeyboardFocus(page, base, { path, selector, label, unclipped = false }) {
@@ -207,6 +392,7 @@ async function main() {
 
   for (const width of WIDTHS) {
     const page = await browser.newPage();
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
     await page.evaluateOnNewDocument(() => {
       try {
         sessionStorage.setItem('ais-intro', '1');
@@ -218,7 +404,7 @@ async function main() {
 
     for (const path of PATHS) {
       await page.goto(base + path, { waitUntil: 'domcontentloaded' });
-      const { overflow, components } = await page.evaluate(findProblems, path, width);
+      const { overflow, components, tooDim, smallTargets } = await page.evaluate(findProblems, path, width);
       checked++;
 
       if (overflow) {
@@ -228,6 +414,12 @@ async function main() {
       }
       for (const component of components) {
         errors.push(`${width}px ${path} — ${component}`);
+      }
+      for (const sample of tooDim) {
+        errors.push(`${width}px ${path} — persistently dim text "${sample}"`);
+      }
+      for (const target of smallTargets) {
+        errors.push(`${width}px ${path} — undersized control ${target}`);
       }
     }
 
@@ -251,7 +443,22 @@ async function main() {
     const error = await checkKeyboardFocus(focusPage, base, check);
     if (error) errors.push(error);
   }
+  const explorerFocusError = await checkExplorerFocus(focusPage, base);
+  if (explorerFocusError) errors.push(explorerFocusError);
   await focusPage.close();
+
+  const convergePage = await browser.newPage();
+  await convergePage.evaluateOnNewDocument(() => {
+    try {
+      sessionStorage.setItem('ais-intro', '1');
+    } catch {
+      /* ignore */
+    }
+  });
+  await convergePage.setViewport({ width: 1440, height: 1000 });
+  const convergeError = await checkConvergePacing(convergePage, base);
+  if (convergeError) errors.push(convergeError);
+  await convergePage.close();
 
   await browser.close();
   server.close();
