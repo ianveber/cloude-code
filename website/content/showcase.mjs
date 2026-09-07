@@ -163,7 +163,7 @@ export const events = {
   lead: 'Na tej strani bodo objavljeni potrjeni dogodki AIS Slovenia.',
   metaTitle: 'Dogodki, delavnice in predstavitve | AIS Slovenia',
   metaDescription:
-    'Potrjeni dogodki AIS Slovenia bodo objavljeni na tej strani.',
+    'Potrjeni dogodki AIS Slovenia in njihove osnovne informacije bodo objavljeni na tej strani, ko bodo pripravljeni za javnost.',
   answer:
     'AIS Slovenia trenutno nima javno objavljenih dogodkov. Potrjene dogodke bomo dodali na to stran.',
   items: [],
