@@ -58,6 +58,18 @@ export function brainHero(data) {
 </section>`;
 }
 
+export function emptyState({ id, eyebrow, title, body, action }) {
+  return `
+<section class="section empty-state" aria-labelledby="${esc(id)}">
+  <div class="shell empty-state__inner">
+    <p class="eyebrow">${esc(eyebrow)}</p>
+    <h2 id="${esc(id)}">${esc(title)}</h2>
+    <p>${esc(body)}</p>
+    <a class="btn btn--secondary" href="${esc(action.href)}">${esc(action.label)}</a>
+  </div>
+</section>`;
+}
+
 /* ── Converge band ────────────────────────────────────────────────────────
    Three clips run side by side, then close into a single frame as the section
    is scrolled. The clips are decorative and silent, so they are muted, looped
@@ -111,17 +123,14 @@ export function convergeBand(data) {
 /* ── Case studies / partners ──────────────────────────────────────────── */
 
 export function caseStudiesBand(data) {
+  const partners = data.partners.filter((partner) => partner.logo);
+  if (partners.length === 0) return '';
+
   const tiles = each(
-    data.partners,
+    partners,
     (p, i) => `
       <li class="partners__item" style="--i:${i}">
-        ${
-          p.logo
-            ? `<img class="partners__logo" src="${esc(p.logo)}" alt="${esc(p.name)}" loading="lazy" width="150" height="48">`
-            : `<span class="partners__slot"><span class="partners__mono" aria-hidden="true">${esc(
-                p.name.replace(/[^A-Za-zČŠŽčšž0-9]/g, '').slice(0, 2).toUpperCase()
-              )}</span><span class="visually-hidden">${esc(p.name)}</span></span>`
-        }
+        <img class="partners__logo" src="${esc(p.logo)}" alt="${esc(p.name)}" loading="lazy" width="150" height="48">
       </li>`
   );
 
@@ -137,18 +146,6 @@ export function caseStudiesBand(data) {
     <ul class="partners" data-marquee>
       ${tiles}
     </ul>
-    <p class="cases__note">${esc(data.partnersNote)}</p>
-
-    <div class="grid grid--3 cases__work">
-      ${each(
-        data.work,
-        (w) => `
-      <article class="${cls('card', accentMod('card', w.accent))}">
-        <h3>${esc(w.title)}</h3>
-        <p>${esc(w.body)}</p>
-      </article>`
-      )}
-    </div>
   </div>
 </section>`;
 }
@@ -190,31 +187,16 @@ export function capabilityBand(data) {
 </section>`;
 }
 
-/* ── Team band ────────────────────────────────────────────────────────────
-   Known members fill the first tiles; the remainder are reserved slots that
-   keep the grid at its final shape while photographs are outstanding. */
+/* ── Team band ────────────────────────────────────────────────────────── */
 
 export function teamBand(data, members) {
-  const total = Math.max(data.slots, members.length);
-
-  const tiles = Array.from({ length: total }, (_, i) => {
-    const person = members[i];
-
-    if (!person) {
-      return `
-      <li class="teamtile teamtile--empty" style="--i:${i}">
-        <span class="teamtile__photo teamtile__photo--empty" aria-hidden="true"></span>
-        <span class="teamtile__note">${esc(data.placeholderNote)}</span>
-      </li>`;
-    }
-
-    return `
+  const tiles = members.map((person, i) => `
       <li class="teamtile" style="--i:${i}">
-        <img class="teamtile__photo" src="${esc(person.photo)}" alt="${esc(person.name)}" width="240" height="240" loading="lazy">
+        <img class="teamtile__photo" src="${esc(person.photo)}" alt="${esc(person.name)}"
+          width="360" height="360" loading="lazy">
         <span class="teamtile__name">${esc(person.name)}</span>
         <span class="teamtile__role">${esc(person.role)}</span>
-      </li>`;
-  }).join('\n');
+      </li>`).join('\n');
 
   return `
 <section class="section section--paper team-band" aria-labelledby="ekipa-band">
@@ -286,14 +268,6 @@ export function immersiveCta(data) {
 
 /* ── Blog ─────────────────────────────────────────────────────────────── */
 
-function blogSlot(i, note) {
-  return `
-      <li class="postcard postcard--empty" style="--i:${i}">
-        <span class="postcard__art" aria-hidden="true"></span>
-        <span class="postcard__note">${esc(note)}</span>
-      </li>`;
-}
-
 function postCard(post, i) {
   return `
       <li class="postcard" style="--i:${i}">
@@ -308,10 +282,10 @@ function postCard(post, i) {
       </li>`;
 }
 
-/** Blog teaser for the home page: real posts first, reserved slots after. */
+/** Blog teaser for the home page. */
 export function blogTeaser(data) {
-  const posts = data.items.slice(0, data.homeSlots);
-  const empties = Math.max(0, data.homeSlots - posts.length);
+  if (data.items.length === 0) return '';
+  const posts = data.items.slice(0, 3);
 
   return `
 <section class="section blog-band" aria-labelledby="blog-band">
@@ -323,7 +297,6 @@ export function blogTeaser(data) {
     </div>
     <ul class="postgrid">
       ${posts.map((p, i) => postCard(p, i)).join('\n')}
-      ${Array.from({ length: empties }, (_, i) => blogSlot(posts.length + i, data.emptyNote)).join('\n')}
     </ul>
     <div class="btn-row">
       <a class="btn btn--secondary" href="/blog/">Odprite blog</a>
@@ -334,14 +307,16 @@ export function blogTeaser(data) {
 
 /** Full blog index. */
 export function blogGrid(data) {
-  const empties = Math.max(0, data.reserveSlots - data.items.length);
+  if (data.items.length === 0) {
+    return emptyState({ id: 'blog-list', eyebrow: data.eyebrow, ...data.empty });
+  }
+
   return `
 <section class="section" aria-labelledby="blog-list">
   <div class="shell">
     <h2 class="visually-hidden" id="blog-list">Zapisi</h2>
     <ul class="postgrid">
       ${data.items.map((p, i) => postCard(p, i)).join('\n')}
-      ${Array.from({ length: empties }, (_, i) => blogSlot(data.items.length + i, data.emptyNote)).join('\n')}
     </ul>
   </div>
 </section>`;
@@ -350,6 +325,10 @@ export function blogGrid(data) {
 /* ── Products ─────────────────────────────────────────────────────────── */
 
 export function productGrid(data) {
+  if (data.items.length === 0) {
+    return emptyState({ id: 'izdelki-list', eyebrow: data.eyebrow, ...data.empty });
+  }
+
   return `
 <section class="section" aria-labelledby="izdelki-list">
   <div class="shell">
@@ -379,7 +358,9 @@ export function productGrid(data) {
 /* ── News ─────────────────────────────────────────────────────────────── */
 
 export function newsList(data) {
-  const empties = Math.max(0, data.reserveSlots ?? 0);
+  if (data.items.length === 0) {
+    return emptyState({ id: 'novice-list', eyebrow: data.eyebrow, ...data.empty });
+  }
 
   return `
 <section class="section" aria-labelledby="novice-list">
@@ -400,13 +381,6 @@ export function newsList(data) {
         </article>
       </li>`
       )}
-      ${Array.from(
-        { length: empties },
-        (_, i) => `
-      <li class="newsitem newsitem--empty" style="--i:${data.items.length + i}">
-        <span class="newsitem__note">${esc(data.emptyNote)}</span>
-      </li>`
-      ).join('\n')}
     </ol>
   </div>
 </section>`;
@@ -415,7 +389,9 @@ export function newsList(data) {
 /* ── Events ───────────────────────────────────────────────────────────── */
 
 export function eventList(data) {
-  const empties = Math.max(0, data.reserveSlots ?? 0);
+  if (data.items.length === 0) {
+    return emptyState({ id: 'dogodki-list', eyebrow: data.eyebrow, ...data.empty });
+  }
 
   return `
 <section class="section" aria-labelledby="dogodki-list">
@@ -443,13 +419,6 @@ export function eventList(data) {
         </article>
       </li>`
       )}
-      ${Array.from(
-        { length: empties },
-        (_, i) => `
-      <li class="eventitem eventitem--empty" style="--i:${data.items.length + i}">
-        <span class="eventitem__note">${esc(data.emptyNote)}</span>
-      </li>`
-      ).join('\n')}
     </ul>
   </div>
 </section>`;

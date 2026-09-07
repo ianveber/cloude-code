@@ -57,7 +57,7 @@ export function pageHero({ eyebrow, title, lead, accent = 'blue', cta, art = 'la
 
 export function featureExplorer(services) {
   return `
-<section class="explorer" id="storitve" aria-labelledby="explorer-title">
+<section class="explorer" id="storitve" aria-labelledby="explorer-title" data-services>
   <div class="shell explorer__head">
     <p class="eyebrow eyebrow--violet">Storitve</p>
     <h2 id="explorer-title">Tri področja, en sistem</h2>
@@ -184,6 +184,27 @@ ${decor([{ art: 'clock', place: 'left-low', size: 'lg', accent: 'amber' }])}
 
 /* ── Process ──────────────────────────────────────────────────────────── */
 
+export function processOverview(meta, phases) {
+  return `
+<section class="section section--paper" aria-labelledby="proces-pregled" data-process-overview>
+  <div class="shell">
+    ${sectionHead({ ...meta, accent: 'teal', id: 'proces-pregled' })}
+    <ol class="grid grid--4">
+      ${each(
+        phases,
+        (phase) => `
+      <li class="card">
+        <span class="step__num" aria-hidden="true">${esc(phase.number)}</span>
+        <h3>${esc(phase.title)}</h3>
+        <p>${esc(phase.body)}</p>
+        <a class="link" href="${esc(phase.href)}">Podrobneje <span aria-hidden="true">&rarr;</span></a>
+      </li>`
+      )}
+    </ol>
+  </div>
+</section>`;
+}
+
 export function processSection(meta, steps, { headingLevel = 2, showCta = true } = {}) {
   return `
 <section class="section section--paper" aria-labelledby="proces">
@@ -194,12 +215,11 @@ ${decor([{ art: 'path', place: 'right-top', size: 'lg', accent: 'teal' }])}
       ${each(
         steps,
         (s) => `
-      <li class="${cls('step', accentMod('step', s.accent))}">
+      <li class="${cls('step', accentMod('step', s.accent))}"${s.id ? ` id="${esc(s.id)}"` : ''}>
         <span class="step__num" aria-hidden="true">${esc(s.number)}</span>
         <div>
           <div class="step__head">
             <h3>${esc(s.title)}</h3>
-            <span class="step__duration">${esc(s.duration)}</span>
           </div>
           <p>${esc(s.body)}</p>
         </div>

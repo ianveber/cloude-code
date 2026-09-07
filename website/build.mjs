@@ -21,16 +21,15 @@ import {
   optimizationSection,
   problemsSection,
   processSection,
+  processOverview,
   servicesSection,
   outcomesSection,
-  statsSection,
   aboutSection,
   teamSection,
   faqSection,
   contactSection,
   ctaBand,
   featureExplorer,
-  useCaseSlider,
   twinCtaSection,
   sectionHead,
   takeaway,
@@ -41,7 +40,6 @@ import { renderPage } from './src/layout.mjs';
 import {
   brainHero,
   convergeBand,
-  caseStudiesBand,
   capabilityBand,
   teamBand,
   immersiveCta,
@@ -84,22 +82,14 @@ const closingCta = ctaBand({
 function homePage() {
   const body = [
     brainHero(C.hero),
-
-    /* Three screens becoming one product — the story of how work gets built. */
     convergeBand(S.converge),
-
-    caseStudiesBand(S.caseStudies),
     capabilityBand(S.capabilities),
-
     featureExplorer(C.services),
-    useCaseSlider(C.useCases),
-    processSection(C.processMeta, C.processSteps),
-    statsSection(C.stats),
-
+    processOverview(C.processMeta, C.processPhases),
     teamBand(S.teamShowcase, C.team.members),
     faqSection(C.faq, { items: C.faq.items.slice(0, 5) }),
-    immersiveCta(S.ctaBlock),
     blogTeaser(S.blog),
+    immersiveCta(S.ctaBlock),
   ].join('\n');
 
   return {
@@ -284,18 +274,6 @@ function processPage() {
       { showCta: false }
     ),
 
-    `<section class="section">
-  <div class="shell">
-    ${sectionHead({
-      eyebrow: 'Trajanje',
-      title: 'Koliko časa vzame posamezen korak',
-      lead: 'Okvirni časovni okvir. Natančen razpored določimo po diagnostiki.',
-      accent: 'amber',
-    })}
-    ${definitionList(C.processSteps.map((s) => ({ term: `${s.number} — ${s.title}`, definition: s.duration })))}
-  </div>
-</section>`,
-
     closingCta,
   ].join('\n');
 
@@ -303,7 +281,7 @@ function processPage() {
     path: '/proces/',
     title: 'Proces uvedbe AI sistema — 8 korakov | AIS Slovenia',
     description:
-      'Kako poteka uvedba AI avtomatizacije: raziskava, diagnostika, potopitev, arhitektura, prototip, kalibracija, uvedba in evolucija. Osem korakov z okvirnim trajanjem.',
+      'Kako poteka uvedba AI avtomatizacije: raziskava, diagnostika, potopitev, arhitektura, prototip, kalibracija, uvedba in evolucija.',
     keywords: ['uvedba AI sistema', 'proces avtomatizacije', 'AI implementacija'],
     breadcrumbs: [HOME_CRUMB, { label: 'Proces', href: '/proces/' }],
     priority: '0.8',
@@ -335,7 +313,6 @@ function aboutPage() {
 
     problemsSection(C.problems),
     aboutSection(C.about),
-    statsSection(C.stats),
     outcomesSection(C.outcomes),
     teamSection(C.team),
     closingCta,
@@ -469,12 +446,8 @@ function notFoundPage() {
 
 /* ── Products, news, events, blog ─────────────────────────────────────────
    Each follows the same shape as the older pages: a hero, an answer-first
-   summary an AI engine can quote, then the listing itself.
-
-   News, events and blog entries are sample data (see content/showcase.mjs).
-   They deliberately carry no Article or Event structured data — marking up
-   entries that have not actually been published would feed search engines
-   claims the business has not made. Add that markup once the copy is real. */
+   summary an AI engine can quote, then an honest empty state until verified
+   entries are ready to publish. */
 
 function productsPage() {
   const body = [
@@ -714,7 +687,7 @@ ${C.services.map((s) => `- **${s.name}** (${s.role}): ${s.answer}`).join('\n')}
 
 ## Proces uvedbe
 
-${C.processSteps.map((s) => `${Number(s.number)}. **${s.title}** (${s.duration}) — ${s.body}`).join('\n')}
+${C.processSteps.map((s) => `${Number(s.number)}. **${s.title}** — ${s.body}`).join('\n')}
 
 ## Strani
 

@@ -123,58 +123,54 @@ export const problems = {
 export const processSteps = [
   {
     number: '01',
+    id: 'razumevanje',
     title: 'Raziskava',
-    duration: '1–2 sestanki',
     body: 'Prvi stik. Razumevanje vaše vizije, izzivov in ambicij.',
     accent: 'blue',
   },
   {
     number: '02',
     title: 'Diagnostika',
-    duration: '3–5 dni',
     body: 'Mapiranje vseh poslovnih procesov in identifikacija točk odpadanja.',
     accent: 'violet',
   },
   {
     number: '03',
     title: 'Potopitev',
-    duration: '1 teden',
     body: 'Globoko razumevanje vaše kulture, tokov in odločitvenih mehanizmov.',
     accent: 'teal',
   },
   {
     number: '04',
+    id: 'nacrtovanje',
     title: 'Arhitektura',
-    duration: '1 teden',
     body: 'Oblikovanje popolnoma personalizirane AI strategije in tehnične arhitekture.',
     accent: 'amber',
   },
   {
     number: '05',
+    id: 'izvedba',
     title: 'Prototip',
-    duration: '2–3 tedni',
     body: 'Funkcionalni demo vašega sistema — taktilna izkušnja pred investicijo.',
     accent: 'rose',
   },
   {
     number: '06',
     title: 'Kalibracija',
-    duration: '3–5 tednov',
     body: 'Testiranje v realnem času. Kalibracija na vaših podatkih in interakcijah.',
     accent: 'blue',
   },
   {
     number: '07',
     title: 'Uvedba',
-    duration: '1–2 tedna',
-    body: 'Polna uvedba. Brezplačno usposabljanje vaše ekipe. Podpora 24/7.',
+    body: 'Sistem uvedemo v delovno okolje in ekipo pripravimo na uporabo.',
     accent: 'violet',
   },
   {
     number: '08',
+    id: 'izboljsevanje',
     title: 'Evolucija',
-    duration: 'Nenehno',
-    body: 'Mesečna analitika, optimizacija in kontinuirano izboljševanje.',
+    body: 'Po uvedbi spremljamo delovanje, zbiramo povratne informacije in sistem izboljšujemo.',
     accent: 'teal',
   },
 ];
@@ -182,8 +178,35 @@ export const processSteps = [
 export const processMeta = {
   eyebrow: 'Proces',
   title: 'Konfiguracija vašega AI sistema za avtomatizacijo',
-  lead: 'Osem natančnih korakov. Nič manj, nič več.',
+  lead: 'Osem korakov od raziskave do izboljševanja uvedenega sistema.',
 };
+
+export const processPhases = [
+  {
+    number: '01',
+    title: 'Razumemo',
+    body: 'Proces razstavimo na delo, odločitve, izjeme in podatke.',
+    href: '/proces/#razumevanje',
+  },
+  {
+    number: '02',
+    title: 'Načrtujemo',
+    body: 'Določimo arhitekturo, odgovornosti sistema in merila uspeha.',
+    href: '/proces/#nacrtovanje',
+  },
+  {
+    number: '03',
+    title: 'Zgradimo',
+    body: 'Izdelamo prototip, ga preizkusimo in pripravimo za realno delo.',
+    href: '/proces/#izvedba',
+  },
+  {
+    number: '04',
+    title: 'Izboljšujemo',
+    body: 'Po uvedbi spremljamo rezultate in sistem prilagajamo dejanski uporabi.',
+    href: '/proces/#izboljsevanje',
+  },
+];
 
 /* ── Services ─────────────────────────────────────────────────────────── */
 
@@ -291,12 +314,6 @@ export const about = {
   questionPivot: 'Ampak:',
 };
 
-export const stats = [
-  { label: 'Avtomatizirane naloge', value: '1,2 mio+', note: 'Skupaj obdelano v letu 2024', accent: 'blue' },
-  { label: 'Rast učinkovitosti', value: '340 %', note: 'Povprečen dvig učinkovitosti', accent: 'violet' },
-  { label: 'Zanesljivost sistema', value: 'Enterprise', note: 'Varnost na poslovni ravni', accent: 'teal' },
-];
-
 /* ── Team ─────────────────────────────────────────────────────────────── */
 
 export const team = {
@@ -368,7 +385,7 @@ export const faq = {
     },
     {
       q: 'Koliko časa traja uvedba?',
-      a: 'Odvisno od obsega. Diagnostika traja 3 do 5 dni, potopitev in arhitektura po en teden, prototip 2 do 3 tedne, kalibracija 3 do 5 tednov, sama uvedba pa 1 do 2 tedna. Faza evolucije z mesečno analitiko in optimizacijo teče nenehno.',
+      a: 'Trajanje uvedbe je odvisno od obsega, zahtevnosti procesa in potrebnih integracij. Natančen razpored določimo po diagnostiki.',
     },
     {
       q: 'Ali AI sistemi govorijo slovensko?',
@@ -388,7 +405,7 @@ export const faq = {
     },
     {
       q: 'Kaj vključuje podpora po uvedbi?',
-      a: 'Uvedba vključuje brezplačno usposabljanje vaše ekipe in podporo 24/7. Po uvedbi sledi faza evolucije z mesečno analitiko, optimizacijo in kontinuiranim izboljševanjem sistema.',
+      a: 'Obseg podpore po uvedbi določimo glede na potrebe sistema in ekipe. Spremljamo delovanje, zbiramo povratne informacije ter se dogovorimo o nadaljnjih izboljšavah.',
     },
     {
       q: 'Kako začnemo sodelovanje?',
