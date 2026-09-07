@@ -1853,11 +1853,11 @@ html:not(.is-intro) .hero__intro { display: none; }
 .converge,
 .capband,
 .ctaband {
-  --d-bg: #06070b;
-  --d-panel: #10131c;
-  --d-line: #232838;
-  --d-ink: #f2f4fa;
-  --d-dim: #8f97ad;
+  --d-bg: #09090b;
+  --d-panel: #18181b;
+  --d-line: #27272a;
+  --d-ink: #fafafa;
+  --d-dim: #a1a1aa;
 
   position: relative;
   background: var(--d-bg);
@@ -2013,7 +2013,7 @@ html.motion-on .converge__caption {
 }
 
 .readline__w {
-  color: #3b4256;
+  color: #52525b;
   transition: color 0.25s linear;
 }
 
@@ -2086,10 +2086,10 @@ html:not(.motion-on) .readline__w,
   color: var(--cap-accent, var(--blue));
 }
 
-.art__panel { stroke: #313852; }
-.art__tile { fill: rgba(255, 255, 255, 0.05); stroke: #313852; stroke-width: 1.4; }
+.art__panel { stroke: #3f3f46; }
+.art__tile { fill: rgba(255, 255, 255, 0.05); stroke: #3f3f46; stroke-width: 1.4; }
 .art__tile--hot { fill: color-mix(in srgb, currentColor 16%, transparent); stroke: currentColor; }
-.art__edge { stroke: #3b4360; }
+.art__edge { stroke: #52525b; }
 .art__spark { color: currentColor; }
 .art__pip { color: currentColor; }
 
@@ -2191,7 +2191,7 @@ html.motion-on .capitem.is-in .art__pip {
 .ctaband__copy .lead { margin-top: 0.9rem; max-width: 34ch; }
 
 .ctaform {
-  background: rgba(12, 15, 22, 0.82);
+  background: rgba(24, 24, 27, 0.82);
   border: 1px solid var(--d-line);
   border-radius: var(--radius);
   padding: clamp(1.5rem, 3.5vw, 2.25rem);

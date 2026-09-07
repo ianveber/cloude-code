@@ -707,14 +707,14 @@ function ogImageSvg() {
 
   <rect x="80" y="92" width="132" height="5" rx="2.5" fill="#1d77fe"/>
 
-  <text x="80" y="152" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="23" font-weight="600" letter-spacing="3.4" fill="#666d7d">AIS — ARTIFICIAL INTELLIGENCE SLOVENIA</text>
+  <text x="80" y="152" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="23" font-weight="600" letter-spacing="3.4" fill="#69707d">AIS — ARTIFICIAL INTELLIGENCE SLOVENIA</text>
 
-  <text x="80" y="286" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="72" font-weight="700" letter-spacing="-2.4" fill="#15171d">AI avtomatizacija.</text>
+  <text x="80" y="286" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="72" font-weight="700" letter-spacing="-2.4" fill="#111318">AI avtomatizacija.</text>
   <text x="80" y="376" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="72" font-weight="700" letter-spacing="-2.4" fill="#1d77fe">Hitrejši procesi.</text>
 
-  <text x="80" y="486" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="26" font-weight="500" fill="#666d7d">Administracija &#183; Prodaja &#183; Trg &#8212; AI sistemi v slovenščini</text>
+  <text x="80" y="486" font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="26" font-weight="500" fill="#69707d">Administracija &#183; Prodaja &#183; Trg &#8212; AI sistemi v slovenščini</text>
 
-  <g font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="22" font-weight="600" fill="#3d434f">
+  <g font-family="Plus Jakarta Sans, Segoe UI, sans-serif" font-size="22" font-weight="600" fill="#353a44">
     <circle cx="88" cy="551" r="6" fill="#1d77fe"/>
     <text x="106" y="559">ais-slovenia.si</text>
     <circle cx="330" cy="551" r="6" fill="#1d77fe"/>
