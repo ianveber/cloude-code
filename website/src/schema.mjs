@@ -176,7 +176,6 @@ export function howToNode(pagePath) {
     description:
       'Osemstopenjski proces, po katerem AIS Slovenia postavi AI sistem za avtomatizacijo poslovnih procesov — od raziskave do nenehne evolucije.',
     inLanguage: site.lang,
-    totalTime: 'P10W',
     step: processSteps.map((s, i) => ({
       '@type': 'HowToStep',
       position: i + 1,
