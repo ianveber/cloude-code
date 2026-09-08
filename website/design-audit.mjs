@@ -37,12 +37,12 @@ expect(!/body::after/.test(styles), 'Fixed paper-grain overlay remains.');
 expect(
   /class="depth" aria-hidden="true"/.test(home) &&
     /\.depth\s*\{[^}]*z-index:\s*-1;/s.test(styles) &&
-    ![...styles.matchAll(/rgba\(111, 127, 156, (0?\.\d+)\)/g)].some((m) => /depth/.test(styles.slice(Math.max(0, m.index - 400), m.index)) && parseFloat(m[1]) > 0.14),
+    ![...styles.matchAll(/rgba\(111, 127, 156, (0?\.\d+)\)/g)].some((m) => parseFloat(m[1]) > 0.14),
   'Depth layer must exist, sit behind the page and stay faint (alpha ≤ 0.14).'
 );
 expect(
-  !/rgba\(29,\s*119,\s*254/.test(styles) && /--brain-blue:\s*#1d77fe;/.test(styles),
-  'UI accents are blue-grey; only the brand mark keeps AIS blue.'
+  /--brain-blue:\s*#1d77fe;/.test(styles) && /\.text-blue\s*\{\s*color:\s*var\(--blue\);\s*\}/.test(styles),
+  'Accents are AIS blue, the same blue as the mark.'
 );
 expect(
   /class="section faq faq--dark"/.test(home) && /class="faq__panel"/.test(home),
@@ -51,8 +51,7 @@ expect(
 expect(!/radial-gradient\(rgba\(21, 23, 29/.test(styles), 'Site-wide dot grid remains.');
 expect(!/border-radius:\s*999/.test(styles), 'Unbounded pill radius remains outside explicit controls.');
 expect(
-  /--blue:\s*#6f7f9c;/.test(styles) &&
-    /--steel:\s*#6f7f9c;/.test(styles) &&
+  /--blue:\s*#1d77fe;/.test(styles) &&
     /--control-radius:\s*100px;/.test(styles),
   'The shared colour, spacing, and control-radius tokens are incomplete.'
 );

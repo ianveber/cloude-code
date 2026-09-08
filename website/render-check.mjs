@@ -353,9 +353,9 @@ async function checkKeyboardFocus(page, base, { path, selector, label, unclipped
     state.focusVisible &&
     state.outlineWidth >= 2 &&
     state.outlineStyle !== 'none' &&
-    state.outlineColor === 'rgb(111, 127, 156)';
+    state.outlineColor === 'rgb(29, 119, 254)';
   if (!clearOutline) {
-    return `${label} — focus indicator is not a clear 2px blue-grey outline (${JSON.stringify(state)})`;
+    return `${label} — focus indicator is not a clear 2px AIS-blue outline (${JSON.stringify(state)})`;
   }
   if (state.mustBeUnclipped && ['hidden', 'clip'].includes(state.containerOverflow)) {
     return `${label} — focus outline is clipped by overflow:${state.containerOverflow}`;
@@ -413,7 +413,7 @@ async function checkDisclosureToggle(page, selector, label) {
     !focus.focusVisible ||
     focus.outlineWidth < 2 ||
     focus.outlineStyle === 'none' ||
-    focus.outlineColor !== 'rgb(111, 127, 156)'
+    focus.outlineColor !== 'rgb(29, 119, 254)'
   ) {
     return `${label} — focus is invisible (${JSON.stringify(focus)})`;
   }

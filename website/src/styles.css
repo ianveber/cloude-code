@@ -19,8 +19,8 @@
   --line-strong: #cfd3da;
   --paper: #fff;
   --canvas: #f4f5f7;
-  --blue: #6f7f9c;
-  --blue-soft: rgba(111, 127, 156, .12);
+  --blue: #1d77fe;
+  --blue-soft: rgba(29, 119, 254, .10);
   --steel: #6f7f9c;
   --steel-light: #b3bfd3;
   --steel-dark: #56647f;
@@ -98,7 +98,7 @@ a {
 }
 
 ::selection {
-  background: rgba(111, 127, 156, 0.16);
+  background: rgba(29, 119, 254, 0.16);
 }
 
 /* ── Layout primitives ────────────────────────────────────────────────── */
@@ -181,24 +181,6 @@ p { text-wrap: pretty; }
 .text-blue {
   color: var(--blue);
 }
-
-/* Blue-grey with a slow sheen: a gradient moves across the letters. */
-.hero--brain .text-blue {
-  color: transparent;
-  background: linear-gradient(100deg, var(--steel-dark) 0%, var(--steel-light) 38%, var(--steel) 52%, var(--steel-light) 70%, var(--steel-dark) 100%);
-  background-size: 220% 100%;
-  background-position: 100% 0;
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-html.motion-on .hero--brain .text-blue {
-  animation: steelSheen 7s ease-in-out infinite;
-}
-
-@keyframes steelSheen {
-  0%, 100% { background-position: 100% 0; }
-  50% { background-position: 0% 0; }
 }
 
 .section-head {
@@ -1964,7 +1946,7 @@ html.motion-on .brand-brain__float {
   transform: translateZ(2px);
   background:
     radial-gradient(52% 52% at var(--gx) var(--gy), rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.1) 42%, transparent 72%),
-    linear-gradient(160deg, rgba(255, 255, 255, 0.2), transparent 48%, rgba(111, 127, 156, 0.16) 100%);
+    linear-gradient(160deg, rgba(255, 255, 255, 0.2), transparent 48%, rgba(29, 119, 254, 0.16) 100%);
   pointer-events: none;
 }
 
@@ -2152,10 +2134,12 @@ html:not(.is-intro) .intro { display: none; }
 
 /* ── Build stage ──────────────────────────────────────────────────────────
    The one dark block: a rounded black panel inside the page margins. Three
-   screens; the front one large, the other two tucked behind it. In the
-   spread pose all three shrink and sit side by side. Position classes are set
-   in the HTML and moved by motion.js; with no JS the panel holds its first
-   pose. */
+   screens take turns. Front pose: one screen large in the centre with a soft
+   blue halo. Cluster pose: it recedes to the upper left while the next slides
+   in from the right and the third rises from below, and the three drift
+   slowly as a loose group. Then the cluster clears and the next screen
+   scales up into the centre. Position classes are set in the HTML and moved
+   by motion.js; with no JS the panel holds the front pose. */
 
 .build {
   padding: 0 var(--edge) clamp(1rem, 2vw, 1.5rem);
@@ -2179,7 +2163,7 @@ html:not(.is-intro) .intro { display: none; }
   right: -20%;
   bottom: -45%;
   height: 80%;
-  background: radial-gradient(50% 60% at 50% 100%, rgba(111, 127, 156, 0.32), transparent 70%);
+  background: radial-gradient(50% 60% at 50% 100%, rgba(29, 119, 254, 0.28), transparent 70%);
   pointer-events: none;
 }
 
@@ -2192,70 +2176,92 @@ html:not(.is-intro) .intro { display: none; }
   position: relative;
   margin-top: clamp(2rem, 5vw, 3.5rem);
   padding-inline: clamp(1rem, 3vw, 2.5rem);
-  perspective: 1600px;
 }
 
 .build__rig {
   position: relative;
   max-width: 1240px;
   margin-inline: auto;
-  aspect-ratio: 16 / 7.6;
-  transform-style: preserve-3d;
+  aspect-ratio: 16 / 8.2;
 }
 
 .build__screen {
+  --x: 0%;
+  --y: 0%;
+  --s: 1;
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 74%;
+  width: 66%;
   margin: 0;
-  transform-style: preserve-3d;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) translate(var(--x), var(--y)) scale(var(--s));
   transition:
-    transform 1.15s cubic-bezier(0.2, 0.8, 0.2, 1),
-    opacity 0.8s ease,
-    filter 0.8s ease;
+    transform 1.25s cubic-bezier(0.2, 0.7, 0.1, 1),
+    opacity 0.9s ease;
   cursor: pointer;
 }
 
-/* Front pose. */
+/* Front pose: the active screen alone, the others parked just off their
+   cluster spots so they slide in from there. */
 .build__screen.is-active {
+  --x: 0%;
+  --y: 0%;
+  --s: 1;
   z-index: 3;
-  transform: translate(-50%, -50%);
   cursor: default;
 }
 
-.build__screen.is-left {
-  z-index: 1;
-  transform: translate(-50%, -50%) translateX(-11%) translateZ(-320px) scale(0.82);
-  opacity: 0.35;
-  filter: brightness(0.5);
-}
-
 .build__screen.is-right {
-  z-index: 1;
-  transform: translate(-50%, -50%) translateX(11%) translateZ(-320px) scale(0.82);
-  opacity: 0.35;
-  filter: brightness(0.5);
+  --x: 46%;
+  --y: -18%;
+  --s: 0.62;
+  z-index: 2;
+  opacity: 0;
 }
 
-/* Spread pose: three small screens side by side. */
+.build__screen.is-left {
+  --x: 8%;
+  --y: 46%;
+  --s: 0.56;
+  z-index: 1;
+  opacity: 0;
+}
+
+/* Cluster pose: three windows in a loose group, none of them centred. */
 .build__rig.is-spread .build__screen {
   opacity: 1;
-  filter: none;
   cursor: pointer;
 }
 
 .build__rig.is-spread .build__screen.is-active {
-  transform: translate(-50%, -50%) scale(0.42);
-}
-
-.build__rig.is-spread .build__screen.is-left {
-  transform: translate(-50%, -50%) translateX(-45%) scale(0.42);
+  --x: -24%;
+  --y: -16%;
+  --s: 0.68;
 }
 
 .build__rig.is-spread .build__screen.is-right {
-  transform: translate(-50%, -50%) translateX(45%) scale(0.42);
+  --x: 30%;
+  --y: -14%;
+  --s: 0.62;
+}
+
+.build__rig.is-spread .build__screen.is-left {
+  --x: 6%;
+  --y: 30%;
+  --s: 0.56;
+}
+
+/* While the cluster holds, each window drifts a little on its own beat. */
+html.motion-on .build__rig.is-spread .build__screen .build__frame {
+  animation: stageDrift 7s ease-in-out infinite;
+}
+
+html.motion-on .build__rig.is-spread .build__screen.is-right .build__frame { animation-delay: -2.3s; }
+html.motion-on .build__rig.is-spread .build__screen.is-left .build__frame { animation-delay: -4.6s; }
+
+@keyframes stageDrift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0.6%, -1.4%, 0); }
 }
 
 .build__frame {
@@ -2263,6 +2269,18 @@ html:not(.is-intro) .intro { display: none; }
   border-radius: var(--radius);
   overflow: hidden;
   background: var(--d-panel);
+  box-shadow: 0 50px 110px rgba(0, 0, 0, 0.6);
+  transition: box-shadow 0.9s ease;
+}
+
+/* The front screen carries a soft blue halo. */
+.build__screen.is-active .build__frame {
+  box-shadow:
+    0 60px 130px rgba(0, 0, 0, 0.7),
+    0 0 90px rgba(29, 119, 254, 0.28);
+}
+
+.build__rig.is-spread .build__screen.is-active .build__frame {
   box-shadow: 0 50px 110px rgba(0, 0, 0, 0.6);
 }
 
@@ -2425,7 +2443,7 @@ html.motion-on .marquee--reverse .marquee__track {
   top: -50%;
   width: 80%;
   height: 150%;
-  background: radial-gradient(45% 45% at 50% 50%, rgba(111, 127, 156, 0.22), transparent 70%);
+  background: radial-gradient(45% 45% at 50% 50%, rgba(29, 119, 254, 0.22), transparent 70%);
   pointer-events: none;
 }
 
@@ -2543,7 +2561,7 @@ html.motion-on .depth__b { animation: depthB 41s ease-in-out infinite alternate;
   padding: clamp(1.25rem, 3.2vw, 2.75rem);
   border-radius: var(--panel-radius);
   background:
-    radial-gradient(120% 90% at 50% 0%, rgba(111, 127, 156, 0.16), rgba(111, 127, 156, 0) 55%),
+    radial-gradient(120% 90% at 50% 0%, rgba(29, 119, 254, 0.16), rgba(29, 119, 254, 0) 55%),
     var(--canvas);
 }
 
@@ -2664,7 +2682,7 @@ html.motion-on .depth__b { animation: depthB 41s ease-in-out infinite alternate;
   top: -60%;
   width: 90%;
   height: 160%;
-  background: radial-gradient(45% 45% at 50% 50%, rgba(111, 127, 156, 0.28), transparent 70%);
+  background: radial-gradient(45% 45% at 50% 50%, rgba(29, 119, 254, 0.28), transparent 70%);
   pointer-events: none;
 }
 
@@ -2730,7 +2748,7 @@ html.motion-on .depth__b { animation: depthB 41s ease-in-out infinite alternate;
   color: var(--d-ink);
   border-radius: var(--control-radius-md);
   padding: .65rem .85rem;
-  background: rgba(111, 127, 156, .18);
+  background: rgba(29, 119, 254, .18);
 }
 
 /* ── Footer ───────────────────────────────────────────────────────────── */
@@ -2837,7 +2855,7 @@ html.motion-on .depth__b { animation: depthB 41s ease-in-out infinite alternate;
   overflow: hidden;
   user-select: none;
   color: transparent;
-  background: radial-gradient(circle at var(--mx) 50%, var(--blue) 0, rgba(111, 127, 156, 0.7) 10%, var(--ink) 34%);
+  background: radial-gradient(circle at var(--mx) 50%, var(--blue) 0, rgba(29, 119, 254, 0.7) 10%, var(--ink) 34%);
   -webkit-background-clip: text;
   background-clip: text;
   opacity: 0.12;
@@ -2878,7 +2896,7 @@ html.motion-on .depth__b { animation: depthB 41s ease-in-out infinite alternate;
     height: auto;
   }
   .postgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .build__screen { width: 84%; }
+  .build__screen { width: 74%; }
 }
 
 @media (max-width: 1024px) {
@@ -2895,12 +2913,12 @@ html.motion-on .depth__b { animation: depthB 41s ease-in-out infinite alternate;
 @media (max-width: 768px) {
   .brand-brain { min-height: 18rem; }
   .brand-brain__rig { width: min(17rem, 72vw); }
-  .build__stage { perspective: none; }
   .build__rig {
     aspect-ratio: auto;
     display: grid;
     gap: var(--space-4);
   }
+  .build__rig .build__frame { animation: none !important; }
   .build__screen,
   .build__screen.is-active,
   .build__screen.is-left,

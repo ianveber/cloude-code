@@ -390,8 +390,8 @@
 
   /* ── Build stage ─────────────────────────────────────────────────────────
      Three screens, one in front. Left alone the stage moves in beats: the
-     front screen holds, then all three shrink and spread out side by side,
-     then they gather again with the next screen in front. A click on a
+     front screen holds, then it recedes into a loose cluster with the other
+     two, then the cluster clears and the next screen comes to the front. A click on a
      screen or a tab, or the arrow keys, bring a screen forward at once.
      Runs with reduced motion too, without the beats, because the tabs are
      real controls and must keep working. */
@@ -410,8 +410,8 @@
     var timer = null;
     var paused = false;
     var visible = false;
-    var HOLD_FRONT = 4600;
-    var HOLD_SPREAD = 3400;
+    var HOLD_FRONT = 4200;
+    var HOLD_SPREAD = 4200;
 
     function paint() {
       screens.forEach(function (screen, i) {

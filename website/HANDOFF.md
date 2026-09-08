@@ -23,7 +23,7 @@ The home page is a product narrative, not a template landing page:
 1. Typed intro: white screen, the bare brain, "AIS Slovenia" typed with a caret (home only)
 2. Hero: headline left, two pill buttons, the 3D brain slab on the right (white)
 3. Build stage: a rounded black panel where the three clips take turns in front,
-   spread out side by side, then gather again (the only dark block)
+   recede into a loose cluster, then the next comes forward (the only dark block)
 4. Clients: two marquee rows of small pills (logo + name), top row drifting left, bottom row right, no descriptions
 5. Three pillars: a title, one sentence and a rendered product picture in a soft panel
 6. Team (three real people, name and role)
@@ -63,12 +63,10 @@ These are enforced by `design-audit.mjs` and/or by the approved spec.
    light sweep that follow the pointer, and two shadows in its own silhouette.
    No tile or frame around it. Pointer tilt is capped at ±8°.
 3. **Buttons are black or soft grey pills.** No accent-coloured buttons.
-4. **One accent, blue-grey with a sheen.** UI accents (`--blue`, `--steel`)
-   are `#6f7f9c`; the hero's second line carries a slow metallic sheen. Only
-   the brand mark itself keeps AIS blue `#1d77fe` (`--brain-blue`). No
-   violet / teal / amber / rose accent system. The rendered pillar pictures
-   use the same blue-grey; the three clips still carry their original
-   colours until they are re-rendered.
+4. **One accent: AIS blue `#1d77fe`, the same blue as the mark.** Eyebrows,
+   the hero's second line, glows and focus rings all use `--blue`. The only
+   blue-grey left is the faint depth layer behind the page (`--steel`). No
+   violet / teal / amber / rose accent system.
 5. **No borders, no rules, no dashes.** Nothing on the site draws a line:
    no card borders, no hairlines between sections, no underlines, no `<hr>`,
    no em or en dashes in copy. Tiles are soft grey fills, dark blocks are
@@ -226,12 +224,16 @@ arrival at the home page; a hop from another page of the site after it has
 played skips it. `?nointro` or `sessionStorage.ais-intro = 'skip'` turns it
 off for tooling and previews.
 
-Build stage: moves in beats, never continuously. The front screen holds
-**4.6 s**, then the three shrink and spread out side by side for **3.4 s**,
-then gather with the next screen in front. Pointer over the stage pauses the
-beats. Clicks on a screen or tab, and the arrow keys, bring a screen forward
-at once. `buildStage` also runs under reduced motion (without the beats)
-because the tabs are real controls.
+Build stage: moves in beats, never continuously, in the manner of the
+Antigravity hero film (our clips, their choreography). The front screen holds
+**4.2 s** alone in the centre with a soft blue halo. Then it recedes to the
+upper left while the next screen slides in from the right and the third
+rises from below; the loose cluster holds **4.2 s** and each window drifts a
+little on its own beat. Then the cluster clears and the next screen scales
+up into the centre. Pointer over the stage pauses the beats. Clicks on a
+screen or tab, and the arrow keys, bring a screen forward at once.
+`buildStage` also runs under reduced motion (without the beats) because the
+tabs are real controls.
 
 **Removed on purpose:** particles, bouncing chips, custom cursor, magnetic
 buttons, the CTA wireframe canvas, the glossy brain slab, the tab countdown
