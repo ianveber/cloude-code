@@ -22,12 +22,11 @@ async function shoot(page, name, { full = false } = {}) {
   process.stdout.write(`  ${name}\n`);
 }
 
-/** Scroll in steps so scroll-linked effects and lazy videos actually fire. */
 async function scrollTo(page, y) {
   await page.evaluate((target) => {
     window.scrollTo({ top: target, behavior: 'instant' });
   }, y);
-  await wait(600);
+  await wait(500);
 }
 
 async function sectionTop(page, selector) {
@@ -46,68 +45,69 @@ async function main() {
     args: ['--no-sandbox', '--disable-dev-shm-usage', '--autoplay-policy=no-user-gesture-required'],
   });
 
+  const intro = await browser.newPage();
+  await intro.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
+  await intro.goto(`${BASE}/`, { waitUntil: 'networkidle0' });
+  await wait(280);
+  await shoot(intro, 'intro-logo');
+  await wait(700);
+  await shoot(intro, 'intro-lockup');
+  await wait(1600);
+  await shoot(intro, 'home-hero');
+  await intro.close();
+
   const page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
-
-  /* ── Opening sequence, caught at three moments ── */
-  await page.goto(`${BASE}/`, { waitUntil: 'networkidle0' });
-  await wait(320);
-  await shoot(page, 'intro-1-logo');
-  await wait(750);
-  await shoot(page, 'intro-2-wordmark');
-  await wait(2200);
-  await shoot(page, 'intro-3-hero');
-
-  /* ── The rest of the home page, with the intro already seen ── */
-  const seen = await browser.newPage();
-  await seen.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
-  await seen.evaluateOnNewDocument(() => {
+  await page.evaluateOnNewDocument(() => {
     try {
       sessionStorage.setItem('ais-intro', '1');
-    } catch (e) {}
+    } catch {
+      /* ignore */
+    }
   });
 
-  await seen.goto(`${BASE}/`, { waitUntil: 'networkidle0' });
-  await wait(700);
-  await shoot(seen, 'home-hero');
+  await page.goto(`${BASE}/`, { waitUntil: 'networkidle0' });
+  await wait(600);
+  await shoot(page, 'home-hero-resting');
 
-  for (const [name, selector, offset] of [
-    ['home-converge-apart', '[data-converge]', -60],
+  const home = [
+    ['home-converge-apart', '[data-converge]', -40],
     ['home-converge-merged', '[data-converge]', 620],
-    ['home-cases', '.cases', -60],
-    ['home-capband', '[data-capband]', -40],
-    ['home-capitem', '.capitem', 260],
-    ['home-team', '.team-band', -60],
-    ['home-cta', '.ctaband', -60],
-    ['home-blog', '.blog-band', -60],
-  ]) {
-    const top = await sectionTop(seen, selector);
-    if (top === null) continue;
-    await scrollTo(seen, Math.max(0, top + offset));
-    await shoot(seen, name);
+    ['home-capabilities', '[data-capband]', 80],
+    ['home-services', '[data-services]', -40],
+    ['home-process', '[data-process-overview]', -40],
+    ['home-team', '.team-band', -40],
+    ['home-cta', '[data-cta], .ctaband', -40],
+  ];
+
+  for (const [name, selector, offset] of home) {
+    const top = await sectionTop(page, selector);
+    if (top === null) {
+      process.stdout.write(`  skip ${name} (missing ${selector})\n`);
+      continue;
+    }
+    await scrollTo(page, Math.max(0, top + offset));
+    await shoot(page, name);
   }
 
   for (const [name, url] of [
-    ['page-produkti', '/produkti/'],
-    ['page-novice', '/novice/'],
-    ['page-dogodki', '/dogodki/'],
-    ['page-blog', '/blog/'],
+    ['products-empty', '/produkti/'],
+    ['news-empty', '/novice/'],
+    ['events-empty', '/dogodki/'],
+    ['blog-empty', '/blog/'],
   ]) {
-    await seen.goto(`${BASE}${url}`, { waitUntil: 'networkidle0' });
-    await wait(500);
-    await shoot(seen, name);
+    await page.goto(`${BASE}${url}`, { waitUntil: 'networkidle0' });
+    await wait(400);
+    await shoot(page, name);
   }
 
-  /* ── Mobile ── */
-  await seen.setViewport({ width: 390, height: 844, deviceScaleFactor: 2 });
-  await seen.goto(`${BASE}/`, { waitUntil: 'networkidle0' });
-  await wait(700);
-  await shoot(seen, 'mobile-hero');
-  const conv = await sectionTop(seen, '[data-converge]');
-  if (conv !== null) {
-    await scrollTo(seen, conv - 40);
-    await shoot(seen, 'mobile-converge');
-  }
+  await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2 });
+  await page.goto(`${BASE}/`, { waitUntil: 'networkidle0' });
+  await wait(500);
+  await shoot(page, 'mobile-home');
+  await page.$eval('.nav-toggle > summary', (el) => el.click());
+  await wait(250);
+  await shoot(page, 'mobile-menu');
 
   await browser.close();
   process.stdout.write('Done.\n');

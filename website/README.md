@@ -1,5 +1,7 @@
 # ais-slovenia.si — website
 
+If you are taking this site over, start with [`HANDOFF.md`](./HANDOFF.md).
+
 A rebuild of the AIS Slovenia site with the same structure and copy as the
 original, optimised for search engines and AI answer engines, and redesigned
 around a lighter, quieter, more readable visual language.
@@ -62,15 +64,18 @@ website/
 │   ├── layout.mjs      <head>, header, footer, document shell
 │   ├── sections.mjs    section components
 │   ├── showcase.mjs    home-page bands and the newer listing blocks
-│   ├── art.mjs         the brain mark and the capability drawings
-│   ├── decor.mjs       faint background line art
+│   ├── art.mjs         non-brand capability drawings only
+│   ├── decor.mjs       service glyphs used by the explorer
 │   ├── schema.mjs      JSON-LD structured data
 │   └── html.mjs        escaping helpers
-├── public/             static assets, copied to dist as-is
+├── public/
+│   ├── brand/          official lockup, standalone brain, OG image
 │   └── video/          generated clips — see tools/video
 ├── tools/video/        clip source + renderer (not part of the build)
 ├── build.mjs           page definitions + generator
 ├── audit.mjs           SEO/GEO checks
+├── design-audit.mjs    brand, honesty, and visual-system checks
+├── render-check.mjs    browser layout, motion, and keyboard checks
 └── vercel.json         deployment config
 ```
 
@@ -84,8 +89,8 @@ from them.
 
 | URL | Purpose |
 |---|---|
-| `/` | Home — the full narrative |
-| `/produkti/` | Products — the four SaaS products |
+| `/` | Home — promise, demonstration, work, services, process, team, FAQ, CTA |
+| `/produkti/` | Products — honest empty state until a product is ready to publish |
 | `/storitve/` | Services overview: the three areas of automation |
 | `/storitve/avtomatizacija-administracije/` | Administration and operations |
 | `/storitve/avtomatizacija-prodaje/` | Sales and customer communication |
@@ -104,22 +109,26 @@ for its own query instead of one page competing for everything.
 
 ---
 
-## Reserved slots
+## Official brand assets
 
-Some blocks are waiting on material that does not exist yet. They render as
-reserved slots rather than being hidden, so the layout is already the final
-layout and dropping the real data in is the only remaining step.
+- Standalone brain: `public/brand/favicon.png`. This is the only mark that
+  receives the option-3 treatment: a 30° CSS perspective tilt, a restrained
+  depth edge, and a directional shadow. The geometry is never redrawn.
+- Light lockup: `public/brand/logo-light.png`. Used in the intro crossfade,
+  header, and footer. The wordmark stays flat.
+- Dark lockup: `public/brand/logo.png`. Use only on a genuinely dark surface.
+
+## Honest empty states
+
+Products, news, events, and blog render one factual empty state when their
+item lists are empty. Partner/case-study and blog-teaser bands stay out of
+the HTML until real entries exist. Do not invent placeholders, metrics, or
+unpublished titles — the design audit fails the build if they come back.
 
 | What | Where to edit |
 |---|---|
-| Partner logos and case studies | `caseStudies.partners` in `content/showcase.mjs` — add `logo: '/partners/name.svg'` to a partner to swap the monogram tile for the image |
-| Team photographs | `team.members` in `content/content.mjs`; `teamShowcase.slots` sets how many tiles the band reserves |
-| Blog posts | `blog.items` in `content/showcase.mjs`; empty tiles fill the rest of the grid |
-
-News and events currently hold **sample entries**. Replace them with real ones
-before launch. They deliberately carry no `Article` or `Event` structured data —
-marking up entries that were never published would feed search engines claims
-the business has not made. Add that markup once the copy is real.
+| Products, news, events, blog | `items` in `content/showcase.mjs` |
+| Team photographs | `team.members` in `content/content.mjs` |
 
 ---
 
@@ -179,8 +188,11 @@ facts across pages make a model less likely to state any of them confidently.
 
 ## The automated audit
 
-`npm run audit` checks the built output and **exits non-zero on failure**, so CI
-catches regressions. It verifies per page:
+`npm run check` builds the site, then runs the SEO/GEO audit, the design
+audit, and the browser render check. `npm run audit` is the SEO/GEO pass
+alone. Both **exit non-zero on failure**, so CI catches regressions.
+
+The SEO/GEO audit verifies per page:
 
 - `<title>` present, 20–65 characters
 - meta description present, 70–165 characters
@@ -204,8 +216,12 @@ CI runs this on every push touching `website/` (`.github/workflows/website.yml`)
 
 ### Checks that need a browser
 
-These tools run against a live server (`npm run serve`) rather than the built
-files, so they are not part of `npm run check`:
+`design-audit.mjs` asserts official brand paths, truthful empty states, home
+section order, and the restrained visual system. `render-check.mjs` opens
+every page at 18 widths and checks overflow, 44px targets, keyboard focus,
+reduced motion, and home-section composition.
+
+These extra tools run against a live server (`npm run serve`):
 
 ```bash
 node tools/head-check.mjs   # animated text still reads correctly
@@ -229,27 +245,22 @@ intermediate frames.
 
 ## Design
 
-The brief was: lighter, cleaner, smaller type, no overlapping elements,
-artistically colourful but still clean, and no colourful buttons.
+Paper, ink, neutrals, and one AIS blue. Home motion is limited to the intro,
+hero entrance, brain tilt, converge, reading line, explorer, and a quiet CTA
+field. Particles, custom cursor, magnetic buttons, and bouncing chips are gone.
 
-- **Light.** Paper-white surfaces, ink-dark text. The original was black with
-  white text and a full-viewport WebGL canvas behind everything.
-- **Small type.** Body is 16px. Display type is capped at `2.85rem` via `clamp()`
-  rather than the original's viewport-scaled headlines that ran to hundreds of
-  pixels.
-- **No overlaying.** Every element is in normal document flow. There are no
-  stacked absolutely-positioned layers, no scroll-jacking, no fixed canvas and
-  no "ENTER EXPERIENCE" gate. Colour arrives as `background-image` gradients on
-  the sections themselves, so it can never sit on top of text.
-- **Colour as accent.** Five accents — blue, violet, teal, amber, rose — appear
-  in eyebrow rules, card top rules, chip dots, process numerals, stat figures
-  and one gradient hairline above the footer.
-- **Neutral buttons.** Every button is ink-on-white or white-with-a-border.
-  No button uses an accent colour, by design.
+- **Light.** Paper-white surfaces and ink-dark text. Dark bands are reserved
+  for the demonstration, capability narrative, and final CTA.
+- **One accent.** AIS blue `#1d77fe` is the only decorative chromatic colour.
+- **Neutral buttons.** Primary is black; secondary is a ghost outline.
+- **Option-3 brain.** The official favicon sits at a 30° tilt with a restrained
+  edge and shadow. The lockup never gets that treatment.
+- **No overlaying.** Copy stays in normal flow. The CTA field is a sibling
+  behind the form, never a parent of the text.
 
 Accessibility: pinch zoom restored, a skip link, `aria-current` on the active
-nav item, visible focus rings, `prefers-reduced-motion` honoured, and mobile
-navigation built on `<details>` so it works without JavaScript.
+nav item, visible 2px AIS-blue focus rings, `prefers-reduced-motion` honoured,
+and mobile navigation built on `<details>` so it works without JavaScript.
 
 ---
 
