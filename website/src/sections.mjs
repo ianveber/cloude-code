@@ -326,7 +326,7 @@ export function teamSection(data, { headingLevel = 2 } = {}) {
    'list'       — plain headings and paragraphs, for the dedicated FAQ page.
    'disclosure' — closed <details>, collapsible for scanning. */
 
-export function faqSection(data, { headingLevel = 2, items, variant = 'disclosure' } = {}) {
+export function faqSection(data, { headingLevel = 2, items, variant = 'disclosure', dark = false } = {}) {
   const list = items ?? data.items;
 
   const body =
@@ -348,16 +348,33 @@ export function faqSection(data, { headingLevel = 2, items, variant = 'disclosur
       </details>`
         );
 
+  const head = sectionHead({
+    eyebrow: data.eyebrow,
+    title: data.title,
+    lead: dark ? '' : data.lead,
+    level: headingLevel,
+    id: 'pogosta-vprasanja',
+  });
+
+  /* The home page puts the questions in a rounded black panel. */
+  if (dark) {
+    return `
+<section class="section faq faq--dark" aria-labelledby="pogosta-vprasanja">
+  <div class="faq__panel">
+    <div class="shell">
+      ${head.replace('class="eyebrow"', 'class="eyebrow eyebrow--onDark"')}
+      <div class="faq-list">
+        ${body}
+      </div>
+    </div>
+  </div>
+</section>`;
+  }
+
   return `
 <section class="section" aria-labelledby="pogosta-vprasanja">
   <div class="shell">
-    ${sectionHead({
-      eyebrow: data.eyebrow,
-      title: data.title,
-      lead: data.lead,
-      level: headingLevel,
-      id: 'pogosta-vprasanja',
-    })}
+    ${head}
     <div class="faq-list">
       ${body}
     </div>

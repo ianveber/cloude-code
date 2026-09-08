@@ -189,11 +189,45 @@ export function buildStage(data) {
 </section>`;
 }
 
-/* ── Clients wall ─────────────────────────────────────────────────────────
-   One soft tile per client: the logo and the brand name, nothing else. The
-   tiles sit at staggered heights, float slowly, and lean toward the pointer. */
+/* ── Clients marquee ──────────────────────────────────────────────────────
+   Two rows of small pills, each with a client's logo and name. The rows
+   drift in opposite directions. Each row holds its items twice so the loop
+   has no seam; the second copy is hidden from assistive tech. */
+
+function clientPill(item, clone) {
+  const tag = item.href ? 'a' : 'span';
+  const attrs = item.href ? ` href="${esc(item.href)}" rel="noopener"` : '';
+  return `
+        <li class="client"${clone ? ' aria-hidden="true"' : ''}>
+          <${tag} class="client__tile"${attrs}${clone ? ' tabindex="-1"' : ''}>
+            <span class="client__logo${item.tone === 'dark' ? ' client__logo--dark' : ''}">
+              <img src="${esc(item.logo.src)}" alt="" width="${item.logo.width}" height="${item.logo.height}" loading="lazy" decoding="async">
+            </span>
+            <span class="client__name">${esc(item.name)}</span>
+          </${tag}>
+        </li>`;
+}
+
+/* Four copies per row: one set of pills is narrower than a wide screen, so
+   the loop needs spares to stay seamless. The animation travels one set. */
+const MARQUEE_COPIES = 4;
+
+function marqueeRow(items, reverse) {
+  const copies = Array.from({ length: MARQUEE_COPIES }, (_, c) =>
+    each(items, (item) => clientPill(item, c > 0))
+  ).join('\n');
+  return `
+    <div class="marquee${reverse ? ' marquee--reverse' : ''}">
+      <ul class="marquee__track">
+        ${copies}
+      </ul>
+    </div>`;
+}
 
 export function clientsLine(data) {
+  /* Alternate clients between the rows so long and short names mix. */
+  const rows = [data.items.filter((_, i) => i % 2 === 0), data.items.filter((_, i) => i % 2 === 1)];
+
   return `
 <section class="section clients" aria-labelledby="clients-title" data-clients>
   <div class="shell">
@@ -201,20 +235,10 @@ export function clientsLine(data) {
       <p class="eyebrow">${esc(data.eyebrow)}</p>
       <h2 id="clients-title">${esc(data.title)}</h2>
     </div>
-    <ul class="clients__wall">
-      ${each(
-        data.items,
-        (item, i) => `
-      <li class="client" style="--i:${i}">
-        <${item.href ? `a class="client__tile" href="${esc(item.href)}" rel="noopener"` : 'div class="client__tile"'} data-tilt>
-          <span class="client__logo">
-            <img src="${esc(item.logo.src)}" alt="" width="${item.logo.width}" height="${item.logo.height}" loading="lazy" decoding="async">
-          </span>
-          <span class="client__name">${esc(item.name)}</span>
-        </${item.href ? 'a' : 'div'}>
-      </li>`
-      )}
-    </ul>
+  </div>
+  <div class="clients__rows">
+    ${marqueeRow(rows[0], false)}
+    ${marqueeRow(rows[1].length ? rows[1] : rows[0], true)}
   </div>
 </section>`;
 }

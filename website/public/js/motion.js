@@ -116,6 +116,7 @@
     reveals();
     tiltFrames();
     footerGlow();
+    depthParallax();
     lazyVideo();
   });
 
@@ -605,6 +606,30 @@
         frame.style.setProperty('--glare', '-80%');
       });
     });
+  }
+
+  /* ── Depth ───────────────────────────────────────────────────────────────
+     The two lights behind the page slide a little against the scroll, so the
+     page reads as sitting in front of them. */
+  function depthParallax() {
+    var a = document.querySelector('.depth__a');
+    var b = document.querySelector('.depth__b');
+    if (!a || !b) return;
+    var ticking = false;
+
+    function sync() {
+      ticking = false;
+      var y = window.scrollY || 0;
+      a.style.setProperty('--py', (y * -0.05).toFixed(1) + 'px');
+      b.style.setProperty('--py', (y * 0.035).toFixed(1) + 'px');
+    }
+
+    sync();
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(sync);
+    }, { passive: true });
   }
 
   /* ── Footer wordmark ─────────────────────────────────────────────────────

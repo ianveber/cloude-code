@@ -52,13 +52,15 @@ export const buildStage = {
   ],
 };
 
-/* ── Clients wall ───────────────────────────────────────────────────────
-   One tile per client: the logo and the brand name, nothing else.
+/* ── Clients marquee ────────────────────────────────────────────────────
+   Two rows of small pills, each with a client's logo and name, nothing else.
 
    Logos come from each client's own website (public/clients/). INSPECTUS,
-   Pacom and ZaLife are confirmed clients; ATHLOS is our own sports product.
-   Before a production deploy, confirm with each client that their logo may
-   appear here. */
+   Pacom, ZaLife, Elementum, Tower Spa Celje, Dr. Asya Grafy Bio Institute,
+   SI-BIG, HEVA and Epolac are clients; AISOS, VETA and ATHLOS are our own
+   products and brands. `tone: 'dark'` puts a dark disc behind a logo drawn
+   for dark surfaces. Before a production deploy, confirm with each client
+   that their logo may appear here. */
 
 export const clients = {
   eyebrow: 'Reference',
@@ -78,6 +80,45 @@ export const clients = {
       name: 'ZaLife',
       href: 'https://www.zalife.eu/',
       logo: { src: '/clients/zalife.png', width: 593, height: 240 },
+    },
+    {
+      name: 'Elementum',
+      href: 'https://elementum.si/',
+      logo: { src: '/clients/elementum.png', width: 443, height: 85 },
+    },
+    {
+      name: 'Tower Spa Celje',
+      href: 'https://towerspacelje.com/',
+      logo: { src: '/clients/towerspa.png', width: 400, height: 436 },
+    },
+    {
+      name: 'Dr. Asya Grafy Bio Institute',
+      href: 'https://drasyagrafy.com/',
+      logo: { src: '/clients/asyagrafy.png', width: 600, height: 363 },
+    },
+    {
+      name: 'AISOS',
+      logo: { src: '/clients/aisos.svg', width: 1168, height: 1104 },
+    },
+    {
+      name: 'SI-BIG',
+      href: 'https://si-big.com/',
+      logo: { src: '/clients/sibig.png', width: 592, height: 541 },
+    },
+    {
+      name: 'HEVA',
+      href: 'https://www.heva.si/',
+      logo: { src: '/clients/heva.png', width: 110, height: 50 },
+    },
+    {
+      name: 'Epolac',
+      href: 'https://www.epolac.com/',
+      logo: { src: '/clients/epolac.png', width: 308, height: 83 },
+      tone: 'dark',
+    },
+    {
+      name: 'VETA',
+      logo: { src: '/clients/veta.svg', width: 512, height: 512 },
     },
     {
       name: 'ATHLOS',

@@ -24,15 +24,20 @@ The home page is a product narrative, not a template landing page:
 2. Hero: headline left, two pill buttons, the 3D brain slab on the right (white)
 3. Build stage: a rounded black panel where the three clips take turns in front,
    spread out side by side, then gather again (the only dark block)
-4. Clients wall: one soft tile per client with the logo and the brand name, staggered heights, no descriptions
+4. Clients: two marquee rows of small pills (logo + name), top row drifting left, bottom row right, no descriptions
 5. Three pillars: a title, one sentence and a rendered product picture in a soft panel
 6. Team (three real people, name and role)
 7. Blog (one line while `blog.items` is empty)
-8. FAQ (first five questions)
+8. FAQ (first five questions) in a rounded black panel
 9. Closing CTA: a rounded black panel with the short form
 10. Footer with every section, contact, the team, and the large "AI Slovenia" wordmark
 
 Home sections carry a tag (eyebrow) and a title. No lead paragraphs.
+
+Behind everything sits `.depth`: two very faint blue-grey lights (alpha ≤ 0.14,
+the audit checks) that drift on their own and slide a little against the
+scroll, plus a faint fall-off toward the bottom. It is the only "texture" on
+the page and it must stay barely noticeable.
 
 Supporting pages exist for products, news, events, blog, services, process,
 about, team, FAQ, and contact. Products / news / events / blog currently
@@ -58,8 +63,12 @@ These are enforced by `design-audit.mjs` and/or by the approved spec.
    light sweep that follow the pointer, and two shadows in its own silhouette.
    No tile or frame around it. Pointer tilt is capped at ±8°.
 3. **Buttons are black or soft grey pills.** No accent-coloured buttons.
-4. **One decorative colour:** AIS blue `#1d77fe`. No violet / teal / amber / rose
-   accent system.
+4. **One accent, blue-grey with a sheen.** UI accents (`--blue`, `--steel`)
+   are `#6f7f9c`; the hero's second line carries a slow metallic sheen. Only
+   the brand mark itself keeps AIS blue `#1d77fe` (`--brain-blue`). No
+   violet / teal / amber / rose accent system. The rendered pillar pictures
+   use the same blue-grey; the three clips still carry their original
+   colours until they are re-rendered.
 5. **No borders, no rules, no dashes.** Nothing on the site draws a line:
    no card borders, no hairlines between sections, no underlines, no `<hr>`,
    no em or en dashes in copy. Tiles are soft grey fills, dark blocks are
@@ -168,12 +177,16 @@ design audit fails the build if those strings return.
 Team photos: files in `public/team/` plus `photo` / `photoWidth` / `photoHeight`
 on each member in `content/content.mjs`. Crop is CSS `4 / 5`.
 
-Clients wall: `clients.items` in `content/showcase.mjs` lists confirmed
-clients (INSPECTUS, Pacom, ZaLife) and our own product ATHLOS, each with a
-logo in `public/clients/` taken from the client's own website. **Before a
-production deploy, confirm with each client that their logo may appear
-here.** Never add a client that does not exist; the render check requires a
-real logo image and a name per tile and rejects descriptions.
+Clients: `clients.items` in `content/showcase.mjs` lists the clients
+(INSPECTUS, Pacom, ZaLife, Elementum, Tower Spa Celje, Dr. Asya Grafy Bio
+Institute, SI-BIG, HEVA, Epolac) and our own brands (AISOS, VETA, ATHLOS),
+each with a logo in `public/clients/` taken from the client's own website or
+our repositories. `tone: 'dark'` puts a dark disc behind a logo drawn for
+dark surfaces (Epolac). Items alternate between the two marquee rows; each
+row repeats its pills four times so the loop is seamless on wide screens.
+**Before a production deploy, confirm with each client that their logo may
+appear here.** Never add a client that does not exist; the render check
+requires a real logo image and a name per pill and rejects descriptions.
 
 ---
 
@@ -188,7 +201,8 @@ real logo image and a name per tile and rejects descriptions.
 - Tracing: `potrace` (npm) over the lockup's alpha, ink and blue separately;
   the solid outline is the shape closed with a 21 px filter, flood-filled from
   the border and eroded back. Re-run only if the official mark changes.
-- Font: Figtree (Google Fonts), headlines at weight 500 with tight tracking.
+- Font: Google Sans Flex (Google Fonts, the Antigravity typeface), headlines
+  at weight 400 with tight tracking, body 400, controls and names 500.
 - Header/footer: flat `logo-light.png`.
 
 If you replace a brand file, keep the same filenames or update `site.brand`

@@ -88,7 +88,7 @@ function homePage() {
     pillarsSection(S.pillars),
     teamBand(S.teamShowcase, C.team.members),
     blogTeaser(S.blog),
-    faqSection(C.faq, { items: C.faq.items.slice(0, 5) }),
+    faqSection(C.faq, { items: C.faq.items.slice(0, 5), dark: true }),
     immersiveCta(S.ctaBlock),
   ].join('\n');
 

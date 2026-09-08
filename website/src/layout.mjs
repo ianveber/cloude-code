@@ -64,9 +64,9 @@ function head(page) {
     /* Fonts — preconnect then load without blocking first paint */
     '<link rel="preconnect" href="https://fonts.googleapis.com">',
     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>',
-    '<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap">',
-    '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" media="print" onload="this.media=\'all\'">',
-    '<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap"></noscript>',
+    '<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@300;400;500;600&display=swap">',
+    '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@300;400;500;600&display=swap" media="print" onload="this.media=\'all\'">',
+    '<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@300;400;500;600&display=swap"></noscript>',
 
     '<link rel="stylesheet" href="/styles.css">',
     /* Marks the document as script-capable before first paint so entrance
@@ -250,6 +250,7 @@ ${head(page)}
 </head>
 <body>
 <a class="skip-link" href="#main">Preskoči na vsebino</a>
+<div class="depth" aria-hidden="true" data-depth><span class="depth__a"></span><span class="depth__b"></span></div>
 ${page.showIntro ? introOverlay() : ''}
 ${header(page)}
 ${breadcrumbs(page)}

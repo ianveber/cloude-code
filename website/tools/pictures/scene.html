@@ -19,8 +19,8 @@
     --faint: #9299a5;
     --line: #e5e7eb;
     --line-strong: #cfd3da;
-    --blue: #1d77fe;
-    --blue-soft: rgba(29, 119, 254, .10);
+    --blue: #6f7f9c;
+    --blue-soft: rgba(111, 127, 156, .14);
     --green: #1f9d5a;
     --green-soft: #e6f6ec;
     --amber: #d98b0c;
@@ -64,7 +64,7 @@
   .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; }
   .avatar {
     width: 32px; height: 32px; border-radius: 50%;
-    background: linear-gradient(135deg, #1d77fe, #6fb0ff);
+    background: linear-gradient(135deg, #56647f, #9dabc4);
     color: #fff; font-size: 12px; font-weight: 700; display: grid; place-items: center;
   }
 
@@ -185,7 +185,7 @@
     box-shadow: 0 1px 2px rgba(17,19,24,.05), 0 10px 26px rgba(17,19,24,.06);
     display: grid; grid-template-columns: 36px 1fr; gap: 12px; align-items: center;
   }
-  .node--on { border-color: rgba(29, 119, 254, .55); box-shadow: 0 0 0 4px rgba(29,119,254,.10), 0 10px 26px rgba(17,19,24,.08); }
+  .node--on { border-color: rgba(111, 127, 156, .6); box-shadow: 0 0 0 4px rgba(111,127,156,.12), 0 10px 26px rgba(17,19,24,.08); }
   .node__icon { width: 36px; height: 36px; border-radius: 10px; background: var(--canvas); border: 1px solid var(--line); display: grid; place-items: center; }
   .node__icon i { width: 14px; height: 14px; border-radius: 4px; border: 2px solid var(--ink-soft); display: block; }
   .node__icon i.round { border-radius: 50%; }
@@ -351,13 +351,13 @@
               <div class="card__title">Ročno delo proti avtomatizirano</div>
               <div class="card__meta">zadnjih 30 dni · ure na dan</div>
             </div>
-            <div class="legend"><span><i style="background:#c3c8d2"></i>ročno</span><span><i style="background:#1d77fe"></i>avtomatizirano</span></div>
+            <div class="legend"><span><i style="background:#c3c8d2"></i>ročno</span><span><i style="background:#6f7f9c"></i>avtomatizirano</span></div>
           </div>
           <svg viewBox="0 0 900 250" preserveAspectRatio="none" aria-hidden="true">
             <defs>
               <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#1d77fe" stop-opacity=".22"/>
-                <stop offset="1" stop-color="#1d77fe" stop-opacity="0"/>
+                <stop offset="0" stop-color="#6f7f9c" stop-opacity=".22"/>
+                <stop offset="1" stop-color="#6f7f9c" stop-opacity="0"/>
               </linearGradient>
             </defs>
             <g stroke="#eceef2" stroke-width="1">
@@ -366,8 +366,8 @@
             </g>
             <path d="M40 70 C160 74, 260 82, 380 96 S620 118, 880 128" fill="none" stroke="#c3c8d2" stroke-width="2.5"/>
             <path d="M40 200 C140 196, 220 190, 320 176 S520 128, 640 104 S800 66, 880 58 L880 230 L40 230 Z" fill="url(#g1)"/>
-            <path d="M40 200 C140 196, 220 190, 320 176 S520 128, 640 104 S800 66, 880 58" fill="none" stroke="#1d77fe" stroke-width="3"/>
-            <circle cx="880" cy="58" r="5" fill="#fff" stroke="#1d77fe" stroke-width="3"/>
+            <path d="M40 200 C140 196, 220 190, 320 176 S520 128, 640 104 S800 66, 880 58" fill="none" stroke="#6f7f9c" stroke-width="3"/>
+            <circle cx="880" cy="58" r="5" fill="#fff" stroke="#6f7f9c" stroke-width="3"/>
             <g font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#9299a5">
               <text x="40" y="244">1. 8.</text><text x="440" y="244" text-anchor="middle">16. 8.</text><text x="880" y="244" text-anchor="end">danes</text>
             </g>
