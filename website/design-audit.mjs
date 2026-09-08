@@ -11,7 +11,6 @@ const expect = (condition, message) => {
 };
 
 const home = await read('dist/index.html');
-const art = await read('src/art.mjs');
 const styles = await read('src/styles.css');
 const layout = await read('src/layout.mjs');
 const sections = await read('src/sections.mjs');
@@ -65,7 +64,6 @@ expect(
 );
 expect(/class="nav-toggle__icon"/.test(layout), 'Mobile navigation needs the composed menu icon.');
 expect(/class="faq-item__icon"/.test(sections), 'FAQ disclosures need an explicit affordance.');
-expect(/class="[^"]*\bprocess-overview\b/.test(home), 'Home process overview needs its visual-system class.');
 expect(
   /class="shell empty-state__shell"[\s\S]*class="empty-state__inner"/.test(showcase),
   'Empty-state gutters and card composition must use separate elements.'
@@ -85,14 +83,31 @@ expect(
 expect(
   siteConfig.includes(
     "blurb: 'Programska oprema in avtomatizacija za delo, ki ne bi smelo ostati ročno.'"
-  ),
-  'Footer must use the approved factual brand statement.'
+  ) && siteConfig.includes("wordmark: 'AI Slovenia'"),
+  'Footer must use the approved factual brand statement and the AI Slovenia wordmark.'
+);
+expect(
+  /class="footer-people"/.test(home) &&
+    /mailto:info@ais-slovenia\.si/.test(home) &&
+    /tel:\+38670717087/.test(home),
+  'Footer must print the team, the public inbox and the phone number.'
 );
 expect(
   !/export function (?:useCaseSlider|statsSection)/.test(sections) &&
-    !/export function caseStudiesBand/.test(showcase) &&
-    !/export const caseStudies/.test(showcaseContent),
-  'Dormant slider, stats, or case-study exports remain.'
+    !/export function (?:caseStudiesBand|convergeBand|capabilityBand)/.test(showcase),
+  'Dormant slider, stats, converge, or capability exports remain.'
+);
+expect(
+  /export function clientsLine/.test(showcase) &&
+    /export const clients = \{[\s\S]*items: \[[\s\S]*name:/.test(showcaseContent) &&
+    !/logo:/.test(showcaseContent),
+  'Clients line must list named projects with one sentence each and no logos.'
+);
+expect(
+  /export function pillarsSection/.test(showcase) &&
+    /\/pictures\/(?:saas|flow|security)/.test(showcaseContent) &&
+    /<source srcset="[^"]+\.webp" type="image\/webp">/.test(showcase),
+  'Pillars must render the three rendered product pictures with a webp source.'
 );
 expect(
   !/\baccentMod\b/.test(`${htmlHelpers}\n${sections}\n${showcase}`) &&
@@ -157,9 +172,15 @@ expect(
   'Card and control radii must use two distinct, non-duplicated tokens.'
 );
 expect(
-  /\.converge\s*\{[^}]*--settled:\s*1;/.test(styles) &&
-    /html\.motion-on \.converge\s*\{[^}]*--settled:\s*0;/.test(styles),
-  'Converge settled default must stay readable without JS and start at 0 for JS motion.'
+  /\.build__screen\.is-active\s*\{/.test(styles) &&
+    /class="build__screen is-active"/.test(home) &&
+    /class="build__screen is-left"/.test(home) &&
+    /class="build__screen is-right"/.test(home),
+  'Build stage must ship its first pose in HTML so it reads without JS.'
+);
+expect(
+  /@media \(max-width: 768px\)[\s\S]*\.build__screen\.is-right\s*\{[^}]*position:\s*static;/.test(styles),
+  'Build stage must stack its screens on small screens.'
 );
 expect(
   !/function (?:particles|bouncers|cursor|magnetic)\(/.test(motion) &&
@@ -170,9 +191,9 @@ expect(
   'Ornamental particles, bouncers, cursor, and magnetic motion must be removed.'
 );
 expect(
-  /at\(100,/.test(motion) && /at\(720,/.test(motion) && /at\(1900,/.test(motion) &&
-    !/at\(120,/.test(motion) && !/at\(900,/.test(motion) && !/at\(2350,/.test(motion),
-  'Intro must use the restrained 100 / 720 / 1900 ms stages.'
+  /at\(100,/.test(motion) && /at\(520,/.test(motion) && /at\(2300,/.test(motion) &&
+    /typeInto\(brand, 78,/.test(motion) && /typeInto\(tail, 58,/.test(motion),
+  'Intro must use the 100 ms mark, typing by 520 ms at 78 / 58 ms per character, and open at 2300 ms.'
 );
 expect(
   /Math\.min\(window\.devicePixelRatio[^,]*, 1\.5\)/.test(motion) &&
@@ -180,7 +201,7 @@ expect(
   'CTA field must cap device pixel ratio at 1.5 and stay AIS-blue/neutral.'
 );
 expect(
-  /@media \(prefers-reduced-motion: reduce\)\s*\{[\s\S]*animation-iteration-count:\s*1 !important;[\s\S]*\[data-enter\][\s\S]*\.readline__w[\s\S]*\.ctaband__field\s*\{\s*display:\s*none;/.test(styles),
+  /@media \(prefers-reduced-motion: reduce\)\s*\{[\s\S]*animation-iteration-count:\s*1 !important;[\s\S]*\[data-enter\][\s\S]*\.ctaband__field\s*\{\s*display:\s*none;/.test(styles),
   'Reduced-motion CSS must force visible copy and hide the CTA field.'
 );
 
@@ -199,14 +220,22 @@ expect(
   'Hero must use the official /brand/favicon.png brain.'
 );
 expect(
-  /data-brand-lockup[^>]+src="\/brand\/logo-light\.png"/.test(home),
-  'Intro must reveal the official light-background lockup.'
+  /data-intro-brand[^>]+data-text="AIS"/.test(home) &&
+    /data-intro-tail[^>]+data-text="Slovenia"/.test(home) &&
+    /data-intro-caret/.test(home),
+  'Intro must type the brand name next to the mark with a caret.'
 );
 expect(!/brain3d__slice|class="brain-mark/.test(home), 'Generated home still contains invented brain SVG.');
-expect(!/BRAIN_SILHOUETTE|brainMark|brainSlice/.test(art), 'src/art.mjs still defines invented brand art.');
 expect(
-  /\.hero__intro-brain img\s*\{[^}]*width:\s*41\.7%;/s.test(styles),
-  'Intro brain must match the official lockup glyph footprint (41.7%).'
+  /\.intro__mark\s*\{[^}]*aspect-ratio:\s*1;/s.test(styles) &&
+    /\.intro__ghost\s*\{\s*visibility:\s*hidden;/.test(styles),
+  'Intro mark must stay square and the typed wordmark must reserve its width.'
+);
+expect(
+  /\.brand-brain__side--3\s*\{/.test(styles) &&
+    /\.brand-brain__gloss\s*\{/.test(styles) &&
+    !/mix-blend-mode/.test(styles),
+  'Hero brain must be a layered glossy slab without blend modes.'
 );
 expect(
   /showIntro:\s*true/.test(build) &&
@@ -243,14 +272,16 @@ for (const [route, html] of Object.entries({
 }
 
 const order = [
+  'data-intro-stage',
   'data-intro',
-  'data-converge',
-  'data-capband',
-  'data-services',
-  'data-process-overview',
+  'data-build',
+  'data-clients',
+  'data-pillars',
   'team-band',
+  'blog-band',
   'pogosta-vprasanja',
   'povprasevanje',
+  'data-footer-mark',
 ];
 let cursor = -1;
 for (const marker of order) {

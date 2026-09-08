@@ -20,16 +20,16 @@ response so search engines and AI answer engines can read it without JavaScript.
 
 The home page is a product narrative, not a template landing page:
 
-1. Official brain intro (home only)
-2. Hero with option-3 3D brain + CTAs
-3. Three-clip converge band (flowchart → code → SaaS)
-4. Capability chapters (SaaS, automation, security, custom apps)
-5. Service explorer (three real service areas)
-6. Four-phase process overview
-7. Team (three real people)
+1. Typed intro: white screen, the brain mark, "AIS Slovenia" typed with a caret (home only)
+2. Hero with the glossy 3D brain slab + CTAs (white)
+3. Build stage: three clips in a fanned 3D stage (the only black band)
+4. Clients line: named projects, one sentence each, no logos (white)
+5. Three pillars with rendered product pictures: SaaS, automation, security + apps
+6. Team (three real people)
+7. Blog teaser (honest empty state while `blog.items` is empty)
 8. FAQ (first five questions)
-9. Blog teaser (omitted while `blog.items` is empty)
-10. Dark CTA form
+9. Dark CTA form
+10. Footer with every contact, the team, and the large "AI Slovenia" wordmark
 
 Supporting pages exist for products, news, events, blog, services, process,
 about, team, FAQ, and contact. Products / news / events / blog currently
@@ -98,16 +98,17 @@ push that touches `website/`.
 |---|---|
 | Company name, nav, contact, brand paths, footer blurb | `content/site.mjs` |
 | Hero, services, process, team, FAQ, about | `content/content.mjs` |
-| Home bands, products / news / events / blog data | `content/showcase.mjs` |
+| Intro text, build stage, clients, pillars, blog data | `content/showcase.mjs` |
 | Page composition and routes | `build.mjs` |
 | Header, footer, `<head>` | `src/layout.mjs` |
 | Shared sections | `src/sections.mjs` |
-| Home-only bands (intro, hero brain, converge, CTA) | `src/showcase.mjs` |
-| Capability line art (not the logo) | `src/art.mjs` |
+| Home-only bands (intro, hero, stage, clients, pillars, CTA) | `src/showcase.mjs` |
+| Product pictures for the pillars | `tools/pictures/scene.html` |
 | Visual system | `src/styles.css` |
 | Motion | `public/js/motion.js` |
 | JSON-LD | `src/schema.mjs` |
 | Official images | `public/brand/`, `public/team/` |
+| Rendered pictures and clips | `public/pictures/`, `public/video/` |
 
 **Change wording in `content/`, then `npm run build`.** Pages, nav, sitemap,
 `llms.txt`, and schema regenerate from those files.
@@ -151,18 +152,26 @@ design audit fails the build if those strings return.
 Team photos: files in `public/team/` plus `photo` / `photoWidth` / `photoHeight`
 on each member in `content/content.mjs`. Crop is CSS `4 / 5`.
 
-Partner logos: there is no public case-study band until real logos exist.
-Do not reintroduce fabricated partners.
+Clients line: `clients.items` in `content/showcase.mjs` lists real projects
+from our own repositories (INSPECTUS, ATHLOS, AIS Command, the coating model)
+with one sentence each and no logos. **Before a production deploy, confirm
+with each client that the project may be named publicly and replace the
+working names with the ones they approve.** Never add a project that does not
+exist.
 
 ---
 
 ## Brand treatment (option 3)
 
-- Intro: official brain image, then crossfade to `logo-light.png`. The brain
-  in the lockup is aligned to a **41.7%** glyph footprint — do not guess a new
-  percentage.
-- Hero: `favicon.png` inside `.brand-brain__rig` with `--tilt-x` / `--tilt-z`.
-  Pointer tilt is capped at ±3°.
+- Intro: the official brain tile (`favicon.png`, corners softened to an
+  app-icon radius) with "AIS Slovenia" typed beside it in the site font. The
+  text comes from `intro` in `content/showcase.mjs`. There is no lockup
+  crossfade any more.
+- Hero: `favicon.png` inside `.brand-brain__rig` with `--tilt-x` / `--tilt-z`,
+  treated as a glossy slab: three edge layers for thickness, a pointer-driven
+  highlight, a light sweep every 6.5 s and a slow float. Pointer tilt is
+  capped at ±8° and follows the pointer anywhere over the hero. The image is
+  never redrawn; only the tilt, the shadow and the light move.
 - Header/footer: flat `logo-light.png`.
 
 If you replace a brand file, keep the same filenames or update `site.brand`
@@ -174,13 +183,21 @@ and the design-audit selectors together.
 
 `public/js/motion.js` may run:
 
-`introSequence`, `heroEntrance`, `brainTilt`, `explorer`, `reveals`,
-`converge`, `readline`, `ctaField`, `lazyVideo`, plus `headerState` and
-`contactForms`.
+`introSequence`, `heroEntrance`, `brainShine`, `buildStage`, `reveals`,
+`clientsLine`, `tiltFrames`, `footerGlow`, `ctaField`, `lazyVideo`, plus
+`headerState`, `explorer` (other pages) and `contactForms`.
 
-Intro timing (home, first visit, motion allowed): **100 ms** logo, **720 ms**
-lockup, **1900 ms** site. Click / Escape / Enter / Space skip immediately.
-`sessionStorage.ais-intro` prevents a repeat in the same tab.
+Intro timing (home, first visit, motion allowed): **100 ms** mark, typing
+starts once the webfont is ready (**380–520 ms**) at 78 ms per character for
+"AIS" and 58 ms for "Slovenia", caret blinks, **2300 ms** site loads in.
+Click / Escape / Enter / Space skip immediately. `sessionStorage.ais-intro`
+prevents a repeat in the same tab.
+
+Build stage: the front screen changes every **6 s** (the blue rule on the
+active tab is the countdown), pauses under the pointer or on a focused tab,
+and answers clicks, tab presses and Arrow keys. `buildStage` also runs under
+reduced motion (without auto-rotation or the pointer lean) because the tabs
+are real controls.
 
 **Removed on purpose:** particles, bouncing chips, custom cursor, magnetic
 buttons. Do not bring them back.
@@ -200,11 +217,18 @@ under the form either way.
 
 ---
 
-## Converge videos
+## Build-stage videos and pillar pictures
 
-Generated, not filmed. Source: `tools/video/scene.html`. Renderer:
-`node tools/video/render.mjs`. Outputs live in `public/video/` (webm, mp4,
-poster). Re-render only when the scene file changes. Needs Chrome and ffmpeg.
+Both are generated, not filmed or photographed.
+
+- Clips: source `tools/video/scene.html`, renderer `node tools/video/render.mjs`,
+  outputs in `public/video/` (webm, mp4, poster).
+- Pictures: source `tools/pictures/scene.html`, renderer
+  `node tools/pictures/render.mjs`, outputs in `public/pictures/` (webp + jpg
+  at 3200×2000). The `<picture>` markup in `src/showcase.mjs` expects both.
+
+Re-render only when a scene file changes. Both need Chrome (the macOS path is
+detected, otherwise set `CHROME_PATH`) and ffmpeg.
 
 ---
 
@@ -212,7 +236,7 @@ poster). Re-render only when the scene file changes. Needs Chrome and ffmpeg.
 
 - Paper `#fff`, canvas `#f8f9fb`, ink `#111318`, AIS blue `#1d77fe`
 - Control radius 10px, card radius 16px, 44px minimum targets
-- Dark bands only for converge, capabilities, and the final CTA
+- Dark bands only for the build stage and the final CTA
 - Shared CSS link arrow `↗` — do not put literal arrows in markup
 - Spacing tokens `--space-1` … `--space-7` — prefer tokens over magic numbers
 
@@ -256,7 +280,7 @@ After a production deploy:
 ## Still open (not bugs — waiting on the business)
 
 - Product, news, event, and blog entries
-- Confirmed partner logos / case studies
+- Client approval for the names in the clients line (see above)
 - Contact webhook (`formEndpoint`)
 - Kariera has no page; the footer link goes to `/kontakt/`
 - English locale is not built (hreflang is `sl-SI` + `x-default` only)

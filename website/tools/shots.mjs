@@ -46,17 +46,6 @@ async function sectionTop(page, selector) {
   }, selector);
 }
 
-async function scrollConverge(page, progress) {
-  await page.evaluate((value) => {
-    const section = document.querySelector('[data-converge]');
-    if (!section) return;
-    const origin = section.querySelector('.converge__stage') || section;
-    const top = window.scrollY + origin.getBoundingClientRect().top;
-    const target = top - window.innerHeight * 0.58 + value * window.innerHeight * 0.72;
-    window.scrollTo({ top: Math.max(0, target), behavior: 'instant' });
-  }, progress);
-  await wait(450);
-}
 
 async function main() {
   await mkdir(OUT, { recursive: true });
@@ -73,16 +62,16 @@ async function main() {
     intro,
     () => {
       const stage = document.querySelector('[data-intro-stage]');
-      return Boolean(stage?.classList.contains('is-logo') && !stage.classList.contains('is-word'));
+      return Boolean(stage?.classList.contains('is-logo') && !stage.classList.contains('is-typed'));
     }
   );
   await wait(80);
-  await shoot(intro, 'intro-logo');
+  await shoot(intro, 'intro-mark');
   await waitFor(intro, () =>
-    Boolean(document.querySelector('[data-intro-stage]')?.classList.contains('is-word'))
+    Boolean(document.querySelector('[data-intro-stage]')?.classList.contains('is-typed'))
   );
   await wait(220);
-  await shoot(intro, 'intro-lockup');
+  await shoot(intro, 'intro-typed');
   await waitFor(intro, () => !document.documentElement.classList.contains('is-intro'));
   await wait(500);
   await shoot(intro, 'home-hero');
@@ -102,15 +91,10 @@ async function main() {
   await wait(600);
   await shoot(page, 'home-hero-resting');
 
-  await scrollConverge(page, 0.12);
-  await shoot(page, 'home-converge-apart');
-  await scrollConverge(page, 0.7);
-  await shoot(page, 'home-converge-merged');
-
   const home = [
-    ['home-capabilities', '[data-capband]', 80],
-    ['home-services', '[data-services]', -40],
-    ['home-process', '[data-process-overview]', -40],
+    ['home-build', '[data-build]', -40],
+    ['home-clients', '[data-clients]', -40],
+    ['home-pillars', '[data-pillars]', -40],
     ['home-team', '.team-band', -40],
     ['home-cta', '[data-cta], .ctaband', -40],
   ];

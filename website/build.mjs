@@ -39,8 +39,9 @@ import {
 import { renderPage } from './src/layout.mjs';
 import {
   brainHero,
-  convergeBand,
-  capabilityBand,
+  buildStage,
+  clientsLine,
+  pillarsSection,
   teamBand,
   immersiveCta,
   blogTeaser,
@@ -82,13 +83,12 @@ const closingCta = ctaBand({
 function homePage() {
   const body = [
     brainHero(C.hero),
-    convergeBand(S.converge),
-    capabilityBand(S.capabilities),
-    featureExplorer(C.services),
-    processOverview(C.processMeta, C.processPhases),
+    buildStage(S.buildStage),
+    clientsLine(S.clients),
+    pillarsSection(S.pillars),
     teamBand(S.teamShowcase, C.team.members),
-    faqSection(C.faq, { items: C.faq.items.slice(0, 5) }),
     blogTeaser(S.blog),
+    faqSection(C.faq, { items: C.faq.items.slice(0, 5) }),
     immersiveCta(S.ctaBlock),
   ].join('\n');
 
@@ -112,7 +112,7 @@ function homePage() {
     breadcrumbs: [HOME_CRUMB],
     priority: '1.0',
     changefreq: 'weekly',
-    schema: [faqNode(C.faq.items.slice(0, 5), '/'), howToNode('/')],
+    schema: [faqNode(C.faq.items.slice(0, 5), '/')],
     body,
   };
 }

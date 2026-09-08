@@ -10,6 +10,7 @@ import { esc, join, each, jsonLd, absolute } from './html.mjs';
 import { buildGraph } from './schema.mjs';
 import { introOverlay } from './showcase.mjs';
 import site from '../content/site.mjs';
+import { team } from '../content/content.mjs';
 
 const url = (path) => absolute(site.origin, path);
 
@@ -176,6 +177,12 @@ function breadcrumbs(page) {
 
 /* ── Footer ───────────────────────────────────────────────────────────── */
 
+/**
+ * Footer with everything a visitor might need to reach us: the flat lockup,
+ * the brand statement, every section of the site, the public inbox and
+ * phone, the people behind the company, and the large typographic
+ * "AI Slovenia" wordmark that closes the page.
+ */
 function footer() {
   const columns = each(
     site.footer.columns,
@@ -188,6 +195,12 @@ function footer() {
       </div>`
   );
 
+  const people = each(
+    team.members,
+    (person) => `
+          <li><b>${esc(person.name)}</b> · ${esc(person.role)} · <a href="mailto:${esc(person.email)}">${esc(person.email)}</a></li>`
+  );
+
   return `
 <footer class="site-footer">
   <div class="shell">
@@ -198,6 +211,7 @@ function footer() {
           <img src="${esc(site.brand.logo)}" alt="${esc(site.name)}" width="${site.brand.logoWidth}" height="${site.brand.logoHeight}" loading="lazy">
         </a>
         <p>${esc(site.footer.blurb)}</p>
+        <p class="footer-statement">${esc(site.footer.statement)}</p>
       </div>
       <div class="footer-nav">
         ${columns}
@@ -209,11 +223,17 @@ function footer() {
           <li><a href="${esc(site.contact.phoneHref)}">${esc(site.contact.phone)}</a></li>
           <li><span>${esc(site.contact.city)}, ${esc(site.contact.country)}</span></li>
         </ul>
+        <h4 class="footer-people__title">Ekipa</h4>
+        <ul class="footer-people">
+          ${people}
+        </ul>
         <p class="footer-legal">${esc(site.legalName)}</p>
       </div>
     </div>
+    <p class="footer-wordmark" data-footer-mark aria-hidden="true">${esc(site.footer.wordmark)}</p>
     <div class="footer-bottom">
-      <span>&copy; ${site.copyrightYear} ${esc(site.name)}. Vse pravice pridržane.</span>
+      <span>&copy; ${site.copyrightYear} ${esc(site.legalName)}. Vse pravice pridržane.</span>
+      <span>${esc(site.contact.city)}, ${esc(site.contact.country)} · <a href="mailto:${esc(site.contact.email)}">${esc(site.contact.email)}</a></span>
     </div>
   </div>
 </footer>`;

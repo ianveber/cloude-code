@@ -74,34 +74,30 @@ async function main() {
   await page.reload({ waitUntil: 'domcontentloaded' });
   await wait(2600);
 
-  const conv = await top('[data-converge]');
-  if (conv !== null) {
-    await glide(conv - 70, 46, 26);
-    await wait(900);
-    for (const off of [140, 300, 460, 620]) {
-      await glide(conv + off, 16, 34);
-      await wait(360);
-    }
+  const stage = await top('[data-build]');
+  if (stage !== null) {
+    await glide(stage - 40, 46, 26);
+    /* Hold long enough for the stage to rotate once on its own. */
+    await wait(7000);
   }
 
-  const cap = await top('[data-capband]');
-  if (cap !== null) {
-    await glide(cap - 50, 40, 28);
-    await wait(600);
-    const items = await page.evaluate(() =>
-      [...document.querySelectorAll('.capitem')].map(
-        (el) => window.scrollY + el.getBoundingClientRect().top
-      )
-    );
-    for (const iy of items) {
-      await glide(iy - 120, 22, 32);
-      await wait(500);
-    }
+  const clients = await top('[data-clients]');
+  if (clients !== null) {
+    await glide(clients - 40, 40, 28);
+    await wait(2400);
+  }
+
+  const pillars = await page.evaluate(() =>
+    [...document.querySelectorAll('.pillar')].map(
+      (el) => window.scrollY + el.getBoundingClientRect().top
+    )
+  );
+  for (const py of pillars) {
+    await glide(py - 120, 22, 32);
+    await wait(700);
   }
 
   for (const [sel, off, hold] of [
-    ['[data-services]', -40, 900],
-    ['[data-process-overview]', -40, 800],
     ['.team-band', -40, 800],
     ['#pogosta-vprasanja, .faq', -40, 700],
     ['[data-cta], .ctaband', -40, 1600],

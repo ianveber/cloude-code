@@ -77,6 +77,10 @@ export const site = {
 
   footer: {
     blurb: 'Programska oprema in avtomatizacija za delo, ki ne bi smelo ostati ročno.',
+    statement:
+      'Umetna inteligenca za slovenska podjetja. Načrtujemo, gradimo in vzdržujemo sisteme, ki prevzamejo delo.',
+    /* Large typographic wordmark that closes every page. */
+    wordmark: 'AI Slovenia',
     columns: [
       {
         title: 'Podjetje',

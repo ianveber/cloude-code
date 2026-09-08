@@ -7,31 +7,48 @@
  */
 
 import { esc, each } from './html.mjs';
-import { capabilityArt } from './art.mjs';
 import site from '../content/site.mjs';
+import { intro as introCopy } from '../content/showcase.mjs';
 
-/* ── Hero ─────────────────────────────────────────────────────────────── */
+/* ── Opening sequence ─────────────────────────────────────────────────── */
 
 /**
- * The opening overlay.
+ * The opening overlay: a white screen, the brain mark, and the brand name
+ * typed out next to it with a blinking caret. The site loads in once the
+ * typing has finished.
  *
  * Rendered by the layout *outside* `<main>`: while the intro runs, the whole
  * page below is faded out, and an element inside a faded parent cannot be
  * shown again by any rule of its own.
+ *
+ * The full wordmark is present twice: once as an invisible ghost that reserves
+ * the final width so nothing shifts while typing, and once as the live text
+ * that motion.js fills one character at a time.
  */
 export function introOverlay() {
   return `
-<div class="hero__intro" data-intro-stage aria-hidden="true">
-  <span class="hero__intro-brain">
-    <img data-brand-brain src="${esc(site.brand.brain)}" alt=""
-      width="${site.brand.brainWidth}" height="${site.brand.brainHeight}">
-  </span>
-  <img class="hero__intro-lockup" data-brand-lockup
-    src="${esc(site.brand.logo)}" alt=""
-    width="${site.brand.logoWidth}" height="${site.brand.logoHeight}">
+<div class="intro" data-intro-stage aria-hidden="true">
+  <div class="intro__lockup">
+    <span class="intro__mark">
+      <img data-brand-brain src="${esc(site.brand.brain)}" alt=""
+        width="${site.brand.brainWidth}" height="${site.brand.brainHeight}">
+    </span>
+    <span class="intro__type">
+      <span class="intro__ghost"><span class="intro__brand">${esc(introCopy.brand)}</span><span class="intro__tail">${esc(introCopy.tail)}</span></span>
+      <span class="intro__live"><span class="intro__brand" data-intro-brand data-text="${esc(introCopy.brand)}"></span><span class="intro__tail" data-intro-tail data-text="${esc(introCopy.tail)}"></span><span class="intro__caret" data-intro-caret></span></span>
+    </span>
+  </div>
 </div>`;
 }
 
+/* ── Hero ─────────────────────────────────────────────────────────────── */
+
+/**
+ * White stage with the official brain as a glossy slab, tilted toward the
+ * visitor. The slab is the only 3D object on the site: a stack of edge layers
+ * gives it thickness, a moving highlight gives it shine, and both follow the
+ * pointer slowly.
+ */
 export function brainHero(data) {
   return `
 <section class="hero hero--brain" data-intro>
@@ -46,11 +63,18 @@ export function brainHero(data) {
     </div>
     <div class="hero__art" aria-hidden="true">
       <div class="brand-brain" data-brain>
-        <div class="brand-brain__rig">
-          <span class="brand-brain__edge"></span>
-          <img data-brand-brain src="${esc(site.brand.brain)}" alt=""
-            width="${site.brand.brainWidth}" height="${site.brand.brainHeight}">
-          <span class="brand-brain__shadow"></span>
+        <div class="brand-brain__float">
+          <div class="brand-brain__rig">
+            <span class="brand-brain__shadow"></span>
+            <span class="brand-brain__side brand-brain__side--3"></span>
+            <span class="brand-brain__side brand-brain__side--2"></span>
+            <span class="brand-brain__side brand-brain__side--1"></span>
+            <img data-brand-brain src="${esc(site.brand.brain)}" alt=""
+              width="${site.brand.brainWidth}" height="${site.brand.brainHeight}">
+            <span class="brand-brain__gloss"></span>
+            <span class="brand-brain__sweep"></span>
+            <span class="brand-brain__rim"></span>
+          </div>
         </div>
       </div>
     </div>
@@ -73,22 +97,26 @@ export function emptyState({ id, eyebrow, title, body, action }) {
 </section>`;
 }
 
-/* ── Converge band ────────────────────────────────────────────────────────
-   Three clips run side by side, then close into a single frame as the section
-   is scrolled. The clips are decorative and silent, so they are muted, looped
-   and marked aria-hidden; the caption under each one carries the meaning. */
+/* ── Build stage ──────────────────────────────────────────────────────────
+   The one dark band. Three clips sit in a fanned stage: the front screen is
+   large, the other two wait at its sides. Any screen can be brought forward
+   by pointer, keyboard or the tabs beneath; left alone, the stage rotates on
+   its own. The clips are decorative and silent, so they are muted, looped and
+   marked aria-hidden; the tabs carry the meaning. */
 
-function screenPanel(screen, index) {
+const STAGE_POSITION = ['is-left', 'is-active', 'is-right'];
+
+function stageScreen(screen, index) {
   const sources = each(
     screen.sources,
     (s) => `<source src="${esc(s.src)}" type="${esc(s.type)}">`
   );
 
   return `
-      <figure class="converge__panel" data-converge-panel="${index}">
-        <div class="converge__frame">
+      <figure class="build__screen ${STAGE_POSITION[index]}" data-build-screen="${index}">
+        <div class="build__frame">
           <video
-            class="converge__video"
+            class="build__video"
             poster="${esc(screen.poster)}"
             width="1280" height="800"
             muted loop playsinline preload="none"
@@ -96,66 +124,123 @@ function screenPanel(screen, index) {
             data-lazy-video>
             ${sources}
           </video>
+          <span class="build__glare"></span>
         </div>
-        <figcaption class="converge__caption">
-          <span class="converge__label">${esc(screen.label)}</span>
-          <span class="converge__text">${esc(screen.caption)}</span>
+        <figcaption class="build__cap">
+          <span class="build__cap-label">${esc(screen.label)}</span>
+          <span class="build__cap-text">${esc(screen.caption)}</span>
         </figcaption>
       </figure>`;
 }
 
-export function convergeBand(data) {
+function stageTab(screen, index) {
+  const active = index === 1;
   return `
-<section class="converge" id="kako-nastane" aria-labelledby="converge-title" data-converge>
-  <div class="shell converge__head">
+      <button class="build__tab${active ? ' is-active' : ''}" type="button"
+        data-build-tab="${index}" aria-pressed="${active ? 'true' : 'false'}">
+        <span class="build__tab-num" aria-hidden="true">${esc(screen.number)}</span>
+        <span class="build__tab-label">${esc(screen.label)}</span>
+        <span class="build__tab-text">${esc(screen.caption)}</span>
+      </button>`;
+}
+
+export function buildStage(data) {
+  return `
+<section class="build" id="kako-nastane" aria-labelledby="build-title" data-build>
+  <div class="shell build__head">
     <p class="eyebrow eyebrow--onDark">${esc(data.eyebrow)}</p>
-    <h2 id="converge-title">${esc(data.title)}</h2>
+    <h2 id="build-title">${esc(data.title)}</h2>
     <p class="lead lead--onDark">${esc(data.lead)}</p>
   </div>
 
-  <div class="converge__stage">
-    <div class="converge__rail">
-      ${each(data.screens, screenPanel)}
+  <div class="build__stage" data-build-stage>
+    <div class="build__rig" data-build-rig>
+      ${each(data.screens, stageScreen)}
     </div>
   </div>
 
   <div class="shell">
-    <p class="converge__outro">${esc(data.outro)}</p>
+    <div class="build__tabs" data-build-tabs>
+      ${each(data.screens, stageTab)}
+    </div>
+    <p class="build__outro">${esc(data.outro)}</p>
   </div>
 </section>`;
 }
 
-/* ── Capability band ──────────────────────────────────────────────────────
-   Dark band. The opening sentence is split into words that brighten as the
-   section scrolls, so it reads as though it is still being written. Splitting
-   happens here at build time — the sentence is plain text to a crawler. */
+/* ── Clients line ─────────────────────────────────────────────────────────
+   One horizontal line of the projects we have built. It drifts slowly on its
+   own and slows under the pointer; without JS it is a plain scrollable row. */
 
-function scrollWords(line) {
-  return line
-    .split(/\s+/)
-    .map((word, i) => `<span class="readline__w" style="--i:${i}">${esc(word)}</span>`)
-    .join(' ');
+export function clientsLine(data) {
+  return `
+<section class="section clients" aria-labelledby="clients-title" data-clients>
+  <div class="shell">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">${esc(data.eyebrow)}</p>
+      <h2 id="clients-title">${esc(data.title)}</h2>
+      <p class="lead">${esc(data.lead)}</p>
+    </div>
+  </div>
+  <div class="clients__line" data-clients-line>
+    <ul class="clients__track" data-clients-track>
+      ${each(
+        data.items,
+        (item, i) => `
+      <li class="client" style="--i:${i}">
+        <span class="client__kind">${esc(item.kind)}</span>
+        <span class="client__name">${esc(item.name)}</span>
+        <span class="client__body">${esc(item.body)}</span>
+      </li>`
+      )}
+    </ul>
+  </div>
+</section>`;
 }
 
-export function capabilityBand(data) {
-  return `
-<section class="capband" id="kaj-delamo" aria-labelledby="capband-title" data-capband>
-  <div class="shell">
-    <p class="eyebrow eyebrow--onDark">${esc(data.eyebrow)}</p>
-    <h2 class="readline" id="capband-title" data-readline>${scrollWords(data.line)}</h2>
-  </div>
+/* ── Three pillars ────────────────────────────────────────────────────────
+   White section. Each pillar pairs copy with one product picture; the picture
+   sits in a frame that leans toward the pointer a few degrees. */
 
-  <div class="shell capband__list">
+function pillarPicture(picture) {
+  return `
+        <picture>
+          <source srcset="${esc(picture.src)}.webp" type="image/webp">
+          <img src="${esc(picture.src)}.jpg" alt="${esc(picture.alt)}"
+            width="${picture.width}" height="${picture.height}" loading="lazy" decoding="async">
+        </picture>`;
+}
+
+export function pillarsSection(data) {
+  return `
+<section class="section pillars" id="kaj-gradimo" aria-labelledby="pillars-title" data-pillars>
+  <div class="shell">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">${esc(data.eyebrow)}</p>
+      <h2 id="pillars-title">${esc(data.title)}</h2>
+      <p class="lead">${esc(data.lead)}</p>
+    </div>
+  </div>
+  <div class="shell pillars__list">
     ${each(
       data.items,
-      (item, i) => `
-    <article class="capitem" id="${esc(item.id)}" data-capitem>
-      <div class="capitem__copy">
-        <span class="capitem__index" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>
-        <h3 class="capitem__label">${esc(item.label)}</h3>
-        <p class="capitem__body">${esc(item.body)}</p>
+      (item) => `
+    <article class="pillar" id="${esc(item.id)}" data-pillar>
+      <div class="pillar__copy" data-reveal>
+        <span class="pillar__index" aria-hidden="true">${esc(item.number)}</span>
+        <h3 class="pillar__title">${esc(item.title)}</h3>
+        <p class="pillar__body">${esc(item.body)}</p>
+        <ul class="pillar__points">
+          ${each(item.points, (p) => `<li>${esc(p)}</li>`)}
+        </ul>
+        <a class="link" href="${esc(item.link.href)}">${esc(item.link.label)}</a>
       </div>
-      <div class="capitem__art" aria-hidden="true">${capabilityArt(item.art)}</div>
+      <div class="pillar__visual" data-reveal>
+        <div class="pillar__frame" data-tilt>
+          ${pillarPicture(item.picture)}
+          <span class="pillar__glare"></span>
+        </div>
+      </div>
     </article>`
     )}
   </div>
@@ -171,6 +256,7 @@ export function teamBand(data, members) {
           width="${person.photoWidth}" height="${person.photoHeight}" loading="lazy">
         <span class="teamtile__name">${esc(person.name)}</span>
         <span class="teamtile__role">${esc(person.role)}</span>
+        <a class="teamtile__mail" href="mailto:${esc(person.email)}">${esc(person.email)}</a>
       </li>`).join('\n');
 
   return `
@@ -257,10 +343,28 @@ function postCard(post, i) {
       </li>`;
 }
 
-/** Blog teaser for the home page. */
+/**
+ * Blog teaser for the home page. With no posts yet it shows the same honest
+ * empty state as the blog index, so the section still has a place on the
+ * page without implying unpublished work exists.
+ */
 export function blogTeaser(data) {
-  if (data.items.length === 0) return '';
   const posts = data.items.slice(0, 3);
+
+  const body = posts.length
+    ? `
+    <ul class="postgrid">
+      ${posts.map((p, i) => postCard(p, i)).join('\n')}
+    </ul>
+    <div class="btn-row">
+      <a class="btn btn--secondary" href="/blog/">Odprite blog</a>
+    </div>`
+    : `
+    <div class="blog-band__empty" data-reveal>
+      <p class="blog-band__empty-title">${esc(data.empty.title)}</p>
+      <p>${esc(data.empty.body)}</p>
+      <a class="link" href="/blog/">Odprite blog</a>
+    </div>`;
 
   return `
 <section class="section blog-band" aria-labelledby="blog-band">
@@ -270,12 +374,7 @@ export function blogTeaser(data) {
       <h2 id="blog-band">${esc(data.homeTitle)}</h2>
       <p class="lead">${esc(data.homeLead)}</p>
     </div>
-    <ul class="postgrid">
-      ${posts.map((p, i) => postCard(p, i)).join('\n')}
-    </ul>
-    <div class="btn-row">
-      <a class="btn btn--secondary" href="/blog/">Odprite blog</a>
-    </div>
+    ${body}
   </div>
 </section>`;
 }

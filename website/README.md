@@ -64,7 +64,6 @@ website/
 │   ├── layout.mjs      <head>, header, footer, document shell
 │   ├── sections.mjs    section components
 │   ├── showcase.mjs    home-page bands and the newer listing blocks
-│   ├── art.mjs         non-brand capability drawings only
 │   ├── decor.mjs       service glyphs used by the explorer
 │   ├── schema.mjs      JSON-LD structured data
 │   └── html.mjs        escaping helpers
@@ -135,10 +134,12 @@ FAQ page keeps every answer visible as headings and paragraphs.
 
 ---
 
-## The clips in the converge band
+## The clips in the build stage
 
 The three clips under the hero — a workflow diagram, the code, the finished
-product — are generated, not filmed. The source is one HTML file that exposes
+product — are generated, not filmed. The three pillar pictures further down
+are made the same way from `tools/pictures/scene.html` with
+`node tools/pictures/render.mjs`. The source is one HTML file that exposes
 `renderFrame(t)` as a pure function of time, so a capture is reproducible and
 never lands mid-transition.
 
@@ -241,7 +242,7 @@ the original string.
 
 `walkthrough.mjs` clears the session flag first, so the opening sequence actually
 plays in the recording rather than being skipped as it is for a returning
-visitor, and steps the scroll so the converge band and the reading line render
+visitor, and steps the scroll so the build stage and the clients line render
 intermediate frames.
 
 ---
@@ -249,7 +250,7 @@ intermediate frames.
 ## Design
 
 Paper, ink, neutrals, and one AIS blue. Home motion is limited to the intro,
-hero entrance, brain tilt, converge, reading line, explorer, and a quiet CTA
+hero entrance, brain shine, build stage, clients line, picture tilt, and a quiet CTA
 field. Particles, custom cursor, magnetic buttons, and bouncing chips are gone.
 
 - **Light.** Paper-white surfaces and ink-dark text. Dark bands are reserved

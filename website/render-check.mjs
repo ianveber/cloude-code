@@ -7,7 +7,8 @@
  *   1. Nothing overflows horizontally, which is the usual cause of an
  *      unexpected sideways scrollbar on mobile.
  *   2. Empty-state cards preserve the responsive shell gutters.
- *   3. Process cards keep copy together and links at the bottom.
+ *   3. The build stage, clients line and pillars keep their composition
+ *      and stay operable from the keyboard.
  *   4. Keyboard focus remains visible on FAQ and form controls.
  *
  * Needs a Chrome/Chromium binary and `puppeteer-core`. When neither is present
@@ -49,6 +50,7 @@ const WIDTHS = [
 
 const CHROME_CANDIDATES = [
   process.env.CHROME_PATH,
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   '/usr/local/bin/google-chrome',
   '/usr/bin/google-chrome',
   '/usr/bin/google-chrome-stable',
@@ -128,22 +130,6 @@ function findProblems(path, width) {
     }
   }
 
-  if (path === '/' && width >= 1024) {
-    document.querySelectorAll('.process-overview .card').forEach((card, index) => {
-      const title = card.querySelector('h3');
-      const body = card.querySelector('p');
-      const link = card.querySelector('.link');
-      if (!title || !body || !link) return;
-      const titleGap = body.getBoundingClientRect().top - title.getBoundingClientRect().bottom;
-      const bottomGap = card.getBoundingClientRect().bottom - link.getBoundingClientRect().bottom;
-      if (titleGap > 32 || bottomGap < 12 || bottomGap > 36) {
-        components.push(
-          `process card ${index + 1} alignment title/body=${titleGap.toFixed(1)}px link/bottom=${bottomGap.toFixed(1)}px`
-        );
-      }
-    });
-  }
-
   if (path === '/' && [1000, 1024].includes(width)) {
     const footerNav = document.querySelector('.footer-nav');
     if (footerNav) {
@@ -155,106 +141,58 @@ function findProblems(path, width) {
   }
 
   if (path === '/' && width === 1440) {
-    const capabilitySvgs = [...document.querySelectorAll('.capitem__art svg')];
-    if (capabilitySvgs.length !== 4) {
-      components.push(`capability artwork count ${capabilitySvgs.length}; expected 4`);
-    }
-    capabilitySvgs.forEach((svg, index) => {
-      const box = svg.viewBox.baseVal;
-      if (box.x !== 0 || box.y !== 0 || box.width !== 320 || box.height !== 200) {
-        components.push(`capability artwork ${index + 1} viewBox is not 0 0 320 200`);
-      }
-      if (svg.querySelector('linearGradient, radialGradient')) {
-        components.push(`capability artwork ${index + 1} contains a filled gradient`);
-      }
-      const inconsistent = [...svg.querySelectorAll('path,rect,circle,line,polyline,polygon')]
-        .filter((element) => getComputedStyle(element).stroke !== 'none')
-        .find((element) => {
-          const style = getComputedStyle(element);
-          return (
-            Math.abs(parseFloat(style.strokeWidth) - 1.5) > 0.01 ||
-            style.strokeLinecap !== 'round' ||
-            style.strokeLinejoin !== 'round'
-          );
-        });
-      if (inconsistent) {
-        components.push(`capability artwork ${index + 1} breaks the 1.5px round line grammar`);
-      }
-      const active = [...svg.querySelectorAll('.art__active [stroke], .art__active path, .art__active circle, .art__spark, .art__pip')];
-      const offBlue = active.find((element) => getComputedStyle(element).stroke !== 'rgb(29, 119, 254)');
-      if (!active.length || offBlue) {
-        components.push(`capability artwork ${index + 1} active stroke is not AIS blue`);
-      }
-    });
-
-    const capabilityItems = [...document.querySelectorAll('.capitem')];
-    capabilityItems.forEach((item, index) => {
-      const copy = item.querySelector('.capitem__copy').getBoundingClientRect();
-      const artElement = item.querySelector('.capitem__art');
-      const art = artElement.getBoundingClientRect();
-      const copyFirst = copy.left < art.left;
-      if (copyFirst !== (index % 2 === 0)) {
-        components.push(`capability chapter ${index + 1} does not alternate at desktop`);
-      }
-      const body = item.querySelector('.capitem__body');
-      let specifiedCh = null;
-      for (const sheet of document.styleSheets) {
-        let rules;
-        try {
-          rules = [...sheet.cssRules];
-        } catch {
-          continue;
-        }
-        for (const rule of rules) {
-          if (!rule.selectorText || !rule.style || !body.matches(rule.selectorText)) continue;
-          if (rule.style.maxWidth.endsWith('ch')) specifiedCh = parseFloat(rule.style.maxWidth);
-        }
-      }
-      if (specifiedCh == null || specifiedCh < 56 || specifiedCh > 68) {
-        components.push(`capability chapter ${index + 1} copy limit is ${specifiedCh ?? 'missing'}ch`);
-      }
-    });
-
-    const explorerTitle = document.querySelector('#explorer-title')?.textContent.trim();
-    const explorerLead = document.querySelector('.explorer__head .lead')?.textContent.trim();
-    if (
-      explorerTitle !== 'Tri področja. En odgovoren sistem.' ||
-      explorerLead !== 'Vsaka rešitev začne pri konkretnem delu, ki ga ekipa danes opravlja ročno.'
-    ) {
-      components.push('service explorer does not render the approved title and lead');
-    }
-
-    const process = document.querySelector('.process-overview ol');
-    const phases = process ? [...process.children] : [];
-    if (phases.length !== 4) {
-      components.push(`process phase count ${phases.length}; expected 4`);
+    /* Build stage: three screens, the active one in front and widest. */
+    const screens = [...document.querySelectorAll('.build__screen')];
+    const active = document.querySelector('.build__screen.is-active');
+    if (screens.length !== 3 || !active) {
+      components.push(`build stage has ${screens.length} screens and ${active ? 'an' : 'no'} active screen`);
     } else {
-      const baseline = getComputedStyle(process, '::before');
-      const phaseTops = new Set(phases.map((phase) => Math.round(phase.getBoundingClientRect().top)));
-      if (
-        baseline.content === 'none' ||
-        parseFloat(baseline.height) < 1 ||
-        baseline.backgroundColor !== 'rgb(29, 119, 254)' ||
-        phaseTops.size !== 1
-      ) {
-        components.push('process phases do not form one horizontal sequence with an AIS-blue baseline');
-      } else {
-        const trackBox = process.getBoundingClientRect();
-        const lineCenter =
-          trackBox.top + parseFloat(baseline.top) + parseFloat(baseline.height) / 2;
-        phases.forEach((phase, index) => {
-          const marker = phase.querySelector('.step__num');
-          if (!marker) return;
-          const markerBox = marker.getBoundingClientRect();
-          const markerCenter = markerBox.top + markerBox.height / 2;
-          if (Math.abs(lineCenter - markerCenter) > 2) {
-            components.push(
-              `process baseline misses marker ${index + 1} by ${Math.abs(lineCenter - markerCenter).toFixed(1)}px`
-            );
-          }
-        });
+      const widths = screens.map((screen) => screen.getBoundingClientRect().width);
+      const activeWidth = active.getBoundingClientRect().width;
+      if (activeWidth < Math.max(...widths) - 1) {
+        components.push('build stage active screen is not the widest');
+      }
+      const caption = getComputedStyle(active.querySelector('.build__cap')).opacity;
+      if (parseFloat(caption) < 0.95) {
+        components.push('build stage active caption is not fully visible');
       }
     }
+    const tabs = [...document.querySelectorAll('.build__tab')];
+    if (tabs.length !== 3 || tabs.filter((tab) => tab.getAttribute('aria-pressed') === 'true').length !== 1) {
+      components.push('build stage tabs must be three buttons with exactly one pressed');
+    }
+
+    /* Clients line: at least three named projects, one sentence each. */
+    const clients = [...document.querySelectorAll('.client:not(.is-clone)')];
+    if (clients.length < 3) {
+      components.push(`clients line lists ${clients.length} projects; expected at least 3`);
+    }
+    clients.forEach((client, index) => {
+      if (!client.querySelector('.client__name')?.textContent.trim() || !client.querySelector('.client__body')?.textContent.trim()) {
+        components.push(`client ${index + 1} is missing a name or a sentence`);
+      }
+      if (client.querySelector('img, svg')) {
+        components.push(`client ${index + 1} carries a picture`);
+      }
+    });
+
+    /* Pillars: three, alternating copy and picture at desktop. */
+    const pillars = [...document.querySelectorAll('.pillar')];
+    if (pillars.length !== 3) {
+      components.push(`pillar count ${pillars.length}; expected 3`);
+    }
+    pillars.forEach((pillar, index) => {
+      const copy = pillar.querySelector('.pillar__copy').getBoundingClientRect();
+      const visual = pillar.querySelector('.pillar__visual').getBoundingClientRect();
+      const copyFirst = copy.left < visual.left;
+      if (copyFirst !== (index % 2 === 0)) {
+        components.push(`pillar ${index + 1} does not alternate at desktop`);
+      }
+      const picture = pillar.querySelector('.pillar__frame img');
+      if (!picture || !picture.getAttribute('alt') || !picture.getAttribute('width')) {
+        components.push(`pillar ${index + 1} picture is missing alt text or dimensions`);
+      }
+    });
 
     const team = document.querySelector('.teamgrid');
     const members = team ? [...team.children] : [];
@@ -282,20 +220,14 @@ function findProblems(path, width) {
       }
     });
 
-    const explorerCopyLefts = new Set(
-      [...document.querySelectorAll('.explorer__item .explorer__copy')].map((copy) =>
-        Math.round(copy.getBoundingClientRect().left)
-      )
-    );
-    if (explorerCopyLefts.size > 1) {
-      components.push('explorer active state shifts copy');
+    /* Footer: wordmark stays inside the shell, people and contact printed. */
+    const mark = document.querySelector('.footer-wordmark');
+    if (!mark || mark.getBoundingClientRect().right > window.innerWidth + 1) {
+      components.push('footer wordmark is missing or overflows');
     }
-
-    document.querySelectorAll('.explorer__item').forEach((item, index) => {
-      if (parseFloat(getComputedStyle(item).opacity) < 0.95) {
-        components.push(`explorer item ${index + 1} relies on low opacity`);
-      }
-    });
+    if (document.querySelectorAll('.footer-people li').length !== 3) {
+      components.push('footer must list the three team members');
+    }
   }
 
   if (path === '/' && [1024, 768, 390].includes(width)) {
@@ -324,11 +256,11 @@ function findProblems(path, width) {
   }
 
   if (path === '/' && width === 390) {
-    document.querySelectorAll('.capitem').forEach((item, index) => {
-      const copy = item.querySelector('.capitem__copy').getBoundingClientRect();
-      const art = item.querySelector('.capitem__art').getBoundingClientRect();
-      if (copy.top >= art.top) {
-        components.push(`capability chapter ${index + 1} does not put copy before art on mobile`);
+    document.querySelectorAll('.pillar').forEach((pillar, index) => {
+      const copy = pillar.querySelector('.pillar__copy').getBoundingClientRect();
+      const visual = pillar.querySelector('.pillar__visual').getBoundingClientRect();
+      if (copy.top >= visual.top) {
+        components.push(`pillar ${index + 1} does not put copy before its picture on mobile`);
       }
     });
   }
@@ -336,107 +268,42 @@ function findProblems(path, width) {
   return { overflow, components, tooDim, smallTargets };
 }
 
-async function checkExplorerSummaries(page, base) {
+async function checkBuildStage(page, base) {
   await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(
     () =>
       document.documentElement.classList.contains('motion-on') ||
       document.documentElement.classList.contains('motion-off')
   );
-  await new Promise((resolve) => setTimeout(resolve, 80));
-  const hidden = await page.evaluate(() =>
-    [...document.querySelectorAll('.explorer__copy p')].flatMap((paragraph, index) => {
-      const chars = [...paragraph.querySelectorAll('.char')].filter(
-        (node) => !node.classList.contains('char--space')
-      );
-      const opacities = chars.length
-        ? chars.map((node) => parseFloat(getComputedStyle(node).opacity))
-        : [parseFloat(getComputedStyle(paragraph).opacity)];
-      const min = Math.min(...opacities);
-      return min < 0.95
-        ? [`item ${index + 1} min-opacity ${min.toFixed(2)} "${paragraph.textContent.trim().slice(0, 36)}"`]
-        : [];
-    })
-  );
-  return hidden.length
-    ? `Service explorer — default-motion summaries are not fully visible (${hidden.join('; ')})`
-    : null;
-}
 
-async function checkExplorerFocus(page, base) {
-  await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
-  await page.$eval('.explorer__item:nth-child(2) .explorer__copy', (link) => link.focus());
-  await new Promise((resolve) => setTimeout(resolve, 50));
-  const state = await page.evaluate(() => ({
-    item: document.querySelector('.explorer__item:nth-child(2)')?.classList.contains('is-active'),
-    scene: document.querySelector('.explorer__scene:nth-child(2)')?.classList.contains('is-active'),
+  /* A tab click brings its screen to the front. */
+  await page.click('.build__tab[data-build-tab="2"]');
+  await new Promise((resolve) => setTimeout(resolve, 60));
+  const clicked = await page.evaluate(() => ({
+    screen: document.querySelector('.build__screen[data-build-screen="2"]')?.classList.contains('is-active'),
+    tab: document.querySelector('.build__tab[data-build-tab="2"]')?.getAttribute('aria-pressed'),
+    pressed: document.querySelectorAll('.build__tab[aria-pressed="true"]').length,
   }));
-  return state.item && state.scene
-    ? null
-    : `Service explorer — keyboard focus did not activate matching item and media (${JSON.stringify(state)})`;
-}
-
-async function checkConvergePacing(page, base) {
-  await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
-
-  async function stateAt(progress) {
-    await page.evaluate((value) => {
-      const section = document.querySelector('[data-converge]');
-      const origin = section.querySelector('.converge__stage') || section;
-      const top = window.scrollY + origin.getBoundingClientRect().top;
-      const target = top - window.innerHeight * 0.58 + value * window.innerHeight * 0.72;
-      window.scrollTo(0, target);
-    }, progress);
-    await new Promise((resolve) => setTimeout(resolve, 450));
-    return page.evaluate(() => {
-      const section = document.querySelector('[data-converge]');
-      const panels = [...section.querySelectorAll('.converge__frame')].map((frame) => {
-        const rect = frame.getBoundingClientRect();
-        return { left: rect.left, right: rect.right };
-      });
-      return {
-        progress: parseFloat(section.style.getPropertyValue('--converge')),
-        settled: parseFloat(section.style.getPropertyValue('--settled')),
-        captions: [...section.querySelectorAll('.converge__caption')].map((caption) =>
-          parseFloat(getComputedStyle(caption).opacity)
-        ),
-        panels,
-        tail: section.getBoundingClientRect().bottom -
-          section.querySelector('.converge__outro').getBoundingClientRect().bottom,
-      };
-    });
+  if (!clicked.screen || clicked.tab !== 'true' || clicked.pressed !== 1) {
+    return `Build stage — tab click did not bring its screen forward (${JSON.stringify(clicked)})`;
   }
 
-  const opening = await stateAt(0.18);
-  const cleared = await stateAt(0.28);
-  const merged = await stateAt(0.65);
-  const held = await stateAt(1);
-  const aligned = (state) =>
-    Math.max(...state.panels.map((panel) => panel.left)) -
-      Math.min(...state.panels.map((panel) => panel.left)) <=
-    2;
+  /* Arrow keys move through the screens. */
+  await page.$eval('.build__tab[data-build-tab="2"]', (tab) => tab.focus());
+  await page.keyboard.press('ArrowRight');
+  await new Promise((resolve) => setTimeout(resolve, 60));
+  const keyed = await page.evaluate(() =>
+    document.querySelector('.build__screen[data-build-screen="0"]')?.classList.contains('is-active')
+  );
+  if (!keyed) return 'Build stage — ArrowRight did not advance to the next screen';
 
-  if (
-    opening.captions.some((opacity) => opacity < 0.45) ||
-    opening.panels[0].right > opening.panels[1].left + 1
-  ) {
-    return 'Converge — opening frames are not independently readable';
-  }
-  if (
-    cleared.captions.some((opacity) => opacity > 0.05) ||
-    cleared.panels[0].right > cleared.panels[1].left + 1
-  ) {
-    return 'Converge — captions do not clear before frame collision';
-  }
-  if (!aligned(merged) || !aligned(held)) {
-    return 'Converge — merged frame is not held for the final 35% of active travel';
-  }
-  if (Math.abs(held.progress - 1) > 0.01 || Math.abs(held.settled - 1) > 0.01) {
-    return `Converge — active range did not clamp with a separate settled value (${JSON.stringify(held)})`;
-  }
-  if (held.tail > 40) {
-    return `Converge — outro leaves a ${held.tail.toFixed(1)}px empty tail`;
-  }
+  /* A side screen click brings it forward too. */
+  await page.$eval('.build__screen[data-build-screen="1"]', (screen) => screen.click());
+  await new Promise((resolve) => setTimeout(resolve, 60));
+  const sided = await page.evaluate(() =>
+    document.querySelector('.build__screen[data-build-screen="1"]')?.classList.contains('is-active')
+  );
+  if (!sided) return 'Build stage — clicking a side screen did not bring it forward';
   return null;
 }
 
@@ -581,17 +448,20 @@ async function checkHomeResponsive(page, base, width) {
       const used = parseFloat(getComputedStyle(rig).width);
       if (used > max + 1) problems.push(`brain width ${used.toFixed(1)}px exceeds ${max.toFixed(1)}px`);
     }
-    const panels = [...document.querySelectorAll('.converge__panel')].map((panel) =>
-      panel.getBoundingClientRect()
+    const screens = [...document.querySelectorAll('.build__screen')].map((screen) =>
+      screen.getBoundingClientRect()
     );
-    if (panels.length >= 2 && Math.abs(panels[0].top - panels[1].top) < 8) {
-      problems.push('converge panels do not stack');
+    if (screens.length >= 2 && Math.abs(screens[0].top - screens[1].top) < 8) {
+      problems.push('build screens do not stack');
     }
-    document.querySelectorAll('.capitem').forEach((item, index) => {
-      const chapterCopy = item.querySelector('.capitem__copy').getBoundingClientRect();
-      const chapterArt = item.querySelector('.capitem__art').getBoundingClientRect();
-      if (chapterCopy.top >= chapterArt.top) {
-        problems.push(`capability chapter ${index + 1} does not put copy before art`);
+    if (screens.some((box) => box.left < -1 || box.right > w + 1)) {
+      problems.push('a build screen leaves the viewport');
+    }
+    document.querySelectorAll('.pillar').forEach((pillar, index) => {
+      const copy = pillar.querySelector('.pillar__copy').getBoundingClientRect();
+      const visual = pillar.querySelector('.pillar__visual').getBoundingClientRect();
+      if (copy.top >= visual.top) {
+        problems.push(`pillar ${index + 1} does not put copy before its picture`);
       }
     });
     const process = document.querySelector('.process-overview__track');
@@ -717,35 +587,20 @@ async function main() {
     const error = await checkKeyboardFocus(focusPage, base, check);
     if (error) errors.push(error);
   }
-  const explorerFocusError = await checkExplorerFocus(focusPage, base);
-  if (explorerFocusError) errors.push(explorerFocusError);
   await focusPage.close();
 
-  const motionPage = await browser.newPage();
-  await motionPage.evaluateOnNewDocument(() => {
+  const stagePage = await browser.newPage();
+  await stagePage.evaluateOnNewDocument(() => {
     try {
       sessionStorage.setItem('ais-intro', '1');
     } catch {
       /* ignore */
     }
   });
-  await motionPage.setViewport({ width: 1440, height: 1000 });
-  const explorerSummaryError = await checkExplorerSummaries(motionPage, base);
-  if (explorerSummaryError) errors.push(explorerSummaryError);
-  await motionPage.close();
-
-  const convergePage = await browser.newPage();
-  await convergePage.evaluateOnNewDocument(() => {
-    try {
-      sessionStorage.setItem('ais-intro', '1');
-    } catch {
-      /* ignore */
-    }
-  });
-  await convergePage.setViewport({ width: 1440, height: 1000 });
-  const convergeError = await checkConvergePacing(convergePage, base);
-  if (convergeError) errors.push(convergeError);
-  await convergePage.close();
+  await stagePage.setViewport({ width: 1440, height: 1000 });
+  const stageError = await checkBuildStage(stagePage, base);
+  if (stageError) errors.push(stageError);
+  await stagePage.close();
 
   const reducedPage = await browser.newPage();
   const reducedErrors = await checkReducedMotion(reducedPage, base);

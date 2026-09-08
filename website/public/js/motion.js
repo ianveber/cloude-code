@@ -1,10 +1,10 @@
 /**
  * Motion — progressive enhancement.
  *
- * Meaningful motion only: intro, hero entrance, brain tilt, explorer,
- * reveals, converge, reading line, and a quiet CTA field. The HTML already
- * contains every word; this file is skipped when the user prefers reduced
- * motion.
+ * Meaningful motion only: the typed intro, hero entrance, the glossy brain,
+ * the build stage, reveals, the clients line, picture tilt, and a quiet CTA
+ * field. The HTML already contains every word; this file is skipped when the
+ * user prefers reduced motion.
  */
 (function () {
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -17,6 +17,10 @@
 
   function escapeHtml(value) {
     return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function clamp(value, min, max) {
+    return value < min ? min : value > max ? max : value;
   }
 
   /* Each character needs its own box to be animated, but adjacent inline-blocks
@@ -95,6 +99,7 @@
     slider();
     contactForms();
     explorer();
+    buildStage();
 
     if (reduce) {
       document.documentElement.classList.add('motion-off');
@@ -106,10 +111,11 @@
     document.documentElement.classList.add('motion-on');
     introSequence();
     heroEntrance();
-    brainTilt();
+    brainShine();
+    clientsLine();
     reveals();
-    converge();
-    readline();
+    tiltFrames();
+    footerGlow();
     ctaField();
     lazyVideo();
   });
@@ -131,30 +137,62 @@
   }
 
   /* ── Opening sequence ────────────────────────────────────────────────────
-     Brain mark alone on white, then a crossfade to the official lockup, then
-     the site loads in behind. Runs once per session; a click, Escape, Enter or
-     Space jumps straight to the end. */
+     White screen, the brain mark, and the brand name typed out next to it
+     one character at a time with a blinking caret. Once the last character
+     is in, the caret keeps blinking for a beat and the site loads in behind.
+     Runs once per session; a click, Escape, Enter or Space jumps straight to
+     the end. */
   function introSequence() {
     var root = document.documentElement;
     var stage = document.querySelector('[data-intro-stage]');
     if (!stage || !root.classList.contains('is-intro')) return;
 
+    var brand = stage.querySelector('[data-intro-brand]');
+    var tail = stage.querySelector('[data-intro-tail]');
     var timers = [];
     var opened = false;
+    var typing = null;
 
     function at(ms, fn) {
       timers.push(window.setTimeout(fn, ms));
+    }
+
+    /* Types into `el` from data-text, one character per `step` ms. */
+    function typeInto(el, step, done) {
+      var text = el ? el.getAttribute('data-text') || '' : '';
+      var i = 0;
+      function tick() {
+        if (opened) return;
+        i += 1;
+        el.textContent = text.slice(0, i);
+        if (i < text.length) typing = window.setTimeout(tick, step);
+        else done();
+      }
+      if (!text) {
+        done();
+        return;
+      }
+      tick();
+    }
+
+    function finishText() {
+      if (brand) brand.textContent = brand.getAttribute('data-text') || '';
+      if (tail) tail.textContent = tail.getAttribute('data-text') || '';
+      stage.classList.remove('is-typing');
+      stage.classList.add('is-typed');
     }
 
     function open() {
       if (opened) return;
       opened = true;
       timers.forEach(window.clearTimeout);
+      window.clearTimeout(typing);
       window.removeEventListener('keydown', onKey);
       stage.removeEventListener('click', open);
 
       /* Make sure the finished state is on screen even when skipped early. */
-      stage.classList.add('is-logo', 'is-word');
+      stage.classList.add('is-logo');
+      finishText();
 
       root.classList.add('is-intro-out');
       window.setTimeout(function () {
@@ -179,9 +217,30 @@
     window.addEventListener('keydown', onKey);
     stage.addEventListener('click', open);
 
+    /* The mark appears first. Typing waits for the webfont so the letters do
+       not change shape halfway through, but never longer than a short beat. */
     at(100, function () { stage.classList.add('is-logo'); });
-    at(720, function () { stage.classList.add('is-word'); });
-    at(1900, open);
+
+    var fontsReady = document.fonts && document.fonts.ready
+      ? document.fonts.ready
+      : Promise.resolve();
+    var started = false;
+    function startTyping() {
+      if (started || opened) return;
+      started = true;
+      stage.classList.add('is-typing');
+      typeInto(brand, 78, function () {
+        window.setTimeout(function () {
+          typeInto(tail, 58, finishText);
+        }, 140);
+      });
+    }
+    at(380, function () { fontsReady.then(startTyping); });
+    at(520, startTyping);
+
+    /* Site loads in once the caret has blinked a couple of times after the
+       last character: roughly 520 + 3×78 + 140 + 8×58 ≈ 1.4 s of typing. */
+    at(2300, open);
   }
 
   function heroEntrance() {
@@ -217,28 +276,57 @@
     });
   }
 
-  /* The official mark leans toward the pointer, within a few degrees. */
-  function brainTilt() {
+  /* ── Brain shine ─────────────────────────────────────────────────────────
+     The official mark leans toward the pointer anywhere over the hero, and
+     its highlight slides across the surface as it does. Movement is slow on
+     purpose: the transition in CSS does the easing, this only sets targets. */
+  function brainShine() {
     var brain = document.querySelector('[data-brain]');
     if (!brain || !finePointer) return;
     var rig = brain.querySelector('.brand-brain__rig');
+    var hero = brain.closest('.hero') || brain;
     if (!rig) return;
 
-    brain.addEventListener(
+    var ticking = false;
+    var last = null;
+
+    function apply() {
+      ticking = false;
+      if (!last) return;
+      var rect = brain.getBoundingClientRect();
+      var cx = rect.left + rect.width / 2;
+      var cy = rect.top + rect.height / 2;
+      /* Normalised offset from the mark's centre, capped a little beyond it. */
+      var px = clamp((last.x - cx) / Math.max(rect.width, 1), -0.9, 0.9);
+      var py = clamp((last.y - cy) / Math.max(rect.height, 1), -0.9, 0.9);
+
+      rig.style.setProperty('--pointer-y', (-py * 8).toFixed(2) + 'deg');
+      rig.style.setProperty('--pointer-x', (px * 8).toFixed(2) + 'deg');
+      rig.style.setProperty('--gx', (50 + px * 42).toFixed(1) + '%');
+      rig.style.setProperty('--gy', (42 + py * 42).toFixed(1) + '%');
+      rig.style.setProperty('--sx', (26 - px * 22).toFixed(1) + 'px');
+      rig.style.setProperty('--sy', (42 - py * 14).toFixed(1) + 'px');
+    }
+
+    hero.addEventListener(
       'pointermove',
       function (event) {
-        var rect = brain.getBoundingClientRect();
-        var px = (event.clientX - rect.left) / rect.width - 0.5;
-        var py = (event.clientY - rect.top) / rect.height - 0.5;
-        rig.style.setProperty('--pointer-y', (-py * 3).toFixed(2) + 'deg');
-        rig.style.setProperty('--pointer-x', (px * 3).toFixed(2) + 'deg');
+        last = { x: event.clientX, y: event.clientY };
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(apply);
       },
       { passive: true }
     );
 
-    brain.addEventListener('pointerleave', function () {
+    hero.addEventListener('pointerleave', function () {
+      last = null;
       rig.style.setProperty('--pointer-y', '0deg');
       rig.style.setProperty('--pointer-x', '0deg');
+      rig.style.setProperty('--gx', '50%');
+      rig.style.setProperty('--gy', '42%');
+      rig.style.setProperty('--sx', '26px');
+      rig.style.setProperty('--sy', '42px');
     });
   }
 
@@ -282,7 +370,7 @@
 
   function reveals() {
     var nodes = document.querySelectorAll(
-      '[data-reveal], .usecase, .svc, .card, .step, .stat, .capitem, .product, .postcard, .newsitem, .eventitem'
+      '[data-reveal], .usecase, .svc, .card, .step, .stat, .product, .postcard, .newsitem, .eventitem, .teamtile, .client'
     );
     if (!nodes.length || !('IntersectionObserver' in window)) return;
 
@@ -305,73 +393,270 @@
     });
   }
 
-  /* ── Converge band ───────────────────────────────────────────────────────
-     Drives one custom property from 0 (three panels apart) to 1 (closed into
-     one). All the movement itself lives in CSS. */
-  function converge() {
-    var section = document.querySelector('[data-converge]');
+  /* ── Build stage ─────────────────────────────────────────────────────────
+     Three screens, one in front. The active index moves on its own every few
+     seconds, on a click or focus on a screen or tab, and the whole stage
+     leans a few degrees toward the pointer. Runs with reduced motion too —
+     without the auto-rotation and the lean — because the tabs are real
+     controls and must keep working. */
+  function buildStage() {
+    var section = document.querySelector('[data-build]');
     if (!section) return;
 
-    var ticking = false;
+    var rig = section.querySelector('[data-build-rig]');
+    var stage = section.querySelector('[data-build-stage]');
+    var screens = Array.prototype.slice.call(section.querySelectorAll('[data-build-screen]'));
+    var tabs = Array.prototype.slice.call(section.querySelectorAll('[data-build-tab]'));
+    if (!rig || screens.length < 3) return;
 
-    function sync() {
-      ticking = false;
-      var origin = section.querySelector('.converge__stage') || section;
-      var rect = origin.getBoundingClientRect();
-      var vh = window.innerHeight || 1;
+    var position = ['is-left', 'is-active', 'is-right'];
+    var active = 1;
+    var timer = null;
+    var paused = false;
+    var visible = false;
+    var HOLD = 6000;
 
-      var raw = (vh * 0.58 - rect.top) / (vh * 0.72);
-      var progress = Math.max(0, Math.min(1, raw));
-      section.style.setProperty('--converge', progress.toFixed(4));
-      section.style.setProperty('--settled', Math.max(0, (progress - 0.72) / 0.28).toFixed(4));
+    function setActive(index, source) {
+      active = (index + screens.length) % screens.length;
+      screens.forEach(function (screen, i) {
+        var rel = (i - active + screens.length) % screens.length;
+        /* rel: 0 = active, 1 = next (right), 2 = previous (left) */
+        var cls = rel === 0 ? position[1] : rel === 1 ? position[2] : position[0];
+        position.forEach(function (p) { screen.classList.remove(p); });
+        screen.classList.add(cls);
+        screen.setAttribute('aria-hidden', rel === 0 ? 'false' : 'true');
+      });
+      tabs.forEach(function (tab, i) {
+        var on = i === active;
+        tab.classList.toggle('is-active', on);
+        tab.setAttribute('aria-pressed', on ? 'true' : 'false');
+        /* Restart the progress rule on the active tab. */
+        if (on && !reduce) {
+          tab.classList.remove('is-counting');
+          void tab.offsetWidth;
+          tab.classList.add('is-counting');
+        }
+      });
+      section.style.setProperty('--active', String(active));
+      schedule();
     }
 
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(sync);
+    function schedule() {
+      window.clearTimeout(timer);
+      if (reduce || paused || !visible) return;
+      timer = window.setTimeout(function () {
+        setActive(active + 1, 'auto');
+      }, HOLD);
     }
 
-    sync();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
-  }
+    screens.forEach(function (screen, i) {
+      screen.addEventListener('click', function () {
+        if (i !== active) setActive(i, 'click');
+      });
+    });
 
-  /* ── Reading line ────────────────────────────────────────────────────────
-     Words brighten one after another as the band scrolls, so the sentence
-     reads as if it is still being written. Words start dim, never hidden. */
-  function readline() {
-    var line = document.querySelector('[data-readline]');
-    if (!line) return;
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener('click', function () { setActive(i, 'click'); });
+      tab.addEventListener('focus', function () { paused = true; schedule(); });
+      tab.addEventListener('blur', function () { paused = false; schedule(); });
+    });
 
-    var words = line.querySelectorAll('.readline__w');
-    if (!words.length) return;
+    section.addEventListener('keydown', function (event) {
+      if (event.key === 'ArrowRight') { event.preventDefault(); setActive(active + 1, 'key'); }
+      if (event.key === 'ArrowLeft') { event.preventDefault(); setActive(active - 1, 'key'); }
+    });
 
-    var ticking = false;
+    if (stage) {
+      stage.addEventListener('pointerenter', function () { paused = true; schedule(); });
+      stage.addEventListener('pointerleave', function () {
+        paused = false;
+        rig.style.setProperty('--px', '0deg');
+        rig.style.setProperty('--py', '0deg');
+        schedule();
+      });
 
-    function sync() {
-      ticking = false;
-      var rect = line.getBoundingClientRect();
-      var vh = window.innerHeight || 1;
-
-      var p = (vh * 0.82 - rect.top) / (vh * 0.5);
-      p = p < 0 ? 0 : p > 1 ? 1 : p;
-
-      var lit = Math.round(p * words.length);
-      for (var i = 0; i < words.length; i++) {
-        words[i].classList.toggle('is-read', i < lit);
+      if (!reduce && finePointer) {
+        var ticking = false;
+        var last = null;
+        stage.addEventListener(
+          'pointermove',
+          function (event) {
+            last = event;
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(function () {
+              ticking = false;
+              if (!last) return;
+              var rect = stage.getBoundingClientRect();
+              var px = (last.clientX - rect.left) / Math.max(rect.width, 1) - 0.5;
+              var py = (last.clientY - rect.top) / Math.max(rect.height, 1) - 0.5;
+              rig.style.setProperty('--px', (px * 7).toFixed(2) + 'deg');
+              rig.style.setProperty('--py', (-py * 4).toFixed(2) + 'deg');
+            });
+          },
+          { passive: true }
+        );
       }
     }
 
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(sync);
+    if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(
+        function (entries) {
+          visible = entries[0].isIntersecting;
+          if (visible) {
+            section.classList.add('is-on');
+            /* Start counting when the band first comes into view. */
+            tabs.forEach(function (tab) {
+              if (tab.classList.contains('is-active') && !reduce) {
+                tab.classList.remove('is-counting');
+                void tab.offsetWidth;
+                tab.classList.add('is-counting');
+              }
+            });
+          }
+          schedule();
+        },
+        { threshold: 0.25 }
+      );
+      observer.observe(section);
+    } else {
+      visible = true;
+      schedule();
     }
 
-    sync();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
+    setActive(1, 'init');
+  }
+
+  /* ── Clients line ────────────────────────────────────────────────────────
+     The row drifts to the left on its own. The items are cloned once so the
+     loop has no visible seam; clones are hidden from assistive tech. Under
+     the pointer the drift slows to a crawl so a card can be read. */
+  function clientsLine() {
+    var line = document.querySelector('[data-clients-line]');
+    var track = document.querySelector('[data-clients-track]');
+    if (!line || !track) return;
+
+    var items = Array.prototype.slice.call(track.children);
+    if (!items.length) return;
+
+    items.forEach(function (item) {
+      var copy = item.cloneNode(true);
+      copy.setAttribute('aria-hidden', 'true');
+      copy.classList.add('is-clone');
+      track.appendChild(copy);
+    });
+
+    var x = 0;
+    var speed = 0.42;
+    var target = speed;
+    var half = 0;
+    var running = false;
+    var lastTime = 0;
+
+    function measure() {
+      var gap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 0;
+      half = 0;
+      items.forEach(function (item) {
+        half += item.getBoundingClientRect().width + gap;
+      });
+    }
+
+    function step(now) {
+      if (!running) return;
+      var dt = lastTime ? Math.min(now - lastTime, 48) : 16;
+      lastTime = now;
+      speed += (target - speed) * 0.05;
+      x -= speed * (dt / 16.7);
+      if (half > 0 && -x >= half) x += half;
+      track.style.transform = 'translate3d(' + x.toFixed(2) + 'px, 0, 0)';
+      requestAnimationFrame(step);
+    }
+
+    line.addEventListener('pointerenter', function () { target = 0.08; });
+    line.addEventListener('pointerleave', function () { target = 0.42; });
+    track.addEventListener('focusin', function () { target = 0; });
+    track.addEventListener('focusout', function () { target = 0.42; });
+
+    measure();
+    window.addEventListener('resize', measure, { passive: true });
+
+    if (!('IntersectionObserver' in window)) {
+      running = true;
+      requestAnimationFrame(step);
+      return;
+    }
+    var observer = new IntersectionObserver(
+      function (entries) {
+        var on = entries[0].isIntersecting;
+        if (on && !running) {
+          running = true;
+          lastTime = 0;
+          requestAnimationFrame(step);
+        } else if (!on) {
+          running = false;
+        }
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(line);
+  }
+
+  /* ── Picture tilt ────────────────────────────────────────────────────────
+     Each product picture leans a few degrees toward the pointer and its glare
+     slides across. Targets only; CSS eases them. */
+  function tiltFrames() {
+    var frames = document.querySelectorAll('[data-tilt]');
+    if (!frames.length || !finePointer) return;
+
+    frames.forEach(function (frame) {
+      var ticking = false;
+      var last = null;
+
+      frame.addEventListener(
+        'pointermove',
+        function (event) {
+          last = event;
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(function () {
+            ticking = false;
+            if (!last) return;
+            var rect = frame.getBoundingClientRect();
+            var px = (last.clientX - rect.left) / Math.max(rect.width, 1) - 0.5;
+            var py = (last.clientY - rect.top) / Math.max(rect.height, 1) - 0.5;
+            frame.style.setProperty('--ry', (px * 6).toFixed(2) + 'deg');
+            frame.style.setProperty('--rx', (-py * 5).toFixed(2) + 'deg');
+            frame.style.setProperty('--glare', (px * 90).toFixed(1) + '%');
+          });
+        },
+        { passive: true }
+      );
+
+      frame.addEventListener('pointerleave', function () {
+        last = null;
+        frame.style.setProperty('--ry', '0deg');
+        frame.style.setProperty('--rx', '0deg');
+        frame.style.setProperty('--glare', '-80%');
+      });
+    });
+  }
+
+  /* ── Footer wordmark ─────────────────────────────────────────────────────
+     A spot of AIS blue follows the pointer across the large wordmark. */
+  function footerGlow() {
+    var mark = document.querySelector('[data-footer-mark]');
+    if (!mark || !finePointer) return;
+    var footer = mark.closest('.site-footer') || mark;
+
+    footer.addEventListener(
+      'pointermove',
+      function (event) {
+        var rect = mark.getBoundingClientRect();
+        var px = clamp((event.clientX - rect.left) / Math.max(rect.width, 1), 0, 1);
+        mark.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
+      },
+      { passive: true }
+    );
   }
 
   /* ── CTA field ───────────────────────────────────────────────────────────

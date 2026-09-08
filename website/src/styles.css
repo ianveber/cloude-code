@@ -500,61 +500,6 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
   list-style: none;
 }
 
-/* ── Official brand brain ─────────────────────────────────────────────── */
-
-.brand-brain {
-  display: grid;
-  min-height: 24rem;
-  place-items: center;
-  perspective: 1100px;
-}
-
-.brand-brain__rig {
-  --tilt-x: 58deg;
-  --tilt-z: -30deg;
-  --pointer-x: 0deg;
-  --pointer-y: 0deg;
-  position: relative;
-  width: min(21rem, 72vw);
-  aspect-ratio: 1;
-  transform:
-    rotateX(calc(var(--tilt-x) + var(--pointer-y)))
-    rotateZ(calc(var(--tilt-z) + var(--pointer-x)));
-  transform-style: preserve-3d;
-  transition: transform 500ms cubic-bezier(.2,.8,.2,1);
-}
-
-.brand-brain__rig > img,
-.brand-brain__edge {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.brand-brain__rig > img {
-  z-index: 2;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 1px rgba(7, 15, 31, .12));
-}
-
-.brand-brain__edge {
-  z-index: 1;
-  background: url('/brand/favicon.png') center / contain no-repeat;
-  filter: saturate(1.1) drop-shadow(0 8px 0 rgba(29, 119, 254, .34));
-  transform: translate3d(0, 8px, -1px);
-}
-
-.brand-brain__shadow {
-  position: absolute;
-  inset: 20% 9% 2%;
-  z-index: 0;
-  border-radius: 50%;
-  background: rgba(10, 21, 43, .18);
-  filter: blur(28px);
-  transform: translate3d(26px, 42px, -20px) rotateX(-58deg);
-}
-
 /* ── Chips ────────────────────────────────────────────────────────────── */
 
 .chip {
@@ -1309,96 +1254,6 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
   min-width: 44px;
 }
 
-/* ── Footer ───────────────────────────────────────────────────────────── */
-
-.site-footer {
-  background: var(--paper);
-  border-top: 1px solid var(--line);
-  padding-block: var(--space-7) var(--space-5);
-}
-
-.footer-grid {
-  display: grid;
-  gap: var(--space-6);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
-}
-
-.footer-brand { max-width: 26rem; }
-.footer-brand p { font-size: var(--text-sm); color: var(--muted); margin-top: 0.85rem; }
-
-.footer-nav {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
-  gap: var(--space-3);
-}
-
-.footer-contact {
-  min-width: 0;
-}
-
-.footer-legal {
-  margin-top: var(--space-4);
-  font-size: var(--text-xs);
-  color: var(--faint);
-}
-
-.site-footer h4 {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--faint);
-  font-weight: 600;
-}
-
-.footer-links {
-  list-style: none;
-  padding: 0;
-  margin-top: 0.85rem;
-  display: grid;
-  gap: 0.45rem;
-}
-
-.footer-links a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  min-width: 44px;
-  font-size: var(--text-sm);
-  color: var(--muted);
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-underline-offset: .2em;
-  transition: color 0.18s ease, text-decoration-color 0.18s ease;
-}
-
-.footer-links a:hover {
-  color: var(--blue);
-  text-decoration-color: currentColor;
-}
-
-.footer-bottom {
-  margin-top: 2.5rem;
-  padding-top: 1.35rem;
-  border-top: 1px solid var(--line);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-4);
-  justify-content: space-between;
-  align-items: center;
-  font-size: var(--text-xs);
-  color: var(--faint);
-}
-
-.footer-rule {
-  height: 2px;
-  border: 0;
-  border-radius: 2px;
-  margin-bottom: clamp(2rem, 4vw, 2.75rem);
-  background: var(--blue);
-  opacity: 0.7;
-}
-
 /* ── Accessibility helpers ────────────────────────────────────────────── */
 
 .visually-hidden {
@@ -1636,96 +1491,6 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
   .statement__icon { display: none; }
 }
 
-/* ── Opening sequence ───────────────────────────────────────────────────
-   First paint on the home page is a white screen holding only the brain mark.
-   The mark then crossfades to the official lockup, and the site loads in
-   behind. The `is-intro` class is set in <head>, so the full page never flashes
-   first.
-
-   The overlay is its own fixed layer, so nothing in the page below has to be
-   re-positioned while it is on screen. */
-
-.hero__intro { display: none; }
-
-html.is-intro,
-html.is-intro body {
-  overflow: hidden;
-  background: #fff;
-}
-
-html.is-intro .site-header,
-html.is-intro .site-footer,
-html.is-intro .skip-link,
-html.is-intro .breadcrumbs,
-html.is-intro main {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-html.is-intro .site-header { transform: translateY(-22px); }
-
-html.is-intro .hero__intro {
-  --intro-lockup-width: clamp(10rem, 24vw, 16rem);
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  display: grid;
-  place-items: center;
-  background: #fff;
-  cursor: pointer;
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-.hero__intro-brain,
-.hero__intro-lockup {
-  grid-area: 1 / 1;
-  width: var(--intro-lockup-width);
-  opacity: 0;
-}
-
-.hero__intro-brain {
-  display: flex;
-  align-items: center;
-  aspect-ratio: 133 / 52;
-  transform: scale(0.86);
-}
-
-.hero__intro-brain img {
-  width: 41.7%;
-  height: auto;
-}
-
-html.is-intro .hero__intro.is-logo .hero__intro-brain {
-  opacity: 1;
-  transform: scale(1);
-  transition:
-    opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.9s cubic-bezier(0.16, 1.25, 0.3, 1);
-}
-
-html.is-intro .hero__intro.is-word .hero__intro-brain {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-html.is-intro .hero__intro.is-word .hero__intro-lockup {
-  opacity: 1;
-  transition: opacity 0.45s ease 0.08s;
-}
-
-/* Overlay lifts away; the site is already composed underneath. */
-html.is-intro-out .hero__intro {
-  opacity: 0;
-  transform: scale(1.04);
-  pointer-events: none;
-  transition:
-    opacity 0.62s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
 html.motion-on .site-header {
   transition:
     opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
@@ -1739,7 +1504,6 @@ html.motion-on main {
 }
 
 /* No-JS and reduced-motion visitors never see the overlay at all. */
-html:not(.is-intro) .hero__intro { display: none; }
 
 
 /* ── Motion (only when JS is present and motion is allowed) ───────────── */
@@ -1854,14 +1618,12 @@ html:not(.is-intro) .hero__intro { display: none; }
   [data-enter],
   [data-reveal],
   [data-type-in] .char,
-  [data-type-chars] .char,
-  .readline__w {
+  [data-type-chars] .char {
     opacity: 1 !important;
     transform: none !important;
     color: inherit !important;
   }
   .ctaband__field { display: none; }
-  .converge__outro { opacity: 1 !important; }
 }
 
 @media print {
@@ -1873,13 +1635,12 @@ html:not(.is-intro) .hero__intro { display: none; }
 /* ==========================================================================
    Dark bands
 
-   Two sections invert the page: the converge band and the capability band.
+   Two sections invert the page: the build stage and the closing CTA.
    They share one set of tokens so the inversion is consistent, and both keep
    text on flat colour — never on top of a moving layer.
    ========================================================================== */
 
-.converge,
-.capband,
+.build,
 .ctaband {
   --d-bg: #09090b;
   --d-panel: #18181b;
@@ -1893,8 +1654,7 @@ html:not(.is-intro) .hero__intro { display: none; }
   overflow: hidden;
 }
 
-.converge h2,
-.capband h2,
+.build h2,
 .ctaband h2 {
   color: var(--d-ink);
 }
@@ -1902,280 +1662,6 @@ html:not(.is-intro) .hero__intro { display: none; }
 .eyebrow--onDark { color: var(--d-dim); }
 .eyebrow--onDark::before { background: var(--blue); }
 .lead--onDark { color: var(--d-dim); }
-
-/* ── Converge band ────────────────────────────────────────────────────────
-   Three clips sit side by side, then close into one frame as the section
-   scrolls. --converge is written by motion.js from 0 (apart) to 1 (merged);
-   with no JS the panels simply stay side by side, which is a valid layout. */
-
-.converge {
-  --settled: 1;
-  padding-top: clamp(4rem, 9vw, 7rem);
-  padding-bottom: var(--space-5);
-}
-
-html.motion-on .converge {
-  --settled: 0;
-}
-
-.converge__head {
-  text-align: center;
-  max-width: 46rem;
-  margin-inline: auto;
-}
-
-.converge__head .lead { margin-top: 0.9rem; }
-
-.converge__stage {
-  margin-top: clamp(2.5rem, 6vw, 4.5rem);
-  padding-inline: var(--gutter);
-}
-
-.converge__rail {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-4);
-  max-width: 1320px;
-  margin-inline: auto;
-  perspective: 1600px;
-}
-
-.converge__panel {
-  --close: max(0, min(1, (var(--converge, 0) - 0.3) / 0.32));
-  margin: 0;
-  min-width: 0;
-  /* Close only after captions have cleared; hold the merge from 0.65 to 1. */
-  transform: translateX(calc(var(--dir, 0) * var(--close) * (100% + var(--space-4))));
-  transform-origin: center;
-}
-
-.converge__panel[data-converge-panel='0'] { --dir: 1; }
-.converge__panel[data-converge-panel='1'] { --dir: 0; z-index: 2; }
-.converge__panel[data-converge-panel='2'] { --dir: -1; }
-
-.converge__panel[data-converge-panel='1'] {
-  transform: none;
-}
-
-html.motion-on .converge__panel {
-  transition: none;
-}
-html.motion-on .converge__frame {
-  transition: opacity 0.35s linear;
-}
-
-/* The caption gets no easing on purpose. Smoothing it on the same 0.35s curve
-   as the panels made its fade lag the movement, so a fast scroll left three
-   captions legible while the panels were already sliding over one another. */
-html.motion-on .converge__caption {
-  transition: none;
-}
-
-.converge__frame {
-  position: relative;
-  border: 1px solid var(--d-line);
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: var(--d-panel);
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
-}
-
-.converge__video {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-}
-
-/* Captions stay readable through 0.18, then clear before frames start closing. */
-.converge__caption {
-  display: block;
-  margin-top: var(--space-3);
-  opacity: calc(1 - max(0, (var(--converge, 0) - 0.16) * 10));
-}
-
-.converge__label {
-  display: block;
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--d-ink);
-}
-
-.converge__text {
-  display: block;
-  margin-top: 0.25rem;
-  font-size: var(--text-sm);
-  color: var(--d-dim);
-}
-
-.converge__outro {
-  margin-top: var(--space-5);
-  text-align: center;
-  font-size: clamp(1.15rem, 0.9rem + 1.2vw, 1.75rem);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  color: var(--d-ink);
-  opacity: calc(0.55 + var(--settled, 0) * 0.45);
-}
-
-/* ── Capability band ──────────────────────────────────────────────────────
-   The opening sentence brightens word by word as the band scrolls. Words are
-   dim, not hidden: the sentence is legible even before the effect runs, and
-   completely legible with no JS at all. */
-
-.capband {
-  padding-block: clamp(4rem, 9vw, 7rem);
-  border-top: 1px solid var(--d-line);
-}
-
-.readline {
-  margin-top: 1.1rem;
-  max-width: 30ch;
-  font-size: clamp(1.5rem, 1rem + 2.6vw, 2.9rem);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  line-height: 1.28;
-  color: var(--d-ink);
-}
-
-.readline__w {
-  color: #52525b;
-  transition: color 0.25s linear;
-}
-
-html:not(.motion-on) .readline__w,
-.readline__w.is-read {
-  color: var(--d-ink);
-}
-
-.capband__list {
-  margin-top: var(--space-6);
-  display: grid;
-  gap: var(--space-6);
-}
-
-.capitem {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: center;
-  gap: var(--space-5);
-  padding-top: var(--space-5);
-  border-top: 1px solid var(--d-line);
-}
-
-/* Alternate order only on desktop. Mobile keeps copy before art. */
-.capitem:nth-child(even) {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-}
-.capitem:nth-child(even) .capitem__copy { order: 2; }
-
-.capitem__index {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: 0.14em;
-  color: var(--blue);
-}
-
-.capitem__label {
-  margin-top: var(--space-2);
-  font-size: clamp(1.35rem, 1rem + 1.4vw, 2rem);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-  color: var(--d-ink);
-}
-
-.capitem__body {
-  margin-top: 0.65rem;
-  max-width: 62ch;
-  font-size: var(--text-sm);
-  line-height: 1.6;
-  color: var(--d-dim);
-}
-
-.capitem__art {
-  border: 1px solid var(--d-line);
-  border-radius: var(--radius);
-  background: var(--d-panel);
-  padding: var(--space-4);
-}
-
-.capitem__art svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.capitem__art svg * {
-  stroke-width: 1.5px;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.art__line { stroke: #3f3f46; fill: none; }
-.art__active,
-.art__spark,
-.art__pip { stroke: var(--blue); fill: none; }
-
-html.motion-on .art__spark {
-  stroke-dasharray: 340;
-  stroke-dashoffset: 340;
-}
-
-html.motion-on .capitem.is-in .art__spark {
-  stroke-dashoffset: 0;
-  transition: stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
-}
-
-html.motion-on .art__pip { opacity: 0; }
-html.motion-on .capitem.is-in .art__pip {
-  opacity: 1;
-  transition: opacity 0.4s ease 1.2s;
-}
-
-/* ── Team band ────────────────────────────────────────────────────────── */
-
-.teamgrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-5);
-  margin-top: var(--space-6);
-  padding: 0;
-  list-style: none;
-}
-
-.teamtile { min-width: 0; text-align: left; }
-
-.teamtile__photo {
-  display: block;
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
-  object-position: center 20%;
-  border-radius: var(--radius);
-  border: 1px solid var(--line);
-  background: var(--canvas);
-}
-
-.teamtile__name {
-  display: block;
-  margin-top: 0.6rem;
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.teamtile__role,
-.teamtile__note {
-  display: block;
-  margin-top: 0.1rem;
-  font-size: var(--text-xs);
-  color: var(--faint);
-}
-
-.teamtile__note { margin-top: 0.6rem; }
 
 /* ── Immersive CTA ────────────────────────────────────────────────────────
    The canvas drifts behind the panel. It is a sibling of the content, never a
@@ -2541,14 +2027,960 @@ html.motion-on .capitem.is-in .art__pip {
     );
 }
 
-/* ── Responsive for the new blocks ────────────────────────────────────── */
+/* ── Official brand brain ───────────────────────────────────────────────
+   The mark is the official square tile, treated as a glossy slab: rounded
+   corners, three edge layers for thickness, a highlight that follows the
+   pointer, and a sweep of light every few seconds. Only the tilt, the
+   shadow and the light move; the image itself is never redrawn. */
+
+@property --gx {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 50%;
+}
+
+@property --gy {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 42%;
+}
+
+.brand-brain {
+  display: grid;
+  min-height: 24rem;
+  place-items: center;
+  perspective: 1200px;
+}
+
+.brand-brain__float { transform-style: preserve-3d; }
+
+html.motion-on .brand-brain__float {
+  animation: brainFloat 7.5s ease-in-out infinite;
+}
+
+.brand-brain__rig {
+  --tilt-x: 58deg;
+  --tilt-z: -30deg;
+  --pointer-x: 0deg;
+  --pointer-y: 0deg;
+  --gx: 50%;
+  --gy: 42%;
+  --sx: 26px;
+  --sy: 42px;
+  --slab-radius: 17%;
+  position: relative;
+  width: min(21rem, 72vw);
+  aspect-ratio: 1;
+  transform:
+    rotateX(calc(var(--tilt-x) + var(--pointer-y)))
+    rotateZ(calc(var(--tilt-z) + var(--pointer-x)));
+  transform-style: preserve-3d;
+  transition:
+    transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1),
+    --gx 0.9s ease,
+    --gy 0.9s ease;
+}
+
+.brand-brain__rig > * {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--slab-radius);
+}
+
+.brand-brain__rig > img {
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: translateZ(1px);
+}
+
+/* Thickness: three dark layers stepped back in Z. */
+.brand-brain__side { background: #16181d; }
+.brand-brain__side--1 { z-index: 3; background: #22252c; transform: translateZ(-5px); }
+.brand-brain__side--2 { z-index: 2; background: #121419; transform: translateZ(-11px); }
+.brand-brain__side--3 {
+  z-index: 1;
+  background: #0b0c10;
+  transform: translateZ(-17px);
+  box-shadow:
+    0 0 0 1px rgba(29, 119, 254, 0.45),
+    0 0 34px rgba(29, 119, 254, 0.25);
+}
+
+/* Highlight that follows the pointer. */
+.brand-brain__gloss {
+  z-index: 5;
+  transform: translateZ(2px);
+  background: radial-gradient(
+    58% 58% at var(--gx) var(--gy),
+    rgba(255, 255, 255, 0.34),
+    rgba(255, 255, 255, 0.08) 42%,
+    transparent 72%
+  );
+  pointer-events: none;
+}
+
+/* A band of light sweeps across every few seconds. */
+.brand-brain__sweep {
+  z-index: 6;
+  transform: translateZ(3px);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.brand-brain__sweep::before {
+  content: '';
+  position: absolute;
+  inset: -40% -60%;
+  background: linear-gradient(
+    115deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.22) 50%,
+    transparent 60%
+  );
+  transform: translateX(-70%);
+}
+
+html.motion-on .brand-brain__sweep::before {
+  animation: brainSweep 6.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Rim light: a thin bright edge and a blue reflection on the far side. */
+.brand-brain__rim {
+  z-index: 7;
+  transform: translateZ(4px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    inset 0 -14px 30px rgba(29, 119, 254, 0.22),
+    inset 0 12px 26px rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.brand-brain__shadow {
+  inset: 16% 6% -2%;
+  z-index: 0;
+  border-radius: 50%;
+  background: rgba(10, 21, 43, 0.3);
+  filter: blur(30px);
+  transform: translate3d(var(--sx), var(--sy), -40px);
+  transition: transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes brainFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes brainSweep {
+  0%, 62% { transform: translateX(-70%); }
+  100% { transform: translateX(70%); }
+}
+
+/* ── Team band ────────────────────────────────────────────────────────── */
+
+.teamgrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+  padding: 0;
+  list-style: none;
+}
+
+.teamtile { position: relative; min-width: 0; text-align: left; }
+
+.teamtile__photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center 20%;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--canvas);
+  transition:
+    transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.5s ease;
+}
+
+.teamtile:hover .teamtile__photo {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.teamtile__name {
+  display: block;
+  margin-top: 0.6rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.teamtile__role,
+.teamtile__note {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: var(--text-xs);
+  color: var(--faint);
+}
+
+.teamtile__note { margin-top: 0.6rem; }
+
+.teamtile__mail {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: var(--text-xs);
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: .2em;
+  transition: color 0.18s ease, text-decoration-color 0.18s ease;
+}
+
+.teamtile__mail:hover {
+  color: var(--blue);
+  text-decoration-color: currentColor;
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────── */
+
+.site-footer {
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  padding-block: var(--space-7) var(--space-5);
+  overflow: hidden;
+}
+
+.footer-grid {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+
+.footer-brand { max-width: 26rem; }
+.footer-brand p { font-size: var(--text-sm); color: var(--muted); margin-top: 0.85rem; }
+.footer-brand .footer-statement { margin-top: 0.6rem; color: var(--ink-soft); }
+
+.footer-nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: var(--space-3);
+}
+
+.footer-contact {
+  min-width: 0;
+}
+
+.footer-people__title { margin-top: var(--space-4); }
+
+.footer-people {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.5rem;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.footer-people li {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.footer-people b { font-weight: 600; color: var(--ink); }
+
+.footer-people a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: .2em;
+  transition: color 0.18s ease, text-decoration-color 0.18s ease;
+}
+
+.footer-people a:hover {
+  color: var(--blue);
+  text-decoration-color: currentColor;
+}
+
+.footer-legal {
+  margin-top: var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--faint);
+}
+
+.site-footer h4 {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-weight: 600;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.85rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+  font-size: var(--text-sm);
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: .2em;
+  transition: color 0.18s ease, text-decoration-color 0.18s ease;
+}
+
+.footer-links a:hover {
+  color: var(--blue);
+  text-decoration-color: currentColor;
+}
+
+/* Large typographic wordmark. Decorative: the legal name is printed in the
+   bottom row. A spot of AIS blue follows the pointer across it. */
+.footer-wordmark {
+  --mx: 50%;
+  margin-top: clamp(2.5rem, 7vw, 5rem);
+  font-size: clamp(3.4rem, 13.6vw, 12.6rem);
+  font-weight: 700;
+  letter-spacing: -0.06em;
+  line-height: 0.92;
+  white-space: nowrap;
+  overflow: hidden;
+  user-select: none;
+  color: transparent;
+  background: radial-gradient(circle at var(--mx) 50%, var(--blue) 0, rgba(29, 119, 254, 0.7) 10%, var(--ink) 34%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  opacity: 0.12;
+  transition: opacity 0.3s ease;
+}
+
+.site-footer:hover .footer-wordmark { opacity: 0.2; }
+
+.footer-bottom {
+  margin-top: 2.5rem;
+  padding-top: 1.35rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--text-xs);
+  color: var(--faint);
+}
+
+.footer-bottom a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--muted);
+}
+
+.footer-bottom a:hover { color: var(--blue); }
+
+.footer-rule {
+  height: 2px;
+  border: 0;
+  border-radius: 2px;
+  margin-bottom: clamp(2rem, 4vw, 2.75rem);
+  background: var(--blue);
+  opacity: 0.7;
+}
+
+/* ── Opening sequence ───────────────────────────────────────────────────
+   First paint on the home page is a white screen holding the brain mark and
+   the brand name typed out beside it with a blinking caret. The `is-intro`
+   class is set in <head>, so the full page never flashes first.
+
+   The overlay is its own fixed layer, so nothing in the page below has to be
+   re-positioned while it is on screen. */
+
+.intro { display: none; }
+
+html.is-intro,
+html.is-intro body {
+  overflow: hidden;
+  background: #fff;
+}
+
+html.is-intro .site-header,
+html.is-intro .site-footer,
+html.is-intro .skip-link,
+html.is-intro .breadcrumbs,
+html.is-intro main {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+html.is-intro .site-header { transform: translateY(-22px); }
+
+html.is-intro .intro {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: var(--gutter);
+  background: #fff;
+  cursor: pointer;
+}
+
+.intro__lockup {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.9rem, 2.4vw, 1.6rem);
+}
+
+/* The mark is the official tile, softened to an app-icon corner. */
+.intro__mark {
+  display: block;
+  flex: 0 0 auto;
+  width: clamp(3.6rem, 9vw, 5.6rem);
+  aspect-ratio: 1;
+  border-radius: 22%;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(0.84) translateY(8px);
+  box-shadow: 0 18px 40px rgba(17, 19, 24, 0.18);
+}
+
+.intro__mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.intro.is-logo .intro__mark {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.85s cubic-bezier(0.16, 1.25, 0.3, 1);
+}
+
+.intro__type {
+  position: relative;
+  display: block;
+  font-size: clamp(2.3rem, 6.4vw, 4.2rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--ink);
+  opacity: 0;
+}
+
+.intro.is-logo .intro__type {
+  opacity: 1;
+  transition: opacity 0.3s ease 0.2s;
+}
+
+/* The ghost reserves the finished width; the live text is typed over it. */
+.intro__ghost { visibility: hidden; }
+
+.intro__live {
+  position: absolute;
+  inset: 0 auto auto 0;
+  white-space: nowrap;
+}
+
+.intro__tail {
+  color: var(--blue);
+  font-weight: 500;
+  margin-left: 0.24em;
+}
+
+.intro__caret {
+  display: inline-block;
+  width: 0.07em;
+  height: 0.9em;
+  margin-left: 0.06em;
+  border-radius: 1px;
+  background: var(--ink);
+  vertical-align: -0.04em;
+  animation: introCaret 1.05s steps(1) infinite;
+}
+
+/* Solid while letters are landing, blinking while it waits. */
+.intro.is-typing .intro__caret { animation: none; opacity: 1; }
+.intro.is-typed .intro__caret { background: var(--blue); }
+
+@keyframes introCaret {
+  0%, 52% { opacity: 1; }
+  53%, 100% { opacity: 0; }
+}
+
+/* Overlay lifts away; the site is already composed underneath. */
+html.is-intro-out .intro {
+  opacity: 0;
+  transform: scale(1.03);
+  pointer-events: none;
+  transition:
+    opacity 0.62s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* No-JS and reduced-motion visitors never see the overlay at all. */
+html:not(.is-intro) .intro { display: none; }
+
+/* ── Build stage ──────────────────────────────────────────────────────────
+   The one dark band. Three screens in a fanned stage: the front one large,
+   the other two waiting at its sides. Position classes are set in the HTML
+   and moved by motion.js; with no JS the stage simply holds its first pose. */
+
+.build {
+  padding-block: clamp(4rem, 9vw, 7rem);
+}
+
+.build__head {
+  text-align: center;
+  max-width: 48rem;
+  margin-inline: auto;
+}
+
+.build__head .lead {
+  margin-top: 0.9rem;
+  margin-inline: auto;
+}
+
+.build__stage {
+  margin-top: clamp(2.5rem, 6vw, 4.5rem);
+  padding-inline: var(--gutter);
+  perspective: 1800px;
+}
+
+.build__rig {
+  --px: 0deg;
+  --py: 0deg;
+  position: relative;
+  max-width: 1320px;
+  margin-inline: auto;
+  aspect-ratio: 16 / 7.9;
+  transform-style: preserve-3d;
+  transform: rotateY(var(--px)) rotateX(var(--py));
+  transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.build__screen {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 62%;
+  margin: 0;
+  transform-style: preserve-3d;
+  transform: translateX(-50%);
+  transition:
+    transform 1.05s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.7s ease,
+    filter 0.7s ease;
+  cursor: pointer;
+}
+
+.build__screen.is-active {
+  z-index: 3;
+  transform: translateX(-50%) translateZ(70px);
+  cursor: default;
+}
+
+.build__screen.is-left {
+  z-index: 1;
+  transform: translateX(-50%) translateX(-46%) translateZ(-260px) rotateY(28deg) scale(0.84);
+  opacity: 0.7;
+  filter: brightness(0.62);
+}
+
+.build__screen.is-right {
+  z-index: 1;
+  transform: translateX(-50%) translateX(46%) translateZ(-260px) rotateY(-28deg) scale(0.84);
+  opacity: 0.7;
+  filter: brightness(0.62);
+}
+
+.build__screen.is-left:hover,
+.build__screen.is-right:hover {
+  opacity: 0.9;
+  filter: brightness(0.8);
+}
+
+.build__frame {
+  position: relative;
+  border: 1px solid var(--d-line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--d-panel);
+  box-shadow:
+    0 50px 110px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.build__screen.is-active .build__frame {
+  box-shadow:
+    0 60px 130px rgba(0, 0, 0, 0.7),
+    0 0 90px rgba(29, 119, 254, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.build__video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.build__glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.09), transparent 38%);
+}
+
+.build__cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin-top: var(--space-3);
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.build__screen.is-active .build__cap {
+  opacity: 1;
+  transition-delay: 0.35s;
+}
+
+.build__cap-label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--d-ink);
+}
+
+.build__cap-text {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: var(--text-sm);
+  color: var(--d-dim);
+}
+
+.build__tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+}
+
+.build__tab {
+  position: relative;
+  overflow: hidden;
+  min-height: 44px;
+  text-align: left;
+  font: inherit;
+  color: var(--d-dim);
+  background: transparent;
+  border: 1px solid var(--d-line);
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.build__tab:hover {
+  border-color: #3f3f46;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.build__tab.is-active {
+  border-color: rgba(29, 119, 254, 0.55);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+/* Progress rule: fills over the hold time, then the next screen comes in. */
+.build__tab::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 2px;
+  width: 0;
+  background: var(--blue);
+}
+
+.build__tab.is-active::before { width: 100%; }
+
+html.motion-on .build__tab.is-counting::before {
+  animation: buildCount 6s linear forwards;
+}
+
+@keyframes buildCount {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.build__tab-num {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  color: var(--blue);
+}
+
+.build__tab-label {
+  display: block;
+  margin-top: 0.35rem;
+  font-weight: 600;
+  color: var(--d-ink);
+}
+
+.build__tab-text {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--d-dim);
+}
+
+.build__outro {
+  margin-top: var(--space-6);
+  text-align: center;
+  font-size: clamp(1.15rem, 0.9rem + 1.2vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--d-ink);
+}
+
+/* ── Clients line ─────────────────────────────────────────────────────────
+   One row of the projects we have built. It drifts on its own and slows
+   under the pointer; with no JS it is a plain row that scrolls sideways. */
+
+.clients { overflow: hidden; }
+
+.clients__line {
+  position: relative;
+  margin-top: clamp(1rem, 2vw, 1.5rem);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+html:not(.js) .clients__line { overflow-x: auto; }
+
+.clients__track {
+  display: flex;
+  gap: var(--space-3);
+  width: max-content;
+  margin: 0;
+  padding: var(--space-2) var(--gutter);
+  list-style: none;
+  will-change: transform;
+}
+
+.client {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(16rem, 24vw, 21rem);
+  display: grid;
+  gap: 0.4rem;
+  align-content: start;
+  padding: var(--space-4);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  transition:
+    transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.4s ease,
+    border-color 0.4s ease;
+}
+
+.client::before {
+  content: '';
+  display: block;
+  width: 2.75rem;
+  height: 3px;
+  margin-bottom: var(--space-2);
+  border-radius: var(--control-radius);
+  background: var(--blue);
+}
+
+.client:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: #dcdee6;
+}
+
+.client__kind {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+
+.client__name {
+  font-size: 1.1rem;
+  font-weight: 640;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.client__body {
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* ── Three pillars ────────────────────────────────────────────────────────
+   White section. Copy beside one product picture; the picture leans toward
+   the pointer and a glare slides across it. */
+
+.pillars__list {
+  display: grid;
+  gap: clamp(3.5rem, 8vw, 7rem);
+  margin-top: var(--space-3);
+}
+
+.pillar {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+}
+
+.pillar:nth-child(even) .pillar__copy { order: 2; }
+
+.pillar__index {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  color: var(--blue);
+}
+
+.pillar__title {
+  margin-top: var(--space-2);
+  font-size: clamp(1.7rem, 1.2rem + 1.8vw, 2.6rem);
+  font-weight: 620;
+  letter-spacing: -0.032em;
+  line-height: 1.1;
+}
+
+.pillar__body {
+  margin-top: var(--space-3);
+  max-width: 46ch;
+  font-size: var(--text-lead);
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.pillar__points {
+  margin-top: var(--space-4);
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.pillar__points li {
+  position: relative;
+  padding-left: 1.5rem;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.pillar__points li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 0.75rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--blue);
+}
+
+.pillar__copy .link { margin-top: var(--space-4); }
+
+.pillar__visual { perspective: 1500px; }
+
+.pillar__frame {
+  --rx: 0deg;
+  --ry: 0deg;
+  --glare: -80%;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--canvas);
+  box-shadow:
+    var(--shadow-card-hover),
+    0 40px 80px rgba(17, 19, 24, 0.10);
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transform-style: preserve-3d;
+  transition:
+    transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.4s ease;
+}
+
+.pillar__frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.pillar__glare {
+  position: absolute;
+  inset: -20% -40%;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, 0.35) 50%, transparent 58%);
+  transform: translateX(var(--glare));
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ── Blog band without posts ──────────────────────────────────────────── */
+
+.blog-band__empty {
+  max-width: 42rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+}
+
+.blog-band__empty-title {
+  font-weight: 620;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+}
+
+.blog-band__empty p:not(.blog-band__empty-title) {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+/* ── Responsive for the home blocks ───────────────────────────────────── */
 
 @media (max-width: 1024px) {
   .hero__grid { grid-template-columns: 1fr; }
   .brand-brain { min-height: 20rem; }
-  .capitem,
-  .capitem:nth-child(even) { grid-template-columns: 1fr; }
-  .capitem:nth-child(even) .capitem__copy { order: 0; }
   .ctaband__inner { grid-template-columns: 1fr; }
   .process-overview__track { grid-template-columns: 1fr; }
   .process-overview .card { padding-left: 2.75rem; }
@@ -2566,16 +2998,50 @@ html.motion-on .capitem.is-in .art__pip {
     height: auto;
   }
   .postgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .build__screen { width: 70%; }
+  .build__screen.is-left {
+    transform: translateX(-50%) translateX(-40%) translateZ(-300px) rotateY(30deg) scale(0.78);
+  }
+  .build__screen.is-right {
+    transform: translateX(-50%) translateX(40%) translateZ(-300px) rotateY(-30deg) scale(0.78);
+  }
+}
+
+@media (max-width: 900px) {
+  .pillar,
+  .pillar:nth-child(even) { grid-template-columns: 1fr; }
+  .pillar:nth-child(even) .pillar__copy { order: 0; }
 }
 
 @media (max-width: 768px) {
   .brand-brain { min-height: 16rem; }
   .brand-brain__rig { width: min(17rem, 72vw); }
-  .converge__rail { grid-template-columns: 1fr; gap: var(--space-4); }
-  .converge__panel { transform: none !important; }
-  .converge__panel .converge__frame,
-  .converge__caption,
-  .converge__outro { opacity: 1 !important; }
+  .build__stage { perspective: none; }
+  .build__rig {
+    aspect-ratio: auto;
+    display: grid;
+    gap: var(--space-5);
+    transform: none;
+  }
+  .build__screen,
+  .build__screen.is-active,
+  .build__screen.is-left,
+  .build__screen.is-right {
+    position: static;
+    width: 100%;
+    transform: none;
+    opacity: 1;
+    filter: none;
+    cursor: default;
+  }
+  .build__cap,
+  .build__screen.is-active .build__cap {
+    position: static;
+    margin-top: var(--space-2);
+    text-align: left;
+    opacity: 1;
+  }
+  .build__tabs { grid-template-columns: 1fr; }
   .teamgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .footer-grid { grid-template-columns: 1fr; }
   .eventitem > article { grid-template-columns: 1fr; }
@@ -2584,4 +3050,5 @@ html.motion-on .capitem.is-in .art__pip {
 @media (max-width: 520px) {
   .teamgrid { grid-template-columns: 1fr; }
   .postgrid { grid-template-columns: 1fr; }
+  .client { width: min(20rem, 78vw); }
 }
