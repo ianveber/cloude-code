@@ -172,6 +172,12 @@ export const servicesMeta = {
   lead: 'Vsako področje pokriva namenski sistem — AI chatboti in voice AI agenti v slovenščini — skupaj pa tvorijo celovito rešitev za avtomatizacijo poslovanja.',
 };
 
+export const explorer = {
+  eyebrow: 'Storitve',
+  title: 'Tri področja. En odgovoren sistem.',
+  lead: 'Vsaka rešitev začne pri konkretnem delu, ki ga ekipa danes opravlja ročno.',
+};
+
 /* Services are described by what they do, not as named characters. */
 export const services = [
   {

@@ -96,6 +96,7 @@
     slider();
     contactForms();
     lazyVideo();
+    explorer();
 
     if (reduce) {
       document.documentElement.classList.add('motion-off');
@@ -109,7 +110,6 @@
     heroEntrance();
     brainTilt();
     particles();
-    explorer();
     reveals();
     converge();
     readline();
@@ -420,7 +420,7 @@
 
     items.forEach(function (item) {
       var para = item.querySelector('[data-type-chars]');
-      if (para) splitChars(para);
+      if (para && !reduce) splitChars(para);
     });
 
     function activate(slug) {
@@ -429,12 +429,20 @@
         el.classList.toggle('is-active', on);
         var para = el.querySelector('[data-type-chars]');
         if (!para) return;
-        if (on && !para.classList.contains('is-typed')) typeChars(para, 0.012);
+        if (!reduce && on && !para.classList.contains('is-typed')) typeChars(para, 0.012);
       });
       scenes.forEach(function (el) {
         el.classList.toggle('is-active', el.getAttribute('data-explorer-scene') === slug);
       });
     }
+
+    items.forEach(function (item) {
+      var link = item.querySelector('a');
+      if (!link) return;
+      link.addEventListener('focus', function () {
+        activate(item.getAttribute('data-explorer-item'));
+      });
+    });
 
     if (!('IntersectionObserver' in window)) return;
 
@@ -452,7 +460,7 @@
     });
 
     var first = items[0];
-    if (first) {
+    if (first && !reduce) {
       var firstPara = first.querySelector('[data-type-chars]');
       if (firstPara) typeChars(firstPara, 0.012);
     }
@@ -497,15 +505,10 @@
       var rect = section.getBoundingClientRect();
       var vh = window.innerHeight || 1;
 
-      /* 0 while the band is entering, 1 once its middle has passed the middle
-         of the viewport. */
-      var travel = rect.height + vh;
-      var seen = vh - rect.top;
-      var p = seen / travel;
-      p = (p - 0.36) / 0.34;
-      p = p < 0 ? 0 : p > 1 ? 1 : p;
-
-      section.style.setProperty('--converge', p.toFixed(3));
+      var raw = (vh * 0.58 - rect.top) / (vh * 0.72);
+      var progress = Math.max(0, Math.min(1, raw));
+      section.style.setProperty('--converge', progress.toFixed(4));
+      section.style.setProperty('--settled', Math.max(0, (progress - 0.72) / 0.28).toFixed(4));
     }
 
     function onScroll() {

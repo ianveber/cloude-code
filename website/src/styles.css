@@ -257,6 +257,8 @@ p { text-wrap: pretty; }
 .link {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
+  min-width: 44px;
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--ink);
@@ -311,6 +313,8 @@ p { text-wrap: pretty; }
   align-items: center;
   gap: var(--space-1);
   flex-shrink: 0;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .brand img { height: 26px; width: auto; }
@@ -665,15 +669,54 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
 .card p { font-size: var(--text-sm); color: var(--muted); }
 .card__foot { margin-top: var(--space-3); }
 
-/* The overview is a compact sequence, not a generic card collection. */
-.process-overview .grid {
+/* Four phases on one AIS-blue baseline, not a row of coloured cards. */
+.process-overview__track {
+  list-style: none;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-3);
+  padding: 0;
+}
+
+.process-overview__track::before {
+  content: '';
+  position: absolute;
+  left: var(--space-2);
+  right: var(--space-2);
+  top: 1.15rem;
+  height: 2px;
+  background: var(--blue);
 }
 
 .process-overview .card {
   display: flex;
   flex-direction: column;
   min-height: 17rem;
+  position: relative;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: var(--space-5) 0 var(--space-3);
+  overflow: visible;
+}
+
+.process-overview .card:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.process-overview .card::before,
+.process-overview .card::after {
+  display: none;
+}
+
+.process-overview .step__num {
+  position: relative;
+  z-index: 1;
+  width: fit-content;
+  background: var(--paper);
 }
 
 .process-overview .card .link {
@@ -920,7 +963,13 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
   font-size: var(--text-sm);
 }
 
-.person__links a { color: var(--muted); }
+.person__links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+  color: var(--muted);
+}
 .person__links a:hover { color: var(--ink); text-decoration: underline; }
 
 /* ── FAQ ──────────────────────────────────────────────────────────────── */
@@ -1164,6 +1213,13 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
   color: var(--line);
 }
 
+.breadcrumbs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+  color: inherit;
+}
 .breadcrumbs a:hover { color: var(--ink); }
 
 /* ── Key-takeaway box (GEO: quotable summary) ─────────────────────────── */
@@ -1250,6 +1306,12 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
 }
 
 .deflist dd { font-size: var(--text-sm); color: var(--ink-soft); margin: 0; }
+.deflist a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+}
 
 /* ── Footer ───────────────────────────────────────────────────────────── */
 
@@ -1302,6 +1364,10 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
 }
 
 .footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
   font-size: var(--text-sm);
   color: var(--muted);
   text-decoration: underline;
@@ -1356,6 +1422,10 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
   left: var(--space-1);
   top: -4rem;
   z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
   background: var(--ink);
   color: #fff;
   padding: 0.6rem var(--space-3);
@@ -1472,15 +1542,23 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
 
 .explorer__item {
   border-top: 1px solid var(--line);
-  padding: var(--space-4) 0 1.7rem;
-  opacity: 0.45;
-  transition: opacity 0.25s ease;
+  padding: var(--space-4) 0 var(--space-4);
+  opacity: 1;
 }
 
-.explorer__item.is-active,
-.explorer__item:hover { opacity: 1; }
+.explorer__item.is-active {
+  border-left: 2px solid var(--blue);
+  padding-left: var(--space-3);
+}
 
-.explorer__copy { display: grid; gap: 0.45rem; }
+.explorer__item.is-active .explorer__copy h3 { font-weight: 700; }
+
+.explorer__copy {
+  display: grid;
+  gap: 0.45rem;
+  min-height: 44px;
+  min-width: 44px;
+}
 .explorer__kicker {
   font-size: var(--text-xs);
   font-weight: 650;
@@ -1876,7 +1954,9 @@ html:not(.is-intro) .hero__intro { display: none; }
    with no JS the panels simply stay side by side, which is a valid layout. */
 
 .converge {
-  padding-block: clamp(4rem, 9vw, 7rem);
+  --settled: 1;
+  padding-top: clamp(4rem, 9vw, 7rem);
+  padding-bottom: var(--space-5);
 }
 
 .converge__head {
@@ -1895,20 +1975,18 @@ html:not(.is-intro) .hero__intro { display: none; }
 .converge__rail {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(0.75rem, 3vw, 2rem);
+  gap: var(--space-4);
   max-width: 1320px;
   margin-inline: auto;
   perspective: 1600px;
 }
 
 .converge__panel {
+  --close: max(0, min(1, (var(--converge, 0) - 0.3) / 0.32));
   margin: 0;
   min-width: 0;
-  /* Outer panels slide toward the middle and drop behind the centre one. */
-  transform:
-    translateX(calc(var(--dir, 0) * var(--converge, 0) * 33%))
-    translateZ(calc(var(--converge, 0) * -80px))
-    scale(calc(1 - var(--converge, 0) * 0.06));
+  /* Close only after captions have cleared; hold the merge from 0.65 to 1. */
+  transform: translateX(calc(var(--dir, 0) * var(--close) * (100% + var(--space-4))));
   transform-origin: center;
 }
 
@@ -1917,17 +1995,14 @@ html:not(.is-intro) .hero__intro { display: none; }
 .converge__panel[data-converge-panel='2'] { --dir: -1; }
 
 .converge__panel[data-converge-panel='1'] {
-  transform: scale(calc(1 + var(--converge, 0) * 0.06));
+  transform: none;
 }
 
-.converge__panel[data-converge-panel='0'] .converge__frame,
-.converge__panel[data-converge-panel='2'] .converge__frame {
-  opacity: calc(1 - var(--converge, 0) * 0.55);
+html.motion-on .converge__panel {
+  transition: none;
 }
-
-html.motion-on .converge__panel,
 html.motion-on .converge__frame {
-  transition: transform 0.35s linear, opacity 0.35s linear;
+  transition: opacity 0.35s linear;
 }
 
 /* The caption gets no easing on purpose. Smoothing it on the same 0.35s curve
@@ -1954,13 +2029,11 @@ html.motion-on .converge__caption {
   object-fit: cover;
 }
 
-/* Captions clear early: once the panels start closing they would slide over
-   one another, and three overlapping captions read as a rendering fault. Gone
-   by --converge 0.31, where the panels have barely begun to move. */
+/* Captions stay readable through 0.18, then clear before frames start closing. */
 .converge__caption {
   display: block;
   margin-top: var(--space-3);
-  opacity: calc(1 - var(--converge, 0) * 3.2);
+  opacity: calc(1 - max(0, (var(--converge, 0) - 0.16) * 10));
 }
 
 .converge__label {
@@ -1978,13 +2051,13 @@ html.motion-on .converge__caption {
 }
 
 .converge__outro {
-  margin-top: clamp(2rem, 5vw, 3.25rem);
+  margin-top: var(--space-5);
   text-align: center;
   font-size: clamp(1.15rem, 0.9rem + 1.2vw, 1.75rem);
   font-weight: 600;
   letter-spacing: -0.03em;
   color: var(--d-ink);
-  opacity: calc(0.25 + var(--converge, 0) * 0.75);
+  opacity: calc(0.55 + var(--settled, 0) * 0.45);
 }
 
 /* ── Capability band ──────────────────────────────────────────────────────
@@ -2018,24 +2091,23 @@ html:not(.motion-on) .readline__w,
 }
 
 .capband__list {
-  margin-top: clamp(3rem, 7vw, 5.5rem);
+  margin-top: var(--space-6);
   display: grid;
-  gap: clamp(2.5rem, 6vw, 4.5rem);
+  gap: var(--space-6);
 }
 
 .capitem {
   display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
-  gap: clamp(1.5rem, 4vw, 3.5rem);
-  padding-top: clamp(2rem, 5vw, 3rem);
+  gap: var(--space-5);
+  padding-top: var(--space-5);
   border-top: 1px solid var(--d-line);
 }
 
-/* Alternate which side the drawing sits on, swapping the track widths with it
-   so the drawing always keeps the wider column. */
+/* Alternate order only on desktop. Mobile keeps copy before art. */
 .capitem:nth-child(even) {
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 .capitem:nth-child(even) .capitem__copy { order: 2; }
 
@@ -2056,10 +2128,9 @@ html:not(.motion-on) .readline__w,
   color: var(--d-ink);
 }
 
-/* Deliberately small: the drawing carries the section, the words annotate it. */
 .capitem__body {
   margin-top: 0.65rem;
-  max-width: 34ch;
+  max-width: 62ch;
   font-size: var(--text-sm);
   line-height: 1.6;
   color: var(--d-dim);
@@ -2068,25 +2139,26 @@ html:not(.motion-on) .readline__w,
 .capitem__art {
   border: 1px solid var(--d-line);
   border-radius: var(--radius);
-  background:
-    radial-gradient(120% 100% at 50% 0%, rgba(255, 255, 255, 0.045), transparent 70%),
-    var(--d-panel);
-  padding: clamp(1.25rem, 3vw, 2.25rem);
+  background: var(--d-panel);
+  padding: var(--space-4);
 }
 
 .capitem__art svg {
   width: 100%;
   height: auto;
   display: block;
-  color: var(--blue);
 }
 
-.art__panel { stroke: #3f3f46; }
-.art__tile { fill: rgba(255, 255, 255, 0.05); stroke: #3f3f46; stroke-width: 1.4; }
-.art__tile--hot { fill: color-mix(in srgb, currentColor 16%, transparent); stroke: currentColor; }
-.art__edge { stroke: #52525b; }
-.art__spark { color: currentColor; }
-.art__pip { color: currentColor; }
+.capitem__art svg * {
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.art__line { stroke: #3f3f46; fill: none; }
+.art__active,
+.art__spark,
+.art__pip { stroke: var(--blue); fill: none; }
 
 html.motion-on .art__spark {
   stroke-dasharray: 340;
@@ -2108,33 +2180,24 @@ html.motion-on .capitem.is-in .art__pip {
 
 .teamgrid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: clamp(0.75rem, 2vw, 1.25rem);
-  margin-top: clamp(2rem, 5vw, 3rem);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+  margin-top: var(--space-6);
   padding: 0;
   list-style: none;
 }
 
-.teamtile { min-width: 0; text-align: center; }
+.teamtile { min-width: 0; text-align: left; }
 
 .teamtile__photo {
   display: block;
   width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
+  object-position: center 20%;
   border-radius: var(--radius);
   border: 1px solid var(--line);
   background: var(--canvas);
-}
-
-.teamtile__photo--empty {
-  border-style: dashed;
-  background:
-    repeating-linear-gradient(
-      135deg,
-      transparent 0 8px,
-      rgba(21, 23, 29, 0.028) 8px 16px
-    );
 }
 
 .teamtile__name {
@@ -2528,6 +2591,15 @@ html.motion-on .capitem.is-in .art__pip {
   .capitem { grid-template-columns: 1fr; }
   .capitem:nth-child(even) .capitem__copy { order: 0; }
   .ctaband__inner { grid-template-columns: 1fr; }
+  .process-overview__track { grid-template-columns: 1fr; }
+  .process-overview__track::before {
+    left: 0.7rem;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    height: auto;
+  }
   .teamgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .postgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -2540,5 +2612,6 @@ html.motion-on .capitem.is-in .art__pip {
   .converge__caption { opacity: 1 !important; }
   .converge__outro { opacity: 1; }
   .eventitem > article { grid-template-columns: 1fr; }
-  .postgrid, .teamgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .postgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .teamgrid { grid-template-columns: 1fr; }
 }

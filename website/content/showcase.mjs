@@ -68,7 +68,7 @@ export const capabilities = {
     },
     {
       id: 'varnost',
-      art: 'shield',
+      art: 'security',
       label: 'Kibernetska varnost',
       body: 'Nadzor dostopa, revizijska sled in šifrirani podatki. Varnost na poslovni ravni.',
     },

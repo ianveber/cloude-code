@@ -9,91 +9,95 @@
  * Every drawing is decorative; the meaning is always carried by adjacent text.
  */
 
-const SVG_OPEN = (viewBox, extra = '') =>
-  `<svg viewBox="${viewBox}" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"${extra}>`;
-
 /* ── Capability artwork ─────────────────────────────────────────────────── */
 
-const UI = 'stroke="currentColor" stroke-width="1.6" fill="none"';
+const SVG_OPEN = (name) =>
+  `<svg viewBox="0 0 320 200" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="art art--${name}">`;
 
-/** A SaaS product: window chrome, sidebar, KPI tiles and a chart. */
-const artSaas = () => `${SVG_OPEN('0 0 320 200', ' class="art art--saas"')}
-  <rect ${UI} x="8" y="10" width="304" height="180" rx="10" class="art__panel"/>
-  <path ${UI} d="M8 34 H312"/>
-  <circle cx="24" cy="22" r="3.5" fill="currentColor" opacity="0.45"/>
-  <circle cx="36" cy="22" r="3.5" fill="currentColor" opacity="0.3"/>
-  <circle cx="48" cy="22" r="3.5" fill="currentColor" opacity="0.3"/>
-  <path ${UI} d="M84 34 V190"/>
-  <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity="0.55">
-    <path d="M22 52 H68"/><path d="M22 68 H60"/><path d="M22 84 H66"/><path d="M22 100 H54"/>
+/** SaaS: one browser shell organised around a single measurable outcome. */
+const artSaas = () => `${SVG_OPEN('saas')}
+  <g class="art__line">
+    <rect x="12" y="14" width="296" height="172" rx="8"/>
+    <path d="M12 38H308M78 38V186"/>
+    <circle cx="27" cy="26" r="2.5"/><circle cx="38" cy="26" r="2.5"/><circle cx="49" cy="26" r="2.5"/>
+    <path d="M28 58H61M28 73H57M28 88H64M28 103H52"/>
+    <path d="M98 62H186M98 78H154"/>
+    <path d="M98 158H286M98 98V158"/>
+    <path d="M122 158V146M158 158V133M194 158V140M230 158V112M266 158V91"/>
   </g>
-  <rect class="art__tile" x="100" y="50" width="62" height="42" rx="7"/>
-  <rect class="art__tile" x="172" y="50" width="62" height="42" rx="7"/>
-  <rect class="art__tile art__tile--hot" x="244" y="50" width="52" height="42" rx="7"/>
-  <g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" opacity="0.75">
-    <path d="M110 80 H132"/><path d="M182 80 H206"/><path d="M254 80 H272"/>
+  <g class="art__active">
+    <path class="art__spark" d="M104 146L139 132L174 138L209 112L244 105L280 77"/>
+    <circle class="art__pip" cx="280" cy="77" r="4"/>
   </g>
-  <rect ${UI} x="100" y="106" width="196" height="70" rx="8" class="art__panel"/>
-  <path class="art__spark" d="M112 158 L138 142 L160 150 L184 124 L210 132 L236 112 L262 118 L284 96"
-        stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <circle class="art__pip" cx="284" cy="96" r="4.5" fill="currentColor"/>
 </svg>`;
 
-/** Automation: nodes, a decision diamond and a branch. */
-const artFlow = () => `${SVG_OPEN('0 0 320 200', ' class="art art--flow"')}
-  <rect class="art__tile" x="10" y="26" width="86" height="42" rx="8"/>
-  <rect class="art__tile" x="10" y="126" width="86" height="42" rx="8"/>
-  <path class="art__edge" d="M96 47 C124 47 118 88 146 92" ${UI}/>
-  <path class="art__edge" d="M96 147 C124 147 118 108 146 100" ${UI}/>
-  <path class="art__tile art__tile--hot" d="M186 60 L228 96 L186 132 L144 96 Z"/>
-  <path class="art__edge" d="M228 82 C252 74 250 54 274 52" ${UI}/>
-  <path class="art__edge" d="M228 110 C252 118 250 142 274 144" ${UI}/>
-  <rect class="art__tile" x="266" y="32" width="44" height="40" rx="8"/>
-  <rect class="art__tile" x="266" y="124" width="44" height="40" rx="8"/>
-  <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity="0.5">
-    <path d="M24 42 H60"/><path d="M24 54 H74"/>
-    <path d="M24 142 H60"/><path d="M24 154 H74"/>
+/** Automation: an event enters, a decision routes it, and a result exits. */
+const artFlow = () => `${SVG_OPEN('flow')}
+  <g class="art__line">
+    <circle cx="36" cy="100" r="22"/>
+    <path d="M29 92V108L44 100Z"/>
+    <path d="M58 100H111"/>
+    <path d="M104 94L111 100L104 106"/>
+    <path d="M160 55L205 100L160 145L115 100Z"/>
+    <path d="M205 100H258"/>
+    <path d="M251 94L258 100L251 106"/>
+    <rect x="258" y="73" width="50" height="54" rx="7"/>
+    <path d="M270 91H296M270 102H290M270 113H284"/>
+    <path d="M160 145V174H258"/>
+    <circle cx="160" cy="174" r="3"/><circle cx="258" cy="174" r="3"/>
   </g>
-  <circle class="art__pip" cx="186" cy="96" r="5" fill="currentColor"/>
+  <g class="art__active">
+    <path class="art__spark" d="M58 100H111M115 100L160 55L205 100H258"/>
+    <path d="M251 94L258 100L251 106"/>
+    <circle class="art__pip" cx="160" cy="55" r="4"/>
+  </g>
 </svg>`;
 
-/** Cybersecurity: a shield over a key grid, with a scanning sweep. */
-const artShield = () => `${SVG_OPEN('0 0 320 200', ' class="art art--shield"')}
-  <g stroke="currentColor" stroke-width="1.4" opacity="0.32">
-    <path d="M18 44 H302"/><path d="M18 78 H302"/><path d="M18 112 H302"/><path d="M18 146 H302"/>
-    <path d="M60 20 V180"/><path d="M126 20 V180"/><path d="M194 20 V180"/><path d="M260 20 V180"/>
+/** Security: an access ledger is checked across a verification boundary. */
+const artSecurity = () => `${SVG_OPEN('security')}
+  <g class="art__line">
+    <rect x="14" y="22" width="186" height="156" rx="8"/>
+    <path d="M14 52H200M60 52V178M150 52V178"/>
+    <path d="M28 38H102"/>
+    <circle cx="37" cy="73" r="6"/><path d="M51 73H96M164 73H184"/>
+    <circle cx="37" cy="101" r="6"/><path d="M51 101H111M164 101H184"/>
+    <circle cx="37" cy="129" r="6"/><path d="M51 129H88M164 129H184"/>
+    <circle cx="37" cy="157" r="6"/><path d="M51 157H104M164 157H184"/>
+    <path d="M238 40V160"/>
+    <path d="M238 40C276 40 300 64 300 100S276 160 238 160"/>
   </g>
-  <path class="art__tile art__tile--hot"
-        d="M160 22 L226 46 V104 C226 140 196 166 160 178 C124 166 94 140 94 104 V46 Z"/>
-  <path ${UI} d="M133 100 L153 120 L189 80" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity="0.6">
-    <path d="M28 62 H48"/><path d="M272 62 H292"/>
-    <path d="M28 130 H48"/><path d="M272 130 H292"/>
+  <g class="art__active">
+    <path class="art__spark" d="M164 101H225"/>
+    <path d="M218 95L225 101L218 107"/>
+    <circle class="art__pip" cx="267" cy="101" r="21"/>
+    <path d="M258 101L265 108L278 93"/>
   </g>
-  <circle class="art__pip" cx="38" cy="96" r="4" fill="currentColor"/>
-  <circle class="art__pip" cx="282" cy="96" r="4" fill="currentColor"/>
 </svg>`;
 
-/** Custom application: a phone-shaped app frame beside a form panel. */
-const artApp = () => `${SVG_OPEN('0 0 320 200', ' class="art art--app"')}
-  <rect ${UI} x="14" y="16" width="104" height="168" rx="14" class="art__panel"/>
-  <path ${UI} d="M48 30 H84" stroke-width="3.4" stroke-linecap="round"/>
-  <rect class="art__tile art__tile--hot" x="28" y="48" width="76" height="34" rx="7"/>
-  <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity="0.55">
-    <path d="M28 98 H104"/><path d="M28 112 H86"/><path d="M28 126 H98"/><path d="M28 140 H72"/>
+/** Custom app: the same task moves between a desktop queue and mobile action. */
+const artApp = () => `${SVG_OPEN('app')}
+  <g class="art__line">
+    <rect x="12" y="24" width="202" height="142" rx="8"/>
+    <path d="M12 48H214M64 48V166"/>
+    <path d="M27 67H50M27 83H45M27 99H52"/>
+    <path d="M82 67H139M82 83H184"/>
+    <rect x="82" y="101" width="104" height="42" rx="6"/>
+    <path d="M95 114H153M95 130H138"/>
+    <path d="M95 178H132M160 178H198"/>
+    <rect x="232" y="12" width="76" height="176" rx="13"/>
+    <path d="M257 27H283M246 58H294M246 74H282"/>
+    <rect x="246" y="96" width="48" height="48" rx="6"/>
+    <path d="M251 173H289"/>
   </g>
-  <rect class="art__tile" x="28" y="154" width="76" height="18" rx="9"/>
-  <rect ${UI} x="140" y="16" width="166" height="168" rx="12" class="art__panel"/>
-  <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity="0.5">
-    <path d="M158 44 H232"/>
+  <g class="art__active">
+    <path class="art__spark" d="M186 122C221 122 218 120 246 120"/>
+    <path d="M239 114L246 120L239 126"/>
+    <circle class="art__pip" cx="270" cy="120" r="14"/>
+    <path d="M263 120L268 125L278 114"/>
   </g>
-  <rect class="art__tile" x="158" y="58" width="130" height="26" rx="7"/>
-  <rect class="art__tile" x="158" y="94" width="130" height="26" rx="7"/>
-  <rect class="art__tile art__tile--hot" x="158" y="134" width="86" height="30" rx="8"/>
-  <circle class="art__pip" cx="272" cy="149" r="5" fill="currentColor"/>
 </svg>`;
 
-const ART = { saas: artSaas, flow: artFlow, shield: artShield, app: artApp };
+const ART = { saas: artSaas, flow: artFlow, security: artSecurity, app: artApp };
 
 /** Look up a capability drawing by key. Unknown keys render nothing. */
 export const capabilityArt = (key) => (ART[key] ? ART[key]() : '');

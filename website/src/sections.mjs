@@ -8,6 +8,7 @@
 
 import { esc, each, cls } from './html.mjs';
 import { serviceGlyph, stageScene } from './decor.mjs';
+import { explorer as explorerCopy } from '../content/content.mjs';
 import site from '../content/site.mjs';
 
 /** Section heading block: eyebrow + h2 + lead. */
@@ -58,9 +59,9 @@ export function featureExplorer(services) {
   return `
 <section class="explorer" id="storitve" aria-labelledby="explorer-title" data-services>
   <div class="shell explorer__head">
-    <p class="eyebrow">Storitve</p>
-    <h2 id="explorer-title">Tri področja, en sistem</h2>
-    <p class="lead">Vsako področje ima svoj oder. Skupaj pokrivajo administracijo, prodajo in trg.</p>
+    <p class="eyebrow">${esc(explorerCopy.eyebrow)}</p>
+    <h2 id="explorer-title">${esc(explorerCopy.title)}</h2>
+    <p class="lead">${esc(explorerCopy.lead)}</p>
   </div>
   <div class="shell explorer__grid">
     <ol class="explorer__list">
@@ -159,7 +160,7 @@ export function processOverview(meta, phases) {
 <section class="section process-overview" aria-labelledby="proces-pregled" data-process-overview>
   <div class="shell">
     ${sectionHead({ ...meta, id: 'proces-pregled' })}
-    <ol class="grid grid--4">
+    <ol class="process-overview__track">
       ${each(
         phases,
         (phase) => `

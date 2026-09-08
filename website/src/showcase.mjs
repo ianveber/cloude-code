@@ -119,7 +119,9 @@ export function convergeBand(data) {
     </div>
   </div>
 
-  <p class="converge__outro">${esc(data.outro)}</p>
+  <div class="shell">
+    <p class="converge__outro">${esc(data.outro)}</p>
+  </div>
 </section>`;
 }
 
