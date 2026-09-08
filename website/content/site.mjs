@@ -39,11 +39,13 @@ export const site = {
     logo: '/brand/logo-light.png',
     logoWidth: 133,
     logoHeight: 52,
-    /* The brain alone, on a transparent ground, cut from the official
-       lockup. brain.png keeps the white lines (for dark surfaces);
-       brain-light.png has them recoloured to ink (for white surfaces). */
-    brain: '/brand/brain.png',
-    brainLight: '/brand/brain-light.png',
+    /* The brain alone, on a transparent ground, traced from the official
+       lockup so it stays sharp at any size. brain.svg keeps the white lines
+       (for dark surfaces); brain-light.svg has them in ink (for white
+       surfaces); brain-mask.svg is the silhouette used for light and shadow. */
+    brain: '/brand/brain.svg',
+    brainLight: '/brand/brain-light.svg',
+    brainMask: '/brand/brain-mask.svg',
     brainWidth: 1168,
     brainHeight: 1104,
     favicon: '/brand/favicon.png',

@@ -21,10 +21,10 @@ response so search engines and AI answer engines can read it without JavaScript.
 The home page is a product narrative, not a template landing page:
 
 1. Typed intro: white screen, the bare brain, "AIS Slovenia" typed with a caret (home only)
-2. Hero: headline centred, two pill buttons, the brain large and soft behind the words (white)
+2. Hero: headline left, two pill buttons, the 3D brain slab on the right (white)
 3. Build stage: a rounded black panel where the three clips take turns in front,
    spread out side by side, then gather again (the only dark block)
-4. Clients line: soft grey tiles, a tag, a name and one sentence each, no logos
+4. Clients wall: one soft tile per client with the logo and the brand name, staggered heights, no descriptions
 5. Three pillars: a title, one sentence and a rendered product picture in a soft panel
 6. Team (three real people, name and role)
 7. Blog (one line while `blog.items` is empty)
@@ -44,14 +44,19 @@ render **one honest empty state**. Do not invent catalogue entries to fill them.
 
 These are enforced by `design-audit.mjs` and/or by the approved spec.
 
-1. **Exact brand only.** The bare brain is `public/brand/brain-light.png` (ink
-   lines, for white surfaces) and `public/brand/brain.png` (white lines, for
-   dark surfaces); both are cut from the official lockup with the ground made
-   transparent and nothing redrawn. `favicon.png` is the browser icon only.
-   Light lockup is `public/brand/logo-light.png`. Do not redraw, trace, or
-   SVG-invent the brain.
-2. **The brain is a picture, not an icon.** No tile, no frame, no shadow
-   around it. In the hero it sits behind the headline and only drifts.
+1. **Exact brand only.** The bare brain is a vector traced automatically from
+   the official lockup (`tools/…/trace` notes in this file): `brain-light.svg`
+   (ink lines, for white surfaces), `brain.svg` (white lines, for dark
+   surfaces), `brain-mask.svg` (the same shape in black) and `brain-solid.svg`
+   (the filled outline, for depth, light and shadow masks). `favicon.png` is
+   the browser icon only. Light lockup is `public/brand/logo-light.png`.
+   Never hand-draw, edit or "improve" these paths; re-trace from the lockup
+   if the mark changes.
+2. **The brain is the only 3D object.** In the hero it lies at the approved
+   tilt (`--tilt-x: 58deg`, `--tilt-z: -30deg`) as a slab: the traced face on
+   a white core, eight dark slices behind it for thickness, a highlight and a
+   light sweep that follow the pointer, and two shadows in its own silhouette.
+   No tile or frame around it. Pointer tilt is capped at ±8°.
 3. **Buttons are black or soft grey pills.** No accent-coloured buttons.
 4. **One decorative colour:** AIS blue `#1d77fe`. No violet / teal / amber / rose
    accent system.
@@ -163,23 +168,26 @@ design audit fails the build if those strings return.
 Team photos: files in `public/team/` plus `photo` / `photoWidth` / `photoHeight`
 on each member in `content/content.mjs`. Crop is CSS `4 / 5`.
 
-Clients line: `clients.items` in `content/showcase.mjs` lists real projects
-from our own repositories (INSPECTUS, ATHLOS, AIS Command, the coating model)
-with one sentence each and no logos. **Before a production deploy, confirm
-with each client that the project may be named publicly and replace the
-working names with the ones they approve.** Never add a project that does not
-exist.
+Clients wall: `clients.items` in `content/showcase.mjs` lists confirmed
+clients (INSPECTUS, Pacom, ZaLife) and our own product ATHLOS, each with a
+logo in `public/clients/` taken from the client's own website. **Before a
+production deploy, confirm with each client that their logo may appear
+here.** Never add a client that does not exist; the render check requires a
+real logo image and a name per tile and rejects descriptions.
 
 ---
 
 ## Brand treatment (option 3)
 
-- Intro: the bare brain (`brain-light.png`) with "AIS Slovenia" typed beside
+- Intro: the bare brain (`brain-light.svg`) with "AIS Slovenia" typed beside
   it in the site font. The text comes from `intro` in `content/showcase.mjs`.
-- Hero: `brain-light.png` in `.hero__brain`, large, at low opacity, behind the
-  centred headline, with a soft white halo behind the words for legibility.
-  It drifts a few pixels toward the pointer and breathes slowly. Nothing is
-  drawn around it.
+- Hero: the brain as a lying 3D slab. `src/showcase.mjs` reads the two paths
+  from `brain-light.svg` at build time into an inline `<symbol>`; the face
+  uses it, everything else (slices, core, gloss, sweep, shadow) is a masked
+  box using `brain-solid.svg`. Slice colours come from `--k` and `color-mix`.
+- Tracing: `potrace` (npm) over the lockup's alpha, ink and blue separately;
+  the solid outline is the shape closed with a 21 px filter, flood-filled from
+  the border and eroded back. Re-run only if the official mark changes.
 - Font: Figtree (Google Fonts), headlines at weight 500 with tight tracking.
 - Header/footer: flat `logo-light.png`.
 
@@ -192,7 +200,7 @@ and the design-audit selectors together.
 
 `public/js/motion.js` may run:
 
-`introSequence`, `heroEntrance`, `brainDrift`, `buildStage`, `reveals`,
+`introSequence`, `heroEntrance`, `brainShine`, `buildStage`, `reveals`,
 `clientsLine`, `tiltFrames`, `footerGlow`, `lazyVideo`, plus `headerState`,
 `explorer` (other pages) and `contactForms`.
 

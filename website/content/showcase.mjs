@@ -52,42 +52,36 @@ export const buildStage = {
   ],
 };
 
-/* ── Clients line ───────────────────────────────────────────────────────
-   One tile per project we have built: a tag, a name and one sentence. No
-   logos, no numbers, no invented names.
+/* ── Clients wall ───────────────────────────────────────────────────────
+   One tile per client: the logo and the brand name, nothing else.
 
-   Every entry is a real project from our own repositories. Before a
-   production deploy, confirm with each client that the project may be named
-   publicly, and replace the working names with the ones they approve. */
+   Logos come from each client's own website (public/clients/). INSPECTUS,
+   Pacom and ZaLife are confirmed clients; ATHLOS is our own sports product.
+   Before a production deploy, confirm with each client that their logo may
+   appear here. */
 
 export const clients = {
   eyebrow: 'Reference',
   title: 'S kom smo delali',
   items: [
     {
-      name: 'INSPECTUS VLDR',
-      kind: 'Avtomatizacija',
-      body: 'Poročila o pregledu vozil v pristanišču sistem prebere in iz njih sestavi zapis o vsakem vozilu.',
+      name: 'INSPECTUS',
+      href: 'https://inspectus.si/',
+      logo: { src: '/clients/inspectus.png', width: 608, height: 224 },
     },
     {
-      name: 'INSPECTUS VIN',
-      kind: 'Avtomatizacija',
-      body: 'Fotografije s pomola se same razvrstijo po vozilih in preverijo proti seznamu razkladanja.',
+      name: 'Pacom',
+      href: 'https://pacom.si/',
+      logo: { src: '/clients/pacom.png', width: 300, height: 259 },
+    },
+    {
+      name: 'ZaLife',
+      href: 'https://www.zalife.eu/',
+      logo: { src: '/clients/zalife.png', width: 593, height: 240 },
     },
     {
       name: 'ATHLOS',
-      kind: 'SaaS izdelek',
-      body: 'Aplikacija za športnika, nadzorna plošča za trenerja in AI trener, ki sme popraviti trening.',
-    },
-    {
-      name: 'AIS Command',
-      kind: 'SaaS izdelek',
-      body: 'Naš interni CRM s portalom za stranke, računi in plačili.',
-    },
-    {
-      name: 'Model za premaze',
-      kind: 'AI model',
-      body: 'Napove gostoto, viskoznost in prekrivnost premaza, preden ga kdo zmeša.',
+      logo: { src: '/clients/athlos.svg', width: 48, height: 46 },
     },
   ],
 };

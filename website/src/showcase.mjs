@@ -6,9 +6,25 @@
  * to read anything here — the text is complete in the HTML on first response.
  */
 
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+
 import { esc, each } from './html.mjs';
 import site from '../content/site.mjs';
 import { intro as introCopy } from '../content/showcase.mjs';
+
+/* The two paths of the official brain, read once from the traced SVG so the
+   hero can stack them in 3D and colour each layer from CSS. */
+const BRAIN_SVG = readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public', 'brand', 'brain-light.svg'),
+  'utf8'
+);
+const BRAIN_PATHS = [...BRAIN_SVG.matchAll(/<path[^>]*\sd="([^"]+)"/g)].map((m) => m[1]);
+if (BRAIN_PATHS.length !== 2) {
+  throw new Error('public/brand/brain-light.svg must contain exactly two paths (ink, blue).');
+}
+const BRAIN_VIEWBOX = `0 0 ${site.brand.brainWidth} ${site.brand.brainHeight}`;
 
 /* ── Opening sequence ─────────────────────────────────────────────────── */
 
@@ -44,23 +60,53 @@ export function introOverlay() {
 /* ── Hero ─────────────────────────────────────────────────────────────── */
 
 /**
- * White stage, headline centred, the brain large and soft behind the words.
- * The brain is the official mark on a transparent ground, nothing else. It
- * drifts a little with the pointer and breathes slowly; the image itself is
- * never redrawn.
+ * White stage: headline on the left, the brain on the right as a real 3D
+ * object. The brain lies at a shallow angle, has visible thickness (the
+ * traced shape stacked in depth), a highlight and a light sweep that follow
+ * the pointer, and a soft shadow with its own silhouette underneath. The
+ * shape itself is the official mark, traced once and never redrawn.
  */
+const BRAIN_DEPTH_LAYERS = 8;
+
 export function brainHero(data) {
+  /* Slices of the slab, deepest first. --z steps them back in depth; --k
+     runs from 0 to 1 toward the face so the edge lightens as it comes forward. */
+  const layers = Array.from({ length: BRAIN_DEPTH_LAYERS }, (_, i) => {
+    const z = -(BRAIN_DEPTH_LAYERS - i) * 3;
+    const k = (i / (BRAIN_DEPTH_LAYERS - 1)).toFixed(2);
+    return `            <span class="brand-brain__layer" style="--z:${z}px;--k:${k}"></span>`;
+  }).join('\n');
+
   return `
 <section class="hero hero--brain" data-intro>
-  <div class="hero__brain" aria-hidden="true" data-brain>
-    <img data-brand-brain src="${esc(site.brand.brainLight)}" alt=""
-      width="${site.brand.brainWidth}" height="${site.brand.brainHeight}" fetchpriority="high">
-  </div>
-  <div class="shell hero__inner">
-    <h1 data-type-in>${esc(data.headline)}</h1>
-    <div class="btn-row" data-enter="1">
-      <a class="btn btn--primary" href="${esc(data.primary.href)}">${esc(data.primary.label)}</a>
-      <a class="btn btn--secondary" href="${esc(data.secondary.href)}">${esc(data.secondary.label)}</a>
+  <svg class="brand-brain__defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <symbol id="brain-shape" viewBox="${BRAIN_VIEWBOX}">
+      <path style="fill:var(--brain-ink)" fill-rule="evenodd" d="${BRAIN_PATHS[0]}"/>
+      <path style="fill:var(--brain-blue)" fill-rule="evenodd" d="${BRAIN_PATHS[1]}"/>
+    </symbol>
+  </svg>
+  <div class="shell hero__grid">
+    <div class="hero__copy">
+      <h1 data-type-in>${esc(data.headline)}</h1>
+      <div class="btn-row" data-enter="1">
+        <a class="btn btn--primary" href="${esc(data.primary.href)}">${esc(data.primary.label)}</a>
+        <a class="btn btn--secondary" href="${esc(data.secondary.href)}">${esc(data.secondary.label)}</a>
+      </div>
+    </div>
+    <div class="hero__art" aria-hidden="true">
+      <div class="brand-brain" data-brain>
+        <div class="brand-brain__float">
+          <div class="brand-brain__rig">
+            <span class="brand-brain__ground"></span>
+            <span class="brand-brain__shadow"></span>
+${layers}
+            <span class="brand-brain__core"></span>
+            <svg class="brand-brain__face" viewBox="${BRAIN_VIEWBOX}" aria-hidden="true" focusable="false"><use href="#brain-shape"/></svg>
+            <span class="brand-brain__gloss"></span>
+            <span class="brand-brain__sweep"></span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>`;
@@ -143,9 +189,9 @@ export function buildStage(data) {
 </section>`;
 }
 
-/* ── Clients line ─────────────────────────────────────────────────────────
-   One row of the projects we have built. It drifts slowly on its own and
-   slows under the pointer; without JS it is a plain row that scrolls. */
+/* ── Clients wall ─────────────────────────────────────────────────────────
+   One soft tile per client: the logo and the brand name, nothing else. The
+   tiles sit at staggered heights, float slowly, and lean toward the pointer. */
 
 export function clientsLine(data) {
   return `
@@ -155,16 +201,17 @@ export function clientsLine(data) {
       <p class="eyebrow">${esc(data.eyebrow)}</p>
       <h2 id="clients-title">${esc(data.title)}</h2>
     </div>
-  </div>
-  <div class="clients__line" data-clients-line>
-    <ul class="clients__track" data-clients-track>
+    <ul class="clients__wall">
       ${each(
         data.items,
         (item, i) => `
       <li class="client" style="--i:${i}">
-        <span class="client__kind">${esc(item.kind)}</span>
-        <span class="client__name">${esc(item.name)}</span>
-        <span class="client__body">${esc(item.body)}</span>
+        <${item.href ? `a class="client__tile" href="${esc(item.href)}" rel="noopener"` : 'div class="client__tile"'} data-tilt>
+          <span class="client__logo">
+            <img src="${esc(item.logo.src)}" alt="" width="${item.logo.width}" height="${item.logo.height}" loading="lazy" decoding="async">
+          </span>
+          <span class="client__name">${esc(item.name)}</span>
+        </${item.href ? 'a' : 'div'}>
       </li>`
       )}
     </ul>

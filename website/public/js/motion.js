@@ -1,7 +1,7 @@
 /**
  * Motion — progressive enhancement.
  *
- * Meaningful motion only: the typed intro, hero entrance, the drifting brain,
+ * Meaningful motion only: the typed intro, hero entrance, the shining brain,
  * the build stage, reveals, the clients line and picture tilt. The HTML
  * already contains every word; this file is skipped when the user prefers
  * reduced motion.
@@ -111,7 +111,7 @@
     document.documentElement.classList.add('motion-on');
     introSequence();
     heroEntrance();
-    brainDrift();
+    brainShine();
     clientsLine();
     reveals();
     tiltFrames();
@@ -274,40 +274,53 @@
     });
   }
 
-  /* ── Brain drift ─────────────────────────────────────────────────────────
-     The brain behind the headline slides a few pixels toward the pointer.
-     Targets only; the CSS transition does the easing. */
-  function brainDrift() {
+  /* ── Brain shine ─────────────────────────────────────────────────────────
+     The brain leans toward the pointer anywhere over the hero; its highlight
+     slides across the surface and its shadow slips the other way. Targets
+     only; the CSS transitions do the easing, so the movement stays slow. */
+  function brainShine() {
     var brain = document.querySelector('[data-brain]');
     if (!brain || !finePointer) return;
+    var rig = brain.querySelector('.brand-brain__rig');
     var hero = brain.closest('.hero') || brain;
+    if (!rig) return;
 
     var ticking = false;
     var last = null;
 
+    function apply() {
+      ticking = false;
+      if (!last) return;
+      var rect = brain.getBoundingClientRect();
+      var cx = rect.left + rect.width / 2;
+      var cy = rect.top + rect.height / 2;
+      var px = clamp((last.x - cx) / Math.max(rect.width, 1), -0.9, 0.9);
+      var py = clamp((last.y - cy) / Math.max(rect.height, 1), -0.9, 0.9);
+
+      rig.style.setProperty('--pointer-y', (-py * 8).toFixed(2) + 'deg');
+      rig.style.setProperty('--pointer-x', (px * 8).toFixed(2) + 'deg');
+      rig.style.setProperty('--gx', (42 + px * 40).toFixed(1) + '%');
+      rig.style.setProperty('--gy', (36 + py * 40).toFixed(1) + '%');
+      rig.style.setProperty('--sx', (34 - px * 26).toFixed(1) + 'px');
+      rig.style.setProperty('--sy', (54 - py * 18).toFixed(1) + 'px');
+    }
+
     hero.addEventListener(
       'pointermove',
       function (event) {
-        last = event;
+        last = { x: event.clientX, y: event.clientY };
         if (ticking) return;
         ticking = true;
-        requestAnimationFrame(function () {
-          ticking = false;
-          if (!last) return;
-          var rect = hero.getBoundingClientRect();
-          var px = clamp((last.clientX - rect.left) / Math.max(rect.width, 1) - 0.5, -0.5, 0.5);
-          var py = clamp((last.clientY - rect.top) / Math.max(rect.height, 1) - 0.5, -0.5, 0.5);
-          brain.style.setProperty('--bx', (px * 36).toFixed(1) + 'px');
-          brain.style.setProperty('--by', (py * 26).toFixed(1) + 'px');
-        });
+        requestAnimationFrame(apply);
       },
       { passive: true }
     );
 
     hero.addEventListener('pointerleave', function () {
       last = null;
-      brain.style.setProperty('--bx', '0px');
-      brain.style.setProperty('--by', '0px');
+      ['--pointer-y', '--pointer-x', '--gx', '--gy', '--sx', '--sy'].forEach(function (name) {
+        rig.style.removeProperty(name);
+      });
     });
   }
 

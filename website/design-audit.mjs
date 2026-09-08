@@ -108,9 +108,10 @@ expect(
 );
 expect(
   /export function clientsLine/.test(showcase) &&
-    /export const clients = \{[\s\S]*items: \[[\s\S]*name:/.test(showcaseContent) &&
-    !/logo:/.test(showcaseContent),
-  'Clients line must list named projects with one sentence each and no logos.'
+    /export const clients = \{[\s\S]*items: \[[\s\S]*name:[\s\S]*logo: \{ src: '\/clients\//.test(showcaseContent) &&
+    !/export const clients = \{[\s\S]*?body:/.test(showcaseContent.split('/* ── Three pillars')[0].split('export const clients')[1] ?? '') &&
+    /class="client__logo"/.test(home) && !/class="client__body"/.test(home),
+  'Clients wall must show a logo and a brand name per client, without descriptions.'
 );
 expect(
   /export function pillarsSection/.test(showcase) &&
@@ -226,9 +227,17 @@ expect(
 );
 
 expect(
-  /class="hero__brain"[^>]*>\s*<img data-brand-brain[^>]+src="\/brand\/brain-light\.png"/.test(home) &&
-    !/brand-brain__/.test(home),
-  'Hero must use the transparent official brain (/brand/brain-light.png) and nothing around it.'
+  /<symbol id="brain-shape"/.test(home) &&
+    /class="brand-brain__face"[^>]*><use href="#brain-shape"\/>/.test(home) &&
+    /class="brand-brain__layer"/.test(home) &&
+    /class="brand-brain__core"/.test(home) &&
+    !/brain-light\.png|favicon\.png"[^>]*data-brand-brain/.test(home),
+  'Hero must build the 3D brain from the traced vector mark with depth slices and a white core.'
+);
+expect(
+  /--silhouette:\s*url\('\/brand\/brain-solid\.svg'\)/.test(styles) &&
+    /\.brand-brain__rig\s*\{[^}]*--tilt-x:\s*58deg;[^}]*--tilt-z:\s*-30deg;/s.test(styles),
+  'Hero brain must lie at the approved tilt and mask its slab with the solid silhouette.'
 );
 expect(
   /data-intro-brand[^>]+data-text="AIS"/.test(home) &&
@@ -243,12 +252,7 @@ expect(
     !/\.intro__mark\s*\{[^}]*box-shadow/s.test(styles),
   'Intro must show the bare brain and the typed wordmark must reserve its width.'
 );
-expect(
-  /\.hero__brain\s*\{[^}]*position:\s*absolute;[^}]*z-index:\s*0;/s.test(styles) &&
-    /\.hero--brain \.hero__inner\s*\{[^}]*z-index:\s*1;/s.test(styles) &&
-    !/mix-blend-mode/.test(styles),
-  'Hero brain must sit behind the centred copy without blend modes.'
-);
+expect(!/mix-blend-mode/.test(styles), 'No blend modes in the stylesheet.');
 expect(
   /showIntro:\s*true/.test(build) &&
     /page\.showIntro\s*\?\s*introOverlay\(\)\s*:\s*''/.test(layout) &&

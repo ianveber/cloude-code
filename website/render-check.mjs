@@ -158,17 +158,20 @@ function findProblems(path, width) {
       components.push('build stage tabs must be three buttons with exactly one pressed');
     }
 
-    /* Clients line: at least three named projects, one sentence each. */
-    const clients = [...document.querySelectorAll('.client:not(.is-clone)')];
+    /* Clients wall: a logo and a brand name per client, nothing else. */
+    const clients = [...document.querySelectorAll('.client')];
     if (clients.length < 3) {
-      components.push(`clients line lists ${clients.length} projects; expected at least 3`);
+      components.push(`clients wall lists ${clients.length} clients; expected at least 3`);
     }
     clients.forEach((client, index) => {
-      if (!client.querySelector('.client__name')?.textContent.trim() || !client.querySelector('.client__body')?.textContent.trim()) {
-        components.push(`client ${index + 1} is missing a name or a sentence`);
+      const logo = client.querySelector('.client__logo img');
+      if (!client.querySelector('.client__name')?.textContent.trim() || !logo) {
+        components.push(`client ${index + 1} is missing a name or a logo`);
+      } else if (logo.getBoundingClientRect().height < 24) {
+        components.push(`client ${index + 1} logo renders under 24px`);
       }
-      if (client.querySelector('img, svg')) {
-        components.push(`client ${index + 1} carries a picture`);
+      if (client.querySelector('p')) {
+        components.push(`client ${index + 1} carries a description`);
       }
     });
 
