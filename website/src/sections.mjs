@@ -321,14 +321,12 @@ export function teamSection(data, { headingLevel = 2 } = {}) {
 }
 
 /* ── FAQ ──────────────────────────────────────────────────────────────────
-   Answers are always visible rather than hidden behind a collapsed
-   disclosure. Text inside a closed <details> is in the HTML but is not
-   *rendered*, so anything that reads the rendered page — including several AI
-   answer engines — sees nothing. Since the FAQ is the most quotable content on
-   the site, its answers stay on the page.
+   Answers stay in the HTML for crawlers. Home disclosures start closed so
+   the plus affordance is honest. The dedicated FAQ page uses the
+   always-visible list variant.
 
    'list'       — plain headings and paragraphs, for the dedicated FAQ page.
-   'disclosure' — <details> rendered open, collapsible for scanning. */
+   'disclosure' — closed <details>, collapsible for scanning. */
 
 export function faqSection(data, { headingLevel = 2, items, variant = 'disclosure' } = {}) {
   const list = items ?? data.items;
@@ -346,7 +344,7 @@ export function faqSection(data, { headingLevel = 2, items, variant = 'disclosur
       : each(
           list,
           (item) => `
-      <details class="faq-item" open>
+      <details class="faq-item">
         <summary>${esc(item.q)}<span class="faq-item__icon" aria-hidden="true"></span></summary>
         <div class="faq-item__answer"><p>${esc(item.a)}</p></div>
       </details>`

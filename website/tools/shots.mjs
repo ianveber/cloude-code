@@ -17,6 +17,15 @@ const CHROME = process.env.CHROME_PATH || '/usr/local/bin/google-chrome';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
+async function waitFor(page, fn, timeout = 4000) {
+  const started = Date.now();
+  while (Date.now() - started < timeout) {
+    if (await page.evaluate(fn)) return true;
+    await wait(40);
+  }
+  return false;
+}
+
 async function shoot(page, name, { full = false } = {}) {
   await page.screenshot({ path: path.join(OUT, `${name}.png`), fullPage: full });
   process.stdout.write(`  ${name}\n`);
@@ -37,6 +46,18 @@ async function sectionTop(page, selector) {
   }, selector);
 }
 
+async function scrollConverge(page, progress) {
+  await page.evaluate((value) => {
+    const section = document.querySelector('[data-converge]');
+    if (!section) return;
+    const origin = section.querySelector('.converge__stage') || section;
+    const top = window.scrollY + origin.getBoundingClientRect().top;
+    const target = top - window.innerHeight * 0.58 + value * window.innerHeight * 0.72;
+    window.scrollTo({ top: Math.max(0, target), behavior: 'instant' });
+  }, progress);
+  await wait(450);
+}
+
 async function main() {
   await mkdir(OUT, { recursive: true });
 
@@ -48,11 +69,22 @@ async function main() {
   const intro = await browser.newPage();
   await intro.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
   await intro.goto(`${BASE}/`, { waitUntil: 'networkidle0' });
-  await wait(280);
+  await waitFor(
+    intro,
+    () => {
+      const stage = document.querySelector('[data-intro-stage]');
+      return Boolean(stage?.classList.contains('is-logo') && !stage.classList.contains('is-word'));
+    }
+  );
+  await wait(80);
   await shoot(intro, 'intro-logo');
-  await wait(700);
+  await waitFor(intro, () =>
+    Boolean(document.querySelector('[data-intro-stage]')?.classList.contains('is-word'))
+  );
+  await wait(220);
   await shoot(intro, 'intro-lockup');
-  await wait(1600);
+  await waitFor(intro, () => !document.documentElement.classList.contains('is-intro'));
+  await wait(500);
   await shoot(intro, 'home-hero');
   await intro.close();
 
@@ -70,9 +102,12 @@ async function main() {
   await wait(600);
   await shoot(page, 'home-hero-resting');
 
+  await scrollConverge(page, 0.12);
+  await shoot(page, 'home-converge-apart');
+  await scrollConverge(page, 0.7);
+  await shoot(page, 'home-converge-merged');
+
   const home = [
-    ['home-converge-apart', '[data-converge]', -40],
-    ['home-converge-merged', '[data-converge]', 620],
     ['home-capabilities', '[data-capband]', 80],
     ['home-services', '[data-services]', -40],
     ['home-process', '[data-process-overview]', -40],
@@ -97,7 +132,9 @@ async function main() {
     ['blog-empty', '/blog/'],
   ]) {
     await page.goto(`${BASE}${url}`, { waitUntil: 'networkidle0' });
-    await wait(400);
+    await wait(300);
+    const top = await sectionTop(page, '.empty-state');
+    if (top !== null) await scrollTo(page, Math.max(0, top - 80));
     await shoot(page, name);
   }
 

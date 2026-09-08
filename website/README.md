@@ -125,6 +125,9 @@ item lists are empty. Partner/case-study and blog-teaser bands stay out of
 the HTML until real entries exist. Do not invent placeholders, metrics, or
 unpublished titles — the design audit fails the build if they come back.
 
+Home FAQ items start closed. Answers remain in the HTML, and the dedicated
+FAQ page keeps every answer visible as headings and paragraphs.
+
 | What | Where to edit |
 |---|---|
 | Products, news, events, blog | `items` in `content/showcase.mjs` |

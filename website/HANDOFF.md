@@ -263,9 +263,8 @@ After a production deploy:
 
 Known implementation notes:
 
-- Home FAQ disclosures currently ship with the `open` attribute. Closing them
-  by default is a reasonable UX follow-up; crawlers still see the answers in
-  HTML either way.
+- Home FAQ disclosures start closed. Answers stay in the HTML; the dedicated
+  FAQ page keeps every answer visible as headings and paragraphs.
 - `npm run check` in the root README used to say “audit only”; it now also
   runs design-audit and render-check. Keep that sentence true if you edit
   `package.json`.

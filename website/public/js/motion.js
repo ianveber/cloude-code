@@ -316,7 +316,8 @@
 
     function sync() {
       ticking = false;
-      var rect = section.getBoundingClientRect();
+      var origin = section.querySelector('.converge__stage') || section;
+      var rect = origin.getBoundingClientRect();
       var vh = window.innerHeight || 1;
 
       var raw = (vh * 0.58 - rect.top) / (vh * 0.72);

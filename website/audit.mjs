@@ -120,11 +120,13 @@ function auditPage(route, html) {
     fail(route, `Premalo besedila v HTML (${words} besed, minimum ${LIMITS.minWords}).`);
   }
 
-  /* FAQ answers must render. Text inside a closed <details> is in the HTML but
-     is not rendered, so anything reading the rendered page would miss it. */
-  const collapsed = [...html.matchAll(/<details class="faq-item"(?![^>]*\bopen\b)/gi)];
-  if (collapsed.length) {
-    fail(route, `${collapsed.length} FAQ odgovorov je skritih v zaprtem <details>.`);
+  /* FAQ answers stay in the HTML whether the home disclosures start closed
+     or open. Fail only when a disclosure is missing its answer markup. */
+  const faqItems = [...html.matchAll(/<details class="faq-item"[^>]*>[\s\S]*?<\/details>/gi)];
+  for (const [block] of faqItems) {
+    if (!/class="faq-item__answer"/.test(block)) {
+      fail(route, 'FAQ item nima odgovora v HTML.');
+    }
   }
 
   /* Images need alt text */

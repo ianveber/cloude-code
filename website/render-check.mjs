@@ -382,7 +382,8 @@ async function checkConvergePacing(page, base) {
   async function stateAt(progress) {
     await page.evaluate((value) => {
       const section = document.querySelector('[data-converge]');
-      const top = window.scrollY + section.getBoundingClientRect().top;
+      const origin = section.querySelector('.converge__stage') || section;
+      const top = window.scrollY + origin.getBoundingClientRect().top;
       const target = top - window.innerHeight * 0.58 + value * window.innerHeight * 0.72;
       window.scrollTo(0, target);
     }, progress);

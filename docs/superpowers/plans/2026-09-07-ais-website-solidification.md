@@ -1000,7 +1000,7 @@ git push -u origin cursor/ais-website-geo-seo-redesign-112a
 - Consumes: completed site and live server on port 4321
 - Produces: final screenshots, screen recording, updated documentation
 
-- [ ] **Step 1: Check environment setup and start/reuse the preview**
+- [x] **Step 1: Check environment setup and start/reuse the preview**
 
 Inspect `/tmp/cursor/async-install/install-user.status` when present. Reuse the
 existing tmux preview session or start one bound on port 4321.
@@ -1015,7 +1015,7 @@ curl -I http://[::1]:4321/
 
 Expected: HTTP 200 for all three.
 
-- [ ] **Step 2: Run the complete automated suite**
+- [x] **Step 2: Run the complete automated suite**
 
 ```bash
 cd /workspace
@@ -1027,7 +1027,7 @@ node tools/head-check.mjs
 Expected: zero errors/warnings, all generated pages checked, all 13 widths pass,
 brand/content/design audit passes, split-text check reports zero problems.
 
-- [ ] **Step 3: Manually inspect every route on desktop**
+- [x] **Step 3: Manually inspect every route on desktop**
 
 Use Chrome at 1440×900 and inspect:
 
@@ -1053,13 +1053,13 @@ Check hierarchy, line length, spacing, section transitions, controls, truthful
 empty states, header/dropdowns, footer, and copy. Fix every concrete defect and
 repeat the affected checks.
 
-- [ ] **Step 4: Manually inspect mobile and interaction states**
+- [x] **Step 4: Manually inspect mobile and interaction states**
 
 At 390×844 inspect the home page, every page type, mobile menu open/closed,
 dropdown alternatives, FAQ, form fields, keyboard focus, and section stacking.
 Confirm no horizontal scroll and no hero/text collision.
 
-- [ ] **Step 5: Capture the minimal screenshot set**
+- [x] **Step 5: Capture the minimal screenshot set**
 
 Update `tools/shots.mjs` to capture:
 
@@ -1084,7 +1084,7 @@ mobile-menu
 
 Capture only successful final states.
 
-- [ ] **Step 6: Record and review the final walkthrough**
+- [x] **Step 6: Record and review the final walkthrough**
 
 Update `tools/walkthrough.mjs` to record:
 
@@ -1102,7 +1102,7 @@ Update `tools/walkthrough.mjs` to record:
 Save a new immutable artifact name. Review it with the video-review agent and fix
 any defect before referencing it.
 
-- [ ] **Step 7: Update documentation**
+- [x] **Step 7: Update documentation**
 
 Document:
 
@@ -1114,7 +1114,7 @@ Document:
 - design audit and browser checks
 - video generation and walkthrough commands
 
-- [ ] **Step 8: Run verification after documentation changes**
+- [x] **Step 8: Run verification after documentation changes**
 
 ```bash
 cd /workspace
@@ -1127,7 +1127,7 @@ git status --short
 
 Expected: all checks pass; only intended files are modified.
 
-- [ ] **Step 9: Commit, push, and update the pull request**
+- [x] **Step 9: Commit, push, and update the pull request**
 
 ```bash
 git add website docs/superpowers/plans/2026-09-07-ais-website-solidification.md
