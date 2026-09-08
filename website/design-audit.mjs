@@ -158,8 +158,30 @@ expect(
 );
 expect(
   /\.converge\s*\{[^}]*--settled:\s*1;/.test(styles) &&
-    /html\.js:not\(\.motion-off\) \.converge\s*\{[^}]*--settled:\s*0;/.test(styles),
+    /html\.motion-on \.converge\s*\{[^}]*--settled:\s*0;/.test(styles),
   'Converge settled default must stay readable without JS and start at 0 for JS motion.'
+);
+expect(
+  !/function (?:particles|bouncers|cursor|magnetic)\(/.test(motion) &&
+    !/\b(?:particles|bouncers|cursor|magnetic)\(\)/.test(motion) &&
+    !/data-particles/.test(componentMarkup) &&
+    !/\.cursor\s*\{/.test(styles) &&
+    !/\.bouncers\s*\{/.test(styles),
+  'Ornamental particles, bouncers, cursor, and magnetic motion must be removed.'
+);
+expect(
+  /at\(100,/.test(motion) && /at\(720,/.test(motion) && /at\(1900,/.test(motion) &&
+    !/at\(120,/.test(motion) && !/at\(900,/.test(motion) && !/at\(2350,/.test(motion),
+  'Intro must use the restrained 100 / 720 / 1900 ms stages.'
+);
+expect(
+  /Math\.min\(window\.devicePixelRatio[^,]*, 1\.5\)/.test(motion) &&
+    !/rgba\(139,\s*115,\s*255|rgba\(43,\s*212,\s*196/.test(motion),
+  'CTA field must cap device pixel ratio at 1.5 and stay AIS-blue/neutral.'
+);
+expect(
+  /@media \(prefers-reduced-motion: reduce\)\s*\{[\s\S]*animation-iteration-count:\s*1 !important;[\s\S]*\[data-enter\][\s\S]*\.readline__w[\s\S]*\.ctaband__field\s*\{\s*display:\s*none;/.test(styles),
+  'Reduced-motion CSS must force visible copy and hide the CTA field.'
 );
 
 const twinButtons = [...pages.products.matchAll(

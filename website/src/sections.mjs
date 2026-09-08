@@ -37,7 +37,6 @@ export function takeaway({ label = 'Na kratko', text }) {
 export function pageHero({ eyebrow, title, lead, cta }) {
   return `
 <section class="hero hero--page">
-  <canvas class="hero__field" data-particles aria-hidden="true"></canvas>
   <div class="shell">
     <div class="hero__inner">
       <p class="eyebrow" data-enter="1">${esc(eyebrow)}</p>

@@ -481,6 +481,160 @@ async function checkKeyboardFocus(page, base, { path, selector, label, unclipped
   return null;
 }
 
+async function checkReducedMotion(page, base) {
+  await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+  await page.setViewport({ width: 1440, height: 1000 });
+  await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(
+    () =>
+      document.documentElement.classList.contains('motion-off') ||
+      document.documentElement.classList.contains('motion-on')
+  );
+  const reduced = await page.evaluate(() => ({
+    introBlocked: document.documentElement.classList.contains('is-intro'),
+    hiddenText: [...document.querySelectorAll('main h1,main h2,main h3,main p')]
+      .filter((el) => {
+        const style = getComputedStyle(el);
+        return style.visibility === 'hidden' || parseFloat(style.opacity) < 0.9;
+      })
+      .map((el) => el.textContent.trim().slice(0, 40)),
+    autoplaying: [...document.querySelectorAll('video')].filter((video) => !video.paused).length,
+  }));
+  const errors = [];
+  if (reduced.introBlocked) errors.push('Reduced motion — intro still blocks the page');
+  if (reduced.hiddenText.length) {
+    errors.push(`Reduced motion — hidden/dim text remains (${reduced.hiddenText.join('; ')})`);
+  }
+  if (reduced.autoplaying) {
+    errors.push(`Reduced motion — ${reduced.autoplaying} decorative videos are autoplaying`);
+  }
+  return errors;
+}
+
+async function checkDisclosureToggle(page, selector, label) {
+  const exists = await page.$(selector);
+  if (!exists) return `${label} — missing ${selector}`;
+  const before = await page.$eval(selector, (el) => el.open);
+  await page.$eval(`${selector} > summary`, (el) => el.focus());
+  const focus = await page.$eval(`${selector} > summary`, (el) => {
+    const style = getComputedStyle(el);
+    return {
+      focused: document.activeElement === el,
+      focusVisible: el.matches(':focus-visible'),
+      outlineWidth: parseFloat(style.outlineWidth),
+      outlineStyle: style.outlineStyle,
+      outlineColor: style.outlineColor,
+    };
+  });
+  if (
+    !focus.focused ||
+    !focus.focusVisible ||
+    focus.outlineWidth < 2 ||
+    focus.outlineStyle === 'none' ||
+    focus.outlineColor !== 'rgb(29, 119, 254)'
+  ) {
+    return `${label} — focus is invisible (${JSON.stringify(focus)})`;
+  }
+  await page.keyboard.press('Enter');
+  const after = await page.$eval(selector, (el) => el.open);
+  if (before === after) return `${label} — Enter did not toggle the disclosure`;
+  return null;
+}
+
+async function checkKeyboardChrome(page, base) {
+  const errors = [];
+  await page.setViewport({ width: 1440, height: 1000 });
+  await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
+  const dropdowns = await page.$$eval('.nav .nav-dd', (els) => els.length);
+  if (dropdowns !== 2) errors.push(`Desktop navigation — expected 2 dropdowns, found ${dropdowns}`);
+  for (const [index, selector] of [
+    [1, '.nav details.nav-dd:nth-of-type(1)'],
+    [2, '.nav details.nav-dd:nth-of-type(2)'],
+  ]) {
+    const error = await checkDisclosureToggle(page, selector, `Desktop dropdown ${index}`);
+    if (error) errors.push(error);
+  }
+  const faqError = await checkDisclosureToggle(page, '.faq-item', 'FAQ item');
+  if (faqError) errors.push(faqError);
+
+  await page.setViewport({ width: 390, height: 844 });
+  await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
+  const menuError = await checkDisclosureToggle(page, '.nav-toggle', 'Mobile menu');
+  if (menuError) errors.push(menuError);
+  return errors;
+}
+
+async function checkHomeResponsive(page, base, width) {
+  await page.setViewport({ width, height: 1000 });
+  await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
+  return page.evaluate((w) => {
+    const problems = [];
+    const copy = document.querySelector('.hero--brain .hero__copy');
+    const art = document.querySelector('.hero--brain .hero__art');
+    if (copy && art && copy.getBoundingClientRect().top > art.getBoundingClientRect().top + 1) {
+      problems.push('hero art precedes copy');
+    }
+    const rig = document.querySelector('.brand-brain__rig');
+    if (rig) {
+      const max = Math.min(17 * 16, 0.72 * w);
+      const used = parseFloat(getComputedStyle(rig).width);
+      if (used > max + 1) problems.push(`brain width ${used.toFixed(1)}px exceeds ${max.toFixed(1)}px`);
+    }
+    const panels = [...document.querySelectorAll('.converge__panel')].map((panel) =>
+      panel.getBoundingClientRect()
+    );
+    if (panels.length >= 2 && Math.abs(panels[0].top - panels[1].top) < 8) {
+      problems.push('converge panels do not stack');
+    }
+    document.querySelectorAll('.capitem').forEach((item, index) => {
+      const chapterCopy = item.querySelector('.capitem__copy').getBoundingClientRect();
+      const chapterArt = item.querySelector('.capitem__art').getBoundingClientRect();
+      if (chapterCopy.top >= chapterArt.top) {
+        problems.push(`capability chapter ${index + 1} does not put copy before art`);
+      }
+    });
+    const process = document.querySelector('.process-overview__track');
+    if (process && getComputedStyle(process).gridTemplateColumns.split(' ').length !== 1) {
+      problems.push('process phases are not a single vertical list');
+    }
+    const team = document.querySelector('.teamgrid');
+    if (team) {
+      const columns = getComputedStyle(team).gridTemplateColumns.split(' ').length;
+      const allowed = w <= 520 ? 1 : 2;
+      if (columns > allowed) problems.push(`team uses ${columns} columns; expected at most ${allowed}`);
+    }
+    const ctaCopy = document.querySelector('.ctaband__copy');
+    const ctaForm = document.querySelector('.ctaform');
+    if (
+      ctaCopy &&
+      ctaForm &&
+      ctaForm.getBoundingClientRect().top + 1 < ctaCopy.getBoundingClientRect().bottom
+    ) {
+      problems.push('CTA form is not full width beneath its copy');
+    }
+    const footer = document.querySelector('.footer-grid');
+    if (footer && getComputedStyle(footer).gridTemplateColumns.split(' ').length > 1) {
+      problems.push('footer groups do not stack');
+    }
+    if (w === 390) {
+      [...document.querySelectorAll('a,button,summary,input,textarea')].forEach((el) => {
+        const box = el.getBoundingClientRect();
+        const style = getComputedStyle(el);
+        const closed = el.closest('details:not([open])');
+        if (box.width < 2 || box.height < 2 || el.classList.contains('skip-link')) return;
+        if (style.visibility === 'hidden' || style.display === 'none') return;
+        if (closed && !el.closest('summary')) return;
+        if (box.left < 19.5 || box.right > w - 19.5) {
+          problems.push(
+            `control "${el.textContent.trim().slice(0, 22)}" sits ${Math.round(Math.min(box.left, w - box.right))}px from the edge`
+          );
+        }
+      });
+    }
+    return problems;
+  }, width);
+}
+
 async function main() {
   let puppeteer;
   try {
@@ -591,6 +745,39 @@ async function main() {
   const convergeError = await checkConvergePacing(convergePage, base);
   if (convergeError) errors.push(convergeError);
   await convergePage.close();
+
+  const reducedPage = await browser.newPage();
+  const reducedErrors = await checkReducedMotion(reducedPage, base);
+  errors.push(...reducedErrors);
+  await reducedPage.close();
+
+  const chromePage = await browser.newPage();
+  await chromePage.evaluateOnNewDocument(() => {
+    try {
+      sessionStorage.setItem('ais-intro', '1');
+    } catch {
+      /* ignore */
+    }
+  });
+  const chromeErrors = await checkKeyboardChrome(chromePage, base);
+  errors.push(...chromeErrors);
+  await chromePage.close();
+
+  const responsivePage = await browser.newPage();
+  await responsivePage.evaluateOnNewDocument(() => {
+    try {
+      sessionStorage.setItem('ais-intro', '1');
+    } catch {
+      /* ignore */
+    }
+  });
+  for (const width of [768, 390]) {
+    const problems = await checkHomeResponsive(responsivePage, base, width);
+    for (const problem of problems) {
+      errors.push(`${width}px / — ${problem}`);
+    }
+  }
+  await responsivePage.close();
 
   await browser.close();
   server.close();

@@ -1,11 +1,10 @@
 /**
  * Motion — progressive enhancement.
  *
- * Inspired by the feel of a product-launch page (typed headline, letter
- * stagger, orbital field, follow-cursor, bouncing chips). Nothing here is
- * required to read the site: the HTML already contains every word.
- *
- * Skipped entirely when the user prefers reduced motion.
+ * Meaningful motion only: intro, hero entrance, brain tilt, explorer,
+ * reveals, converge, reading line, and a quiet CTA field. The HTML already
+ * contains every word; this file is skipped when the user prefers reduced
+ * motion.
  */
 (function () {
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -95,7 +94,6 @@
     headerState();
     slider();
     contactForms();
-    lazyVideo();
     explorer();
 
     if (reduce) {
@@ -109,16 +107,11 @@
     introSequence();
     heroEntrance();
     brainTilt();
-    particles();
     reveals();
     converge();
     readline();
     ctaField();
-    bouncers();
-    if (finePointer) {
-      cursor();
-      magnetic();
-    }
+    lazyVideo();
   });
 
   function headerState() {
@@ -186,9 +179,9 @@
     window.addEventListener('keydown', onKey);
     stage.addEventListener('click', open);
 
-    at(120, function () { stage.classList.add('is-logo'); });
-    at(900, function () { stage.classList.add('is-word'); });
-    at(2350, open);
+    at(100, function () { stage.classList.add('is-logo'); });
+    at(720, function () { stage.classList.add('is-word'); });
+    at(1900, open);
   }
 
   function heroEntrance() {
@@ -246,170 +239,6 @@
     brain.addEventListener('pointerleave', function () {
       rig.style.setProperty('--pointer-y', '0deg');
       rig.style.setProperty('--pointer-x', '0deg');
-    });
-  }
-
-  /* Orbital field: two slow rings plus free dots, nudged by the pointer. */
-  function particles() {
-    var canvases = document.querySelectorAll('[data-particles]');
-    if (!canvases.length) return;
-
-    var palette = [
-      [29, 119, 254],
-      [115, 88, 245],
-      [14, 165, 160],
-    ];
-
-    canvases.forEach(function (canvas) {
-      var ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      var dots = [];
-      var running = false;
-      var width = 0;
-      var height = 0;
-      var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      var mx = 0.5;
-      var my = 0.5;
-      var t = 0;
-      var burst = 1;
-
-      function resize() {
-        var rect = canvas.parentElement.getBoundingClientRect();
-        width = Math.max(1, Math.floor(rect.width));
-        height = Math.max(1, Math.floor(rect.height));
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
-        canvas.style.width = width + 'px';
-        canvas.style.height = height + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        seed();
-      }
-
-      function seed() {
-        dots = [];
-        var cx = width * 0.62;
-        var cy = height * 0.48;
-        var rings = [
-          { rx: Math.min(width, height) * 0.22, ry: Math.min(width, height) * 0.16, n: 34, speed: 0.0044 },
-          { rx: Math.min(width, height) * 0.38, ry: Math.min(width, height) * 0.28, n: 52, speed: -0.0028 },
-        ];
-
-        rings.forEach(function (ring, ri) {
-          for (var i = 0; i < ring.n; i++) {
-            dots.push({
-              kind: 'ring',
-              cx: cx,
-              cy: cy,
-              rx: ring.rx,
-              ry: ring.ry,
-              a: (i / ring.n) * Math.PI * 2,
-              speed: ring.speed,
-              r: 1.1 + (ri === 0 ? 0.8 : 0.3),
-              c: palette[(i + ri) % palette.length],
-              alpha: 0.38 + ri * 0.08,
-            });
-          }
-        });
-
-        var free = Math.round((width * height) / 16000);
-        free = Math.max(22, Math.min(free, 70));
-        for (var j = 0; j < free; j++) {
-          dots.push({
-            kind: 'free',
-            x: Math.random() * width,
-            y: Math.random() * height,
-            vx: (Math.random() - 0.5) * 0.24,
-            vy: (Math.random() - 0.5) * 0.24,
-            r: 0.7 + Math.random() * 1.8,
-            c: palette[j % palette.length],
-            alpha: 0.22 + Math.random() * 0.28,
-          });
-        }
-      }
-
-      function onMove(event) {
-        var rect = canvas.parentElement.getBoundingClientRect();
-        mx = (event.clientX - rect.left) / rect.width;
-        my = (event.clientY - rect.top) / rect.height;
-      }
-
-      function step() {
-        if (!running) return;
-        t += 1;
-        var root = document.documentElement;
-        if (root.classList.contains('is-intro-out')) burst += (1.35 - burst) * 0.08;
-        else if (!root.classList.contains('is-intro')) burst += (1 - burst) * 0.035;
-        ctx.clearRect(0, 0, width, height);
-
-        var pullX = (mx - 0.5) * 48 * burst;
-        var pullY = (my - 0.5) * 32 * burst;
-
-        var positions = [];
-
-        for (var i = 0; i < dots.length; i++) {
-          var d = dots[i];
-          var x;
-          var y;
-          if (d.kind === 'ring') {
-            d.a += d.speed * (0.85 + burst * 0.35);
-            x = d.cx + Math.cos(d.a) * d.rx + pullX;
-            y = d.cy + Math.sin(d.a) * d.ry + pullY;
-          } else {
-            d.x += d.vx + (mx - 0.5) * 0.04;
-            d.y += d.vy + (my - 0.5) * 0.04;
-            if (d.x < -8) d.x = width + 8;
-            if (d.x > width + 8) d.x = -8;
-            if (d.y < -8) d.y = height + 8;
-            if (d.y > height + 8) d.y = -8;
-            x = d.x;
-            y = d.y;
-          }
-          positions.push({ x: x, y: y, c: d.c, r: d.r, a: d.alpha });
-        }
-
-        for (var a = 0; a < positions.length; a++) {
-          var pa = positions[a];
-          for (var b = a + 1; b < positions.length; b++) {
-            var pb = positions[b];
-            var dx = pa.x - pb.x;
-            var dy = pa.y - pb.y;
-            var dist = dx * dx + dy * dy;
-            if (dist < 118 * 118) {
-              var fade = 1 - Math.sqrt(dist) / 118;
-              ctx.strokeStyle = 'rgba(' + pa.c[0] + ',' + pa.c[1] + ',' + pa.c[2] + ',' + fade * 0.2 * burst + ')';
-              ctx.lineWidth = burst > 1.2 ? 1.35 : 1;
-              ctx.beginPath();
-              ctx.moveTo(pa.x, pa.y);
-              ctx.lineTo(pb.x, pb.y);
-              ctx.stroke();
-            }
-          }
-        }
-
-        for (var k = 0; k < positions.length; k++) {
-          var p = positions[k];
-          ctx.beginPath();
-          ctx.fillStyle = 'rgba(' + p.c[0] + ',' + p.c[1] + ',' + p.c[2] + ',' + Math.min(1, p.a * burst) + ')';
-          ctx.arc(p.x, p.y, p.r * (0.9 + burst * 0.12), 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        requestAnimationFrame(step);
-      }
-
-      var observer = new IntersectionObserver(
-        function (entries) {
-          running = entries[0].isIntersecting;
-          if (running) requestAnimationFrame(step);
-        },
-        { threshold: 0.05 }
-      );
-
-      resize();
-      observer.observe(canvas.parentElement);
-      window.addEventListener('resize', resize, { passive: true });
-      canvas.parentElement.addEventListener('pointermove', onMove, { passive: true });
     });
   }
 
@@ -556,7 +385,7 @@
     var parent = canvas.parentElement;
     var w = 0;
     var h = 0;
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     var running = false;
     var t = 0;
 
@@ -594,7 +423,7 @@
         var a = project(-1500, zz);
         var b = project(1500, zz);
         var fade = Math.max(0, 1 - zz / 1500);
-        ctx.strokeStyle = 'rgba(140, 170, 235,' + fade * 0.26 + ')';
+        ctx.strokeStyle = 'rgba(29, 119, 254,' + fade * 0.22 + ')';
         ctx.beginPath();
         ctx.moveTo(a.x, a.y);
         ctx.lineTo(b.x, b.y);
@@ -604,19 +433,18 @@
       for (var x = -1500; x <= 1500; x += 150) {
         var near = project(x, 0);
         var far = project(x, 1450);
-        ctx.strokeStyle = 'rgba(140, 170, 235, 0.15)';
+        ctx.strokeStyle = 'rgba(161, 161, 170, 0.16)';
         ctx.beginPath();
         ctx.moveTo(near.x, near.y);
         ctx.lineTo(far.x, far.y);
         ctx.stroke();
       }
 
-      /* Three slow nodes drifting above the plane. */
       for (var i = 0; i < 3; i++) {
         var ang = t * 0.004 + i * 2.1;
         var p = project(Math.cos(ang) * 520, 420 + Math.sin(ang * 0.7) * 320);
         var r = 2.6 * p.d;
-        ctx.fillStyle = ['rgba(61,139,255,0.50)', 'rgba(139,115,255,0.44)', 'rgba(43,212,196,0.40)'][i];
+        ctx.fillStyle = i === 1 ? 'rgba(250, 250, 250, 0.28)' : 'rgba(29, 119, 254, 0.42)';
         ctx.beginPath();
         ctx.arc(p.x, p.y, Math.max(1, r), 0, Math.PI * 2);
         ctx.fill();
@@ -705,77 +533,6 @@
               button.textContent = label;
             }
           });
-      });
-    });
-  }
-
-  function bouncers() {
-    var row = document.querySelector('.bouncers');
-    if (!row) return;
-    var chips = row.querySelectorAll('.bouncer');
-    var start = performance.now();
-
-    function frame(now) {
-      var t = (now - start) / 1000;
-      chips.forEach(function (chip, i) {
-        var y = Math.sin(t * 2.15 + i * 0.7) * 16;
-        var r = Math.sin(t * 1.15 + i) * 10;
-        chip.style.transform = 'translateY(' + y + 'px) rotate(' + r + 'deg)';
-      });
-      requestAnimationFrame(frame);
-    }
-    requestAnimationFrame(frame);
-  }
-
-  function cursor() {
-    var dot = document.createElement('div');
-    dot.className = 'cursor';
-    dot.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(dot);
-
-    var x = window.innerWidth / 2;
-    var y = window.innerHeight / 2;
-    var tx = x;
-    var ty = y;
-
-    window.addEventListener(
-      'pointermove',
-      function (event) {
-        tx = event.clientX;
-        ty = event.clientY;
-        dot.classList.add('is-on');
-      },
-      { passive: true }
-    );
-
-    document.querySelectorAll('a, button, summary').forEach(function (el) {
-      el.addEventListener('pointerenter', function () {
-        dot.classList.add('is-hot');
-      });
-      el.addEventListener('pointerleave', function () {
-        dot.classList.remove('is-hot');
-      });
-    });
-
-    function loop() {
-      x += (tx - x) * 0.18;
-      y += (ty - y) * 0.18;
-      dot.style.transform = 'translate(' + (x - 8) + 'px,' + (y - 8) + 'px)';
-      requestAnimationFrame(loop);
-    }
-    requestAnimationFrame(loop);
-  }
-
-  function magnetic() {
-    document.querySelectorAll('.btn').forEach(function (btn) {
-      btn.addEventListener('pointermove', function (event) {
-        var r = btn.getBoundingClientRect();
-        var dx = event.clientX - (r.left + r.width / 2);
-        var dy = event.clientY - (r.top + r.height / 2);
-        btn.style.transform = 'translate(' + dx * 0.26 + 'px,' + dy * 0.32 + 'px)';
-      });
-      btn.addEventListener('pointerleave', function () {
-        btn.style.transform = '';
       });
     });
   }
