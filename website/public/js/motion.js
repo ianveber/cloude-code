@@ -1,10 +1,10 @@
 /**
  * Motion — progressive enhancement.
  *
- * Meaningful motion only: the typed intro, hero entrance, the glossy brain,
- * the build stage, reveals, the clients line, picture tilt, and a quiet CTA
- * field. The HTML already contains every word; this file is skipped when the
- * user prefers reduced motion.
+ * Meaningful motion only: the typed intro, hero entrance, the drifting brain,
+ * the build stage, reveals, the clients line and picture tilt. The HTML
+ * already contains every word; this file is skipped when the user prefers
+ * reduced motion.
  */
 (function () {
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -111,12 +111,11 @@
     document.documentElement.classList.add('motion-on');
     introSequence();
     heroEntrance();
-    brainShine();
+    brainDrift();
     clientsLine();
     reveals();
     tiltFrames();
     footerGlow();
-    ctaField();
     lazyVideo();
   });
 
@@ -137,11 +136,10 @@
   }
 
   /* ── Opening sequence ────────────────────────────────────────────────────
-     White screen, the brain mark, and the brand name typed out next to it
-     one character at a time with a blinking caret. Once the last character
-     is in, the caret keeps blinking for a beat and the site loads in behind.
-     Runs once per session; a click, Escape, Enter or Space jumps straight to
-     the end. */
+     White screen, the brain, and the brand name typed out next to it one
+     character at a time with a blinking caret. Once the last character is
+     in, the caret keeps blinking for a beat and the site loads in behind.
+     A click, Escape, Enter or Space jumps straight to the end. */
   function introSequence() {
     var root = document.documentElement;
     var stage = document.querySelector('[data-intro-stage]');
@@ -217,7 +215,7 @@
     window.addEventListener('keydown', onKey);
     stage.addEventListener('click', open);
 
-    /* The mark appears first. Typing waits for the webfont so the letters do
+    /* The brain appears first. Typing waits for the webfont so the letters do
        not change shape halfway through, but never longer than a short beat. */
     at(100, function () { stage.classList.add('is-logo'); });
 
@@ -229,18 +227,18 @@
       if (started || opened) return;
       started = true;
       stage.classList.add('is-typing');
-      typeInto(brand, 78, function () {
+      typeInto(brand, 110, function () {
         window.setTimeout(function () {
-          typeInto(tail, 58, finishText);
-        }, 140);
+          typeInto(tail, 75, finishText);
+        }, 180);
       });
     }
-    at(380, function () { fontsReady.then(startTyping); });
-    at(520, startTyping);
+    at(460, function () { fontsReady.then(startTyping); });
+    at(700, startTyping);
 
-    /* Site loads in once the caret has blinked a couple of times after the
-       last character: roughly 520 + 3×78 + 140 + 8×58 ≈ 1.4 s of typing. */
-    at(2300, open);
+    /* Typing ends around 1.8 s; the caret blinks a while, then the site
+       loads in. */
+    at(3100, open);
   }
 
   function heroEntrance() {
@@ -276,57 +274,40 @@
     });
   }
 
-  /* ── Brain shine ─────────────────────────────────────────────────────────
-     The official mark leans toward the pointer anywhere over the hero, and
-     its highlight slides across the surface as it does. Movement is slow on
-     purpose: the transition in CSS does the easing, this only sets targets. */
-  function brainShine() {
+  /* ── Brain drift ─────────────────────────────────────────────────────────
+     The brain behind the headline slides a few pixels toward the pointer.
+     Targets only; the CSS transition does the easing. */
+  function brainDrift() {
     var brain = document.querySelector('[data-brain]');
     if (!brain || !finePointer) return;
-    var rig = brain.querySelector('.brand-brain__rig');
     var hero = brain.closest('.hero') || brain;
-    if (!rig) return;
 
     var ticking = false;
     var last = null;
 
-    function apply() {
-      ticking = false;
-      if (!last) return;
-      var rect = brain.getBoundingClientRect();
-      var cx = rect.left + rect.width / 2;
-      var cy = rect.top + rect.height / 2;
-      /* Normalised offset from the mark's centre, capped a little beyond it. */
-      var px = clamp((last.x - cx) / Math.max(rect.width, 1), -0.9, 0.9);
-      var py = clamp((last.y - cy) / Math.max(rect.height, 1), -0.9, 0.9);
-
-      rig.style.setProperty('--pointer-y', (-py * 8).toFixed(2) + 'deg');
-      rig.style.setProperty('--pointer-x', (px * 8).toFixed(2) + 'deg');
-      rig.style.setProperty('--gx', (50 + px * 42).toFixed(1) + '%');
-      rig.style.setProperty('--gy', (42 + py * 42).toFixed(1) + '%');
-      rig.style.setProperty('--sx', (26 - px * 22).toFixed(1) + 'px');
-      rig.style.setProperty('--sy', (42 - py * 14).toFixed(1) + 'px');
-    }
-
     hero.addEventListener(
       'pointermove',
       function (event) {
-        last = { x: event.clientX, y: event.clientY };
+        last = event;
         if (ticking) return;
         ticking = true;
-        requestAnimationFrame(apply);
+        requestAnimationFrame(function () {
+          ticking = false;
+          if (!last) return;
+          var rect = hero.getBoundingClientRect();
+          var px = clamp((last.clientX - rect.left) / Math.max(rect.width, 1) - 0.5, -0.5, 0.5);
+          var py = clamp((last.clientY - rect.top) / Math.max(rect.height, 1) - 0.5, -0.5, 0.5);
+          brain.style.setProperty('--bx', (px * 36).toFixed(1) + 'px');
+          brain.style.setProperty('--by', (py * 26).toFixed(1) + 'px');
+        });
       },
       { passive: true }
     );
 
     hero.addEventListener('pointerleave', function () {
       last = null;
-      rig.style.setProperty('--pointer-y', '0deg');
-      rig.style.setProperty('--pointer-x', '0deg');
-      rig.style.setProperty('--gx', '50%');
-      rig.style.setProperty('--gy', '42%');
-      rig.style.setProperty('--sx', '26px');
-      rig.style.setProperty('--sy', '42px');
+      brain.style.setProperty('--bx', '0px');
+      brain.style.setProperty('--by', '0px');
     });
   }
 
@@ -394,11 +375,12 @@
   }
 
   /* ── Build stage ─────────────────────────────────────────────────────────
-     Three screens, one in front. The active index moves on its own every few
-     seconds, on a click or focus on a screen or tab, and the whole stage
-     leans a few degrees toward the pointer. Runs with reduced motion too —
-     without the auto-rotation and the lean — because the tabs are real
-     controls and must keep working. */
+     Three screens, one in front. Left alone the stage moves in beats: the
+     front screen holds, then all three shrink and spread out side by side,
+     then they gather again with the next screen in front. A click on a
+     screen or a tab, or the arrow keys, bring a screen forward at once.
+     Runs with reduced motion too, without the beats, because the tabs are
+     real controls and must keep working. */
   function buildStage() {
     var section = document.querySelector('[data-build]');
     if (!section) return;
@@ -409,114 +391,85 @@
     var tabs = Array.prototype.slice.call(section.querySelectorAll('[data-build-tab]'));
     if (!rig || screens.length < 3) return;
 
-    var position = ['is-left', 'is-active', 'is-right'];
     var active = 1;
+    var spread = false;
     var timer = null;
     var paused = false;
     var visible = false;
-    var HOLD = 6000;
+    var HOLD_FRONT = 4600;
+    var HOLD_SPREAD = 3400;
 
-    function setActive(index, source) {
-      active = (index + screens.length) % screens.length;
+    function paint() {
       screens.forEach(function (screen, i) {
         var rel = (i - active + screens.length) % screens.length;
-        /* rel: 0 = active, 1 = next (right), 2 = previous (left) */
-        var cls = rel === 0 ? position[1] : rel === 1 ? position[2] : position[0];
-        position.forEach(function (p) { screen.classList.remove(p); });
-        screen.classList.add(cls);
-        screen.setAttribute('aria-hidden', rel === 0 ? 'false' : 'true');
+        screen.classList.toggle('is-active', rel === 0);
+        screen.classList.toggle('is-right', rel === 1);
+        screen.classList.toggle('is-left', rel === 2);
+        screen.setAttribute('aria-hidden', rel === 0 || spread ? 'false' : 'true');
       });
+      rig.classList.toggle('is-spread', spread);
       tabs.forEach(function (tab, i) {
         var on = i === active;
         tab.classList.toggle('is-active', on);
         tab.setAttribute('aria-pressed', on ? 'true' : 'false');
-        /* Restart the progress rule on the active tab. */
-        if (on && !reduce) {
-          tab.classList.remove('is-counting');
-          void tab.offsetWidth;
-          tab.classList.add('is-counting');
-        }
       });
-      section.style.setProperty('--active', String(active));
-      schedule();
     }
 
     function schedule() {
       window.clearTimeout(timer);
       if (reduce || paused || !visible) return;
-      timer = window.setTimeout(function () {
-        setActive(active + 1, 'auto');
-      }, HOLD);
+      timer = window.setTimeout(beat, spread ? HOLD_SPREAD : HOLD_FRONT);
+    }
+
+    /* One beat: front → spread, or spread → gather with the next in front. */
+    function beat() {
+      if (spread) {
+        spread = false;
+        active = (active + 1) % screens.length;
+      } else {
+        spread = true;
+      }
+      paint();
+      schedule();
+    }
+
+    function setActive(index) {
+      active = (index + screens.length) % screens.length;
+      spread = false;
+      paint();
+      schedule();
     }
 
     screens.forEach(function (screen, i) {
       screen.addEventListener('click', function () {
-        if (i !== active) setActive(i, 'click');
+        if (i !== active || spread) setActive(i);
       });
     });
 
     tabs.forEach(function (tab, i) {
-      tab.addEventListener('click', function () { setActive(i, 'click'); });
+      tab.addEventListener('click', function () { setActive(i); });
       tab.addEventListener('focus', function () { paused = true; schedule(); });
       tab.addEventListener('blur', function () { paused = false; schedule(); });
     });
 
     section.addEventListener('keydown', function (event) {
-      if (event.key === 'ArrowRight') { event.preventDefault(); setActive(active + 1, 'key'); }
-      if (event.key === 'ArrowLeft') { event.preventDefault(); setActive(active - 1, 'key'); }
+      if (event.key === 'ArrowRight') { event.preventDefault(); setActive(active + 1); }
+      if (event.key === 'ArrowLeft') { event.preventDefault(); setActive(active - 1); }
     });
 
     if (stage) {
       stage.addEventListener('pointerenter', function () { paused = true; schedule(); });
-      stage.addEventListener('pointerleave', function () {
-        paused = false;
-        rig.style.setProperty('--px', '0deg');
-        rig.style.setProperty('--py', '0deg');
-        schedule();
-      });
-
-      if (!reduce && finePointer) {
-        var ticking = false;
-        var last = null;
-        stage.addEventListener(
-          'pointermove',
-          function (event) {
-            last = event;
-            if (ticking) return;
-            ticking = true;
-            requestAnimationFrame(function () {
-              ticking = false;
-              if (!last) return;
-              var rect = stage.getBoundingClientRect();
-              var px = (last.clientX - rect.left) / Math.max(rect.width, 1) - 0.5;
-              var py = (last.clientY - rect.top) / Math.max(rect.height, 1) - 0.5;
-              rig.style.setProperty('--px', (px * 7).toFixed(2) + 'deg');
-              rig.style.setProperty('--py', (-py * 4).toFixed(2) + 'deg');
-            });
-          },
-          { passive: true }
-        );
-      }
+      stage.addEventListener('pointerleave', function () { paused = false; schedule(); });
     }
 
     if ('IntersectionObserver' in window) {
       var observer = new IntersectionObserver(
         function (entries) {
           visible = entries[0].isIntersecting;
-          if (visible) {
-            section.classList.add('is-on');
-            /* Start counting when the band first comes into view. */
-            tabs.forEach(function (tab) {
-              if (tab.classList.contains('is-active') && !reduce) {
-                tab.classList.remove('is-counting');
-                void tab.offsetWidth;
-                tab.classList.add('is-counting');
-              }
-            });
-          }
+          if (visible) section.classList.add('is-on');
           schedule();
         },
-        { threshold: 0.25 }
+        { threshold: 0.3 }
       );
       observer.observe(section);
     } else {
@@ -524,7 +477,7 @@
       schedule();
     }
 
-    setActive(1, 'init');
+    paint();
   }
 
   /* ── Clients line ────────────────────────────────────────────────────────
@@ -624,8 +577,8 @@
             var rect = frame.getBoundingClientRect();
             var px = (last.clientX - rect.left) / Math.max(rect.width, 1) - 0.5;
             var py = (last.clientY - rect.top) / Math.max(rect.height, 1) - 0.5;
-            frame.style.setProperty('--ry', (px * 6).toFixed(2) + 'deg');
-            frame.style.setProperty('--rx', (-py * 5).toFixed(2) + 'deg');
+            frame.style.setProperty('--ry', (px * 4).toFixed(2) + 'deg');
+            frame.style.setProperty('--rx', (-py * 3).toFixed(2) + 'deg');
             frame.style.setProperty('--glare', (px * 90).toFixed(1) + '%');
           });
         },
@@ -657,100 +610,6 @@
       },
       { passive: true }
     );
-  }
-
-  /* ── CTA field ───────────────────────────────────────────────────────────
-     A slow wireframe grid tilted in perspective, drifting behind the panel.
-     Deliberately low contrast: it is background, not decoration to look at. */
-  function ctaField() {
-    var canvas = document.querySelector('[data-cta-field]');
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    var parent = canvas.parentElement;
-    var w = 0;
-    var h = 0;
-    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    var running = false;
-    var t = 0;
-
-    function resize() {
-      var rect = parent.getBoundingClientRect();
-      w = Math.max(1, Math.floor(rect.width));
-      h = Math.max(1, Math.floor(rect.height));
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      canvas.style.width = w + 'px';
-      canvas.style.height = h + 'px';
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    /* Project a point on a ground plane into screen space. */
-    function project(x, z) {
-      var d = 1 / (z * 0.0016 + 0.42);
-      return {
-        x: w / 2 + x * d * 0.5,
-        y: h * 0.62 + (170 - z * 0.09) * d * 0.5,
-        d: d,
-      };
-    }
-
-    function step() {
-      if (!running) return;
-      t += 1;
-      ctx.clearRect(0, 0, w, h);
-
-      var drift = (t * 0.55) % 90;
-
-      ctx.lineWidth = 1;
-      for (var z = 0; z < 1500; z += 90) {
-        var zz = z - drift;
-        var a = project(-1500, zz);
-        var b = project(1500, zz);
-        var fade = Math.max(0, 1 - zz / 1500);
-        ctx.strokeStyle = 'rgba(29, 119, 254,' + fade * 0.22 + ')';
-        ctx.beginPath();
-        ctx.moveTo(a.x, a.y);
-        ctx.lineTo(b.x, b.y);
-        ctx.stroke();
-      }
-
-      for (var x = -1500; x <= 1500; x += 150) {
-        var near = project(x, 0);
-        var far = project(x, 1450);
-        ctx.strokeStyle = 'rgba(161, 161, 170, 0.16)';
-        ctx.beginPath();
-        ctx.moveTo(near.x, near.y);
-        ctx.lineTo(far.x, far.y);
-        ctx.stroke();
-      }
-
-      for (var i = 0; i < 3; i++) {
-        var ang = t * 0.004 + i * 2.1;
-        var p = project(Math.cos(ang) * 520, 420 + Math.sin(ang * 0.7) * 320);
-        var r = 2.6 * p.d;
-        ctx.fillStyle = i === 1 ? 'rgba(250, 250, 250, 0.28)' : 'rgba(29, 119, 254, 0.42)';
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, Math.max(1, r), 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      requestAnimationFrame(step);
-    }
-
-    resize();
-    window.addEventListener('resize', resize, { passive: true });
-
-    if (!('IntersectionObserver' in window)) return;
-    var observer = new IntersectionObserver(
-      function (entries) {
-        running = entries[0].isIntersecting;
-        if (running) requestAnimationFrame(step);
-      },
-      { threshold: 0.05 }
-    );
-    observer.observe(parent);
   }
 
   /* Clips are decorative: nothing downloads until the band is on screen, and

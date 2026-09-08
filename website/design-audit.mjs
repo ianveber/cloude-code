@@ -38,7 +38,7 @@ expect(!/radial-gradient\(rgba\(21, 23, 29/.test(styles), 'Site-wide dot grid re
 expect(!/border-radius:\s*999/.test(styles), 'Unbounded pill radius remains outside explicit controls.');
 expect(
   /--blue:\s*#1d77fe;/.test(styles) &&
-    /--control-radius:\s*10px;/.test(styles),
+    /--control-radius:\s*100px;/.test(styles),
   'The shared colour, spacing, and control-radius tokens are incomplete.'
 );
 const spacingTokens = [...styles.matchAll(/--space-\d+:\s*[^;]+;/g)].map(
@@ -77,8 +77,17 @@ expect(
   'Inline links must use the shared CSS arrow instead of literal arrow spans.'
 );
 expect(
-  /\.link::after\s*\{[^}]*content:\s*'↗';/s.test(styles),
-  'Inline links must retain the shared CSS arrow glyph.'
+  !/\.link::after/.test(styles) && !/border-bottom/.test(styles.match(/\.link \{[^}]*\}/)?.[0] ?? ''),
+  'Inline links are pills: no arrow glyph, no underline rule.'
+);
+expect(
+  !/border(?:-top|-bottom|-left|-right)?:\s*[\d.]+px\s+(?:solid|dashed)\s+(?!transparent)/.test(styles) &&
+    !/<hr\b/.test(componentMarkup),
+  'Visible borders or rules remain; the site uses soft fills and spacing instead.'
+);
+expect(
+  !/[—–]/.test(allHtml.replace(/<script[\s\S]*?<\/script>/g, '')),
+  'Dashes remain in rendered copy.'
 );
 expect(
   siteConfig.includes(
@@ -167,12 +176,14 @@ expect(
 );
 expect(
   !/--radius-sm:|var\(--radius-sm\)/.test(styles) &&
-    /--radius:\s*16px;/.test(styles) &&
-    /--control-radius:\s*10px;/.test(styles),
-  'Card and control radii must use two distinct, non-duplicated tokens.'
+    /--radius:\s*24px;/.test(styles) &&
+    /--panel-radius:\s*28px;/.test(styles) &&
+    /--control-radius:\s*100px;/.test(styles),
+  'Tile, panel and control radii must use three distinct tokens.'
 );
 expect(
-  /\.build__screen\.is-active\s*\{/.test(styles) &&
+  /\.build__rig\.is-spread \.build__screen\.is-left\s*\{/.test(styles) &&
+    /\.build__screen\.is-active\s*\{/.test(styles) &&
     /class="build__screen is-active"/.test(home) &&
     /class="build__screen is-left"/.test(home) &&
     /class="build__screen is-right"/.test(home),
@@ -191,18 +202,17 @@ expect(
   'Ornamental particles, bouncers, cursor, and magnetic motion must be removed.'
 );
 expect(
-  /at\(100,/.test(motion) && /at\(520,/.test(motion) && /at\(2300,/.test(motion) &&
-    /typeInto\(brand, 78,/.test(motion) && /typeInto\(tail, 58,/.test(motion),
-  'Intro must use the 100 ms mark, typing by 520 ms at 78 / 58 ms per character, and open at 2300 ms.'
+  /at\(100,/.test(motion) && /at\(700,/.test(motion) && /at\(3100,/.test(motion) &&
+    /typeInto\(brand, 110,/.test(motion) && /typeInto\(tail, 75,/.test(motion),
+  'Intro must show the brain at 100 ms, type by 700 ms at 110 / 75 ms per character, and open at 3100 ms.'
 );
 expect(
-  /Math\.min\(window\.devicePixelRatio[^,]*, 1\.5\)/.test(motion) &&
-    !/rgba\(139,\s*115,\s*255|rgba\(43,\s*212,\s*196/.test(motion),
-  'CTA field must cap device pixel ratio at 1.5 and stay AIS-blue/neutral.'
+  !/ctaField|data-cta-field/.test(`${motion}\n${showcase}`),
+  'The CTA canvas field was removed on purpose; the panel uses a static glow.'
 );
 expect(
-  /@media \(prefers-reduced-motion: reduce\)\s*\{[\s\S]*animation-iteration-count:\s*1 !important;[\s\S]*\[data-enter\][\s\S]*\.ctaband__field\s*\{\s*display:\s*none;/.test(styles),
-  'Reduced-motion CSS must force visible copy and hide the CTA field.'
+  /@media \(prefers-reduced-motion: reduce\)\s*\{[\s\S]*animation-iteration-count:\s*1 !important;[\s\S]*\[data-enter\][\s\S]*opacity:\s*1 !important;/.test(styles),
+  'Reduced-motion CSS must force visible copy.'
 );
 
 const twinButtons = [...pages.products.matchAll(
@@ -216,8 +226,9 @@ expect(
 );
 
 expect(
-  /data-brand-brain[^>]+src="\/brand\/favicon\.png"/.test(home),
-  'Hero must use the official /brand/favicon.png brain.'
+  /class="hero__brain"[^>]*>\s*<img data-brand-brain[^>]+src="\/brand\/brain-light\.png"/.test(home) &&
+    !/brand-brain__/.test(home),
+  'Hero must use the transparent official brain (/brand/brain-light.png) and nothing around it.'
 );
 expect(
   /data-intro-brand[^>]+data-text="AIS"/.test(home) &&
@@ -227,15 +238,16 @@ expect(
 );
 expect(!/brain3d__slice|class="brain-mark/.test(home), 'Generated home still contains invented brain SVG.');
 expect(
-  /\.intro__mark\s*\{[^}]*aspect-ratio:\s*1;/s.test(styles) &&
-    /\.intro__ghost\s*\{\s*visibility:\s*hidden;/.test(styles),
-  'Intro mark must stay square and the typed wordmark must reserve its width.'
+  /\.intro__mark img\s*\{/.test(styles) &&
+    /\.intro__ghost\s*\{\s*visibility:\s*hidden;/.test(styles) &&
+    !/\.intro__mark\s*\{[^}]*box-shadow/s.test(styles),
+  'Intro must show the bare brain and the typed wordmark must reserve its width.'
 );
 expect(
-  /\.brand-brain__side--3\s*\{/.test(styles) &&
-    /\.brand-brain__gloss\s*\{/.test(styles) &&
+  /\.hero__brain\s*\{[^}]*position:\s*absolute;[^}]*z-index:\s*0;/s.test(styles) &&
+    /\.hero--brain \.hero__inner\s*\{[^}]*z-index:\s*1;/s.test(styles) &&
     !/mix-blend-mode/.test(styles),
-  'Hero brain must be a layered glossy slab without blend modes.'
+  'Hero brain must sit behind the centred copy without blend modes.'
 );
 expect(
   /showIntro:\s*true/.test(build) &&

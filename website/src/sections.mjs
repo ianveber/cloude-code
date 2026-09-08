@@ -281,10 +281,8 @@ export function aboutSection(data, { headingLevel = 2 } = {}) {
     })}
     <div class="approach">
       <h3>${esc(data.approachTitle)}</h3>
-      <hr class="approach__divider">
       <p class="approach__label">${esc(data.questionIntro)}</p>
       <p class="approach__q approach__q--muted">&bdquo;${esc(data.questionWrong)}&ldquo;</p>
-      <hr class="approach__divider">
       <p class="approach__label">${esc(data.questionPivot)}</p>
       <p class="approach__q">&bdquo;${esc(data.questionRight)}&ldquo;</p>
     </div>
@@ -304,7 +302,7 @@ export function teamSection(data, { headingLevel = 2 } = {}) {
         data.members,
         (m) => `
       <article class="person">
-        <img class="person__photo" src="${esc(m.photo)}" alt="${esc(m.name)} — ${esc(m.role)}, ${esc(site.name)}" width="560" height="700" loading="lazy" decoding="async">
+        <img class="person__photo" src="${esc(m.photo)}" alt="${esc(m.name)}, ${esc(m.role)}, ${esc(site.name)}" width="560" height="700" loading="lazy" decoding="async">
         <div class="person__body">
           <p class="person__role">${esc(m.role)}</p>
           <h3 class="person__name">${esc(m.name)}</h3>

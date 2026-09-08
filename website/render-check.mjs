@@ -152,10 +152,6 @@ function findProblems(path, width) {
       if (activeWidth < Math.max(...widths) - 1) {
         components.push('build stage active screen is not the widest');
       }
-      const caption = getComputedStyle(active.querySelector('.build__cap')).opacity;
-      if (parseFloat(caption) < 0.95) {
-        components.push('build stage active caption is not fully visible');
-      }
     }
     const tabs = [...document.querySelectorAll('.build__tab')];
     if (tabs.length !== 3 || tabs.filter((tab) => tab.getAttribute('aria-pressed') === 'true').length !== 1) {
@@ -221,6 +217,21 @@ function findProblems(path, width) {
     });
 
     /* Footer: wordmark stays inside the shell, people and contact printed. */
+    /* No visible borders anywhere on the page. */
+    const bordered = [...document.querySelectorAll('main *, footer *, header *')]
+      .filter((element) => {
+        const style = getComputedStyle(element);
+        return ['Top', 'Right', 'Bottom', 'Left'].some((side) => {
+          const width = parseFloat(style[`border${side}Width`]);
+          const color = style[`border${side}Color`];
+          return width > 0 && style[`border${side}Style`] !== 'none' && !/rgba\(\d+, \d+, \d+, 0\)/.test(color) && color !== 'transparent';
+        });
+      })
+      .map((element) => `${element.tagName.toLowerCase()}.${[...element.classList].join('.')}`);
+    if (bordered.length) {
+      components.push(`visible borders on ${bordered.slice(0, 5).join(', ')}`);
+    }
+
     const mark = document.querySelector('.footer-wordmark');
     if (!mark || mark.getBoundingClientRect().right > window.innerWidth + 1) {
       components.push('footer wordmark is missing or overflows');
@@ -539,7 +550,7 @@ async function main() {
     await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
     await page.evaluateOnNewDocument(() => {
       try {
-        sessionStorage.setItem('ais-intro', '1');
+        sessionStorage.setItem('ais-intro', 'skip');
       } catch {
         /* ignore */
       }
@@ -573,7 +584,7 @@ async function main() {
   const focusPage = await browser.newPage();
   await focusPage.evaluateOnNewDocument(() => {
     try {
-      sessionStorage.setItem('ais-intro', '1');
+      sessionStorage.setItem('ais-intro', 'skip');
     } catch {
       /* ignore */
     }
@@ -592,7 +603,7 @@ async function main() {
   const stagePage = await browser.newPage();
   await stagePage.evaluateOnNewDocument(() => {
     try {
-      sessionStorage.setItem('ais-intro', '1');
+      sessionStorage.setItem('ais-intro', 'skip');
     } catch {
       /* ignore */
     }
@@ -610,7 +621,7 @@ async function main() {
   const chromePage = await browser.newPage();
   await chromePage.evaluateOnNewDocument(() => {
     try {
-      sessionStorage.setItem('ais-intro', '1');
+      sessionStorage.setItem('ais-intro', 'skip');
     } catch {
       /* ignore */
     }
@@ -622,7 +633,7 @@ async function main() {
   const responsivePage = await browser.newPage();
   await responsivePage.evaluateOnNewDocument(() => {
     try {
-      sessionStorage.setItem('ais-intro', '1');
+      sessionStorage.setItem('ais-intro', 'skip');
     } catch {
       /* ignore */
     }

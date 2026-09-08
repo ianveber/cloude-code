@@ -111,7 +111,7 @@ export const processSteps = [
     number: '05',
     id: 'izvedba',
     title: 'Prototip',
-    body: 'Funkcionalni demo vašega sistema — taktilna izkušnja pred investicijo.',
+    body: 'Funkcionalni demo vašega sistema, ki ga preizkusite pred investicijo.',
   },
   {
     number: '06',
@@ -169,7 +169,7 @@ export const processPhases = [
 export const servicesMeta = {
   eyebrow: 'Storitve',
   title: 'AI sistemi za podjetja',
-  lead: 'Vsako področje pokriva namenski sistem — AI chatboti in voice AI agenti v slovenščini — skupaj pa tvorijo celovito rešitev za avtomatizacijo poslovanja.',
+  lead: 'Vsako področje pokriva namenski sistem, AI chatboti in voice AI agenti v slovenščini. Skupaj tvorijo celovito rešitev za avtomatizacijo poslovanja.',
 };
 
 export const explorer = {
@@ -192,7 +192,7 @@ export const services = [
       'Avtomatizacija administrativnih procesov: obdelava dokumentov, sinhronizacija podatkov med orodji in prevzem ponavljajočih se operativnih nalog 24/7.',
     /* Answer-first paragraph: written so AI answer engines can quote it directly. */
     answer:
-      'Avtomatizacija administracije prevzame ponavljajoče se administrativne naloge — obdelavo dokumentov, vnos in sinhronizacijo podatkov ter interno poročanje — in jih izvaja neprekinjeno, brez ročnega dela.',
+      'Avtomatizacija administracije prevzame ponavljajoče se administrativne naloge (obdelavo dokumentov, vnos in sinhronizacijo podatkov ter interno poročanje) in jih izvaja neprekinjeno, brez ročnega dela.',
     capabilities: [
       { title: 'Obdelava dokumentov', body: 'Sistem prebere, razvrsti in povzame vhodne dokumente ter jih pošlje v pravi sistem.' },
       { title: 'Sinhronizacija podatkov', body: 'Podatki ostanejo usklajeni med CRM, e-pošto, preglednicami in internimi orodji.' },
@@ -228,7 +228,7 @@ export const services = [
     tags: ['Tržna analiza', 'Dnevni pregled'],
     metaTitle: 'Spremljanje trga in tržna analiza z AI | AIS Slovenia',
     metaDescription:
-      'AI sistem, ki neprestano spremlja trg, razpise in konkurenco ter vam dostavi le relevantne priložnosti — brez ročnega iskanja.',
+      'AI sistem, ki neprestano spremlja trg, razpise in konkurenco ter vam dostavi le relevantne priložnosti, brez ročnega iskanja.',
     answer:
       'Spremljanje trga je AI sistem, ki neprestano pregleduje trg, javne razpise in aktivnosti konkurence ter dostavlja le priložnosti, ki ustrezajo vnaprej določenim merilom.',
     capabilities: [
@@ -358,7 +358,7 @@ export const faq = {
     },
     {
       q: 'Za katera podjetja je AI avtomatizacija smiselna?',
-      a: 'Sodelujemo s podjetji, kjer ima AI implementacija dejanski poslovni vpliv — torej tam, kjer se ponavljajoče se naloge izvajajo ročno, kjer povpraševanja čakajo na prostega človeka in kjer ekipa večino dneva porabi za administracijo namesto za delo, ki prinaša rast.',
+      a: 'Sodelujemo s podjetji, kjer ima AI dejanski poslovni vpliv: tam, kjer se ponavljajoče se naloge izvajajo ročno, kjer povpraševanja čakajo na prostega človeka in kjer ekipa večino dneva porabi za administracijo namesto za delo, ki prinaša rast.',
     },
     {
       q: 'Ali moramo pred uvedbo zamenjati obstoječa orodja?',
@@ -366,7 +366,7 @@ export const faq = {
     },
     {
       q: 'Ali dobimo demo pred investicijo?',
-      a: 'Da. Peti korak procesa je prototip — funkcionalni demo vašega sistema, ki ga preizkusite pred polno investicijo.',
+      a: 'Da. Peti korak procesa je prototip, funkcionalni demo vašega sistema, ki ga preizkusite pred polno investicijo.',
     },
     {
       q: 'Kaj vključuje podpora po uvedbi?',

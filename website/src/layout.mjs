@@ -64,9 +64,9 @@ function head(page) {
     /* Fonts — preconnect then load without blocking first paint */
     '<link rel="preconnect" href="https://fonts.googleapis.com">',
     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>',
-    '<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">',
-    '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" media="print" onload="this.media=\'all\'">',
-    '<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"></noscript>',
+    '<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap">',
+    '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" media="print" onload="this.media=\'all\'">',
+    '<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap"></noscript>',
 
     '<link rel="stylesheet" href="/styles.css">',
     /* Marks the document as script-capable before first paint so entrance
@@ -77,11 +77,15 @@ document.documentElement.classList.add('js');
 try {
   var path = location.pathname;
   var home = path === '/' || path === '' || path === '/index.html';
+  /* The intro plays on every fresh arrival. A hop from within the site after
+     it has already played skips it; 'skip' is for tooling and previews. */
   var seen = sessionStorage.getItem('ais-intro');
+  var internal = false;
+  try { internal = Boolean(document.referrer) && new URL(document.referrer).origin === location.origin; } catch (e) {}
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var skip = /(?:^|[?&])nointro(?:&|=|$)/.test(location.search);
+  var skip = seen === 'skip' || /(?:^|[?&])nointro(?:&|=|$)/.test(location.search);
   var bot = /googlebot|bingbot|slurp|duckduckbot|baiduspider|yandex|sogou|exabot|facebot|ia_archiver|crawler|spider/i.test(navigator.userAgent);
-  if (home && !seen && !reduce && !skip && !bot) {
+  if (home && !(seen && internal) && !reduce && !skip && !bot) {
     document.documentElement.classList.add('is-intro');
   }
 } catch (e) {}
@@ -126,7 +130,7 @@ function header(page) {
   return `
 <header class="site-header">
   <div class="shell site-header__inner">
-    <a class="brand" href="/" aria-label="${esc(site.name)} — domov">
+    <a class="brand" href="/" aria-label="${esc(site.name)}, domov">
       <img src="${esc(site.brand.logo)}" alt="${esc(site.name)}" width="${site.brand.logoWidth}" height="${site.brand.logoHeight}" fetchpriority="high">
       <span class="visually-hidden">${esc(site.name)}</span>
     </a>
@@ -179,9 +183,9 @@ function breadcrumbs(page) {
 
 /**
  * Footer with everything a visitor might need to reach us: the flat lockup,
- * the brand statement, every section of the site, the public inbox and
- * phone, the people behind the company, and the large typographic
- * "AI Slovenia" wordmark that closes the page.
+ * every section of the site, the public inbox and phone, the people behind
+ * the company, and the large typographic "AI Slovenia" wordmark that closes
+ * the page. No rules, no borders.
  */
 function footer() {
   const columns = each(
@@ -198,20 +202,18 @@ function footer() {
   const people = each(
     team.members,
     (person) => `
-          <li><b>${esc(person.name)}</b> · ${esc(person.role)} · <a href="mailto:${esc(person.email)}">${esc(person.email)}</a></li>`
+          <li><b>${esc(person.name)}</b>, ${esc(person.role)} <a href="mailto:${esc(person.email)}">${esc(person.email)}</a></li>`
   );
 
   return `
 <footer class="site-footer">
   <div class="shell">
-    <hr class="footer-rule" aria-hidden="true">
     <div class="footer-grid">
       <div class="footer-brand">
-        <a class="brand" href="/" aria-label="${esc(site.name)} — domov">
+        <a class="brand" href="/" aria-label="${esc(site.name)}, domov">
           <img src="${esc(site.brand.logo)}" alt="${esc(site.name)}" width="${site.brand.logoWidth}" height="${site.brand.logoHeight}" loading="lazy">
         </a>
         <p>${esc(site.footer.blurb)}</p>
-        <p class="footer-statement">${esc(site.footer.statement)}</p>
       </div>
       <div class="footer-nav">
         ${columns}
@@ -227,13 +229,12 @@ function footer() {
         <ul class="footer-people">
           ${people}
         </ul>
-        <p class="footer-legal">${esc(site.legalName)}</p>
       </div>
     </div>
     <p class="footer-wordmark" data-footer-mark aria-hidden="true">${esc(site.footer.wordmark)}</p>
     <div class="footer-bottom">
       <span>&copy; ${site.copyrightYear} ${esc(site.legalName)}. Vse pravice pridržane.</span>
-      <span>${esc(site.contact.city)}, ${esc(site.contact.country)} · <a href="mailto:${esc(site.contact.email)}">${esc(site.contact.email)}</a></span>
+      <span>${esc(site.contact.city)}, ${esc(site.contact.country)}</span>
     </div>
   </div>
 </footer>`;

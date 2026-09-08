@@ -24,7 +24,7 @@ async function main() {
   });
   const page = await browser.newPage();
   await page.evaluateOnNewDocument(() => {
-    try { sessionStorage.setItem('ais-intro', '1'); } catch (e) {}
+    try { sessionStorage.setItem('ais-intro', 'skip'); } catch (e) {}
   });
 
   let failures = 0;

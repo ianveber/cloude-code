@@ -81,7 +81,7 @@ async function main() {
   await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
   await page.evaluateOnNewDocument(() => {
     try {
-      sessionStorage.setItem('ais-intro', '1');
+      sessionStorage.setItem('ais-intro', 'skip');
     } catch {
       /* ignore */
     }

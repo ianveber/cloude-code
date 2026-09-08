@@ -20,16 +20,19 @@ response so search engines and AI answer engines can read it without JavaScript.
 
 The home page is a product narrative, not a template landing page:
 
-1. Typed intro: white screen, the brain mark, "AIS Slovenia" typed with a caret (home only)
-2. Hero with the glossy 3D brain slab + CTAs (white)
-3. Build stage: three clips in a fanned 3D stage (the only black band)
-4. Clients line: named projects, one sentence each, no logos (white)
-5. Three pillars with rendered product pictures: SaaS, automation, security + apps
-6. Team (three real people)
-7. Blog teaser (honest empty state while `blog.items` is empty)
+1. Typed intro: white screen, the bare brain, "AIS Slovenia" typed with a caret (home only)
+2. Hero: headline centred, two pill buttons, the brain large and soft behind the words (white)
+3. Build stage: a rounded black panel where the three clips take turns in front,
+   spread out side by side, then gather again (the only dark block)
+4. Clients line: soft grey tiles, a tag, a name and one sentence each, no logos
+5. Three pillars: a title, one sentence and a rendered product picture in a soft panel
+6. Team (three real people, name and role)
+7. Blog (one line while `blog.items` is empty)
 8. FAQ (first five questions)
-9. Dark CTA form
-10. Footer with every contact, the team, and the large "AI Slovenia" wordmark
+9. Closing CTA: a rounded black panel with the short form
+10. Footer with every section, contact, the team, and the large "AI Slovenia" wordmark
+
+Home sections carry a tag (eyebrow) and a title. No lead paragraphs.
 
 Supporting pages exist for products, news, events, blog, services, process,
 about, team, FAQ, and contact. Products / news / events / blog currently
@@ -41,22 +44,30 @@ render **one honest empty state**. Do not invent catalogue entries to fill them.
 
 These are enforced by `design-audit.mjs` and/or by the approved spec.
 
-1. **Exact brand only.** Standalone brain is `public/brand/favicon.png`. Light
-   lockup is `public/brand/logo-light.png`. Dark lockup `public/brand/logo.png`
-   is only for a genuinely dark surface. Do not redraw, trace, or SVG-invent
-   the brain.
-2. **Only the brain is 3D.** Option 3: CSS perspective tilt (~30°), restrained
-   edge cue, directional shadow. The AIS Slovenia wordmark stays flat.
-3. **Buttons are black or ghost.** No accent-coloured buttons.
+1. **Exact brand only.** The bare brain is `public/brand/brain-light.png` (ink
+   lines, for white surfaces) and `public/brand/brain.png` (white lines, for
+   dark surfaces); both are cut from the official lockup with the ground made
+   transparent and nothing redrawn. `favicon.png` is the browser icon only.
+   Light lockup is `public/brand/logo-light.png`. Do not redraw, trace, or
+   SVG-invent the brain.
+2. **The brain is a picture, not an icon.** No tile, no frame, no shadow
+   around it. In the hero it sits behind the headline and only drifts.
+3. **Buttons are black or soft grey pills.** No accent-coloured buttons.
 4. **One decorative colour:** AIS blue `#1d77fe`. No violet / teal / amber / rose
    accent system.
-5. **Copy lives in HTML.** JavaScript is progressive enhancement. The site
+5. **No borders, no rules, no dashes.** Nothing on the site draws a line:
+   no card borders, no hairlines between sections, no underlines, no `<hr>`,
+   no em or en dashes in copy. Tiles are soft grey fills, dark blocks are
+   rounded black panels inside the page margins. The design audit fails the
+   build if a visible border or a dash returns.
+6. **Copy lives in HTML.** JavaScript is progressive enhancement. The site
    must remain readable with JS off and with `prefers-reduced-motion`.
-6. **No fabricated public claims.** No fake partners, metrics, news, events,
+7. **No fabricated public claims.** No fake partners, metrics, news, events,
    blog posts, or “coming soon” tiles that imply unpublished work exists.
-7. **Antigravity is rhythm only.** Do not copy its assets, type, motion, or
-   layouts.
-8. **Do not send mail, close GitHub issues, or change calendar events** from
+8. **Antigravity is a vibe reference, nothing more.** White ground, centred
+   light-weight headline, pill buttons, soft tiles, rounded black media panels,
+   generous space. Do not copy its assets, wording, motion, or layouts.
+9. **Do not send mail, close GitHub issues, or change calendar events** from
    this repo’s agent workflow without an explicit user request.
 
 ---
@@ -163,15 +174,13 @@ exist.
 
 ## Brand treatment (option 3)
 
-- Intro: the official brain tile (`favicon.png`, corners softened to an
-  app-icon radius) with "AIS Slovenia" typed beside it in the site font. The
-  text comes from `intro` in `content/showcase.mjs`. There is no lockup
-  crossfade any more.
-- Hero: `favicon.png` inside `.brand-brain__rig` with `--tilt-x` / `--tilt-z`,
-  treated as a glossy slab: three edge layers for thickness, a pointer-driven
-  highlight, a light sweep every 6.5 s and a slow float. Pointer tilt is
-  capped at ±8° and follows the pointer anywhere over the hero. The image is
-  never redrawn; only the tilt, the shadow and the light move.
+- Intro: the bare brain (`brain-light.png`) with "AIS Slovenia" typed beside
+  it in the site font. The text comes from `intro` in `content/showcase.mjs`.
+- Hero: `brain-light.png` in `.hero__brain`, large, at low opacity, behind the
+  centred headline, with a soft white halo behind the words for legibility.
+  It drifts a few pixels toward the pointer and breathes slowly. Nothing is
+  drawn around it.
+- Font: Figtree (Google Fonts), headlines at weight 500 with tight tracking.
 - Header/footer: flat `logo-light.png`.
 
 If you replace a brand file, keep the same filenames or update `site.brand`
@@ -183,24 +192,28 @@ and the design-audit selectors together.
 
 `public/js/motion.js` may run:
 
-`introSequence`, `heroEntrance`, `brainShine`, `buildStage`, `reveals`,
-`clientsLine`, `tiltFrames`, `footerGlow`, `ctaField`, `lazyVideo`, plus
-`headerState`, `explorer` (other pages) and `contactForms`.
+`introSequence`, `heroEntrance`, `brainDrift`, `buildStage`, `reveals`,
+`clientsLine`, `tiltFrames`, `footerGlow`, `lazyVideo`, plus `headerState`,
+`explorer` (other pages) and `contactForms`.
 
-Intro timing (home, first visit, motion allowed): **100 ms** mark, typing
-starts once the webfont is ready (**380–520 ms**) at 78 ms per character for
-"AIS" and 58 ms for "Slovenia", caret blinks, **2300 ms** site loads in.
-Click / Escape / Enter / Space skip immediately. `sessionStorage.ais-intro`
-prevents a repeat in the same tab.
+Intro timing (home, motion allowed): **100 ms** brain, typing starts once
+the webfont is ready (**460 to 700 ms**) at 110 ms per character for "AIS"
+and 75 ms for "Slovenia", caret blinks, **3100 ms** site loads in. Click /
+Escape / Enter / Space skip immediately. The intro plays on every fresh
+arrival at the home page; a hop from another page of the site after it has
+played skips it. `?nointro` or `sessionStorage.ais-intro = 'skip'` turns it
+off for tooling and previews.
 
-Build stage: the front screen changes every **6 s** (the blue rule on the
-active tab is the countdown), pauses under the pointer or on a focused tab,
-and answers clicks, tab presses and Arrow keys. `buildStage` also runs under
-reduced motion (without auto-rotation or the pointer lean) because the tabs
-are real controls.
+Build stage: moves in beats, never continuously. The front screen holds
+**4.6 s**, then the three shrink and spread out side by side for **3.4 s**,
+then gather with the next screen in front. Pointer over the stage pauses the
+beats. Clicks on a screen or tab, and the arrow keys, bring a screen forward
+at once. `buildStage` also runs under reduced motion (without the beats)
+because the tabs are real controls.
 
 **Removed on purpose:** particles, bouncing chips, custom cursor, magnetic
-buttons. Do not bring them back.
+buttons, the CTA wireframe canvas, the glossy brain slab, the tab countdown
+rule. Do not bring them back.
 
 Reduced motion: no intro lock, no hidden copy, no decorative video autoplay,
 CTA canvas hidden. CSS branch is in `src/styles.css`.
@@ -234,11 +247,14 @@ detected, otherwise set `CHROME_PATH`) and ffmpeg.
 
 ## Visual system (short)
 
-- Paper `#fff`, canvas `#f8f9fb`, ink `#111318`, AIS blue `#1d77fe`
-- Control radius 10px, card radius 16px, 44px minimum targets
-- Dark bands only for the build stage and the final CTA
-- Shared CSS link arrow `↗` — do not put literal arrows in markup
-- Spacing tokens `--space-1` … `--space-7` — prefer tokens over magic numbers
+- Paper `#fff`, canvas `#f4f5f7` (tiles), ink `#111318`, AIS blue `#1d77fe`
+- Controls are pills (`--control-radius: 100px`), tiles 24px, panels 28px,
+  44px minimum targets
+- Dark blocks only for the build stage and the closing CTA, both rounded
+  panels inside `--edge` margins
+- `.link` is a soft grey pill like `.btn--secondary`; no arrow glyph
+- Spacing tokens `--space-1` to `--space-7`; prefer tokens over magic numbers
+- Copy: short, plain, no dashes, no lead paragraphs on the home page
 
 ---
 
@@ -252,7 +268,7 @@ Typical failures:
 - Fabricated strings (`Partner 01`, `1,2 mio+`, `Mesto rezervirano`, …)
 - Missing empty state on an empty listing page
 - Home section order changed
-- Extra accent colours, grain overlay, pill `border-radius: 999`
+- Extra accent colours, grain overlay, a visible border or `<hr>`, a dash in copy
 - Horizontal overflow at one of 18 widths
 - Controls under 44×44 (inline body links are exempt)
 - Dim persistent copy, clipped FAQ focus, reduced-motion intro lock

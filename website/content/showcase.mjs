@@ -1,32 +1,30 @@
 /**
  * Copy for the home-page showcase sections and the products, news, events and
  * blog pages. Unpublished material is represented by honest empty states.
+ *
+ * Home sections carry a tag and a title, nothing more. Body copy appears only
+ * where a section needs it (one sentence per client, one per pillar).
  */
 
 /* ── Opening sequence ───────────────────────────────────────────────────
-   Typed next to the brain mark, one character at a time, on a white screen.
-   The two parts are typed in order: the brand in ink, the tail in AIS blue. */
+   Typed next to the brain, one character at a time, on a white screen. */
 
 export const intro = {
   brand: 'AIS',
   tail: 'Slovenia',
 };
 
-/* ── Build stage: three screens from the workshop ───────────────────────
-   The only dark band on the home page. Three clips play in a fanned stage;
-   the front screen is large, the other two wait at its sides and rotate in
-   on their own or on request. */
+/* ── Build stage: three clips from the workshop ─────────────────────────
+   The only dark block on the home page. Three clips take turns in front,
+   then spread out side by side, then gather again with the next one in front. */
 
 export const buildStage = {
-  eyebrow: 'Kako gradimo',
-  title: 'Tri okna v našo delavnico',
-  lead: 'Vsak sistem nastane v treh korakih: potek dela, koda in izdelek. To so posnetki iz dela, ne slike iz kataloga.',
+  eyebrow: 'Delavnica',
+  title: 'Kako nastane sistem',
   screens: [
     {
       id: 'flow',
-      number: '01',
       label: 'Avtomatizacija',
-      caption: 'Potek dela zmapiramo do zadnjega koraka: sprožilci, pravila, izjeme.',
       poster: '/video/flow-poster.jpg',
       sources: [
         { src: '/video/flow.webm', type: 'video/webm' },
@@ -35,9 +33,7 @@ export const buildStage = {
     },
     {
       id: 'code',
-      number: '02',
       label: 'Razvoj',
-      caption: 'Iz diagrama nastane koda: agenti, integracije, testi, uvedba.',
       poster: '/video/code-poster.jpg',
       sources: [
         { src: '/video/code.webm', type: 'video/webm' },
@@ -46,9 +42,7 @@ export const buildStage = {
     },
     {
       id: 'saas',
-      number: '03',
       label: 'SaaS izdelek',
-      caption: 'Rezultat je izdelek z nadzorno ploščo, ki prihrani ure in stroške.',
       poster: '/video/saas-poster.jpg',
       sources: [
         { src: '/video/saas.webm', type: 'video/webm' },
@@ -56,73 +50,63 @@ export const buildStage = {
       ],
     },
   ],
-  outro: 'Trije koraki. En sistem, ki dela namesto vas.',
 };
 
 /* ── Clients line ───────────────────────────────────────────────────────
-   One row per project we have built: a name, the kind of work, and one
-   sentence. No logos, no metrics, no invented names.
+   One tile per project we have built: a tag, a name and one sentence. No
+   logos, no numbers, no invented names.
 
-   Every entry below is a real project from our own repositories. Before a
+   Every entry is a real project from our own repositories. Before a
    production deploy, confirm with each client that the project may be named
    publicly, and replace the working names with the ones they approve. */
 
 export const clients = {
   eyebrow: 'Reference',
   title: 'S kom smo delali',
-  lead: 'Sistemi, ki tečejo v produkciji. Ena vrstica na projekt, brez okrasja.',
   items: [
     {
-      name: 'INSPECTUS · VLDR',
+      name: 'INSPECTUS VLDR',
       kind: 'Avtomatizacija',
-      body: 'Dokumentacijski cevovod za pregled vozil v pristanišču: iz poročil nastane preverjen zapis o vsakem vozilu.',
+      body: 'Poročila o pregledu vozil v pristanišču sistem prebere in iz njih sestavi zapis o vsakem vozilu.',
     },
     {
-      name: 'INSPECTUS · VIN',
+      name: 'INSPECTUS VIN',
       kind: 'Avtomatizacija',
-      body: 'Fotografije s pomola postanejo vozila: tablica z VIN odpre vozilo, sistem pa ga preveri proti seznamu razkladanja.',
+      body: 'Fotografije s pomola se same razvrstijo po vozilih in preverijo proti seznamu razkladanja.',
     },
     {
       name: 'ATHLOS',
       kind: 'SaaS izdelek',
-      body: 'Športni operacijski sistem: aplikacija za športnika, nadzorna plošča za trenerja in vgrajeni AI trener.',
+      body: 'Aplikacija za športnika, nadzorna plošča za trenerja in AI trener, ki sme popraviti trening.',
     },
     {
       name: 'AIS Command',
       kind: 'SaaS izdelek',
-      body: 'Interni CRM in portal za stranke z agentnim operacijskim sistemom, izdajanjem računov in plačili.',
+      body: 'Naš interni CRM s portalom za stranke, računi in plačili.',
     },
     {
-      name: 'Model lastnosti premazov',
+      name: 'Model za premaze',
       kind: 'AI model',
-      body: 'Napovedni model, ki gostoto, viskoznost in prekrivnost premaza izračuna, preden ga kdo zmeša.',
+      body: 'Napove gostoto, viskoznost in prekrivnost premaza, preden ga kdo zmeša.',
     },
   ],
 };
 
 /* ── Three pillars ──────────────────────────────────────────────────────
-   White section after the dark stage. Each pillar shows one product picture
-   rendered from tools/pictures/scene.html, so the visuals stay on-brand and
-   honest about being illustrative. */
+   White section after the dark stage. Each pillar is a title, one sentence
+   and a product picture rendered from tools/pictures/scene.html. */
 
 export const pillars = {
-  eyebrow: 'Kaj gradimo',
-  title: 'Tri stvari, ki jih znamo narediti dobro',
-  lead: 'Vsak projekt se začne pri konkretnem delu, ki ga ekipa danes opravlja ročno. Nato izberemo najkrajšo pot do sistema, ki ga prevzame.',
+  eyebrow: 'Storitve',
+  title: 'Kaj gradimo',
   items: [
     {
       id: 'saas',
-      number: '01',
       title: 'SaaS izdelki',
-      body: 'Izdelek z nadzorno ploščo, uporabniki in naročnino. Od prve skice do objave, z merljivim rezultatom na prvem zaslonu.',
-      points: [
-        'Nadzorna plošča, ki pokaže prihranek in izjeme',
-        'Vloge, uporabniki in naročnina od prvega dne',
-        'Integracije z orodji, ki jih že uporabljate',
-      ],
+      body: 'Izdelek z nadzorno ploščo, uporabniki in naročnino. Od prve skice do objave.',
       picture: {
         src: '/pictures/saas',
-        alt: 'Ilustrativna nadzorna plošča SaaS izdelka za obdelavo dokumentov: ključne številke, graf in seznam zadnjih dokumentov.',
+        alt: 'Nadzorna plošča SaaS izdelka za obdelavo dokumentov s ključnimi številkami, grafom in seznamom zadnjih dokumentov.',
         width: 1600,
         height: 1000,
       },
@@ -130,17 +114,11 @@ export const pillars = {
     },
     {
       id: 'avtomatizacija',
-      number: '02',
       title: 'Avtomatizacije',
-      body: 'Diagram poteka, ki teče sam. Sprožilci, pravila in izjeme na enem mestu, vsak zagon pa zabeležen z vhodom, odločitvijo in izhodom.',
-      points: [
-        'Obdelava dokumentov in sinhronizacija podatkov',
-        'Pravila z jasno mejo, kdaj odloči človek',
-        'Dnevni pregled zagonov in izjem',
-      ],
+      body: 'Potek dela, ki teče sam. Sprožilci, pravila in izjeme na enem mestu, vsak zagon zabeležen.',
       picture: {
         src: '/pictures/flow',
-        alt: 'Ilustrativni urejevalnik poteka dela: vozlišča za e-račun, AI razčlenitev, pravilo in samodejno knjiženje ter seznam zadnjih zagonov.',
+        alt: 'Urejevalnik poteka dela z vozlišči za e-račun, AI razčlenitev, pravilo in samodejno knjiženje ter seznamom zadnjih zagonov.',
         width: 1600,
         height: 1000,
       },
@@ -148,17 +126,11 @@ export const pillars = {
     },
     {
       id: 'varnost',
-      number: '03',
-      title: 'Kibernetska varnost in aplikacije',
-      body: 'Aplikacije po meri z varnostjo na poslovni ravni: nadzor dostopa, revizijska sled in šifrirani podatki. Ena aplikacija za en proces, brez odvečnih funkcij.',
-      points: [
-        'Vloge in pravice, ki jih vidite na enem zaslonu',
-        'Revizijska sled za vsako dejanje, tudi agentovo',
-        'Šifriranje v mirovanju in prenosu, prijava brez gesla',
-      ],
+      title: 'Varnost in aplikacije',
+      body: 'Aplikacije po meri z nadzorom dostopa, revizijsko sledjo in šifriranimi podatki.',
       picture: {
         src: '/pictures/security',
-        alt: 'Ilustrativna varnostna konzola ob mobilni aplikaciji: matrika dostopa, šifriranje, revizijska sled in stanje sistema.',
+        alt: 'Varnostna konzola ob mobilni aplikaciji: matrika dostopa, šifriranje, revizijska sled in stanje sistema.',
         width: 1600,
         height: 1000,
       },
@@ -167,19 +139,17 @@ export const pillars = {
   ],
 };
 
-/* ── Immersive CTA ────────────────────────────────────────────────────── */
+/* ── Closing CTA ──────────────────────────────────────────────────────── */
 
 export const ctaBlock = {
   eyebrow: 'Začnimo',
   title: 'Povejte nam, kaj vas zadržuje',
-  lead: 'Pustite kontakt in pripravimo predlog, kje se avtomatizacija najhitreje izplača.',
   fields: [
     { name: 'ime', label: 'Ime in priimek', type: 'text', autocomplete: 'name', required: true },
     { name: 'podjetje', label: 'Podjetje', type: 'text', autocomplete: 'organization', required: false },
     { name: 'email', label: 'Poslovna e-pošta', type: 'email', autocomplete: 'email', required: true },
   ],
   submitLabel: 'Pošljite povpraševanje',
-  footnote: 'Odgovorimo v enem delovnem dnevu. Brez naročniške liste.',
 };
 
 /* ── Team showcase ────────────────────────────────────────────────────── */
@@ -187,7 +157,6 @@ export const ctaBlock = {
 export const teamShowcase = {
   eyebrow: 'Ekipa',
   title: 'Ljudje za sistemi',
-  lead: 'Majhna ekipa, ki sisteme postavi, uvede in jih tudi vzdržuje.',
 };
 
 /* ── Products ─────────────────────────────────────────────────────────── */
@@ -196,7 +165,7 @@ export const products = {
   eyebrow: 'Izdelki',
   title: 'Naši izdelki',
   lead: 'Na tej strani bomo objavili preverjene informacije o izdelkih AIS Slovenia.',
-  metaTitle: 'Izdelki — SaaS rešitve za avtomatizacijo | AIS Slovenia',
+  metaTitle: 'Izdelki in SaaS rešitve za avtomatizacijo | AIS Slovenia',
   metaDescription:
     'Informacije o izdelkih AIS Slovenia bodo objavljene, ko bodo pripravljene in potrjene za javno predstavitev.',
   answer:
@@ -260,7 +229,7 @@ export const blog = {
     'AIS Slovenia trenutno nima javno objavljenih blog zapisov. Potrjene članke bomo dodali na to stran.',
   items: [],
   homeTitle: 'Iz bloga',
-  homeLead: 'Zapiski iz dela: kaj smo zgradili, kaj se je obneslo in kaj bi naredili drugače.',
+  homeEmpty: 'Prvi zapisi so v pripravi.',
   empty: {
     title: 'Vsebina je v pripravi',
     body: 'Blog zapise bomo objavili, ko bodo pripravljeni in potrjeni za javno predstavitev.',

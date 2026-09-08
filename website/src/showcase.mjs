@@ -13,9 +13,9 @@ import { intro as introCopy } from '../content/showcase.mjs';
 /* ── Opening sequence ─────────────────────────────────────────────────── */
 
 /**
- * The opening overlay: a white screen, the brain mark, and the brand name
- * typed out next to it with a blinking caret. The site loads in once the
- * typing has finished.
+ * The opening overlay: a white screen, the brain, and the brand name typed
+ * out next to it with a blinking caret. The site loads in once the typing
+ * has finished.
  *
  * Rendered by the layout *outside* `<main>`: while the intro runs, the whole
  * page below is faded out, and an element inside a faded parent cannot be
@@ -30,7 +30,7 @@ export function introOverlay() {
 <div class="intro" data-intro-stage aria-hidden="true">
   <div class="intro__lockup">
     <span class="intro__mark">
-      <img data-brand-brain src="${esc(site.brand.brain)}" alt=""
+      <img data-brand-brain src="${esc(site.brand.brainLight)}" alt=""
         width="${site.brand.brainWidth}" height="${site.brand.brainHeight}">
     </span>
     <span class="intro__type">
@@ -44,39 +44,23 @@ export function introOverlay() {
 /* ── Hero ─────────────────────────────────────────────────────────────── */
 
 /**
- * White stage with the official brain as a glossy slab, tilted toward the
- * visitor. The slab is the only 3D object on the site: a stack of edge layers
- * gives it thickness, a moving highlight gives it shine, and both follow the
- * pointer slowly.
+ * White stage, headline centred, the brain large and soft behind the words.
+ * The brain is the official mark on a transparent ground, nothing else. It
+ * drifts a little with the pointer and breathes slowly; the image itself is
+ * never redrawn.
  */
 export function brainHero(data) {
   return `
 <section class="hero hero--brain" data-intro>
-  <div class="shell hero__grid">
-    <div class="hero__copy">
-      <h1 data-type-in>${esc(data.headline)}</h1>
-      <p class="hero__lead" data-enter="1">${esc(data.lead)}</p>
-      <div class="btn-row" data-enter="2">
-        <a class="btn btn--primary" href="${esc(data.primary.href)}">${esc(data.primary.label)}</a>
-        <a class="btn btn--secondary" href="${esc(data.secondary.href)}">${esc(data.secondary.label)}</a>
-      </div>
-    </div>
-    <div class="hero__art" aria-hidden="true">
-      <div class="brand-brain" data-brain>
-        <div class="brand-brain__float">
-          <div class="brand-brain__rig">
-            <span class="brand-brain__shadow"></span>
-            <span class="brand-brain__side brand-brain__side--3"></span>
-            <span class="brand-brain__side brand-brain__side--2"></span>
-            <span class="brand-brain__side brand-brain__side--1"></span>
-            <img data-brand-brain src="${esc(site.brand.brain)}" alt=""
-              width="${site.brand.brainWidth}" height="${site.brand.brainHeight}">
-            <span class="brand-brain__gloss"></span>
-            <span class="brand-brain__sweep"></span>
-            <span class="brand-brain__rim"></span>
-          </div>
-        </div>
-      </div>
+  <div class="hero__brain" aria-hidden="true" data-brain>
+    <img data-brand-brain src="${esc(site.brand.brainLight)}" alt=""
+      width="${site.brand.brainWidth}" height="${site.brand.brainHeight}" fetchpriority="high">
+  </div>
+  <div class="shell hero__inner">
+    <h1 data-type-in>${esc(data.headline)}</h1>
+    <div class="btn-row" data-enter="1">
+      <a class="btn btn--primary" href="${esc(data.primary.href)}">${esc(data.primary.label)}</a>
+      <a class="btn btn--secondary" href="${esc(data.secondary.href)}">${esc(data.secondary.label)}</a>
     </div>
   </div>
 </section>`;
@@ -98,11 +82,12 @@ export function emptyState({ id, eyebrow, title, body, action }) {
 }
 
 /* ── Build stage ──────────────────────────────────────────────────────────
-   The one dark band. Three clips sit in a fanned stage: the front screen is
-   large, the other two wait at its sides. Any screen can be brought forward
-   by pointer, keyboard or the tabs beneath; left alone, the stage rotates on
-   its own. The clips are decorative and silent, so they are muted, looped and
-   marked aria-hidden; the tabs carry the meaning. */
+   The one dark block: a rounded black panel inside the page margins. Three
+   clips take turns in front. Left alone the stage moves in beats: the front
+   clip holds, the three spread out side by side, then gather again with the
+   next clip in front. The tabs beneath bring any clip forward. The clips are
+   decorative and silent, so they are muted, looped and marked aria-hidden;
+   the tabs carry the meaning. */
 
 const STAGE_POSITION = ['is-left', 'is-active', 'is-right'];
 
@@ -124,12 +109,8 @@ function stageScreen(screen, index) {
             data-lazy-video>
             ${sources}
           </video>
-          <span class="build__glare"></span>
         </div>
-        <figcaption class="build__cap">
-          <span class="build__cap-label">${esc(screen.label)}</span>
-          <span class="build__cap-text">${esc(screen.caption)}</span>
-        </figcaption>
+        <figcaption class="visually-hidden">${esc(screen.label)}</figcaption>
       </figure>`;
 }
 
@@ -137,40 +118,34 @@ function stageTab(screen, index) {
   const active = index === 1;
   return `
       <button class="build__tab${active ? ' is-active' : ''}" type="button"
-        data-build-tab="${index}" aria-pressed="${active ? 'true' : 'false'}">
-        <span class="build__tab-num" aria-hidden="true">${esc(screen.number)}</span>
-        <span class="build__tab-label">${esc(screen.label)}</span>
-        <span class="build__tab-text">${esc(screen.caption)}</span>
-      </button>`;
+        data-build-tab="${index}" aria-pressed="${active ? 'true' : 'false'}">${esc(screen.label)}</button>`;
 }
 
 export function buildStage(data) {
   return `
 <section class="build" id="kako-nastane" aria-labelledby="build-title" data-build>
-  <div class="shell build__head">
-    <p class="eyebrow eyebrow--onDark">${esc(data.eyebrow)}</p>
-    <h2 id="build-title">${esc(data.title)}</h2>
-    <p class="lead lead--onDark">${esc(data.lead)}</p>
-  </div>
-
-  <div class="build__stage" data-build-stage>
-    <div class="build__rig" data-build-rig>
-      ${each(data.screens, stageScreen)}
+  <div class="build__panel">
+    <div class="shell build__head">
+      <p class="eyebrow eyebrow--onDark">${esc(data.eyebrow)}</p>
+      <h2 id="build-title">${esc(data.title)}</h2>
     </div>
-  </div>
 
-  <div class="shell">
+    <div class="build__stage" data-build-stage>
+      <div class="build__rig" data-build-rig>
+        ${each(data.screens, stageScreen)}
+      </div>
+    </div>
+
     <div class="build__tabs" data-build-tabs>
       ${each(data.screens, stageTab)}
     </div>
-    <p class="build__outro">${esc(data.outro)}</p>
   </div>
 </section>`;
 }
 
 /* ── Clients line ─────────────────────────────────────────────────────────
-   One horizontal line of the projects we have built. It drifts slowly on its
-   own and slows under the pointer; without JS it is a plain scrollable row. */
+   One row of the projects we have built. It drifts slowly on its own and
+   slows under the pointer; without JS it is a plain row that scrolls. */
 
 export function clientsLine(data) {
   return `
@@ -179,7 +154,6 @@ export function clientsLine(data) {
     <div class="section-head" data-reveal>
       <p class="eyebrow">${esc(data.eyebrow)}</p>
       <h2 id="clients-title">${esc(data.title)}</h2>
-      <p class="lead">${esc(data.lead)}</p>
     </div>
   </div>
   <div class="clients__line" data-clients-line>
@@ -199,8 +173,8 @@ export function clientsLine(data) {
 }
 
 /* ── Three pillars ────────────────────────────────────────────────────────
-   White section. Each pillar pairs copy with one product picture; the picture
-   sits in a frame that leans toward the pointer a few degrees. */
+   White section. A title and one sentence beside one product picture. The
+   picture sits in a soft panel and leans a little toward the pointer. */
 
 function pillarPicture(picture) {
   return `
@@ -218,7 +192,6 @@ export function pillarsSection(data) {
     <div class="section-head" data-reveal>
       <p class="eyebrow">${esc(data.eyebrow)}</p>
       <h2 id="pillars-title">${esc(data.title)}</h2>
-      <p class="lead">${esc(data.lead)}</p>
     </div>
   </div>
   <div class="shell pillars__list">
@@ -227,18 +200,16 @@ export function pillarsSection(data) {
       (item) => `
     <article class="pillar" id="${esc(item.id)}" data-pillar>
       <div class="pillar__copy" data-reveal>
-        <span class="pillar__index" aria-hidden="true">${esc(item.number)}</span>
         <h3 class="pillar__title">${esc(item.title)}</h3>
         <p class="pillar__body">${esc(item.body)}</p>
-        <ul class="pillar__points">
-          ${each(item.points, (p) => `<li>${esc(p)}</li>`)}
-        </ul>
-        <a class="link" href="${esc(item.link.href)}">${esc(item.link.label)}</a>
+        <a class="btn btn--secondary" href="${esc(item.link.href)}">${esc(item.link.label)}</a>
       </div>
       <div class="pillar__visual" data-reveal>
-        <div class="pillar__frame" data-tilt>
-          ${pillarPicture(item.picture)}
-          <span class="pillar__glare"></span>
+        <div class="pillar__panel">
+          <div class="pillar__frame" data-tilt>
+            ${pillarPicture(item.picture)}
+            <span class="pillar__glare"></span>
+          </div>
         </div>
       </div>
     </article>`
@@ -256,7 +227,6 @@ export function teamBand(data, members) {
           width="${person.photoWidth}" height="${person.photoHeight}" loading="lazy">
         <span class="teamtile__name">${esc(person.name)}</span>
         <span class="teamtile__role">${esc(person.role)}</span>
-        <a class="teamtile__mail" href="mailto:${esc(person.email)}">${esc(person.email)}</a>
       </li>`).join('\n');
 
   return `
@@ -265,7 +235,6 @@ export function teamBand(data, members) {
     <div class="section-head" data-reveal>
       <p class="eyebrow">${esc(data.eyebrow)}</p>
       <h2 id="ekipa-band">${esc(data.title)}</h2>
-      <p class="lead">${esc(data.lead)}</p>
     </div>
     <ul class="teamgrid">
 ${tiles}
@@ -277,10 +246,9 @@ ${tiles}
 </section>`;
 }
 
-/* ── Immersive CTA ────────────────────────────────────────────────────────
-   A slow, low-contrast field drifts behind the panel. It is drawn on a canvas
-   that sits behind the form, never over it, and it does not render at all when
-   the visitor prefers reduced motion. */
+/* ── Closing CTA ──────────────────────────────────────────────────────────
+   A rounded black panel with a soft blue glow, the title on the left and the
+   short form on the right. */
 
 export function immersiveCta(data) {
   const fields = each(data.fields, (field) => {
@@ -305,24 +273,23 @@ export function immersiveCta(data) {
 
   return `
 <section class="ctaband" id="povprasevanje" aria-labelledby="cta-title">
-  <canvas class="ctaband__field" data-cta-field aria-hidden="true"></canvas>
-  <div class="shell ctaband__inner">
-    <div class="ctaband__copy">
-      <p class="eyebrow eyebrow--onDark">${esc(data.eyebrow)}</p>
-      <h2 id="cta-title">${esc(data.title)}</h2>
-      <p class="lead lead--onDark">${esc(data.lead)}</p>
-    </div>
+  <div class="ctaband__panel">
+    <div class="shell ctaband__inner">
+      <div class="ctaband__copy">
+        <p class="eyebrow eyebrow--onDark">${esc(data.eyebrow)}</p>
+        <h2 id="cta-title">${esc(data.title)}</h2>
+      </div>
 
-    <form class="ctaform" name="povprasevanje" method="post" action="${esc(action)}"${
-      endpoint ? ` data-endpoint="${esc(endpoint)}"` : ' enctype="text/plain"'
-    } data-contact-form>
-      ${fields}
-      <p class="ctaform__actions">
-        <button class="btn btn--primary" type="submit">${esc(data.submitLabel)}</button>
-      </p>
-      <p class="ctaform__note">${esc(data.footnote)}</p>
-      <p class="ctaform__status" data-form-status role="status" aria-live="polite"></p>
-    </form>
+      <form class="ctaform" name="povprasevanje" method="post" action="${esc(action)}"${
+        endpoint ? ` data-endpoint="${esc(endpoint)}"` : ' enctype="text/plain"'
+      } data-contact-form>
+        ${fields}
+        <p class="ctaform__actions">
+          <button class="btn btn--primary" type="submit">${esc(data.submitLabel)}</button>
+        </p>
+        <p class="ctaform__status" data-form-status role="status" aria-live="polite"></p>
+      </form>
+    </div>
   </div>
 </section>`;
 }
@@ -344,9 +311,8 @@ function postCard(post, i) {
 }
 
 /**
- * Blog teaser for the home page. With no posts yet it shows the same honest
- * empty state as the blog index, so the section still has a place on the
- * page without implying unpublished work exists.
+ * Blog teaser for the home page. With no posts yet it says so in one line,
+ * so the section keeps its place without implying unpublished work exists.
  */
 export function blogTeaser(data) {
   const posts = data.items.slice(0, 3);
@@ -361,9 +327,8 @@ export function blogTeaser(data) {
     </div>`
     : `
     <div class="blog-band__empty" data-reveal>
-      <p class="blog-band__empty-title">${esc(data.empty.title)}</p>
-      <p>${esc(data.empty.body)}</p>
-      <a class="link" href="/blog/">Odprite blog</a>
+      <p>${esc(data.homeEmpty)}</p>
+      <a class="btn btn--secondary" href="/blog/">Odprite blog</a>
     </div>`;
 
   return `
@@ -372,7 +337,6 @@ export function blogTeaser(data) {
     <div class="section-head" data-reveal>
       <p class="eyebrow">${esc(data.eyebrow)}</p>
       <h2 id="blog-band">${esc(data.homeTitle)}</h2>
-      <p class="lead">${esc(data.homeLead)}</p>
     </div>
     ${body}
   </div>

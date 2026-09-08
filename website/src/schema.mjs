@@ -150,7 +150,7 @@ export function serviceNode(service) {
     '@type': 'Service',
     '@id': url(`/storitve/${service.slug}/#service`),
     name: service.name,
-    alternateName: `${service.name} — ${service.role}`,
+    alternateName: `${service.name} (${service.role})`,
     serviceType: service.role,
     description: service.answer,
     url: url(`/storitve/${service.slug}/`),
@@ -159,7 +159,7 @@ export function serviceNode(service) {
     availableLanguage: ['sl'],
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
-      name: `Zmožnosti — ${service.name}`,
+      name: `Zmožnosti: ${service.name}`,
       itemListElement: service.capabilities.map((c) => ({
         '@type': 'Offer',
         itemOffered: { '@type': 'Service', name: c.title, description: c.body },
@@ -174,7 +174,7 @@ export function howToNode(pagePath) {
     '@id': `${url(pagePath)}#howto`,
     name: 'Kako poteka uvedba AI sistema za avtomatizacijo',
     description:
-      'Osemstopenjski proces, po katerem AIS Slovenia postavi AI sistem za avtomatizacijo poslovnih procesov — od raziskave do nenehne evolucije.',
+      'Osemstopenjski proces, po katerem AIS Slovenia postavi AI sistem za avtomatizacijo poslovnih procesov, od raziskave do nenehne evolucije.',
     inLanguage: site.lang,
     step: processSteps.map((s, i) => ({
       '@type': 'HowToStep',
@@ -203,7 +203,7 @@ export function contactPageNode(pagePath) {
     '@type': 'ContactPage',
     '@id': `${url(pagePath)}#contactpage`,
     url: url(pagePath),
-    name: 'Kontakt — AIS Slovenia',
+    name: 'Kontakt, AIS Slovenia',
     inLanguage: site.lang,
     about: { '@id': IDS.organization },
   };

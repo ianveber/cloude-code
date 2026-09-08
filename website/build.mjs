@@ -95,7 +95,7 @@ function homePage() {
   return {
     path: '/',
     title: 'AI avtomatizacija in AI chatboti za podjetja | AIS Slovenia',
-    ogTitle: 'AI avtomatizacija. Hitrejši procesi. — AIS Slovenia',
+    ogTitle: 'AI avtomatizacija. Hitrejši procesi. | AIS Slovenia',
     headline: C.hero.seoHeadline,
     /* Only the home page opens with the logo sequence. */
     showIntro: true,
@@ -146,7 +146,7 @@ function servicesIndexPage() {
     })}
     ${definitionList(
       C.services.map((s) => ({
-        term: `${s.name} — ${s.role}`,
+        term: `${s.name} (${s.role})`,
         definition: s.bestFor,
       }))
     )}
@@ -159,7 +159,7 @@ function servicesIndexPage() {
 
   return {
     path: '/storitve/',
-    title: 'AI sistemi za podjetja — storitve | AIS Slovenia',
+    title: 'Storitve: AI sistemi za podjetja | AIS Slovenia',
     description:
       'Tri področja avtomatizacije za podjetja: administracija in operacije, prodaja in komunikacija s strankami ter spremljanje trga. Vse v slovenščini.',
     keywords: ['AI agenti za podjetja', 'AI chatbot za spletno stran', 'voice AI agent slovenščina'],
@@ -271,7 +271,7 @@ function processPage() {
 
   return {
     path: '/proces/',
-    title: 'Proces uvedbe AI sistema — 8 korakov | AIS Slovenia',
+    title: 'Proces uvedbe AI sistema v 8 korakih | AIS Slovenia',
     description:
       'Kako poteka uvedba AI avtomatizacije: raziskava, diagnostika, potopitev, arhitektura, prototip, kalibracija, uvedba in evolucija.',
     keywords: ['uvedba AI sistema', 'proces avtomatizacije', 'AI implementacija'],
@@ -310,7 +310,7 @@ function aboutPage() {
 
   return {
     path: '/o-podjetju/',
-    title: 'O podjetju AIS Slovenia — AI avtomatizacija iz Ljubljane',
+    title: 'O podjetju AIS Slovenia, AI avtomatizacija iz Ljubljane',
     description:
       'AIS Slovenia je slovensko podjetje za avtomatizacijo poslovnih procesov z umetno inteligenco. Sisteme gradimo okoli orodij, ki jih podjetje že uporablja.',
     keywords: ['AIS Slovenia', 'Artificial Intelligence Slovenia', 'AI podjetje Ljubljana'],
@@ -335,7 +335,7 @@ function teamPage() {
 
   return {
     path: '/ekipa/',
-    title: 'Ekipa AIS Slovenia — Anej Vučič, Nejc Feigel Boh, Ian Veber',
+    title: 'Ekipa AIS Slovenia: Anej Vučič, Nejc Feigel Boh, Ian Veber',
     description:
       'Spoznajte ekipo AIS Slovenia: Anej Vučič (CEO), Nejc Feigel Boh (CEO) in Ian Veber (CTO). Majhna ekipa, ki AI sisteme postavi in jih tudi vzdržuje.',
     keywords: ['ekipa AIS Slovenia', 'Anej Vučič', 'Nejc Feigel Boh', 'Ian Veber'],
@@ -392,7 +392,7 @@ function contactPage() {
 
   return {
     path: '/kontakt/',
-    title: 'Kontakt — rezervirajte uvodni pogovor | AIS Slovenia',
+    title: 'Kontakt: rezervirajte uvodni pogovor | AIS Slovenia',
     description:
       'Rezervirajte uvodni pogovor in preverite, ali je AI avtomatizacija smiselna za vaše podjetje. Pišite na info@ais-slovenia.si ali pokličite +386 70 717 087.',
     keywords: ['kontakt AIS Slovenia', 'AI posvet', 'rezervacija posveta'],
@@ -420,7 +420,7 @@ function notFoundPage() {
 
   return {
     path: '/404.html',
-    title: 'Strani ni — AIS Slovenia',
+    title: 'Strani ni | AIS Slovenia',
     description:
       'Iskane strani ni bilo mogoče najti. Vrnite se na domačo stran AIS Slovenia ali si oglejte naše storitve za avtomatizacijo poslovnih procesov.',
     breadcrumbs: [HOME_CRUMB],

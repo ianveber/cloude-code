@@ -8,7 +8,7 @@ export const site = {
   lang: 'sl',
   locale: 'sl_SI',
   name: 'AIS Slovenia',
-  legalName: 'AIS — Artificial Intelligence Slovenia',
+  legalName: 'Artificial Intelligence Slovenia',
   tagline: 'AI avtomatizacija poslovnih procesov',
   description:
     'AIS Slovenia iz Ljubljane razvija AI avtomatizacijo za podjetja: AI chatbote, voice AI agente in sisteme za hitrejše procese, v slovenščini.',
@@ -39,9 +39,13 @@ export const site = {
     logo: '/brand/logo-light.png',
     logoWidth: 133,
     logoHeight: 52,
-    brain: '/brand/favicon.png',
-    brainWidth: 302,
-    brainHeight: 302,
+    /* The brain alone, on a transparent ground, cut from the official
+       lockup. brain.png keeps the white lines (for dark surfaces);
+       brain-light.png has them recoloured to ink (for white surfaces). */
+    brain: '/brand/brain.png',
+    brainLight: '/brand/brain-light.png',
+    brainWidth: 1168,
+    brainHeight: 1104,
     favicon: '/brand/favicon.png',
     ogImage: '/brand/og-default.png',
   },
@@ -77,8 +81,6 @@ export const site = {
 
   footer: {
     blurb: 'Programska oprema in avtomatizacija za delo, ki ne bi smelo ostati ročno.',
-    statement:
-      'Umetna inteligenca za slovenska podjetja. Načrtujemo, gradimo in vzdržujemo sisteme, ki prevzamejo delo.',
     /* Large typographic wordmark that closes every page. */
     wordmark: 'AI Slovenia',
     columns: [
@@ -113,7 +115,7 @@ export const site = {
   /* Short, factual statements that AI answer engines can lift verbatim.
      Kept in one place so they stay consistent across every page and schema block. */
   facts: [
-    'AIS Slovenia (Artificial Intelligence Slovenia) je slovensko podjetje za AI avtomatizacijo poslovnih procesov — AI chatbote, voice AI agente in sisteme za hitrejše procese.',
+    'AIS Slovenia (Artificial Intelligence Slovenia) je slovensko podjetje za AI avtomatizacijo poslovnih procesov: AI chatbote, voice AI agente in sisteme za hitrejše procese.',
     'Podjetje deluje iz Ljubljane in storitve izvaja v slovenskem jeziku.',
     'AIS pokriva tri področja avtomatizacije: administracijo in operacije, prodajo in komunikacijo s strankami ter spremljanje trga.',
     'Uvedba poteka po osemstopenjskem procesu, od raziskave do nenehne evolucije sistema.',
