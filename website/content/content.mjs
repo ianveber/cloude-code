@@ -287,6 +287,8 @@ export const team = {
       phone: '+386 70 717 087',
       phoneHref: 'tel:+38670717087',
       photo: '/team/anej.jpg',
+      photoWidth: 630,
+      photoHeight: 788,
     },
     {
       name: 'Nejc Feigel Boh',
@@ -295,12 +297,16 @@ export const team = {
       phone: '+386 41 709 281',
       phoneHref: 'tel:+38641709281',
       photo: '/team/nejc.jpg',
+      photoWidth: 788,
+      photoHeight: 985,
     },
     {
       name: 'Ian Veber',
       role: 'CTO',
       email: 'ian@ais-slovenia.si',
       photo: '/team/ian.jpg',
+      photoWidth: 560,
+      photoHeight: 700,
     },
   ],
 };

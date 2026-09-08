@@ -180,6 +180,11 @@ function findProblems(path, width) {
       if (inconsistent) {
         components.push(`capability artwork ${index + 1} breaks the 1.5px round line grammar`);
       }
+      const active = [...svg.querySelectorAll('.art__active [stroke], .art__active path, .art__active circle, .art__spark, .art__pip')];
+      const offBlue = active.find((element) => getComputedStyle(element).stroke !== 'rgb(29, 119, 254)');
+      if (!active.length || offBlue) {
+        components.push(`capability artwork ${index + 1} active stroke is not AIS blue`);
+      }
     });
 
     const capabilityItems = [...document.querySelectorAll('.capitem')];
@@ -192,13 +197,21 @@ function findProblems(path, width) {
         components.push(`capability chapter ${index + 1} does not alternate at desktop`);
       }
       const body = item.querySelector('.capitem__body');
-      const probe = document.createElement('span');
-      probe.style.cssText = `position:absolute;width:1ch;font:${getComputedStyle(body).font}`;
-      document.body.append(probe);
-      const maxCopyCh = parseFloat(getComputedStyle(body).maxWidth) / probe.getBoundingClientRect().width;
-      probe.remove();
-      if (maxCopyCh < 56 || maxCopyCh > 68) {
-        components.push(`capability chapter ${index + 1} copy limit is ${maxCopyCh.toFixed(1)}ch`);
+      let specifiedCh = null;
+      for (const sheet of document.styleSheets) {
+        let rules;
+        try {
+          rules = [...sheet.cssRules];
+        } catch {
+          continue;
+        }
+        for (const rule of rules) {
+          if (!rule.selectorText || !rule.style || !body.matches(rule.selectorText)) continue;
+          if (rule.style.maxWidth.endsWith('ch')) specifiedCh = parseFloat(rule.style.maxWidth);
+        }
+      }
+      if (specifiedCh == null || specifiedCh < 56 || specifiedCh > 68) {
+        components.push(`capability chapter ${index + 1} copy limit is ${specifiedCh ?? 'missing'}ch`);
       }
     });
 
@@ -225,6 +238,21 @@ function findProblems(path, width) {
         phaseTops.size !== 1
       ) {
         components.push('process phases do not form one horizontal sequence with an AIS-blue baseline');
+      } else {
+        const trackBox = process.getBoundingClientRect();
+        const lineCenter =
+          trackBox.top + parseFloat(baseline.top) + parseFloat(baseline.height) / 2;
+        phases.forEach((phase, index) => {
+          const marker = phase.querySelector('.step__num');
+          if (!marker) return;
+          const markerBox = marker.getBoundingClientRect();
+          const markerCenter = markerBox.top + markerBox.height / 2;
+          if (Math.abs(lineCenter - markerCenter) > 2) {
+            components.push(
+              `process baseline misses marker ${index + 1} by ${Math.abs(lineCenter - markerCenter).toFixed(1)}px`
+            );
+          }
+        });
       }
     }
 
@@ -242,12 +270,57 @@ function findProblems(path, width) {
         `team composition has ${members.length} members, ${teamColumns} columns and ${crops.size} crop ratios`
       );
     }
+    if (team.querySelector('.teamtile__photo--empty, .teamtile--empty') || members.some((member) => !member.querySelector('img'))) {
+      components.push('team composition includes an empty placeholder');
+    }
+    members.forEach((member, index) => {
+      const photo = member.querySelector('img')?.getBoundingClientRect();
+      if (!photo) return;
+      const ratio = photo.width / photo.height;
+      if (Math.abs(ratio - 0.8) > 0.02) {
+        components.push(`team photo ${index + 1} crop is ${ratio.toFixed(3)}; expected 4:5`);
+      }
+    });
+
+    const explorerCopyLefts = new Set(
+      [...document.querySelectorAll('.explorer__item .explorer__copy')].map((copy) =>
+        Math.round(copy.getBoundingClientRect().left)
+      )
+    );
+    if (explorerCopyLefts.size > 1) {
+      components.push('explorer active state shifts copy');
+    }
 
     document.querySelectorAll('.explorer__item').forEach((item, index) => {
       if (parseFloat(getComputedStyle(item).opacity) < 0.95) {
         components.push(`explorer item ${index + 1} relies on low opacity`);
       }
     });
+  }
+
+  if (path === '/' && [1024, 768, 390].includes(width)) {
+    const process = document.querySelector('.process-overview ol');
+    if (process) {
+      const rail = getComputedStyle(process, '::before');
+      const track = process.getBoundingClientRect();
+      const railLeft = track.left + parseFloat(rail.left);
+      const railRight = railLeft + Math.max(parseFloat(rail.width), 1);
+      const railTop = rail.top === 'auto' ? track.top : track.top + parseFloat(rail.top);
+      const railBottom = rail.bottom === 'auto' || rail.bottom === '0px' ? track.bottom : track.bottom - parseFloat(rail.bottom);
+      [...process.querySelectorAll('h3, p')].forEach((text) => {
+        const box = text.getBoundingClientRect();
+        const overlaps =
+          box.left < railRight - 0.5 &&
+          box.right > railLeft + 0.5 &&
+          box.top < railBottom - 0.5 &&
+          box.bottom > railTop + 0.5;
+        if (overlaps) {
+          components.push(
+            `process rail intersects "${text.textContent.trim().slice(0, 24)}" at ${width}px`
+          );
+        }
+      });
+    }
   }
 
   if (path === '/' && width === 390) {
@@ -261,6 +334,33 @@ function findProblems(path, width) {
   }
 
   return { overflow, components, tooDim, smallTargets };
+}
+
+async function checkExplorerSummaries(page, base) {
+  await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(
+    () =>
+      document.documentElement.classList.contains('motion-on') ||
+      document.documentElement.classList.contains('motion-off')
+  );
+  await new Promise((resolve) => setTimeout(resolve, 80));
+  const hidden = await page.evaluate(() =>
+    [...document.querySelectorAll('.explorer__copy p')].flatMap((paragraph, index) => {
+      const chars = [...paragraph.querySelectorAll('.char')].filter(
+        (node) => !node.classList.contains('char--space')
+      );
+      const opacities = chars.length
+        ? chars.map((node) => parseFloat(getComputedStyle(node).opacity))
+        : [parseFloat(getComputedStyle(paragraph).opacity)];
+      const min = Math.min(...opacities);
+      return min < 0.95
+        ? [`item ${index + 1} min-opacity ${min.toFixed(2)} "${paragraph.textContent.trim().slice(0, 36)}"`]
+        : [];
+    })
+  );
+  return hidden.length
+    ? `Service explorer — default-motion summaries are not fully visible (${hidden.join('; ')})`
+    : null;
 }
 
 async function checkExplorerFocus(page, base) {
@@ -465,6 +565,19 @@ async function main() {
   const explorerFocusError = await checkExplorerFocus(focusPage, base);
   if (explorerFocusError) errors.push(explorerFocusError);
   await focusPage.close();
+
+  const motionPage = await browser.newPage();
+  await motionPage.evaluateOnNewDocument(() => {
+    try {
+      sessionStorage.setItem('ais-intro', '1');
+    } catch {
+      /* ignore */
+    }
+  });
+  await motionPage.setViewport({ width: 1440, height: 1000 });
+  const explorerSummaryError = await checkExplorerSummaries(motionPage, base);
+  if (explorerSummaryError) errors.push(explorerSummaryError);
+  await motionPage.close();
 
   const convergePage = await browser.newPage();
   await convergePage.evaluateOnNewDocument(() => {

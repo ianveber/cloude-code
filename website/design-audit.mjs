@@ -156,6 +156,11 @@ expect(
     /--control-radius:\s*10px;/.test(styles),
   'Card and control radii must use two distinct, non-duplicated tokens.'
 );
+expect(
+  /\.converge\s*\{[^}]*--settled:\s*1;/.test(styles) &&
+    /html\.js:not\(\.motion-off\) \.converge\s*\{[^}]*--settled:\s*0;/.test(styles),
+  'Converge settled default must stay readable without JS and start at 0 for JS motion.'
+);
 
 const twinButtons = [...pages.products.matchAll(
   /<article class="twin__card"[\s\S]*?<a class="btn (btn--(?:primary|secondary))"/g

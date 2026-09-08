@@ -684,7 +684,7 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
   position: absolute;
   left: var(--space-2);
   right: var(--space-2);
-  top: 1.15rem;
+  top: calc(1rem - 1px);
   height: 2px;
   background: var(--blue);
 }
@@ -697,7 +697,7 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
   background: transparent;
   border: none;
   box-shadow: none;
-  padding: var(--space-5) 0 var(--space-3);
+  padding: 0 0 var(--space-3);
   overflow: visible;
 }
 
@@ -715,6 +715,11 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
 .process-overview .step__num {
   position: relative;
   z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  min-height: 2rem;
   width: fit-content;
   background: var(--paper);
 }
@@ -1542,13 +1547,14 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
 
 .explorer__item {
   border-top: 1px solid var(--line);
+  border-left: 2px solid transparent;
   padding: var(--space-4) 0 var(--space-4);
+  padding-left: var(--space-3);
   opacity: 1;
 }
 
 .explorer__item.is-active {
-  border-left: 2px solid var(--blue);
-  padding-left: var(--space-3);
+  border-left-color: var(--blue);
 }
 
 .explorer__item.is-active .explorer__copy h3 { font-weight: 700; }
@@ -1957,6 +1963,10 @@ html:not(.is-intro) .hero__intro { display: none; }
   --settled: 1;
   padding-top: clamp(4rem, 9vw, 7rem);
   padding-bottom: var(--space-5);
+}
+
+html.js:not(.motion-off) .converge {
+  --settled: 0;
 }
 
 .converge__head {
@@ -2592,10 +2602,16 @@ html.motion-on .capitem.is-in .art__pip {
   .capitem:nth-child(even) .capitem__copy { order: 0; }
   .ctaband__inner { grid-template-columns: 1fr; }
   .process-overview__track { grid-template-columns: 1fr; }
-  .process-overview__track::before {
-    left: 0.7rem;
-    right: auto;
+  .process-overview .card { padding-left: 2.75rem; }
+  .process-overview .step__num {
+    position: absolute;
+    left: 0;
     top: 0;
+  }
+  .process-overview__track::before {
+    left: calc(1rem - 1px);
+    right: auto;
+    top: 1rem;
     bottom: 0;
     width: 2px;
     height: auto;

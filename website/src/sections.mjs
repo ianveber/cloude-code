@@ -72,7 +72,7 @@ export function featureExplorer(services) {
         <a class="explorer__copy" href="/storitve/${esc(s.slug)}/">
           <span class="explorer__kicker">${esc(s.role)}</span>
           <h3>${esc(s.name)}</h3>
-          <p data-type-chars>${esc(s.summary)}</p>
+          <p>${esc(s.summary)}</p>
         </a>
       </li>`
       )}

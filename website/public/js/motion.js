@@ -418,18 +418,9 @@
     var scenes = document.querySelectorAll('[data-explorer-scene]');
     if (!items.length) return;
 
-    items.forEach(function (item) {
-      var para = item.querySelector('[data-type-chars]');
-      if (para && !reduce) splitChars(para);
-    });
-
     function activate(slug) {
       items.forEach(function (el) {
-        var on = el.getAttribute('data-explorer-item') === slug;
-        el.classList.toggle('is-active', on);
-        var para = el.querySelector('[data-type-chars]');
-        if (!para) return;
-        if (!reduce && on && !para.classList.contains('is-typed')) typeChars(para, 0.012);
+        el.classList.toggle('is-active', el.getAttribute('data-explorer-item') === slug);
       });
       scenes.forEach(function (el) {
         el.classList.toggle('is-active', el.getAttribute('data-explorer-scene') === slug);
@@ -458,12 +449,6 @@
     items.forEach(function (el) {
       observer.observe(el);
     });
-
-    var first = items[0];
-    if (first && !reduce) {
-      var firstPara = first.querySelector('[data-type-chars]');
-      if (firstPara) typeChars(firstPara, 0.012);
-    }
   }
 
   function reveals() {

@@ -168,7 +168,7 @@ export function teamBand(data, members) {
   const tiles = members.map((person, i) => `
       <li class="teamtile" style="--i:${i}">
         <img class="teamtile__photo" src="${esc(person.photo)}" alt="${esc(person.name)}"
-          width="360" height="360" loading="lazy">
+          width="${person.photoWidth}" height="${person.photoHeight}" loading="lazy">
         <span class="teamtile__name">${esc(person.name)}</span>
         <span class="teamtile__role">${esc(person.role)}</span>
       </li>`).join('\n');
