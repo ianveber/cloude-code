@@ -40,6 +40,14 @@ the audit checks) that drift on their own and slide a little against the
 scroll, plus a faint fall-off toward the bottom. It is the only "texture" on
 the page and it must stay barely noticeable.
 
+In front of the depth layer, still behind the page, sits Ian's **code-glow
+canvas** (`src/code-glow.html`, dropped into `layout.mjs` right after
+`<body>` on every page). It is his snippet, included byte for byte: faint
+lines of code type themselves in under the pointer and fade once it moves on.
+Do not edit the snippet; tune it only if Ian asks, in its own `CFG` block.
+The canvas is `z-index: 0`, so `main`, `.breadcrumbs` and `.site-footer` are
+lifted to `z-index: 1` in `styles.css` (the audit checks both halves).
+
 Supporting pages exist for products, news, events, blog, services, process,
 about, team, FAQ, and contact. Products / news / events / blog currently
 render **one honest empty state**. Do not invent catalogue entries to fill them.

@@ -6,6 +6,8 @@
  * every page in the initial response.
  */
 
+import { readFileSync } from 'node:fs';
+
 import { esc, join, each, jsonLd, absolute } from './html.mjs';
 import { buildGraph } from './schema.mjs';
 import { introOverlay } from './showcase.mjs';
@@ -13,6 +15,10 @@ import site from '../content/site.mjs';
 import { team } from '../content/content.mjs';
 
 const url = (path) => absolute(site.origin, path);
+
+/* Ian's code-glow background, included exactly as supplied (see src/code-glow.html).
+   It goes straight after <body>, as its own header asks. */
+const codeGlow = readFileSync(new URL('./code-glow.html', import.meta.url), 'utf8');
 
 /* ── Head ─────────────────────────────────────────────────────────────── */
 
@@ -249,7 +255,7 @@ export function renderPage(page) {
 ${head(page)}
 </head>
 <body>
-<a class="skip-link" href="#main">Preskoči na vsebino</a>
+${codeGlow}<a class="skip-link" href="#main">Preskoči na vsebino</a>
 <div class="depth" aria-hidden="true" data-depth><span class="depth__a"></span><span class="depth__b"></span></div>
 ${page.showIntro ? introOverlay() : ''}
 ${header(page)}

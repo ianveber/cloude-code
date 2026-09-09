@@ -33,6 +33,12 @@ const allHtml = Object.values(pages).join('\n');
 const componentMarkup = `${layout}\n${sections}\n${showcase}`;
 
 expect(!/--violet:|--teal:|--amber:|--rose:/.test(styles), 'Arbitrary accent tokens remain.');
+const codeGlow = await read('src/code-glow.html');
+expect(
+  Object.values(pages).every((html) => html.includes(codeGlow) && /<body>\n<!--\n  Code Glow Background/.test(html)) &&
+    /^main,\n\.breadcrumbs,\n\.site-footer \{\n  position: relative;\n  z-index: 1;\n\}/m.test(styles),
+  'Code-glow background must be included verbatim right after <body> on every page, with the page content lifted above it.'
+);
 expect(!/body::after/.test(styles), 'Fixed paper-grain overlay remains.');
 expect(
   /class="depth" aria-hidden="true"/.test(home) &&

@@ -2519,6 +2519,16 @@ html.motion-on .marquee--reverse .marquee__track {
   pointer-events: none;
 }
 
+/* The code-glow canvas (src/code-glow.html) is fixed at z-index 0 behind the
+   page, so the page content is lifted above it, as the snippet asks. The header
+   and skip link already sit higher on their own. */
+main,
+.breadcrumbs,
+.site-footer {
+  position: relative;
+  z-index: 1;
+}
+
 .depth::before {
   content: '';
   position: absolute;
