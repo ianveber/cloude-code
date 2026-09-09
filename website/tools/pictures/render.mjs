@@ -38,7 +38,7 @@ const SCALE = 2;
 /* Scenes live in two files: the three pillar screens and the product demos. */
 const FILES = {
   'scene.html': ['saas', 'flow', 'security'],
-  'products.html': ['inspectus-vldr', 'inspectus-vin', 'athlos', 'aisos', 'ais-command', 'model-premazi', 'pacom', 'zalife'],
+  'products.html': ['inspectus-vldr', 'inspectus-vin', 'athlos', 'aisos', 'ais-command', 'model-premazi', 'pacom', 'zalife', 'elementum', 'tower-spa', 'asya-grafy', 'si-big', 'heva', 'epolac'],
 };
 const SCENES = Object.values(FILES).flat();
 

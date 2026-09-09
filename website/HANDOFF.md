@@ -171,7 +171,11 @@ replaced by the grid/list.
 
 `products.items` is live: our own products (ATHLOS, AIS Command, AISOS) and
 the projects built for clients (INSPECTUS VLDR and VIN filter, the coating
-model, Pacom, ZaLife). Each has a demo screen rendered from
+model, Pacom, ZaLife, Elementum, Tower Spa Celje, Dr. Asya Grafy Bio
+Institute, SI-BIG, HEVA, Epolac). **The last six descriptions and screens
+were drafted at Ian's request without source material**, to fit each
+client's business and our three service areas; Ian confirms or corrects them
+before a production deploy. Each has a demo screen rendered from
 `tools/pictures/products.html` (`node tools/pictures/render.mjs`). The
 screens are drawn after the real systems; the numbers on them are
 illustrative. Add a project by adding a stage to `products.html`, listing its

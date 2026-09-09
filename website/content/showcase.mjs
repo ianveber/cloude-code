@@ -195,9 +195,15 @@ export const teamShowcase = {
 };
 
 /* ── Products and projects ──────────────────────────────────────────────
-   Our own products first, then the systems we built for clients. Every
-   picture is a demo screen rendered from tools/pictures/products.html after
-   the real system; the numbers on the screens are illustrative. */
+   Our own products first, then the systems built for clients. Every
+   picture is a demo screen rendered from tools/pictures/products.html; the
+   numbers on the screens are illustrative.
+
+   The first eight entries are described from our repositories and Notion.
+   The last six (Elementum, Tower Spa Celje, Dr. Asya Grafy, SI-BIG, HEVA,
+   Epolac) were drafted at Ian's request without source material, to fit each
+   client's business and our service areas. Ian confirms or corrects them
+   before a production deploy. */
 
 export const products = {
   eyebrow: 'Izdelki in projekti',
@@ -277,6 +283,60 @@ export const products = {
       client: 'ZaLife',
       body: 'Znamka in vsebinski sistem za program osebnega razvoja najstnikov: sredstva znamke, ponudbe za šole in starše ter koledar objav na enem mestu, da ekipa ne išče več po mapah.',
       picture: { src: '/pictures/zalife', alt: 'Sredstva znamke, ponudbe in koledar objav za ZaLife.', width: 1600, height: 1000 },
+    },
+    {
+      id: 'elementum',
+      kicker: 'Za stranko',
+      kind: 'Avtomatizacija prodaje',
+      name: 'Elementum',
+      client: 'Elementum, plemenite kovine',
+      body: 'Spletni svetovalec, ki obiskovalcem v slovenščini odgovarja o nakupu in hrambi zlata in srebra, tudi ponoči, in resna povpraševanja preda svetovalcem. Zjutraj ekipa dobi kratek tržni pregled: cene, novice in premiki konkurence, zbrani iz virov, ki jih prej pregledovali ročno.',
+      picture: { src: '/pictures/elementum', alt: 'Jutranji tržni pregled za svetovalce ob pogovoru spletnega svetovalca s stranko.', width: 1600, height: 1000 },
+    },
+    {
+      id: 'tower-spa',
+      kicker: 'Za stranko',
+      kind: 'Avtomatizacija prodaje',
+      name: 'Tower Spa Celje',
+      client: 'Tower Spa Celje',
+      body: 'Asistent za rezervacije v wellnessu v srednjeveškem stolpu. Odgovarja na vprašanja o paketih, savnah in masažah, sprejme rezervacijo, pošlje opomnik dan prej in ob odpovedi sprosti termin. Vprašanja za skupine in dogodke preda lastniku.',
+      picture: { src: '/pictures/tower-spa', alt: 'Tedenski pregled rezervacij Tower Spa z zadnjimi sporočili strank.', width: 1600, height: 1000 },
+    },
+    {
+      id: 'asya-grafy',
+      kicker: 'Za stranko',
+      kind: 'AI svetovalec',
+      name: 'Dr. Asya Grafy Bio Institute',
+      client: 'Dr. Asya Grafy Bio Institute',
+      body: 'Svetovalec za nego kože v spletni trgovini. Iz dokumentacije o izdelkih odgovori na vprašanja o suhi, občutljivi ali zreli koži, predlaga vrstni red izdelkov in vsak izdelek pošlje v košarico. Zdravstvena vprašanja preda človeku.',
+      picture: { src: '/pictures/asya-grafy', alt: 'Svetovalec za nego kože v mobilni trgovini ob pregledu najpogostejših vprašanj strank.', width: 1600, height: 1000 },
+    },
+    {
+      id: 'si-big',
+      kicker: 'Za stranko',
+      kind: 'Spremljanje trga',
+      name: 'SI-BIG',
+      client: 'SI-BIG Group',
+      body: 'Sistem, ki vsako jutro pregleda razpise, iskanja partnerjev in novice s šestih balkanskih trgov, jih oceni po merilih posamezne stranke in ekipi pripravi seznam, ki ga pošlje naprej. Iskanje, ki je prej vzelo dopoldne, je zdaj pregled ob kavi.',
+      picture: { src: '/pictures/si-big', alt: 'Seznam priložnosti po balkanskih trgih, ocenjenih po ujemanju s strankami.', width: 1600, height: 1000 },
+    },
+    {
+      id: 'heva',
+      kicker: 'Za stranko',
+      kind: 'Avtomatizacija administracije',
+      name: 'HEVA',
+      client: 'HEVA, upravljanje nepremičnin',
+      body: 'Delovni nalogi za upravljanje in vzdrževanje stavb. Iz e-pošte in telefonskih klicev asistent prepozna naslov, težavo in nujnost, ustvari nalog in predlaga prostega monterja. Ekipa nalog dobi na telefon, po opravljenem delu pa gre račun ven sam.',
+      picture: { src: '/pictures/heva', alt: 'Tabla delovnih nalogov HEVA: novo iz sporočil, razporejeno in opravljeno.', width: 1600, height: 1000 },
+    },
+    {
+      id: 'epolac',
+      kicker: 'Za stranko',
+      kind: 'AI asistent',
+      name: 'Epolac',
+      client: 'Epolac, Izrael',
+      body: 'Tehnični asistent za proizvajalca barv in premazov. Iz tehničnih in varnostnih listov odgovarja na vprašanja izvajalcev in distributerjev v angleščini in hebrejščini, navede vir in izračuna porabo. Vprašanja o cenah in projektih preda prodaji.',
+      picture: { src: '/pictures/epolac', alt: 'Tehnični asistent Epolac odgovarja na vprašanje o hidroizolaciji z navedbo tehničnega lista.', width: 1600, height: 1000 },
     },
   ],
   empty: {
