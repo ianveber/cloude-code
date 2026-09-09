@@ -198,7 +198,8 @@ expect(
   'Tile, panel and control radii must use three distinct tokens.'
 );
 expect(
-  /\.build__rig\.is-spread \.build__screen\.is-left\s*\{/.test(styles) &&
+  /\.build__screen\.is-left\s*\{/.test(styles) &&
+    /\.build__screen\.is-right\s*\{/.test(styles) &&
     /\.build__screen\.is-active\s*\{/.test(styles) &&
     /class="build__screen is-active"/.test(home) &&
     /class="build__screen is-left"/.test(home) &&
@@ -293,7 +294,6 @@ expect(
 );
 
 for (const [route, html] of Object.entries({
-  products: pages.products,
   news: pages.news,
   events: pages.events,
   blog: pages.blog,
@@ -301,6 +301,12 @@ for (const [route, html] of Object.entries({
   const emptyStates = html.match(/class="[^"]*\bempty-state\b[^"]*"/g) ?? [];
   expect(emptyStates.length === 1, `${route} must render exactly one honest empty state.`);
 }
+expect(
+  !/\bempty-state\b/.test(pages.products) &&
+    (pages.products.match(/class="project" id="/g) ?? []).length >= 6 &&
+    /\/pictures\/(?:athlos|ais-command|aisos|inspectus-vldr|inspectus-vin|model-premazi|pacom|zalife)\.webp/.test(pages.products),
+  'Products page must list the real products and projects with rendered demo screens.'
+);
 
 const order = [
   'data-intro-stage',
@@ -308,6 +314,7 @@ const order = [
   'data-build',
   'data-clients',
   'data-pillars',
+  'data-products',
   'team-band',
   'blog-band',
   'pogosta-vprasanja',

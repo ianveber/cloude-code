@@ -431,7 +431,19 @@ export function blogGrid(data) {
 </section>`;
 }
 
-/* ── Products ─────────────────────────────────────────────────────────── */
+/* ── Products and projects ──────────────────────────────────────────────
+   Each project is a row: a demo screen in a soft panel beside the name, a
+   tag and one short paragraph. Sides alternate. The home page shows the
+   first four as tiles. */
+
+function projectPicture(picture) {
+  return `
+        <picture>
+          <source srcset="${esc(picture.src)}.webp" type="image/webp">
+          <img src="${esc(picture.src)}.jpg" alt="${esc(picture.alt)}"
+            width="${picture.width}" height="${picture.height}" loading="lazy" decoding="async">
+        </picture>`;
+}
 
 export function productGrid(data) {
   if (data.items.length === 0) {
@@ -439,26 +451,64 @@ export function productGrid(data) {
   }
 
   return `
-<section class="section" aria-labelledby="izdelki-list">
+<section class="section projects" aria-labelledby="izdelki-list" data-projects>
   <div class="shell">
-    <h2 class="visually-hidden" id="izdelki-list">Seznam izdelkov</h2>
-    <div class="grid grid--2 productgrid">
+    <h2 class="visually-hidden" id="izdelki-list">Seznam izdelkov in projektov</h2>
+  </div>
+  <div class="shell projects__list">
+    ${each(
+      data.items,
+      (item) => `
+    <article class="project" id="${esc(item.id)}" data-project>
+      <div class="project__copy" data-reveal>
+        <p class="project__kicker">${esc(item.kicker)}${item.kind ? ` <span class="project__kind">${esc(item.kind)}</span>` : ''}</p>
+        <h3 class="project__name">${esc(item.name)}</h3>
+        ${item.client ? `<p class="project__client">za ${esc(item.client)}</p>` : ''}
+        <p class="project__body">${esc(item.body)}</p>
+      </div>
+      <div class="project__visual" data-reveal>
+        <div class="project__panel">
+          <div class="project__frame" data-tilt>
+            ${projectPicture(item.picture)}
+            <span class="pillar__glare"></span>
+          </div>
+        </div>
+      </div>
+    </article>`
+    )}
+  </div>
+</section>`;
+}
+
+/** Home teaser: the first four products as tiles, then a link to all. */
+export function productsTeaser(data) {
+  if (data.items.length === 0) return '';
+  const items = data.items.slice(0, 4);
+
+  return `
+<section class="section products-band" aria-labelledby="products-band" data-products>
+  <div class="shell">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">${esc(data.eyebrow)}</p>
+      <h2 id="products-band">${esc(data.homeTitle)}</h2>
+    </div>
+    <ul class="ptiles">
       ${each(
-        data.items,
-        (item) => `
-      <article class="product" data-reveal>
-        <p class="product__kicker">${esc(item.kicker)}</p>
-        <h3 class="product__name">${esc(item.name)}</h3>
-        <p class="product__body">${esc(item.body)}</p>
-        <ul class="product__points">
-          ${each(item.points, (p) => `<li>${esc(p)}</li>`)}
-        </ul>
-        <p class="product__foot">
-          <span class="chip">${esc(item.status)}</span>
-          <a class="link" href="${esc(item.href)}">Podrobneje</a>
-        </p>
-      </article>`
+        items,
+        (item, i) => `
+      <li class="ptile" style="--i:${i}">
+        <a class="ptile__link" href="/produkti/#${esc(item.id)}">
+          <span class="ptile__panel">
+            ${projectPicture(item.picture)}
+          </span>
+          <span class="ptile__name">${esc(item.name)}</span>
+          <span class="ptile__kind">${esc(item.kind ?? item.kicker)}</span>
+        </a>
+      </li>`
       )}
+    </ul>
+    <div class="btn-row">
+      <a class="btn btn--secondary" href="/produkti/">Vsi izdelki in projekti</a>
     </div>
   </div>
 </section>`;

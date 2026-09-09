@@ -22,15 +22,16 @@ The home page is a product narrative, not a template landing page:
 
 1. Typed intro: white screen, the bare brain, "AIS Slovenia" typed with a caret (home only)
 2. Hero: headline left, two pill buttons, the 3D brain slab on the right (white)
-3. Build stage: a rounded black panel where the three clips take turns in front,
-   recede into a loose cluster, then the next comes forward (the only dark block)
+3. Build stage: a rounded black panel where the three clips circle through
+   front, back-left and back-right, three seconds each in front (the only dark block)
 4. Clients: two marquee rows of small pills (logo + name), top row drifting left, bottom row right, no descriptions
 5. Three pillars: a title, one sentence and a rendered product picture in a soft panel
-6. Team (three real people, name and role)
-7. Blog (one line while `blog.items` is empty)
-8. FAQ (first five questions) in a rounded black panel
-9. Closing CTA: a rounded black panel with the short form
-10. Footer with every section, contact, the team, and the large "AI Slovenia" wordmark
+6. Products and projects: four tiles from `products.items`, linking to `/produkti/`
+7. Team (three real people, name and role)
+8. Blog (one line while `blog.items` is empty)
+9. FAQ (first five questions) in a rounded black panel
+10. Closing CTA: a rounded black panel with the short form
+11. Footer with every section, contact, the team, and the large "AI Slovenia" wordmark
 
 Home sections carry a tag (eyebrow) and a title. No lead paragraphs.
 
@@ -143,7 +144,7 @@ push that touches `website/`.
 | Path | State |
 |---|---|
 | `/` | Full home narrative + intro |
-| `/produkti/` | Empty state until `products.items` has real entries |
+| `/produkti/` | Live: our products and the projects built for clients |
 | `/storitve/` | Live — three service areas |
 | `/storitve/avtomatizacija-administracije/` | Live |
 | `/storitve/avtomatizacija-prodaje/` | Live |
@@ -166,8 +167,17 @@ Also generated: `/sitemap.xml`, `/robots.txt`, `/llms.txt`.
 
 In `content/showcase.mjs`, push objects onto `products.items`, `news.items`,
 `events.items`, or `blog.items`. When `items.length > 0`, the empty state is
-replaced by the grid/list. When `blog.items` is empty, the home blog teaser
-renders nothing (correct).
+replaced by the grid/list.
+
+`products.items` is live: our own products (ATHLOS, AIS Command, AISOS) and
+the projects built for clients (INSPECTUS VLDR and VIN filter, the coating
+model, Pacom, ZaLife). Each has a demo screen rendered from
+`tools/pictures/products.html` (`node tools/pictures/render.mjs`). The
+screens are drawn after the real systems; the numbers on them are
+illustrative. Add a project by adding a stage to `products.html`, listing its
+id in `FILES` in `render.mjs`, rendering, and adding the item to
+`products.items`. The design audit expects at least six projects with
+rendered pictures on `/produkti/`.
 
 Do **not** add placeholder titles, fake dates, or “Rezervirano” tiles. The
 design audit fails the build if those strings return.
@@ -224,16 +234,16 @@ arrival at the home page; a hop from another page of the site after it has
 played skips it. `?nointro` or `sessionStorage.ais-intro = 'skip'` turns it
 off for tooling and previews.
 
-Build stage: moves in beats, never continuously, in the manner of the
-Antigravity hero film (our clips, their choreography). The front screen holds
-**4.2 s** alone in the centre with a soft blue halo. Then it recedes to the
-upper left while the next screen slides in from the right and the third
-rises from below; the loose cluster holds **4.2 s** and each window drifts a
-little on its own beat. Then the cluster clears and the next screen scales
-up into the centre. Pointer over the stage pauses the beats. Clicks on a
-screen or tab, and the arrow keys, bring a screen forward at once.
-`buildStage` also runs under reduced motion (without the beats) because the
-tabs are real controls.
+Build stage: our clips, the choreography of the Antigravity hero film. The
+three screens circle three spots. The front one holds **3 s** big in the
+centre with a soft blue halo and breathes slowly; the other two wait small
+and dim at the back left and back right and drift. Every beat each screen
+moves one spot on (**1.6 s** of travel): the front one recedes up and left,
+the back-left one crosses the space down to the right, the back-right one
+grows into the centre. Nothing ever sits still. Pointer over the stage
+pauses the beats. Clicks on a screen or tab, and the arrow keys, bring a
+screen forward at once. `buildStage` also runs under reduced motion (without
+the beats) because the tabs are real controls.
 
 **Removed on purpose:** particles, bouncing chips, custom cursor, magnetic
 buttons, the CTA wireframe canvas, the glossy brain slab, the tab countdown
@@ -260,7 +270,8 @@ Both are generated, not filmed or photographed.
 
 - Clips: source `tools/video/scene.html`, renderer `node tools/video/render.mjs`,
   outputs in `public/video/` (webm, mp4, poster).
-- Pictures: source `tools/pictures/scene.html`, renderer
+- Pictures: sources `tools/pictures/scene.html` (three pillars) and
+  `tools/pictures/products.html` (eight products and projects), renderer
   `node tools/pictures/render.mjs`, outputs in `public/pictures/` (webp + jpg
   at 3200×2000). The `<picture>` markup in `src/showcase.mjs` expects both.
 
@@ -319,7 +330,7 @@ After a production deploy:
 
 ## Still open (not bugs — waiting on the business)
 
-- Product, news, event, and blog entries
+- News, event, and blog entries
 - Client approval for the names in the clients line (see above)
 - Contact webhook (`formEndpoint`)
 - Kariera has no page; the footer link goes to `/kontakt/`

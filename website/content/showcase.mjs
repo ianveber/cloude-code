@@ -194,18 +194,91 @@ export const teamShowcase = {
   title: 'Ljudje za sistemi',
 };
 
-/* ── Products ─────────────────────────────────────────────────────────── */
+/* ── Products and projects ──────────────────────────────────────────────
+   Our own products first, then the systems we built for clients. Every
+   picture is a demo screen rendered from tools/pictures/products.html after
+   the real system; the numbers on the screens are illustrative. */
 
 export const products = {
-  eyebrow: 'Izdelki',
-  title: 'Naši izdelki',
-  lead: 'Na tej strani bomo objavili preverjene informacije o izdelkih AIS Slovenia.',
-  metaTitle: 'Izdelki in SaaS rešitve za avtomatizacijo | AIS Slovenia',
+  eyebrow: 'Izdelki in projekti',
+  title: 'Kaj smo zgradili',
+  lead: 'Izdelki, ki jih razvijamo sami, in sistemi, ki smo jih postavili za stranke.',
+  homeTitle: 'Kaj smo zgradili',
+  metaTitle: 'Izdelki in projekti | AIS Slovenia',
   metaDescription:
-    'Informacije o izdelkih AIS Slovenia bodo objavljene, ko bodo pripravljene in potrjene za javno predstavitev.',
+    'SaaS izdelki, avtomatizacije in AI modeli, ki jih je AIS Slovenia zgradila zase in za stranke: ATHLOS, AIS Command, AISOS, INSPECTUS, Pacom in ZaLife.',
   answer:
-    'AIS Slovenia trenutno nima javno objavljenega kataloga izdelkov. Preverjene informacije bomo dodali na to stran.',
-  items: [],
+    'AIS Slovenia razvija lastne izdelke (ATHLOS, AIS Command, AISOS) in gradi sisteme za stranke: avtomatizaciji za INSPECTUS, marketinški sistem za Pacom, vsebinski sistem za ZaLife in napovedni model za premaze.',
+  items: [
+    {
+      id: 'athlos',
+      kicker: 'Lastni izdelek',
+      kind: 'SaaS izdelek',
+      name: 'ATHLOS',
+      body: 'Športni operacijski sistem. Športnik v aplikaciji vidi današnji trening, ga izvede po blokih in opravi jutranji check-in, iz katerega dobi oceno pripravljenosti. Trener sestavlja treninge iz svoje knjižnice in spremlja obremenitev ekipe. Vgrajeni AI trener ZEUS odgovarja na vprašanja in sme s privoljenjem športnika popraviti serije, vsako spremembo pa trener lahko razveljavi.',
+      picture: { src: '/pictures/athlos', alt: 'Aplikacija ATHLOS za športnika z današnjim treningom ob nadzorni plošči za trenerja.', width: 1600, height: 1000 },
+    },
+    {
+      id: 'ais-command',
+      kicker: 'Lastni izdelek',
+      kind: 'SaaS izdelek',
+      name: 'AIS Command',
+      body: 'CRM in portal za stranke v enem. Interno: odnosi, prodajni lijak, projekti, storitve, podpora in računi. Za stranko: njeni projekti, stanje storitev, računi in plačilo na enem mestu. V ozadju teče agentno izvajalno okolje, ki pripravlja osnutke, opomnike in mesečno zaračunavanje.',
+      picture: { src: '/pictures/ais-command', alt: 'AIS Command s prodajnim lijakom, pogledom na stranko in seznamom računov.', width: 1600, height: 1000 },
+    },
+    {
+      id: 'aisos',
+      kicker: 'Lastni izdelek',
+      kind: 'Agentni sistem',
+      name: 'AISOS',
+      body: 'Agentni operacijski sistem podjetja. Agenti vsako jutro pripravijo pregled dneva iz koledarja, e-pošte in nalog, pripravijo osnutke vsebin in računov ter povedo, kaj potrebuje človeka. Nič ne gre ven brez potrditve.',
+      picture: { src: '/pictures/aisos', alt: 'AISOS z jutranjim pregledom, seznamom agentov in nalogami, ki čakajo na človeka.', width: 1600, height: 1000 },
+    },
+    {
+      id: 'inspectus-vldr',
+      kicker: 'Za stranko',
+      kind: 'Avtomatizacija',
+      name: 'INSPECTUS VLDR',
+      client: 'INSPECTUS',
+      body: 'Dokumentacijski cevovod za pregled vozil v pristanišču. Sistem prebere izvoz poročila o škodah, uredi podatke po vozilih in za vsako vozilo natisne kartico VLDR v obliki, ki jo zahteva proizvajalec. Ročno urejanje preglednic je odpadlo.',
+      picture: { src: '/pictures/inspectus-vldr', alt: 'Seznam vozil iz poročila o pregledu ob predogledu kartice VLDR.', width: 1600, height: 1000 },
+    },
+    {
+      id: 'inspectus-vin',
+      kicker: 'Za stranko',
+      kind: 'Avtomatizacija',
+      name: 'INSPECTUS VIN filter',
+      client: 'INSPECTUS',
+      body: 'Pametni filter fotografij s pomola. Tablica s številko VIN odpre vozilo, posnetki za njo mu pripadajo, rezultat pa se v obe smeri preveri proti ladijskemu seznamu razkladanja. Neujemanja dobi človek na pregled.',
+      picture: { src: '/pictures/inspectus-vin', alt: 'Fotografije s pomola, razvrščene po vozilih, s preverjanjem proti seznamu razkladanja.', width: 1600, height: 1000 },
+    },
+    {
+      id: 'model-premazi',
+      kicker: 'Za stranko',
+      kind: 'AI model',
+      name: 'Model za premaze',
+      body: 'Napovedni model za formulacije premazov. Iz sestave izračuna gostoto, viskoznost, suho snov in prekrivnost, preden kdo kaj zmeša, in pove, kako zanesljiva je napoved. Za formulacije zunaj podatkov, na katerih se je učil, odgovor odkloni.',
+      picture: { src: '/pictures/model-premazi', alt: 'Vnos sestave premaza z napovedanimi lastnostmi in oceno zanesljivosti.', width: 1600, height: 1000 },
+    },
+    {
+      id: 'pacom',
+      kicker: 'Za stranko',
+      kind: 'Marketinški sistem',
+      name: 'Pacom',
+      client: 'Čistilni servis Pacom',
+      body: 'Sistem za obstoječe stranke čistilnega servisa: CRM s segmenti, e-poštne sekvence po prvem čiščenju in vsebinski koledar, ki ga polni vsebinski agent. Objave in sporočila potrdi človek.',
+      picture: { src: '/pictures/pacom', alt: 'Stranke po segmentih, e-poštna sekvenca in vsebinski koledar za Pacom.', width: 1600, height: 1000 },
+    },
+    {
+      id: 'zalife',
+      kicker: 'Za stranko',
+      kind: 'Vsebinski sistem',
+      name: 'ZaLife',
+      client: 'ZaLife',
+      body: 'Znamka in vsebinski sistem za program osebnega razvoja najstnikov: sredstva znamke, ponudbe za šole in starše ter koledar objav na enem mestu, da ekipa ne išče več po mapah.',
+      picture: { src: '/pictures/zalife', alt: 'Sredstva znamke, ponudbe in koledar objav za ZaLife.', width: 1600, height: 1000 },
+    },
+  ],
   empty: {
     title: 'Vsebina je v pripravi',
     body: 'Izdelke bomo objavili, ko bodo pripravljeni in potrjeni za javno predstavitev.',

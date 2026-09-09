@@ -389,29 +389,27 @@
   }
 
   /* ── Build stage ─────────────────────────────────────────────────────────
-     Three screens, one in front. Left alone the stage moves in beats: the
-     front screen holds, then it recedes into a loose cluster with the other
-     two, then the cluster clears and the next screen comes to the front. A click on a
-     screen or a tab, or the arrow keys, bring a screen forward at once.
-     Runs with reduced motion too, without the beats, because the tabs are
-     real controls and must keep working. */
+     Three screens circling three spots. Every beat the active index moves
+     on: the front screen recedes, the back-left one crosses to the right,
+     the back-right one comes to the front. The front screen holds three
+     seconds before the next move. A click on a screen or a tab, or the
+     arrow keys, bring a screen forward at once. Runs with reduced motion
+     too, without the beats, because the tabs are real controls. */
   function buildStage() {
     var section = document.querySelector('[data-build]');
     if (!section) return;
 
-    var rig = section.querySelector('[data-build-rig]');
     var stage = section.querySelector('[data-build-stage]');
     var screens = Array.prototype.slice.call(section.querySelectorAll('[data-build-screen]'));
     var tabs = Array.prototype.slice.call(section.querySelectorAll('[data-build-tab]'));
-    if (!rig || screens.length < 3) return;
+    if (screens.length < 3) return;
 
     var active = 1;
-    var spread = false;
     var timer = null;
     var paused = false;
     var visible = false;
-    var HOLD_FRONT = 4200;
-    var HOLD_SPREAD = 4200;
+    var HOLD = 3000;
+    var TRAVEL = 1600;
 
     function paint() {
       screens.forEach(function (screen, i) {
@@ -419,9 +417,8 @@
         screen.classList.toggle('is-active', rel === 0);
         screen.classList.toggle('is-right', rel === 1);
         screen.classList.toggle('is-left', rel === 2);
-        screen.setAttribute('aria-hidden', rel === 0 || spread ? 'false' : 'true');
+        screen.setAttribute('aria-hidden', rel === 0 ? 'false' : 'true');
       });
-      rig.classList.toggle('is-spread', spread);
       tabs.forEach(function (tab, i) {
         var on = i === active;
         tab.classList.toggle('is-active', on);
@@ -432,31 +429,18 @@
     function schedule() {
       window.clearTimeout(timer);
       if (reduce || paused || !visible) return;
-      timer = window.setTimeout(beat, spread ? HOLD_SPREAD : HOLD_FRONT);
-    }
-
-    /* One beat: front → spread, or spread → gather with the next in front. */
-    function beat() {
-      if (spread) {
-        spread = false;
-        active = (active + 1) % screens.length;
-      } else {
-        spread = true;
-      }
-      paint();
-      schedule();
+      timer = window.setTimeout(function () { setActive(active + 1); }, HOLD + TRAVEL);
     }
 
     function setActive(index) {
       active = (index + screens.length) % screens.length;
-      spread = false;
       paint();
       schedule();
     }
 
     screens.forEach(function (screen, i) {
       screen.addEventListener('click', function () {
-        if (i !== active || spread) setActive(i);
+        if (i !== active) setActive(i);
       });
     });
 

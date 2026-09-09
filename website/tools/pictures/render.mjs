@@ -7,7 +7,7 @@
  * on-brand, crisp at any size and honest about being illustrative. Output goes
  * to public/pictures as webp (served) plus jpg (fallback).
  *
- *   node tools/pictures/render.mjs            all scenes
+ *   node tools/pictures/render.mjs            all scenes (pillars + products)
  *   node tools/pictures/render.mjs saas       one scene
  *
  * Only needed when the scene source changes; the encoded images are committed.
@@ -35,7 +35,12 @@ const WIDTH = 1600;
 const HEIGHT = 1000;
 const SCALE = 2;
 
-const SCENES = ['saas', 'flow', 'security'];
+/* Scenes live in two files: the three pillar screens and the product demos. */
+const FILES = {
+  'scene.html': ['saas', 'flow', 'security'],
+  'products.html': ['inspectus-vldr', 'inspectus-vin', 'athlos', 'aisos', 'ais-command', 'model-premazi', 'pacom', 'zalife'],
+};
+const SCENES = Object.values(FILES).flat();
 
 const CHROME =
   process.env.CHROME_PATH ||
@@ -88,20 +93,25 @@ async function main() {
   try {
     const page = await browser.newPage();
     await page.setViewport({ width: WIDTH, height: HEIGHT, deviceScaleFactor: SCALE });
-    await page.goto(`file://${path.join(HERE, 'scene.html')}`, { waitUntil: 'networkidle0' });
-    await page.evaluate(() => document.fonts.ready);
 
-    for (const id of scenes) {
-      await page.evaluate((scene) => {
-        document.querySelectorAll('.stage').forEach((el) => el.classList.toggle('on', el.id === scene));
-      }, id);
-      await new Promise((r) => setTimeout(r, 120));
-      await page.screenshot({
-        path: path.join(TMP, `${id}.png`),
-        clip: { x: 0, y: 0, width: WIDTH, height: HEIGHT },
-      });
-      await encode(id);
-      process.stdout.write(`  ${id}: ${WIDTH * SCALE}×${HEIGHT * SCALE} → public/pictures/${id}.webp + .jpg\n`);
+    for (const [file, ids] of Object.entries(FILES)) {
+      const wanted = ids.filter((id) => scenes.includes(id));
+      if (!wanted.length) continue;
+      await page.goto(`file://${path.join(HERE, file)}`, { waitUntil: 'networkidle0' });
+      await page.evaluate(() => document.fonts.ready);
+
+      for (const id of wanted) {
+        await page.evaluate((scene) => {
+          document.querySelectorAll('.stage').forEach((el) => el.classList.toggle('on', el.id === scene));
+        }, id);
+        await new Promise((r) => setTimeout(r, 120));
+        await page.screenshot({
+          path: path.join(TMP, `${id}.png`),
+          clip: { x: 0, y: 0, width: WIDTH, height: HEIGHT },
+        });
+        await encode(id);
+        process.stdout.write(`  ${id}: ${WIDTH * SCALE}×${HEIGHT * SCALE} → public/pictures/${id}.webp + .jpg\n`);
+      }
     }
   } finally {
     await browser.close();

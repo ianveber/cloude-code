@@ -47,6 +47,7 @@ import {
   blogTeaser,
   blogGrid,
   productGrid,
+  productsTeaser,
   newsList,
   eventList,
 } from './src/showcase.mjs';
@@ -86,6 +87,7 @@ function homePage() {
     buildStage(S.buildStage),
     clientsLine(S.clients),
     pillarsSection(S.pillars),
+    productsTeaser(S.products),
     teamBand(S.teamShowcase, C.team.members),
     blogTeaser(S.blog),
     faqSection(C.faq, { items: C.faq.items.slice(0, 5), dark: true }),
