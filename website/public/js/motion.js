@@ -117,6 +117,7 @@
     tiltFrames();
     footerGlow();
     depthParallax();
+    glowCut();
     lazyVideo();
   });
 
@@ -298,12 +299,12 @@
       var px = clamp((last.x - cx) / Math.max(rect.width, 1), -0.9, 0.9);
       var py = clamp((last.y - cy) / Math.max(rect.height, 1), -0.9, 0.9);
 
-      rig.style.setProperty('--pointer-y', (-py * 8).toFixed(2) + 'deg');
-      rig.style.setProperty('--pointer-x', (px * 8).toFixed(2) + 'deg');
-      rig.style.setProperty('--gx', (42 + px * 40).toFixed(1) + '%');
-      rig.style.setProperty('--gy', (36 + py * 40).toFixed(1) + '%');
-      rig.style.setProperty('--sx', (34 - px * 26).toFixed(1) + 'px');
-      rig.style.setProperty('--sy', (54 - py * 18).toFixed(1) + 'px');
+      rig.style.setProperty('--pointer-y', (-py * 9).toFixed(2) + 'deg');
+      rig.style.setProperty('--pointer-x', (px * 9).toFixed(2) + 'deg');
+      rig.style.setProperty('--gx', (50 + px * 44).toFixed(1) + '%');
+      rig.style.setProperty('--gy', (30 + py * 44).toFixed(1) + '%');
+      rig.style.setProperty('--sx', (-px * 24).toFixed(1) + 'px');
+      rig.style.setProperty('--sy', (26 - py * 16).toFixed(1) + 'px');
     }
 
     hero.addEventListener(
@@ -323,6 +324,32 @@
         rig.style.removeProperty(name);
       });
     });
+  }
+
+  /* The code-glow canvas is masked out above the hero. The mask edge follows
+     the hero's bottom as the page scrolls, so the effect starts exactly where
+     the hero ends and runs everywhere else untouched. */
+  function glowCut() {
+    var canvas = document.getElementById('code-glow');
+    var hero = document.querySelector('.hero--brain');
+    if (!canvas || !hero) return;
+    var ticking = false;
+
+    function apply() {
+      ticking = false;
+      var bottom = hero.getBoundingClientRect().bottom;
+      canvas.style.setProperty('--glow-cut', Math.max(0, Math.round(bottom)) + 'px');
+    }
+
+    function request() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(apply);
+    }
+
+    window.addEventListener('scroll', request, { passive: true });
+    window.addEventListener('resize', request);
+    apply();
   }
 
   function explorer() {

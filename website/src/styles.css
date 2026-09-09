@@ -1900,23 +1900,24 @@ html.motion-on .hero--brain h1.is-entered .hero__line:nth-child(2) {
   transition-delay: 0.11s;
 }
 
-/* ── Official brand brain: a lying 3D object ──────────────────────────────
-   The traced mark lies at a shallow angle. Under the face sits a white core
-   and a stack of dark slices that give the slab its thickness; over it a
-   highlight and a sweep of light follow the pointer; beneath it two shadows
-   with the brain's own silhouette. Nothing here redraws the mark: the face
-   is the traced shape, everything else is a mask of its outline. */
+/* ── Official brand brain: a standing 3D object ───────────────────────────
+   The traced mark faces straight on, symmetric at rest, and turns a little
+   toward the pointer. Under the face sits a white core and a stack of dark
+   slices that give it thickness on the turned edge; over it a highlight and a
+   sweep of light follow the pointer; beneath it two shadows with the brain's
+   own silhouette. Nothing here redraws the mark: the face is the traced
+   shape, everything else is a mask of its outline. */
 
 @property --gx {
   syntax: '<percentage>';
   inherits: false;
-  initial-value: 42%;
+  initial-value: 50%;
 }
 
 @property --gy {
   syntax: '<percentage>';
   inherits: false;
-  initial-value: 36%;
+  initial-value: 30%;
 }
 
 .brand-brain__defs {
@@ -1940,14 +1941,14 @@ html.motion-on .brand-brain__float {
 }
 
 .brand-brain__rig {
-  --tilt-x: 58deg;
-  --tilt-z: -30deg;
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
   --pointer-x: 0deg;
   --pointer-y: 0deg;
-  --gx: 42%;
-  --gy: 36%;
-  --sx: 34px;
-  --sy: 54px;
+  --gx: 50%;
+  --gy: 30%;
+  --sx: 0px;
+  --sy: 26px;
   --brain-ink: #111318;
   --brain-blue: #1d77fe;
   --silhouette: url('/brand/brain-solid.svg');
@@ -1956,7 +1957,7 @@ html.motion-on .brand-brain__float {
   aspect-ratio: 1168 / 1104;
   transform:
     rotateX(calc(var(--tilt-x) + var(--pointer-y)))
-    rotateZ(calc(var(--tilt-z) + var(--pointer-x)));
+    rotateY(calc(var(--tilt-y) + var(--pointer-x)));
   transform-style: preserve-3d;
   transition:
     transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -2008,8 +2009,8 @@ html.motion-on .brand-brain__float {
   z-index: 4;
   transform: translateZ(2px);
   background:
-    radial-gradient(52% 52% at var(--gx) var(--gy), rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.1) 42%, transparent 72%),
-    linear-gradient(160deg, rgba(255, 255, 255, 0.2), transparent 48%, rgba(29, 119, 254, 0.16) 100%);
+    radial-gradient(52% 52% at var(--gx) var(--gy), rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.12) 42%, transparent 72%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 48%, rgba(29, 119, 254, 0.16) 100%);
   pointer-events: none;
 }
 
@@ -2036,19 +2037,20 @@ html.motion-on .brand-brain__sweep::before {
 /* Shadows: the brain's own silhouette displaced below, plus a soft ground. */
 .brand-brain__shadow {
   z-index: 0;
-  background: rgba(6, 12, 28, 0.62);
-  filter: blur(14px);
-  transform: translate3d(var(--sx), var(--sy), -36px) scale(1.04);
+  background: rgba(6, 12, 28, 0.44);
+  filter: blur(20px);
+  transform: translate3d(var(--sx), var(--sy), -40px) scale(1.02);
   transition: transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .brand-brain__ground {
-  inset: 6% -8% -16%;
+  inset: auto -6% -14%;
+  height: 20%;
   z-index: 0;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(10, 21, 43, 0.42), rgba(10, 21, 43, 0));
-  filter: blur(6px);
-  transform: translate3d(calc(var(--sx) * 1.6), calc(var(--sy) * 1.5), -64px);
+  background: radial-gradient(closest-side, rgba(10, 21, 43, 0.34), rgba(10, 21, 43, 0));
+  filter: blur(8px);
+  transform: translate3d(calc(var(--sx) * 0.6), 0, -64px);
   transition: transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -2527,6 +2529,15 @@ main,
 .site-footer {
   position: relative;
   z-index: 1;
+}
+
+/* The hero keeps a clean white ground. The canvas is masked out above the
+   hero's bottom edge, feathered a little, and motion.js moves that edge as
+   the page scrolls. Without the hero (every other page) nothing is masked. */
+#code-glow {
+  --glow-cut: 0px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent calc(var(--glow-cut) - 56px), #000 var(--glow-cut));
+  mask-image: linear-gradient(to bottom, transparent calc(var(--glow-cut) - 56px), #000 var(--glow-cut));
 }
 
 .depth::before {

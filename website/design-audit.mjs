@@ -39,6 +39,11 @@ expect(
     /^main,\n\.breadcrumbs,\n\.site-footer \{\n  position: relative;\n  z-index: 1;\n\}/m.test(styles),
   'Code-glow background must be included verbatim right after <body> on every page, with the page content lifted above it.'
 );
+expect(
+  /#code-glow\s*\{[^}]*--glow-cut:\s*0px;[^}]*mask-image:\s*linear-gradient\(to bottom, transparent calc\(var\(--glow-cut\) - 56px\), #000 var\(--glow-cut\)\)/s.test(styles) &&
+    /function glowCut\(\)/.test(motion) && /glowCut\(\);/.test(motion),
+  'Code glow must be masked out of the hero, with the mask edge following the hero bottom.'
+);
 expect(!/body::after/.test(styles), 'Fixed paper-grain overlay remains.');
 expect(
   /class="depth" aria-hidden="true"/.test(home) &&
@@ -258,8 +263,10 @@ expect(
 );
 expect(
   /--silhouette:\s*url\('\/brand\/brain-solid\.svg'\)/.test(styles) &&
-    /\.brand-brain__rig\s*\{[^}]*--tilt-x:\s*58deg;[^}]*--tilt-z:\s*-30deg;/s.test(styles),
-  'Hero brain must lie at the approved tilt and mask its slab with the solid silhouette.'
+    /\.brand-brain__rig\s*\{[^}]*--tilt-x:\s*0deg;[^}]*--tilt-y:\s*0deg;/s.test(styles) &&
+    /rotateY\(calc\(var\(--tilt-y\) \+ var\(--pointer-x\)\)\)/.test(styles) &&
+    /--gx:\s*50%;[^}]*--gy:\s*30%;[^}]*--sx:\s*0px;/s.test(styles),
+  'Hero brain faces straight on, symmetric at rest, turns toward the pointer and masks its slab with the solid silhouette.'
 );
 expect(
   /data-intro-brand[^>]+data-text="AIS"/.test(home) &&

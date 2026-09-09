@@ -21,7 +21,8 @@ response so search engines and AI answer engines can read it without JavaScript.
 The home page is a product narrative, not a template landing page:
 
 1. Typed intro: white screen, the bare brain, "AIS Slovenia" typed with a caret (home only)
-2. Hero: headline left, two pill buttons, the 3D brain slab on the right (white)
+2. Hero: headline left, two pill buttons, the 3D brain standing on the right (white,
+   the code glow is masked out of this section)
 3. Build stage: a rounded black panel where the three clips circle through
    front, back-left and back-right, three seconds each in front (the only dark block)
 4. Clients: two marquee rows of small pills (logo + name), top row drifting left, bottom row right, no descriptions
@@ -47,6 +48,9 @@ lines of code type themselves in under the pointer and fade once it moves on.
 Do not edit the snippet; tune it only if Ian asks, in its own `CFG` block.
 The canvas is `z-index: 0`, so `main`, `.breadcrumbs` and `.site-footer` are
 lifted to `z-index: 1` in `styles.css` (the audit checks both halves).
+The canvas is masked out above the hero's bottom edge (`--glow-cut`, moved
+by `glowCut()` in `motion.js`), so the hero stays a clean white ground and
+the effect starts exactly where the hero ends.
 
 Supporting pages exist for products, news, events, blog, services, process,
 about, team, FAQ, and contact. Products / news / events / blog currently
@@ -66,11 +70,12 @@ These are enforced by `design-audit.mjs` and/or by the approved spec.
    the browser icon only. Light lockup is `public/brand/logo-light.png`.
    Never hand-draw, edit or "improve" these paths; re-trace from the lockup
    if the mark changes.
-2. **The brain is the only 3D object.** In the hero it lies at the approved
-   tilt (`--tilt-x: 58deg`, `--tilt-z: -30deg`) as a slab: the traced face on
-   a white core, eight dark slices behind it for thickness, a highlight and a
-   light sweep that follow the pointer, and two shadows in its own silhouette.
-   No tile or frame around it. Pointer tilt is capped at ±8°.
+2. **The brain is the only 3D object.** In the hero it faces straight on and
+   is symmetric at rest (`--tilt-x: 0deg`, `--tilt-y: 0deg`; Ian asked for
+   this on 2026-09-09 after a lying slab): the traced face on a white core,
+   eight dark slices behind it that show as a thick edge when it turns, a
+   highlight and a light sweep that follow the pointer, and two shadows in its
+   own silhouette. No tile or frame around it. Pointer turn is capped at ±9°.
 3. **Buttons are black or soft grey pills.** No accent-coloured buttons.
 4. **One accent: AIS blue `#1d77fe`, the same blue as the mark.** Eyebrows,
    the hero's second line, glows and focus rings all use `--blue`. The only
@@ -214,7 +219,7 @@ requires a real logo image and a name per pill and rejects descriptions.
 
 - Intro: the bare brain (`brain-light.svg`) with "AIS Slovenia" typed beside
   it in the site font. The text comes from `intro` in `content/showcase.mjs`.
-- Hero: the brain as a lying 3D slab. `src/showcase.mjs` reads the two paths
+- Hero: the brain standing straight on, in 3D. `src/showcase.mjs` reads the two paths
   from `brain-light.svg` at build time into an inline `<symbol>`; the face
   uses it, everything else (slices, core, gloss, sweep, shadow) is a masked
   box using `brain-solid.svg`. Slice colours come from `--k` and `color-mix`.

@@ -72,7 +72,7 @@ export function brainHero(data) {
   /* Slices of the slab, deepest first. --z steps them back in depth; --k
      runs from 0 to 1 toward the face so the edge lightens as it comes forward. */
   const layers = Array.from({ length: BRAIN_DEPTH_LAYERS }, (_, i) => {
-    const z = -(BRAIN_DEPTH_LAYERS - i) * 3;
+    const z = -(BRAIN_DEPTH_LAYERS - i) * 4;
     const k = (i / (BRAIN_DEPTH_LAYERS - 1)).toFixed(2);
     return `            <span class="brand-brain__layer" style="--z:${z}px;--k:${k}"></span>`;
   }).join('\n');
