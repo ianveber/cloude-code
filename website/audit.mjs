@@ -1,0 +1,319 @@
+#!/usr/bin/env node
+/**
+ * Automated SEO / GEO audit.
+ *
+ * Runs against the built ./dist output and fails the build when a page would
+ * regress. This is the "automated" half of the brief: nobody has to remember
+ * to check meta descriptions or structured data by hand — adding a page that
+ * misses something turns the check red.
+ *
+ *   node audit.mjs           audit ./dist
+ *   node audit.mjs --json    machine-readable output
+ */
+
+import { readFile, readdir, stat } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = path.dirname(fileURLToPath(import.meta.url));
+const DIST = path.join(ROOT, 'dist');
+
+const LIMITS = {
+  titleMin: 20,
+  titleMax: 65,
+  descMin: 70,
+  descMax: 165,
+  minWords: 120,
+  maxHtmlBytes: 120_000,
+};
+
+const results = [];
+const record = (level, page, message) => results.push({ level, page, message });
+const fail = (page, message) => record('error', page, message);
+const warn = (page, message) => record('warn', page, message);
+
+/* ── Tiny HTML probes ─────────────────────────────────────────────────── */
+
+const firstMatch = (html, re) => (html.match(re) ?? [])[1] ?? null;
+
+const metaContent = (html, name) =>
+  firstMatch(html, new RegExp(`<meta\\s+name=["']${name}["']\\s+content=["']([^"']*)["']`, 'i'));
+
+const propContent = (html, prop) =>
+  firstMatch(html, new RegExp(`<meta\\s+property=["']${prop}["']\\s+content=["']([^"']*)["']`, 'i'));
+
+const countTags = (html, tag) => (html.match(new RegExp(`<${tag}[\\s>]`, 'gi')) ?? []).length;
+
+const textOf = (html) =>
+  html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&[a-z]+;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+async function walk(dir) {
+  const out = [];
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) out.push(...(await walk(full)));
+    else if (entry.name.endsWith('.html')) out.push(full);
+  }
+  return out;
+}
+
+/* ── Per-page checks ──────────────────────────────────────────────────── */
+
+function auditPage(route, html) {
+  const noindex = /content=["']noindex/i.test(html);
+
+  /* Title */
+  const title = firstMatch(html, /<title>([\s\S]*?)<\/title>/i);
+  if (!title) fail(route, 'Manjka <title>.');
+  else if (title.length < LIMITS.titleMin) warn(route, `Naslov je kratek (${title.length} znakov).`);
+  else if (title.length > LIMITS.titleMax) warn(route, `Naslov je dolg (${title.length} znakov, priporočeno ≤ ${LIMITS.titleMax}).`);
+
+  /* Meta description */
+  const desc = metaContent(html, 'description');
+  if (!desc) fail(route, 'Manjka meta description.');
+  else if (desc.length < LIMITS.descMin) warn(route, `Meta description je kratek (${desc.length} znakov).`);
+  else if (desc.length > LIMITS.descMax) warn(route, `Meta description je dolg (${desc.length} znakov, priporočeno ≤ ${LIMITS.descMax}).`);
+
+  /* Canonical */
+  const canonical = firstMatch(html, /<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i);
+  if (!noindex && !canonical) fail(route, 'Manjka canonical URL.');
+
+  /* Headings */
+  const h1s = (html.match(/<h1[\s>]/gi) ?? []).length;
+  if (h1s === 0) fail(route, 'Stran nima <h1>.');
+  if (h1s > 1) fail(route, `Stran ima ${h1s} elementov <h1>; dovoljen je natanko eden.`);
+  if (!noindex && countTags(html, 'h2') === 0) warn(route, 'Stran nima nobenega <h2>.');
+
+  /* Language */
+  if (!/<html[^>]+lang=["']sl["']/i.test(html)) fail(route, 'Manjka lang="sl" na <html>.');
+
+  /* Open Graph + Twitter */
+  for (const prop of ['og:title', 'og:description', 'og:url', 'og:image', 'og:type']) {
+    if (!propContent(html, prop)) fail(route, `Manjka ${prop}.`);
+  }
+  if (!metaContent(html, 'twitter:card')) warn(route, 'Manjka twitter:card.');
+
+  /* Structured data */
+  const ldBlocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/gi)];
+  if (!ldBlocks.length) fail(route, 'Manjka JSON-LD structured data.');
+  for (const [, raw] of ldBlocks) {
+    try {
+      const parsed = JSON.parse(raw.replace(/\\u003c/g, '<'));
+      const graph = parsed['@graph'] ?? [parsed];
+      const types = graph.flatMap((n) => (Array.isArray(n['@type']) ? n['@type'] : [n['@type']]));
+      if (!types.includes('Organization')) warn(route, 'JSON-LD brez vozlišča Organization.');
+      if (!types.includes('WebPage')) warn(route, 'JSON-LD brez vozlišča WebPage.');
+    } catch (e) {
+      fail(route, `JSON-LD ni veljaven JSON: ${e.message}`);
+    }
+  }
+
+  /* Content volume — the original site rendered zero text without JavaScript. */
+  const words = textOf(html).split(' ').filter(Boolean).length;
+  if (!noindex && words < LIMITS.minWords) {
+    fail(route, `Premalo besedila v HTML (${words} besed, minimum ${LIMITS.minWords}).`);
+  }
+
+  /* FAQ answers stay in the HTML whether the home disclosures start closed
+     or open. Fail only when a disclosure is missing its answer markup. */
+  const faqItems = [...html.matchAll(/<details class="faq-item"[^>]*>[\s\S]*?<\/details>/gi)];
+  for (const [block] of faqItems) {
+    if (!/class="faq-item__answer"/.test(block)) {
+      fail(route, 'FAQ item nima odgovora v HTML.');
+    }
+  }
+
+  /* Images need alt text */
+  const imgs = [...html.matchAll(/<img\b[^>]*>/gi)].map((m) => m[0]);
+  const missingAlt = imgs.filter((t) => !/\balt=/.test(t));
+  if (missingAlt.length) fail(route, `${missingAlt.length} slik brez atributa alt.`);
+
+  /* Accessibility regressions the original site had */
+  if (/user-scalable=no|maximum-scale=1/i.test(html)) {
+    fail(route, 'Viewport onemogoča povečavo (user-scalable=no / maximum-scale).');
+  }
+
+  /* No dead placeholder links */
+  const deadLinks = [...html.matchAll(/href=["'](#|)["']/gi)];
+  if (deadLinks.length) fail(route, `${deadLinks.length} praznih povezav (href="#").`);
+
+  /* Payload size — the original shipped a 1.76 MB JS bundle */
+  const bytes = Buffer.byteLength(html);
+  if (bytes > LIMITS.maxHtmlBytes) warn(route, `HTML je velik (${(bytes / 1024).toFixed(0)} kB).`);
+
+  /* Render-blocking client-side rendering must not creep back in */
+  if (/<div id="root">\s*<\/div>/i.test(html)) {
+    fail(route, 'Prazen #root — vsebina se izrisuje na odjemalcu.');
+  }
+
+  /* GEO and technical hygiene added 2026-09-10 */
+  if (!noindex) {
+    if (!/"dateModified": "\d{4}-\d{2}-\d{2}"/.test(html)) fail(route, 'WebPage v JSON-LD nima dateModified.');
+    if (!/<link rel="alternate" type="text\/markdown" href="[^"]+index\.md"/.test(html)) fail(route, 'Manjka povezava na različico v Markdownu.');
+    if (!/<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'inline-speculation-rules' 'sha256-/.test(html)) fail(route, 'Manjka CSP z zgoščenimi vrednostmi vgrajenih skript.');
+    if (/<script(?![^>]*\ssrc=)[^>]*>[\s\S]*?<\/script>/i.test(html) && !/'unsafe-inline'[^"]*style-src|script-src[^;]*'sha256-/.test(html)) fail(route, 'Vgrajena skripta brez zgoščene vrednosti v CSP.');
+    if (!/<script type="speculationrules">/.test(html)) warn(route, 'Manjka speculationrules (prerender).');
+    if (/fonts\.googleapis\.com\/css2\?family=Google\+Sans/.test(html)) fail(route, 'Google Sans Flex se še nalaga iz Google Fonts namesto iz lastnega strežnika.');
+    if (!/rel="preload" href="\/fonts\/google-sans-flex-latin\.woff2" as="font"/.test(html)) fail(route, 'Manjka preload za lastno pisavo.');
+    if (/hreflang=/.test(html)) fail(route, 'hreflang na enojezični strani ni potreben.');
+    if (route.startsWith('/studije-primerov/') && route !== '/studije-primerov/') {
+      if (!/"@type": "Article"/.test(html)) fail(route, 'Študija primera nima vozlišča Article.');
+      if (!/class="takeaway"/.test(html)) fail(route, 'Študija primera nima odgovora na kratko.');
+      if (!/<time datetime="\d{4}-\d{2}-\d{2}">/.test(html)) fail(route, 'Študija primera nima vidnega datuma.');
+      if (!/class="study__service">/.test(html)) fail(route, 'Študija primera ne kaže na storitev ali izdelek.');
+      if (!/property="og:type" content="article"/.test(html) || !/property="article:modified_time"/.test(html)) fail(route, 'Študija primera nima Open Graph tipa article z datumom.');
+    }
+    if (/^\/storitve\/[^/]+\/$/.test(route)) {
+      if (!/"@type": "FAQPage"/.test(html) || (html.match(/class="faq-item"/g) ?? []).length < 3) fail(route, 'Stran storitve nima treh vprašanj z odgovori.');
+      if (!/href="\/studije-primerov\/[a-z0-9-]+\/"/.test(html)) fail(route, 'Stran storitve ne kaže na nobeno študijo primera.');
+    }
+    if (/^\/vodici\/[^/]+\/$/.test(route) && !/"@type": "Article"/.test(html)) fail(route, 'Vodič nima vozlišča Article.');
+    if (/<picture>/.test(html) && !/<source srcset="[^"]*-800\.webp 800w, [^"]*-1600\.webp 1600w[^"]*" sizes="/.test(html)) fail(route, 'Slika v <picture> nima srcset z manjšimi različicami.');
+    if (/clients\/[a-z-]+\.png/.test(html)) fail(route, 'Logotip stranke je še PNG namesto majhnega webp.');
+    if (route !== '/' && !/class="hero__meta">Posodobljeno <time datetime="/.test(html)) fail(route, 'Podstran nima vidnega datuma posodobitve.');
+  }
+
+  return { route, title, desc, words, bytes, h1s, ld: ldBlocks.length };
+}
+
+/* ── Site-level checks ────────────────────────────────────────────────── */
+
+async function auditSite(pages) {
+  const need = ['sitemap.xml', 'robots.txt', 'llms.txt', 'llms-full.txt', 'index.md'];
+  for (const f of need) {
+    try {
+      await stat(path.join(DIST, f));
+    } catch {
+      fail('(site)', `Manjka ${f}.`);
+    }
+  }
+
+  try {
+    const sitemap = await readFile(path.join(DIST, 'sitemap.xml'), 'utf8');
+    const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+    if (!locs.length) fail('(site)', 'sitemap.xml nima nobenega <loc>.');
+
+    const indexable = pages.filter((p) => p.route !== '/404.html');
+    for (const p of indexable) {
+      if (!locs.some((l) => l.endsWith(p.route) || (p.route === '/' && l.endsWith('/')))) {
+        fail('(site)', `Stran ${p.route} manjka v sitemap.xml.`);
+      }
+    }
+    if (locs.some((l) => l.includes('404'))) fail('(site)', '404 stran ne sme biti v sitemap.xml.');
+    if (/<changefreq>|<priority>/.test(sitemap)) fail('(site)', 'sitemap.xml naj nosi samo <loc> in <lastmod>.');
+    const lastmods = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)];
+    if (lastmods.length !== locs.length) fail('(site)', 'Vsak URL v sitemap.xml potrebuje svoj <lastmod>.');
+  } catch (e) {
+    if (!/ENOENT/.test(e.message)) fail('(site)', `sitemap.xml: ${e.message}`);
+  }
+
+  try {
+    const robots = await readFile(path.join(DIST, 'robots.txt'), 'utf8');
+    if (!/Sitemap:/i.test(robots)) fail('(site)', 'robots.txt ne navaja sitemapa.');
+    for (const bot of ['OAI-SearchBot', 'Claude-SearchBot', 'PerplexityBot', 'Bingbot', 'GPTBot', 'ClaudeBot', 'Google-Extended']) {
+      if (!robots.includes(bot)) warn('(site)', `robots.txt ne omenja ${bot}.`);
+    }
+    if (!/Content-Signal: search=yes, ai-input=yes/.test(robots)) warn('(site)', 'robots.txt nima Content-Signal.');
+    if (/Disallow: \/\s*$/m.test(robots)) fail('(site)', 'robots.txt prepoveduje celotno stran vsaj enemu robotu.');
+    const keyFiles = (await readdir(DIST)).filter((f) => /^[0-9a-f]{32}\.txt$/.test(f));
+    if (keyFiles.length !== 1) fail('(site)', 'Manjka datoteka s ključem IndexNow.');
+  } catch {
+    /* already reported as missing above */
+  }
+
+  /* Duplicate titles and descriptions dilute rankings */
+  const seenTitles = new Map();
+  const seenDescs = new Map();
+  for (const p of pages) {
+    if (p.title) {
+      if (seenTitles.has(p.title)) fail('(site)', `Podvojen naslov: "${p.title}" (${seenTitles.get(p.title)}, ${p.route}).`);
+      else seenTitles.set(p.title, p.route);
+    }
+    if (p.desc) {
+      if (seenDescs.has(p.desc)) fail('(site)', `Podvojen meta description na ${seenDescs.get(p.desc)} in ${p.route}.`);
+      else seenDescs.set(p.desc, p.route);
+    }
+  }
+}
+
+/* ── Internal link integrity ──────────────────────────────────────────── */
+
+async function auditLinks(files) {
+  const routes = new Set(
+    files.map((f) => {
+      const rel = '/' + path.relative(DIST, f).split(path.sep).join('/');
+      return rel.endsWith('/index.html') ? rel.replace(/index\.html$/, '') : rel;
+    })
+  );
+
+  for (const file of files) {
+    const html = await readFile(file, 'utf8');
+    const rel = '/' + path.relative(DIST, file).split(path.sep).join('/');
+    const route = rel.endsWith('/index.html') ? rel.replace(/index\.html$/, '') : rel;
+
+    const hrefs = [...html.matchAll(/href=["']([^"']+)["']/gi)].map((m) => m[1]);
+    for (const href of hrefs) {
+      if (!href.startsWith('/') || href.startsWith('//')) continue;
+      const target = href.split('#')[0].split('?')[0];
+      if (!target) continue;
+      if (/\.(css|png|jpe?g|svg|webp|avif|xml|txt|md|webmanifest|ico|woff2)$/i.test(target)) continue;
+      if (!routes.has(target)) fail(route, `Notranja povezava kaže v nič: ${href}`);
+    }
+  }
+}
+
+/* ── Runner ───────────────────────────────────────────────────────────── */
+
+async function main() {
+  let files;
+  try {
+    files = await walk(DIST);
+  } catch {
+    console.error('dist/ ne obstaja — najprej zaženite `npm run build`.');
+    process.exit(1);
+  }
+
+  const pages = [];
+  for (const file of files) {
+    const rel = '/' + path.relative(DIST, file).split(path.sep).join('/');
+    const route = rel.endsWith('/index.html') ? rel.replace(/index\.html$/, '') : rel;
+    pages.push(auditPage(route, await readFile(file, 'utf8')));
+  }
+
+  await auditSite(pages);
+  await auditLinks(files);
+
+  const errors = results.filter((r) => r.level === 'error');
+  const warns = results.filter((r) => r.level === 'warn');
+
+  if (process.argv.includes('--json')) {
+    console.log(JSON.stringify({ pages, errors, warns }, null, 2));
+  } else {
+    console.log('\nSEO / GEO pregled\n' + '─'.repeat(72));
+    for (const p of pages.sort((a, b) => a.route.localeCompare(b.route))) {
+      console.log(
+        `${p.route.padEnd(24)} ${String(p.words).padStart(5)} besed  ` +
+          `${String((p.bytes / 1024).toFixed(0)).padStart(4)} kB  ` +
+          `${p.ld} JSON-LD  ${p.h1s} h1`
+      );
+    }
+    console.log('─'.repeat(72));
+
+    for (const r of warns) console.log(`  OPOZORILO  ${r.page}: ${r.message}`);
+    for (const r of errors) console.log(`  NAPAKA     ${r.page}: ${r.message}`);
+
+    console.log(
+      `\n${pages.length} strani pregledanih — ${errors.length} napak, ${warns.length} opozoril.`
+    );
+  }
+
+  process.exit(errors.length ? 1 : 0);
+}
+
+await main();
