@@ -314,14 +314,20 @@ expect(
   'Fabricated or placeholder content remains: HowTo totalTime P10W'
 );
 
-for (const [route, html] of Object.entries({
-  news: pages.news,
-  events: pages.events,
-  blog: pages.blog,
-})) {
-  const emptyStates = html.match(/class="[^"]*\bempty-state\b[^"]*"/g) ?? [];
-  expect(emptyStates.length === 1, `${route} must render exactly one honest empty state.`);
+/* Since 2026-09-10 the three listing pages carry real entries: dated news
+   from delivered work, three event formats and blog posts with pages. */
+for (const [route, html, marker] of [
+  ['news', pages.news, 'class="newsitem"'],
+  ['events', pages.events, 'class="eventitem"'],
+  ['blog', pages.blog, 'class="postcard"'],
+]) {
+  expect(!/\bempty-state\b/.test(html) && html.split(marker).length - 1 >= 3, `${route} must list at least three real entries and no empty state.`);
 }
+expect(
+  (pages.blog.match(/href="\/blog\/[a-z0-9-]+\/"/g) ?? []).length >= 4 &&
+    (pages.products.match(/class="project__simple"/g) ?? []).length === 14,
+  'Blog posts must link to their pages and every product must carry its plain-language lines.'
+);
 expect(
   !/\bempty-state\b/.test(pages.products) &&
     (pages.products.match(/class="project" id="/g) ?? []).length >= 6 &&

@@ -68,6 +68,7 @@ import {
 } from './src/schema.mjs';
 import { serviceFaq } from './content/faq-services.mjs';
 import { guides } from './content/guides.mjs';
+import { blogPosts } from './content/blog.mjs';
 import { esc, absolute } from './src/html.mjs';
 import * as C from './content/content.mjs';
 import * as S from './content/showcase.mjs';
@@ -81,6 +82,13 @@ const url = (p) => absolute(site.origin, p);
 /* ── Shared page fragments ────────────────────────────────────────────── */
 
 const HOME_CRUMB = { label: 'Domov', href: '/' };
+
+/* Blog data with a link and a card summary per post; the index and the home
+   teaser read this, each post gets its own page below. */
+const BLOG = {
+  ...S.blog,
+  items: blogPosts.map((post) => ({ ...post, href: `/blog/${post.slug}/`, body: post.summary })),
+};
 
 /* 2026-09-10 → 10. 9. 2026, the way a date is written in Slovene. */
 const formatDate = (iso) => {
@@ -105,7 +113,7 @@ function homePage() {
     pillarsSection(S.pillars),
     productsTeaser(S.products),
     teamBand(S.teamShowcase, C.team.members),
-    blogTeaser(S.blog),
+    blogTeaser(BLOG),
     faqSection(C.faq, { items: C.faq.items.slice(0, 5), dark: true }),
     immersiveCta(S.ctaBlock),
   ].join('\n');
@@ -733,7 +741,7 @@ function blogPage() {
   </div>
 </section>`,
 
-    blogGrid(S.blog),
+    blogGrid(BLOG),
     closingCta,
   ].join('\n');
 
@@ -745,6 +753,40 @@ function blogPage() {
     breadcrumbs: [HOME_CRUMB, { label: 'Blog', href: '/blog/' }],
     priority: '0.7',
     changefreq: 'weekly',
+    body,
+  };
+}
+
+function blogPostPage(post) {
+  const body = [
+    pageHero({ eyebrow: post.kicker, title: post.title, lead: post.summary, cta: { label: 'Rezervirajte posvet', href: '/kontakt/' } }),
+    `<section class="section guide-body">
+  <div class="shell">
+    <div class="study__text">
+      ${post.sections
+        .map(
+          (s) => `
+      <section class="study__section" data-reveal>
+        <h2>${esc(s.title)}</h2>
+        ${s.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('\n')}
+      </section>`
+        )
+        .join('\n')}
+      <p class="study__back"><a class="link" href="/blog/">Vsi zapisi</a></p>
+    </div>
+  </div>
+</section>`,
+    closingCta,
+  ].join('\n');
+
+  return {
+    path: `/blog/${post.slug}/`,
+    title: post.metaTitle,
+    description: post.metaDescription,
+    keywords: post.keywords,
+    breadcrumbs: [HOME_CRUMB, { label: 'Blog', href: '/blog/' }, { label: post.title, href: `/blog/${post.slug}/` }],
+    ogType: 'article',
+    schema: [(page) => guideArticleNode(post, page)],
     body,
   };
 }
@@ -763,6 +805,7 @@ export function collectPages() {
     newsPage(),
     eventsPage(),
     blogPage(),
+    ...blogPosts.map(blogPostPage),
     aboutPage(),
     teamPage(),
     faqPage(),

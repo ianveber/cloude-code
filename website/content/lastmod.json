@@ -1,6 +1,6 @@
 {
   "/": {
-    "hash": "a81846b999c5d6ea",
+    "hash": "199297e11d4a78b0",
     "published": "2026-09-10",
     "updated": "2026-09-10"
   },
@@ -10,12 +10,32 @@
     "updated": "2026-09-10"
   },
   "/blog/": {
-    "hash": "bf712f8f4f015986",
+    "hash": "0e66042ea58711e9",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  },
+  "/blog/kaj-je-ai-agent/": {
+    "hash": "2148312dcee19a14",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  },
+  "/blog/kaj-je-ai-avtomatizacija/": {
+    "hash": "628623fac41c9e7e",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  },
+  "/blog/prvi-proces-za-avtomatizacijo/": {
+    "hash": "770a38e16302ccba",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  },
+  "/blog/sistem-mora-znati-reci-ne-vem/": {
+    "hash": "5437ec853fb8e6c9",
     "published": "2026-09-10",
     "updated": "2026-09-10"
   },
   "/dogodki/": {
-    "hash": "8c52ee378fe97f70",
+    "hash": "d77d4c5ab6931ef1",
     "published": "2026-09-10",
     "updated": "2026-09-10"
   },
@@ -30,7 +50,7 @@
     "updated": "2026-09-10"
   },
   "/novice/": {
-    "hash": "29024249d36a086a",
+    "hash": "423b1b9d6882a5f7",
     "published": "2026-09-10",
     "updated": "2026-09-10"
   },
@@ -50,7 +70,7 @@
     "updated": "2026-09-10"
   },
   "/produkti/": {
-    "hash": "3c49dbb824c67268",
+    "hash": "7f7defba6af3d027",
     "published": "2026-09-10",
     "updated": "2026-09-10"
   },

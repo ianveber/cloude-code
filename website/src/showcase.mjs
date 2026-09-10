@@ -370,7 +370,7 @@ function postCard(post, i) {
             ${post.kicker ? `<span class="postcard__kicker">${esc(post.kicker)}</span>` : ''}
           </p>
           <h3>${post.href ? `<a href="${esc(post.href)}">${esc(post.title)}</a>` : esc(post.title)}</h3>
-          <p>${esc(post.body)}</p>
+          <p>${esc(post.body ?? post.summary)}</p>
         </article>
       </li>`;
 }
@@ -469,6 +469,8 @@ export function productGrid(data) {
         <h3 class="project__name">${esc(item.name)}</h3>
         ${item.client ? `<p class="project__client">za ${esc(item.client)}</p>` : ''}
         <p class="project__body">${esc(item.body)}</p>
+        ${item.simple ? `<p class="project__simple"><strong>Preprosto povedano.</strong> ${esc(item.simple)}</p>` : ''}
+        ${item.forWhom ? `<p class="project__for"><strong>Za koga.</strong> ${esc(item.forWhom)}</p>` : ''}
         <p class="project__more"><a class="link" href="/studije-primerov/${esc(item.id)}/">Študija primera</a></p>
       </div>
       <div class="project__visual" data-reveal>
@@ -662,7 +664,7 @@ export function eventList(data) {
       <li class="eventitem" style="--i:${i}">
         <article>
           <p class="eventitem__when">
-            <time datetime="${esc(item.date)}">${esc(item.dateLabel)}</time>
+            ${item.date ? `<time datetime="${esc(item.date)}">${esc(item.dateLabel)}</time>` : `<span class="eventitem__date">${esc(item.dateLabel)}</span>`}
             <span>${esc(item.time)}</span>
           </p>
           <div class="eventitem__body">

@@ -53,8 +53,12 @@ by `glowCut()` in `motion.js`), so the hero stays a clean white ground and
 the effect starts exactly where the hero ends.
 
 Supporting pages exist for products, news, events, blog, services, process,
-about, team, FAQ, and contact. Products / news / events / blog currently
-render **one honest empty state**. Do not invent catalogue entries to fill them.
+about, team, FAQ, contact, case studies and guides. News, events and blog
+carry real entries since 2026-09-10 (Ian asked for more copy, "simple enough
+for a five-year-old"): news items are dated milestones from delivered work,
+events are three formats without dates, blog posts live in
+`content/blog.mjs`. Do not add news that did not happen or events with
+invented dates; the empty state returns on its own if a list is emptied.
 
 ---
 
@@ -167,9 +171,10 @@ push that touches `website/`.
 | `/storitve/avtomatizacija-prodaje/` | Live |
 | `/storitve/spremljanje-trga/` | Live |
 | `/proces/` | Live — eight-step process |
-| `/novice/` | Empty state |
-| `/dogodki/` | Empty state |
-| `/blog/` | Empty state |
+| `/novice/` | Live: three dated news items from delivered work |
+| `/dogodki/` | Live: three event formats, dates by agreement |
+| `/blog/` | Live: index of the posts |
+| `/blog/<slug>/` | Live: four plain-language posts (content/blog.mjs) |
 | `/o-podjetju/` | Live |
 | `/ekipa/` | Live — Anej Vučič, Nejc Feigel Boh (Ian Veber removed at his request, 2026-09-10) |
 | `/pogosta-vprasanja/` | Live — ten Q&As |
@@ -182,9 +187,11 @@ Also generated: `/sitemap.xml`, `/robots.txt`, `/llms.txt`.
 
 ## How to publish real catalogue content
 
-In `content/showcase.mjs`, push objects onto `products.items`, `news.items`,
-`events.items`, or `blog.items`. When `items.length > 0`, the empty state is
-replaced by the grid/list.
+In `content/showcase.mjs`, push objects onto `products.items`, `news.items`
+or `events.items`; blog posts go to `content/blog.mjs` (each becomes a page
+at `/blog/<slug>/`). When a list is empty the honest empty state returns.
+Every product also carries `simple` (one plain sentence or two) and
+`forWhom`, rendered under its description.
 
 `products.items` is live: our own products (ATHLOS, AIS Command, AISOS) and
 the projects built for clients (INSPECTUS VLDR and VIN filter, the coating

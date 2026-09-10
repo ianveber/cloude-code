@@ -39,6 +39,8 @@ const PATHS = [
   '/novice/',
   '/dogodki/',
   '/blog/',
+  '/blog/kaj-je-ai-avtomatizacija/',
+  '/vodici/koliko-stane-ai-avtomatizacija/',
   '/o-podjetju/',
   '/ekipa/',
   '/pogosta-vprasanja/',
