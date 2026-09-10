@@ -300,14 +300,6 @@ export const team = {
       photoWidth: 788,
       photoHeight: 985,
     },
-    {
-      name: 'Ian Veber',
-      role: 'CTO',
-      email: 'ian@ais-slovenia.si',
-      photo: '/team/ian.jpg',
-      photoWidth: 560,
-      photoHeight: 700,
-    },
   ],
 };
 

@@ -55,7 +55,14 @@ export const site = {
   /* Primary navigation — mirrors the original site's sections, but every entry is
      now a real, crawlable URL instead of a hash anchor. */
   nav: [
-    { label: 'Izdelki', href: '/produkti/' },
+    {
+      label: 'Izdelki',
+      href: '/produkti/',
+      children: [
+        { label: 'Izdelki in projekti', href: '/produkti/', note: 'Kaj smo zgradili' },
+        { label: 'Študije primerov', href: '/studije-primerov/', note: 'Od težave do sistema' },
+      ],
+    },
     {
       label: 'Storitve',
       href: '/storitve/',
@@ -98,6 +105,7 @@ export const site = {
         title: 'Povezave',
         links: [
           { label: 'Izdelki', href: '/produkti/' },
+          { label: 'Študije primerov', href: '/studije-primerov/' },
           { label: 'Storitve', href: '/storitve/' },
           { label: 'Proces', href: '/proces/' },
           { label: 'Pogosta vprašanja', href: '/pogosta-vprasanja/' },

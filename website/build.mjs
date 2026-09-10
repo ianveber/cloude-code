@@ -48,9 +48,12 @@ import {
   blogGrid,
   productGrid,
   productsTeaser,
+  caseStudyGrid,
+  caseStudyArticle,
   newsList,
   eventList,
 } from './src/showcase.mjs';
+import { caseStudies } from './content/case-studies.mjs';
 import {
   faqNode,
   serviceNode,
@@ -337,10 +340,10 @@ function teamPage() {
 
   return {
     path: '/ekipa/',
-    title: 'Ekipa AIS Slovenia: Anej Vučič, Nejc Feigel Boh, Ian Veber',
+    title: 'Ekipa AIS Slovenia: Anej Vučič in Nejc Feigel Boh',
     description:
-      'Spoznajte ekipo AIS Slovenia: Anej Vučič (CEO), Nejc Feigel Boh (CEO) in Ian Veber (CTO). Majhna ekipa, ki AI sisteme postavi in jih tudi vzdržuje.',
-    keywords: ['ekipa AIS Slovenia', 'Anej Vučič', 'Nejc Feigel Boh', 'Ian Veber'],
+      'Spoznajte ekipo AIS Slovenia: Anej Vučič (CEO) in Nejc Feigel Boh (CEO). Majhna ekipa, ki AI sisteme postavi in jih tudi vzdržuje.',
+    keywords: ['ekipa AIS Slovenia', 'Anej Vučič', 'Nejc Feigel Boh'],
     breadcrumbs: [HOME_CRUMB, { label: 'Ekipa', href: '/ekipa/' }],
     priority: '0.6',
     changefreq: 'yearly',
@@ -470,6 +473,75 @@ function productsPage() {
   };
 }
 
+/* ── Case studies ───────────────────────────────────────────────────────
+   One page per project. The product record supplies the name, kind, client
+   and picture; content/case-studies.mjs supplies the story. */
+
+const STUDIES_CRUMB = { label: 'Študije primerov', href: '/studije-primerov/' };
+
+function productFor(item) {
+  const product = S.products.items.find((p) => p.id === item.id);
+  if (!product) throw new Error(`Case study "${item.id}" has no matching product in content/showcase.mjs.`);
+  return product;
+}
+
+function caseStudiesIndexPage() {
+  const body = [
+    pageHero({
+      eyebrow: caseStudies.eyebrow,
+      title: caseStudies.title,
+      lead: caseStudies.lead,
+      cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
+    }),
+
+    `<section class="section section--plain section--flush-top">
+  <div class="shell">
+    ${takeaway({ label: 'Na kratko', text: caseStudies.answer })}
+  </div>
+</section>`,
+
+    caseStudyGrid(caseStudies, S.products),
+    twinCtaSection(C.twinCta),
+    closingCta,
+  ].join('\n');
+
+  return {
+    path: '/studije-primerov/',
+    title: caseStudies.metaTitle,
+    description: caseStudies.metaDescription,
+    keywords: ['študije primerov AI', 'AI avtomatizacija primeri', 'AI projekti Slovenija', 'reference AIS Slovenia'],
+    breadcrumbs: [HOME_CRUMB, STUDIES_CRUMB],
+    priority: '0.8',
+    changefreq: 'monthly',
+    body,
+  };
+}
+
+function caseStudyPage(item) {
+  const product = productFor(item);
+  const body = [
+    pageHero({
+      eyebrow: 'Študija primera',
+      title: product.name,
+      lead: item.summary,
+      cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
+    }),
+    caseStudyArticle(item, product),
+    closingCta,
+  ].join('\n');
+
+  return {
+    path: `/studije-primerov/${item.id}/`,
+    title: item.metaTitle,
+    description: item.metaDescription,
+    keywords: item.keywords,
+    breadcrumbs: [HOME_CRUMB, STUDIES_CRUMB, { label: product.name, href: `/studije-primerov/${item.id}/` }],
+    priority: '0.7',
+    changefreq: 'yearly',
+    body,
+  };
+}
+
 function newsPage() {
   const body = [
     pageHero({
@@ -564,6 +636,8 @@ export function collectPages() {
   return [
     homePage(),
     productsPage(),
+    caseStudiesIndexPage(),
+    ...caseStudies.items.map(caseStudyPage),
     servicesIndexPage(),
     ...C.services.map(servicePage),
     processPage(),

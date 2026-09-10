@@ -28,6 +28,9 @@ const DIST = fileURLToPath(new URL('./dist/', import.meta.url));
 const PATHS = [
   '/',
   '/produkti/',
+  '/studije-primerov/',
+  '/studije-primerov/athlos/',
+  '/studije-primerov/heva/',
   '/storitve/',
   '/storitve/avtomatizacija-administracije/',
   '/storitve/avtomatizacija-prodaje/',
@@ -202,7 +205,8 @@ function findProblems(path, width) {
         return (photo.width / photo.height).toFixed(3);
       })
     );
-    if (members.length !== 3 || teamColumns !== 3 || crops.size !== 1) {
+    /* Two members since 2026-09-10 (Ian asked to be removed); the grid keeps its columns. */
+    if (members.length !== 2 || teamColumns < members.length || crops.size !== 1) {
       components.push(
         `team composition has ${members.length} members, ${teamColumns} columns and ${crops.size} crop ratios`
       );
@@ -239,8 +243,8 @@ function findProblems(path, width) {
     if (!mark || mark.getBoundingClientRect().right > window.innerWidth + 1) {
       components.push('footer wordmark is missing or overflows');
     }
-    if (document.querySelectorAll('.footer-people li').length !== 3) {
-      components.push('footer must list the three team members');
+    if (document.querySelectorAll('.footer-people li').length !== 2) {
+      components.push('footer must list both team members');
     }
   }
 
@@ -428,7 +432,7 @@ async function checkKeyboardChrome(page, base) {
   await page.setViewport({ width: 1440, height: 1000 });
   await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
   const dropdowns = await page.$$eval('.nav .nav-dd', (els) => els.length);
-  if (dropdowns !== 2) errors.push(`Desktop navigation — expected 2 dropdowns, found ${dropdowns}`);
+  if (dropdowns !== 3) errors.push(`Desktop navigation — expected 3 dropdowns (Izdelki, Storitve, Podjetje), found ${dropdowns}`);
   for (const [index, selector] of [
     [1, '.nav details.nav-dd:nth-of-type(1)'],
     [2, '.nav details.nav-dd:nth-of-type(2)'],

@@ -114,9 +114,9 @@ for its own query instead of one page competing for everything.
 
 - Standalone brain: traced to `public/brand/brain-light.svg` (with
   `brain-solid.svg` as its outline) from the lockup. This is the only mark
-  that receives the 3D treatment: standing straight on, symmetric at rest,
-  turning up to 9° toward the pointer, with a depth edge, a highlight and a
-  shadow. The geometry is never redrawn.
+  that receives the 3D treatment: lying at a shallow angle as a slab, with a
+  depth edge, a highlight that follows the pointer and a shadow. The geometry
+  is never redrawn.
 - Light lockup: `public/brand/logo-light.png`. Used in the intro crossfade,
   header, and footer. The wordmark stays flat.
 - Dark lockup: `public/brand/logo.png`. Use only on a genuinely dark surface.
@@ -261,9 +261,9 @@ field. Particles, custom cursor, magnetic buttons, and bouncing chips are gone.
   for the demonstration, capability narrative, and final CTA.
 - **One accent.** AIS blue `#1d77fe` is the only decorative chromatic colour.
 - **Neutral buttons.** Primary is black; secondary is a ghost outline.
-- **3D brain.** The traced mark stands straight on in the hero, symmetric at
-  rest, and turns a little toward the pointer with a shine that follows it.
-  The lockup never gets that treatment.
+- **3D brain.** The traced mark lies as a tilted slab in the hero and tilts a
+  little with the pointer, with a shine that follows it. The lockup never
+  gets that treatment.
 - **No overlaying.** Copy stays in normal flow. The CTA field is a sibling
   behind the form, never a parent of the text.
 

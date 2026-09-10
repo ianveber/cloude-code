@@ -72,7 +72,7 @@ export function brainHero(data) {
   /* Slices of the slab, deepest first. --z steps them back in depth; --k
      runs from 0 to 1 toward the face so the edge lightens as it comes forward. */
   const layers = Array.from({ length: BRAIN_DEPTH_LAYERS }, (_, i) => {
-    const z = -(BRAIN_DEPTH_LAYERS - i) * 4;
+    const z = -(BRAIN_DEPTH_LAYERS - i) * 3;
     const k = (i / (BRAIN_DEPTH_LAYERS - 1)).toFixed(2);
     return `            <span class="brand-brain__layer" style="--z:${z}px;--k:${k}"></span>`;
   }).join('\n');
@@ -465,6 +465,7 @@ export function productGrid(data) {
         <h3 class="project__name">${esc(item.name)}</h3>
         ${item.client ? `<p class="project__client">za ${esc(item.client)}</p>` : ''}
         <p class="project__body">${esc(item.body)}</p>
+        <p class="project__more"><a class="link" href="/studije-primerov/${esc(item.id)}/">Študija primera</a></p>
       </div>
       <div class="project__visual" data-reveal>
         <div class="project__panel">
@@ -509,6 +510,92 @@ export function productsTeaser(data) {
     </ul>
     <div class="btn-row">
       <a class="btn btn--secondary" href="/produkti/">Vsi izdelki in projekti</a>
+      <a class="btn btn--secondary" href="/studije-primerov/">Študije primerov</a>
+    </div>
+  </div>
+</section>`;
+}
+
+/* ── Case studies ─────────────────────────────────────────────────────────
+   One page per project on /produkti/: the same picture, then the story in
+   four fixed parts (the problem, what we built, the parts of the system,
+   what changed) and the tools. Copy lives in content/case-studies.mjs and
+   the product facts (name, kind, client, picture) come from products, so
+   the two never drift apart. */
+
+function studyParagraphs(list) {
+  return each(list, (text) => `<p>${esc(text)}</p>`);
+}
+
+/** Index: every case study as a tile with a one-line summary. */
+export function caseStudyGrid(data, products) {
+  return `
+<section class="section studies" aria-labelledby="studije-list" data-studies>
+  <div class="shell">
+    <h2 class="visually-hidden" id="studije-list">Seznam študij primerov</h2>
+    <ul class="ptiles ptiles--studies">
+      ${each(data.items, (item, i) => {
+        const product = products.items.find((x) => x.id === item.id);
+        return `
+      <li class="ptile" style="--i:${i}" data-reveal>
+        <a class="ptile__link" href="/studije-primerov/${esc(item.id)}/">
+          <span class="ptile__panel">
+            ${projectPicture(product.picture)}
+          </span>
+          <span class="ptile__name">${esc(product.name)}</span>
+          <span class="ptile__kind">${esc(product.client ? `${product.kind} za ${product.client}` : product.kind)}</span>
+          <span class="ptile__sum">${esc(item.summary)}</span>
+        </a>
+      </li>`;
+      })}
+    </ul>
+  </div>
+</section>`;
+}
+
+/** The body of one case study, below its page hero. */
+export function caseStudyArticle(item, product) {
+  return `
+<section class="section section--plain section--flush-top study" data-study>
+  <div class="shell">
+    <div class="study__facts" data-reveal>
+      <dl class="deflist deflist--facts">
+        ${each(item.facts, (f) => `<div class="deflist__row"><dt>${esc(f.term)}</dt><dd>${esc(f.definition)}</dd></div>`)}
+      </dl>
+    </div>
+    <div class="study__visual" data-reveal>
+      <div class="project__panel">
+        <div class="project__frame" data-tilt>
+          ${projectPicture(product.picture)}
+          <span class="pillar__glare"></span>
+        </div>
+      </div>
+    </div>
+    <div class="study__text">
+      <section class="study__section" data-reveal>
+        <h2>Izziv</h2>
+        ${studyParagraphs(item.challenge)}
+      </section>
+      <section class="study__section" data-reveal>
+        <h2>Kaj smo naredili</h2>
+        ${studyParagraphs(item.build)}
+        <ul class="study__parts">
+          ${each(item.parts, (part) => `<li><h3>${esc(part.name)}</h3><p>${esc(part.body)}</p></li>`)}
+        </ul>
+      </section>
+      <section class="study__section" data-reveal>
+        <h2>Kaj se je spremenilo</h2>
+        <ul class="study__outcomes">
+          ${each(item.outcome, (text) => `<li>${esc(text)}</li>`)}
+        </ul>
+      </section>
+      <section class="study__section" data-reveal>
+        <h2>Orodja</h2>
+        <ul class="study__tags">
+          ${each(item.tools, (tool) => `<li>${esc(tool)}</li>`)}
+        </ul>
+      </section>
+      <p class="study__back"><a class="link" href="/studije-primerov/">Vse študije primerov</a></p>
     </div>
   </div>
 </section>`;

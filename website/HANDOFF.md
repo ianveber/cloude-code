@@ -21,7 +21,7 @@ response so search engines and AI answer engines can read it without JavaScript.
 The home page is a product narrative, not a template landing page:
 
 1. Typed intro: white screen, the bare brain, "AIS Slovenia" typed with a caret (home only)
-2. Hero: headline left, two pill buttons, the 3D brain standing on the right (white,
+2. Hero: headline left, two pill buttons, the 3D brain slab on the right (white,
    the code glow is masked out of this section)
 3. Build stage: a rounded black panel where the three clips circle through
    front, back-left and back-right, three seconds each in front (the only dark block)
@@ -70,12 +70,12 @@ These are enforced by `design-audit.mjs` and/or by the approved spec.
    the browser icon only. Light lockup is `public/brand/logo-light.png`.
    Never hand-draw, edit or "improve" these paths; re-trace from the lockup
    if the mark changes.
-2. **The brain is the only 3D object.** In the hero it faces straight on and
-   is symmetric at rest (`--tilt-x: 0deg`, `--tilt-y: 0deg`; Ian asked for
-   this on 2026-09-09 after a lying slab): the traced face on a white core,
-   eight dark slices behind it that show as a thick edge when it turns, a
-   highlight and a light sweep that follow the pointer, and two shadows in its
-   own silhouette. No tile or frame around it. Pointer turn is capped at ±9°.
+2. **The brain is the only 3D object.** In the hero it lies at the approved
+   tilt (`--tilt-x: 58deg`, `--tilt-z: -30deg`) as a slab: the traced face on
+   a white core, eight dark slices behind it for thickness, a highlight and a
+   light sweep that follow the pointer, and two shadows in its own silhouette.
+   No tile or frame around it. Pointer tilt is capped at ±8°. (A straight-on
+   pose was tried on 2026-09-09 and reverted the next day at Ian's request.)
 3. **Buttons are black or soft grey pills.** No accent-coloured buttons.
 4. **One accent: AIS blue `#1d77fe`, the same blue as the mark.** Eyebrows,
    the hero's second line, glows and focus rings all use `--blue`. The only
@@ -158,6 +158,8 @@ push that touches `website/`.
 |---|---|
 | `/` | Full home narrative + intro |
 | `/produkti/` | Live: our products and the projects built for clients |
+| `/studije-primerov/` | Live: index of the 14 case studies |
+| `/studije-primerov/<id>/` | Live: one case study per project (same ids as the products) |
 | `/storitve/` | Live — three service areas |
 | `/storitve/avtomatizacija-administracije/` | Live |
 | `/storitve/avtomatizacija-prodaje/` | Live |
@@ -167,7 +169,7 @@ push that touches `website/`.
 | `/dogodki/` | Empty state |
 | `/blog/` | Empty state |
 | `/o-podjetju/` | Live |
-| `/ekipa/` | Live — Anej Vučič, Nejc Feigel Boh, Ian Veber |
+| `/ekipa/` | Live — Anej Vučič, Nejc Feigel Boh (Ian Veber removed at his request, 2026-09-10) |
 | `/pogosta-vprasanja/` | Live — ten Q&As |
 | `/kontakt/` | Live — `mailto:` fallback until `formEndpoint` is set |
 | `/404.html` | Live, `noindex` |
@@ -219,7 +221,7 @@ requires a real logo image and a name per pill and rejects descriptions.
 
 - Intro: the bare brain (`brain-light.svg`) with "AIS Slovenia" typed beside
   it in the site font. The text comes from `intro` in `content/showcase.mjs`.
-- Hero: the brain standing straight on, in 3D. `src/showcase.mjs` reads the two paths
+- Hero: the brain as a lying 3D slab. `src/showcase.mjs` reads the two paths
   from `brain-light.svg` at build time into an inline `<symbol>`; the face
   uses it, everything else (slices, core, gloss, sweep, shadow) is a masked
   box using `brain-solid.svg`. Slice colours come from `--k` and `color-mix`.
@@ -280,6 +282,34 @@ page script posts JSON and shows inline success/error. Keep the printed email
 under the form either way.
 
 ---
+
+## Case studies (2026-09-10)
+
+Every project on `/produkti/` has a page under `/studije-primerov/<id>/`, plus
+an index at `/studije-primerov/`. Copy lives in `content/case-studies.mjs`
+(one entry per product id; the name, kind, client and picture come from the
+product record, so they cannot drift). Four fixed parts on every page: Izziv,
+Kaj smo naredili (with the parts of the system), Kaj se je spremenilo, Orodja.
+The audit fails if any of the 14 is missing, unlinked from `/produkti/`, or
+missing a part.
+
+What each study rests on:
+
+- ATHLOS, AIS Command, AISOS, INSPECTUS VLDR, INSPECTUS VIN filter and the
+  coatings model: written from their repositories. Their "Stanje" rows are
+  honest: AIS Command is pre-launch, the VIN filter is a prototype tested on
+  synthetic images, the coatings model has only seen synthetic formulations.
+  Do not "upgrade" those rows without new evidence.
+- Pacom and ZaLife: from the Business HQ in Notion. No client targets or
+  prices are published.
+- Elementum, Tower Spa Celje, Dr. Asya Grafy, SI-BIG, HEVA, Epolac: **drafted
+  without source material** (`draft: true`), like their product entries, at
+  Ian's request. Ian confirms or rewrites them before deploy; until then they
+  must not be quoted anywhere else.
+
+No client quotes, no invented metrics. The only numbers on these pages come
+from the repositories (314 vehicles, 29 of 30 reads, 49 tests, R² on synthetic
+families) and are labelled as such in the copy.
 
 ## Build-stage videos and pillar pictures
 
