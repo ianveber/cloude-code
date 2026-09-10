@@ -13,7 +13,10 @@
     "audit": "node audit.mjs",
     "dev": "node build.mjs --serve",
     "serve": "node build.mjs --serve",
-    "render-check": "node render-check.mjs"
+    "render-check": "node render-check.mjs",
+    "indexnow": "node tools/indexnow.mjs",
+    "pictures": "node tools/pictures/render.mjs && node tools/pictures/variants.mjs",
+    "lighthouse": "node tools/lighthouse.mjs"
   },
   "devDependencies": {
     "puppeteer-core": "^24.43.1"

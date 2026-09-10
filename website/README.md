@@ -324,3 +324,6 @@ environment variables and no install step.
 
 Sitemap, `llms.txt`, internal-link checking and the audit pick it up
 automatically.
+
+
+See `SEO-GEO.md` for the search and answer-engine work; `npm run lighthouse` prints scores, `npm run indexnow` submits the sitemap after a deploy.

@@ -152,7 +152,7 @@ expect(
 expect(
   /export function pillarsSection/.test(showcase) &&
     /\/pictures\/(?:saas|flow|security)/.test(showcaseContent) &&
-    /<source srcset="[^"]+\.webp" type="image\/webp">/.test(showcase),
+    /<source srcset="[^"]+\.webp 3200w" sizes="[^"]+" type="image\/webp">/.test(showcase),
   'Pillars must render the three rendered product pictures with a webp source.'
 );
 expect(

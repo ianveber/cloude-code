@@ -69,32 +69,32 @@ export const clients = {
     {
       name: 'INSPECTUS',
       href: 'https://inspectus.si/',
-      logo: { src: '/clients/inspectus.png', width: 608, height: 224 },
+      logo: { src: '/clients/inspectus.webp', width: 110, height: 41 },
     },
     {
       name: 'Pacom',
       href: 'https://pacom.si/',
-      logo: { src: '/clients/pacom.png', width: 300, height: 259 },
+      logo: { src: '/clients/pacom.webp', width: 110, height: 95 },
     },
     {
       name: 'ZaLife',
       href: 'https://www.zalife.eu/',
-      logo: { src: '/clients/zalife.png', width: 593, height: 240 },
+      logo: { src: '/clients/zalife.webp', width: 110, height: 45 },
     },
     {
       name: 'Elementum',
       href: 'https://elementum.si/',
-      logo: { src: '/clients/elementum.png', width: 443, height: 85 },
+      logo: { src: '/clients/elementum.webp', width: 110, height: 21 },
     },
     {
       name: 'Tower Spa Celje',
       href: 'https://towerspacelje.com/',
-      logo: { src: '/clients/towerspa.png', width: 400, height: 436 },
+      logo: { src: '/clients/towerspa.webp', width: 101, height: 110 },
     },
     {
       name: 'Dr. Asya Grafy Bio Institute',
       href: 'https://drasyagrafy.com/',
-      logo: { src: '/clients/asyagrafy.png', width: 600, height: 363 },
+      logo: { src: '/clients/asyagrafy.webp', width: 110, height: 67 },
     },
     {
       name: 'AISOS',
@@ -103,17 +103,17 @@ export const clients = {
     {
       name: 'SI-BIG',
       href: 'https://si-big.com/',
-      logo: { src: '/clients/sibig.png', width: 592, height: 541 },
+      logo: { src: '/clients/sibig.webp', width: 110, height: 101 },
     },
     {
       name: 'HEVA',
       href: 'https://www.heva.si/',
-      logo: { src: '/clients/heva.png', width: 110, height: 50 },
+      logo: { src: '/clients/heva.webp', width: 110, height: 50 },
     },
     {
       name: 'Epolac',
       href: 'https://www.epolac.com/',
-      logo: { src: '/clients/epolac.png', width: 308, height: 83 },
+      logo: { src: '/clients/epolac.webp', width: 110, height: 30 },
       tone: 'dark',
     },
     {

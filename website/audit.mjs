@@ -152,13 +152,40 @@ function auditPage(route, html) {
     fail(route, 'Prazen #root — vsebina se izrisuje na odjemalcu.');
   }
 
+  /* GEO and technical hygiene added 2026-09-10 */
+  if (!noindex) {
+    if (!/"dateModified": "\d{4}-\d{2}-\d{2}"/.test(html)) fail(route, 'WebPage v JSON-LD nima dateModified.');
+    if (!/<link rel="alternate" type="text\/markdown" href="[^"]+index\.md"/.test(html)) fail(route, 'Manjka povezava na različico v Markdownu.');
+    if (!/<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'inline-speculation-rules' 'sha256-/.test(html)) fail(route, 'Manjka CSP z zgoščenimi vrednostmi vgrajenih skript.');
+    if (/<script(?![^>]*\ssrc=)[^>]*>[\s\S]*?<\/script>/i.test(html) && !/'unsafe-inline'[^"]*style-src|script-src[^;]*'sha256-/.test(html)) fail(route, 'Vgrajena skripta brez zgoščene vrednosti v CSP.');
+    if (!/<script type="speculationrules">/.test(html)) warn(route, 'Manjka speculationrules (prerender).');
+    if (/fonts\.googleapis\.com\/css2\?family=Google\+Sans/.test(html)) fail(route, 'Google Sans Flex se še nalaga iz Google Fonts namesto iz lastnega strežnika.');
+    if (!/rel="preload" href="\/fonts\/google-sans-flex-latin\.woff2" as="font"/.test(html)) fail(route, 'Manjka preload za lastno pisavo.');
+    if (/hreflang=/.test(html)) fail(route, 'hreflang na enojezični strani ni potreben.');
+    if (route.startsWith('/studije-primerov/') && route !== '/studije-primerov/') {
+      if (!/"@type": "Article"/.test(html)) fail(route, 'Študija primera nima vozlišča Article.');
+      if (!/class="takeaway"/.test(html)) fail(route, 'Študija primera nima odgovora na kratko.');
+      if (!/<time datetime="\d{4}-\d{2}-\d{2}">/.test(html)) fail(route, 'Študija primera nima vidnega datuma.');
+      if (!/class="study__service">/.test(html)) fail(route, 'Študija primera ne kaže na storitev ali izdelek.');
+      if (!/property="og:type" content="article"/.test(html) || !/property="article:modified_time"/.test(html)) fail(route, 'Študija primera nima Open Graph tipa article z datumom.');
+    }
+    if (/^\/storitve\/[^/]+\/$/.test(route)) {
+      if (!/"@type": "FAQPage"/.test(html) || (html.match(/class="faq-item"/g) ?? []).length < 3) fail(route, 'Stran storitve nima treh vprašanj z odgovori.');
+      if (!/href="\/studije-primerov\/[a-z0-9-]+\/"/.test(html)) fail(route, 'Stran storitve ne kaže na nobeno študijo primera.');
+    }
+    if (/^\/vodici\/[^/]+\/$/.test(route) && !/"@type": "Article"/.test(html)) fail(route, 'Vodič nima vozlišča Article.');
+    if (/<picture>/.test(html) && !/<source srcset="[^"]*-800\.webp 800w, [^"]*-1600\.webp 1600w[^"]*" sizes="/.test(html)) fail(route, 'Slika v <picture> nima srcset z manjšimi različicami.');
+    if (/clients\/[a-z-]+\.png/.test(html)) fail(route, 'Logotip stranke je še PNG namesto majhnega webp.');
+    if (route !== '/' && !/class="hero__meta">Posodobljeno <time datetime="/.test(html)) fail(route, 'Podstran nima vidnega datuma posodobitve.');
+  }
+
   return { route, title, desc, words, bytes, h1s, ld: ldBlocks.length };
 }
 
 /* ── Site-level checks ────────────────────────────────────────────────── */
 
 async function auditSite(pages) {
-  const need = ['sitemap.xml', 'robots.txt', 'llms.txt'];
+  const need = ['sitemap.xml', 'robots.txt', 'llms.txt', 'llms-full.txt', 'index.md'];
   for (const f of need) {
     try {
       await stat(path.join(DIST, f));
@@ -179,6 +206,9 @@ async function auditSite(pages) {
       }
     }
     if (locs.some((l) => l.includes('404'))) fail('(site)', '404 stran ne sme biti v sitemap.xml.');
+    if (/<changefreq>|<priority>/.test(sitemap)) fail('(site)', 'sitemap.xml naj nosi samo <loc> in <lastmod>.');
+    const lastmods = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)];
+    if (lastmods.length !== locs.length) fail('(site)', 'Vsak URL v sitemap.xml potrebuje svoj <lastmod>.');
   } catch (e) {
     if (!/ENOENT/.test(e.message)) fail('(site)', `sitemap.xml: ${e.message}`);
   }
@@ -186,9 +216,13 @@ async function auditSite(pages) {
   try {
     const robots = await readFile(path.join(DIST, 'robots.txt'), 'utf8');
     if (!/Sitemap:/i.test(robots)) fail('(site)', 'robots.txt ne navaja sitemapa.');
-    for (const bot of ['GPTBot', 'ClaudeBot', 'PerplexityBot', 'Google-Extended']) {
+    for (const bot of ['OAI-SearchBot', 'Claude-SearchBot', 'PerplexityBot', 'Bingbot', 'GPTBot', 'ClaudeBot', 'Google-Extended']) {
       if (!robots.includes(bot)) warn('(site)', `robots.txt ne omenja ${bot}.`);
     }
+    if (!/Content-Signal: search=yes, ai-input=yes/.test(robots)) warn('(site)', 'robots.txt nima Content-Signal.');
+    if (/Disallow: \/\s*$/m.test(robots)) fail('(site)', 'robots.txt prepoveduje celotno stran vsaj enemu robotu.');
+    const keyFiles = (await readdir(DIST)).filter((f) => /^[0-9a-f]{32}\.txt$/.test(f));
+    if (keyFiles.length !== 1) fail('(site)', 'Manjka datoteka s ključem IndexNow.');
   } catch {
     /* already reported as missing above */
   }
@@ -228,7 +262,7 @@ async function auditLinks(files) {
       if (!href.startsWith('/') || href.startsWith('//')) continue;
       const target = href.split('#')[0].split('?')[0];
       if (!target) continue;
-      if (/\.(css|png|jpe?g|svg|xml|txt|webmanifest|ico)$/i.test(target)) continue;
+      if (/\.(css|png|jpe?g|svg|webp|avif|xml|txt|md|webmanifest|ico|woff2)$/i.test(target)) continue;
       if (!routes.has(target)) fail(route, `Notranja povezava kaže v nič: ${href}`);
     }
   }

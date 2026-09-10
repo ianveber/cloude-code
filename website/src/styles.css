@@ -1,3 +1,28 @@
+/* ── Google Sans Flex, self-hosted ───────────────────────────────────────
+   The variable font (weights 300 to 600) in the latin and latin-ext subsets,
+   downloaded from Google Fonts (OFL) and served from this origin. No third
+   party in the font chain, and č, š, ž come from the latin-ext file. */
+
+@font-face {
+  font-family: 'Google Sans Flex';
+  font-style: normal;
+  font-weight: 300 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url('/fonts/google-sans-flex-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Google Sans Flex';
+  font-style: normal;
+  font-weight: 300 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url('/fonts/google-sans-flex-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* ==========================================================================
    AIS Slovenia — design system
 
@@ -14,7 +39,7 @@
   --ink: #111318;
   --ink-soft: #353a44;
   --muted: #5f6470;
-  --faint: #9299a5;
+  --faint: #6f7785;
   --line: #e5e7eb;
   --line-strong: #cfd3da;
   --paper: #fff;
@@ -2873,7 +2898,8 @@ html.motion-on .depth__b { animation: depthB 41s ease-in-out infinite alternate;
 
 .footer-people a:hover { color: var(--blue); }
 
-.site-footer h4 {
+.site-footer .footer-title {
+  margin: 0;
   font-size: var(--text-xs);
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -3141,4 +3167,67 @@ html.motion-on .depth__b { animation: depthB 41s ease-in-out infinite alternate;
 
 @media (max-width: 640px) {
   .ptiles--studies { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ── Dates, service links, guides ────────────────────────────────────── */
+
+.hero__meta {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-sm);
+  color: var(--faint);
+}
+
+.study__service {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.study__service .link { margin-left: 0.35rem; }
+
+.guides {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-3) 0 0;
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.guide__link {
+  display: grid;
+  gap: 0.5rem;
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  background: var(--canvas);
+  color: var(--ink);
+  text-decoration: none;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.guide__link:hover { transform: translateY(-4px); }
+
+.guide__title {
+  font-size: var(--text-lg, 1.25rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.guide__lead {
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.guide-body { padding-bottom: 0; }
+
+@media (max-width: 900px) {
+  .guides { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ── Cross-document view transitions ────────────────────────────────────
+   With prerendering, a click lands on a page that is already painted; the
+   transition crossfades the two documents instead of flashing white. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
 }

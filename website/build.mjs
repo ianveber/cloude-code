@@ -12,6 +12,7 @@
 
 import { mkdir, writeFile, rm, cp, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -37,6 +38,7 @@ import {
   definitionList,
 } from './src/sections.mjs';
 import { renderPage } from './src/layout.mjs';
+import { pageToMarkdown } from './src/markdown.mjs';
 import {
   brainHero,
   buildStage,
@@ -60,7 +62,12 @@ import {
   howToNode,
   teamNodes,
   contactPageNode,
+  articleNode,
+  guideArticleNode,
+  placeNode,
 } from './src/schema.mjs';
+import { serviceFaq } from './content/faq-services.mjs';
+import { guides } from './content/guides.mjs';
 import { esc, absolute } from './src/html.mjs';
 import * as C from './content/content.mjs';
 import * as S from './content/showcase.mjs';
@@ -74,6 +81,12 @@ const url = (p) => absolute(site.origin, p);
 /* ── Shared page fragments ────────────────────────────────────────────── */
 
 const HOME_CRUMB = { label: 'Domov', href: '/' };
+
+/* 2026-09-10 → 10. 9. 2026, the way a date is written in Slovene. */
+const formatDate = (iso) => {
+  const [y, m, d] = String(iso).split('-').map(Number);
+  return `${d}. ${m}. ${y}`;
+};
 
 const closingCta = ctaBand({
   title: 'Preverimo, ali je avtomatizacija smiselna za vas',
@@ -227,6 +240,14 @@ function servicePage(service) {
       C.processSteps
     ),
 
+    caseStudyGrid(
+      { items: caseStudies.items.filter((item) => item.service === service.slug) },
+      S.products,
+      { eyebrow: 'Iz prakse', title: `Kaj smo zgradili: ${service.role.toLowerCase()}` }
+    ),
+
+    faqSection({ eyebrow: 'Vprašanja', title: `Pogosta vprašanja: ${service.name.toLowerCase()}`, lead: '' }, { items: serviceFaq[service.slug] }),
+
     closingCta,
   ].join('\n');
 
@@ -242,7 +263,7 @@ function servicePage(service) {
     ],
     priority: '0.8',
     changefreq: 'monthly',
-    schema: [serviceNode(service)],
+    schema: [serviceNode(service), faqNode(serviceFaq[service.slug], `/storitve/${service.slug}/`)],
     body,
   };
 }
@@ -404,7 +425,7 @@ function contactPage() {
     breadcrumbs: [HOME_CRUMB, { label: 'Kontakt', href: '/kontakt/' }],
     priority: '0.9',
     changefreq: 'monthly',
-    schema: [contactPageNode('/kontakt/')],
+    schema: [contactPageNode('/kontakt/'), placeNode()],
     body,
   };
 }
@@ -519,6 +540,7 @@ function caseStudiesIndexPage() {
 
 function caseStudyPage(item) {
   const product = productFor(item);
+  const service = item.service ? C.services.find((s) => s.slug === item.service) : null;
   const body = [
     pageHero({
       eyebrow: 'Študija primera',
@@ -526,7 +548,7 @@ function caseStudyPage(item) {
       lead: item.summary,
       cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
     }),
-    caseStudyArticle(item, product),
+    caseStudyArticle(item, product, service),
     closingCta,
   ].join('\n');
 
@@ -536,8 +558,103 @@ function caseStudyPage(item) {
     description: item.metaDescription,
     keywords: item.keywords,
     breadcrumbs: [HOME_CRUMB, STUDIES_CRUMB, { label: product.name, href: `/studije-primerov/${item.id}/` }],
-    priority: '0.7',
-    changefreq: 'yearly',
+    ogType: 'article',
+    ogImage: `${product.picture.src}.jpg`,
+    ogImageWidth: product.picture.width,
+    ogImageHeight: product.picture.height,
+    schema: [(page) => articleNode(item, product, page)],
+    body,
+  };
+}
+
+/* ── Guides ─────────────────────────────────────────────────────────────
+   Comparison and cost pages, answer first. */
+
+const GUIDES_CRUMB = { label: 'Vodiči', href: '/vodici/' };
+
+function guidesIndexPage() {
+  const body = [
+    pageHero({ eyebrow: guides.eyebrow, title: guides.title, lead: guides.lead, cta: { label: 'Rezervirajte posvet', href: '/kontakt/' } }),
+    `<section class="section section--plain section--flush-top">
+  <div class="shell">
+    ${takeaway({ label: 'Na kratko', text: guides.answer })}
+  </div>
+</section>`,
+    `<section class="section" aria-labelledby="vodici-list">
+  <div class="shell">
+    ${sectionHead({ eyebrow: 'Trije vodiči', title: 'Odgovori pred prvim pogovorom', id: 'vodici-list' })}
+    <ul class="guides">
+      ${guides.items
+        .map(
+          (g) => `
+      <li class="guide" data-reveal>
+        <a class="guide__link" href="/vodici/${esc(g.slug)}/">
+          <span class="guide__title">${esc(g.title)}</span>
+          <span class="guide__lead">${esc(g.lead)}</span>
+        </a>
+      </li>`
+        )
+        .join('\n')}
+    </ul>
+  </div>
+</section>`,
+    closingCta,
+  ].join('\n');
+
+  return {
+    path: '/vodici/',
+    title: guides.metaTitle,
+    description: guides.metaDescription,
+    keywords: ['AI avtomatizacija vodič', 'AI chatbot ali glasovni agent', 'cena AI avtomatizacije', 'n8n ali Make'],
+    breadcrumbs: [HOME_CRUMB, GUIDES_CRUMB],
+    body,
+  };
+}
+
+function guidePage(guide) {
+  const body = [
+    pageHero({ eyebrow: 'Vodič', title: guide.title, lead: guide.lead, cta: { label: 'Rezervirajte posvet', href: '/kontakt/' } }),
+    `<section class="section section--plain section--flush-top">
+  <div class="shell">
+    ${takeaway({ label: 'Na kratko', text: guide.answer })}
+  </div>
+</section>`,
+    `<section class="section guide-body">
+  <div class="shell">
+    <div class="study__text">
+      ${guide.sections
+        .map(
+          (s) => `
+      <section class="study__section" data-reveal>
+        <h2>${esc(s.title)}</h2>
+        ${s.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('\n')}
+      </section>`
+        )
+        .join('\n')}
+    </div>
+  </div>
+</section>`,
+    `<section class="section">
+  <div class="shell">
+    ${sectionHead({ eyebrow: 'Primerjava', title: 'Na en pogled' })}
+    ${definitionList(guide.compare)}
+  </div>
+</section>`,
+    faqSection({ eyebrow: 'Vprašanja', title: 'Pogosta vprašanja', lead: '' }, { items: guide.faq }),
+    closingCta,
+  ].join('\n');
+
+  return {
+    path: `/vodici/${guide.slug}/`,
+    title: guide.metaTitle,
+    description: guide.metaDescription,
+    keywords: guide.keywords,
+    breadcrumbs: [HOME_CRUMB, GUIDES_CRUMB, { label: guide.title, href: `/vodici/${guide.slug}/` }],
+    ogType: 'article',
+    schema: [
+      (page) => guideArticleNode(guide, page),
+      faqNode(guide.faq, `/vodici/${guide.slug}/`),
+    ],
     body,
   };
 }
@@ -638,6 +755,8 @@ export function collectPages() {
     productsPage(),
     caseStudiesIndexPage(),
     ...caseStudies.items.map(caseStudyPage),
+    guidesIndexPage(),
+    ...guides.items.map(guidePage),
     servicesIndexPage(),
     ...C.services.map(servicePage),
     processPage(),
@@ -654,15 +773,15 @@ export function collectPages() {
 
 /* ── Derived files ────────────────────────────────────────────────────── */
 
-function sitemapXml(pages, lastmod) {
+/* Only <loc> and an accurate per-page <lastmod>: Google reads lastmod when it
+   is trustworthy and ignores changefreq and priority, so those stay out. */
+function sitemapXml(pages) {
   const entries = pages
     .filter((p) => !p.noindex)
     .map(
       (p) => `  <url>
     <loc>${url(p.path)}</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>${p.changefreq ?? 'monthly'}</changefreq>
-    <priority>${p.priority ?? '0.5'}</priority>
+    <lastmod>${p.dateModified}</lastmod>
   </url>`
     )
     .join('\n');
@@ -682,32 +801,49 @@ ${entries}
  * to be able to fetch the pages in the first place.
  */
 function robotsTxt() {
-  const aiAgents = [
-    'GPTBot',
+  const answerBots = [
+    'Googlebot',
+    'Bingbot',
     'OAI-SearchBot',
     'ChatGPT-User',
-    'ClaudeBot',
+    'Claude-SearchBot',
     'Claude-User',
-    'anthropic-ai',
     'PerplexityBot',
     'Perplexity-User',
+    'DuckAssistBot',
+    'MistralAI-User',
+    'YouBot',
+    'Applebot',
+  ];
+  const trainingBots = [
+    'GPTBot',
+    'ClaudeBot',
+    'anthropic-ai',
     'Google-Extended',
     'Applebot-Extended',
     'CCBot',
-    'meta-externalagent',
+    'Meta-ExternalAgent',
+    'Meta-ExternalFetcher',
     'Bytespider',
+    'Amazonbot',
     'cohere-ai',
-    'DuckAssistBot',
-    'MistralAI-User',
   ];
+  const group = (agents) => `${agents.map((a) => `User-agent: ${a}`).join('\n')}\nAllow: /`;
 
   return `# robots.txt — ${site.name}
+# Search and answer engines may read, index and cite everything here.
+# Training crawlers are allowed on purpose: a small brand gains from being
+# known to the models, and nothing on this site is confidential.
 
 User-agent: *
 Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
-# AI answer engines are welcome to read and cite this site.
-${aiAgents.map((a) => `User-agent: ${a}\nAllow: /`).join('\n\n')}
+# Answer engines and the fetchers they use while answering
+${group(answerBots)}
+
+# Training crawlers
+${group(trainingBots)}
 
 Sitemap: ${url('/sitemap.xml')}
 `;
@@ -721,10 +857,14 @@ Sitemap: ${url('/sitemap.xml')}
  * influence how the business gets described in generated answers.
  */
 function llmsTxt(pages) {
-  const pageLines = pages
-    .filter((p) => !p.noindex)
-    .map((p) => `- [${p.title.split('|')[0].trim()}](${url(p.path)}): ${p.description}`)
-    .join('\n');
+  const live = pages.filter((p) => !p.noindex && p.markdownPath);
+  const line = (p) => `- [${p.title.split('|')[0].trim()}](${url(p.markdownPath)}): ${p.description}`;
+  const group = (test) => live.filter(test).map(line).join('\n');
+  const isStudy = (p) => p.path.startsWith('/studije-primerov/') && p.path !== '/studije-primerov/';
+  const isService = (p) => p.path.startsWith('/storitve/');
+  const pageLines = group((p) => !isStudy(p) && !isService(p));
+  const serviceLines = group(isService);
+  const studyLines = group(isStudy);
 
   return `# ${site.name}
 
@@ -750,7 +890,17 @@ ${C.processSteps.map((s) => `${Number(s.number)}. **${s.title}** — ${s.body}`)
 
 ## Strani
 
+Vsaka povezava vodi na različico strani v Markdownu; ista vsebina je na istem naslovu brez index.md. Celotna vsebina v eni datoteki: ${url('/llms-full.txt')}.
+
 ${pageLines}
+
+## Storitve, podrobno
+
+${serviceLines}
+
+## Študije primerov
+
+${studyLines}
 
 ## Pogosta vprašanja
 
@@ -796,10 +946,36 @@ async function build() {
     await cp(PUBLIC, DIST, { recursive: true });
   }
 
-  const css = await readFile(path.join(ROOT, 'src', 'styles.css'), 'utf8');
+  /* Comments and indentation carry nothing to the browser. */
+  const css = (await readFile(path.join(ROOT, 'src', 'styles.css'), 'utf8'))
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^[ \t]+/gm, '')
+    .replace(/\n{2,}/g, '\n');
   await writeFile(path.join(DIST, 'styles.css'), css);
 
   const pages = collectPages();
+
+  /* Dates come from a committed manifest keyed by path: a page's date moves
+     only when its title, description or body actually changes, so sitemap
+     lastmod and dateModified stay truthful instead of stamping every build. */
+  const manifestPath = path.join(ROOT, 'content', 'lastmod.json');
+  const previous = existsSync(manifestPath) ? JSON.parse(await readFile(manifestPath, 'utf8')) : {};
+  const manifest = {};
+  for (const page of pages) {
+    const hash = createHash('sha1').update(`${page.title}\n${page.description}\n${page.body}`).digest('hex').slice(0, 16);
+    const prev = previous[page.path];
+    const entry = prev && prev.hash === hash ? prev : { hash, published: prev?.published ?? lastmod, updated: lastmod };
+    manifest[page.path] = entry;
+    page.datePublished = entry.published;
+    page.dateModified = entry.updated;
+    if (!page.noindex && !page.path.endsWith('.html')) page.markdownPath = `${page.path}index.md`;
+  }
+  await writeFile(
+    manifestPath,
+    JSON.stringify(Object.fromEntries(Object.entries(manifest).sort(([a], [b]) => a.localeCompare(b))), null, 2) + '\n'
+  );
+
+  const fullParts = [];
 
   for (const page of pages) {
     const isFile = page.path.endsWith('.html');
@@ -808,12 +984,24 @@ async function build() {
       : path.join(DIST, page.path.replace(/^\//, ''), 'index.html');
 
     await mkdir(path.dirname(outPath), { recursive: true });
-    await writeFile(outPath, renderPage(page));
+    page.body = page.body.replaceAll('{{dateModifiedIso}}', page.dateModified).replaceAll('{{dateModified}}', formatDate(page.dateModified));
+    const html = renderPage(page);
+    await writeFile(outPath, html);
+    if (page.markdownPath) {
+      const md = pageToMarkdown(page, html);
+      await writeFile(path.join(path.dirname(outPath), 'index.md'), md);
+      fullParts.push(md);
+    }
   }
 
-  await writeFile(path.join(DIST, 'sitemap.xml'), sitemapXml(pages, lastmod));
+  await writeFile(path.join(DIST, 'sitemap.xml'), sitemapXml(pages));
   await writeFile(path.join(DIST, 'robots.txt'), robotsTxt());
   await writeFile(path.join(DIST, 'llms.txt'), llmsTxt(pages));
+  if (site.indexNowKey) await writeFile(path.join(DIST, `${site.indexNowKey}.txt`), site.indexNowKey);
+  await writeFile(
+    path.join(DIST, 'llms-full.txt'),
+    `# ${site.name}: celotna vsebina spletne strani\n\n> ${site.description}\n\nVsaka stran sledi kot Markdown z glavo (naslov, opis, naslov URL, datum posodobitve).\n\n---\n\n${fullParts.join('\n\n---\n\n')}`
+  );
 
   await mkdir(path.join(DIST, 'brand'), { recursive: true });
   await writeFile(path.join(DIST, 'brand', 'og-default.svg'), ogImageSvg());

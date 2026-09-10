@@ -29,6 +29,8 @@ export const caseStudies = {
     /* ── Lastni izdelki ─────────────────────────────────────────────── */
     {
       id: 'athlos',
+      service: null,
+      answer: 'AIS Slovenia je zgradil ATHLOS, športni operacijski sistem: spletno aplikacijo za športnike, nadzorno ploščo za trenerje in AI trenerja ZEUS, ki sme spremeniti trening samo s privoljenjem športnika in vsako spremembo zapiše, da jo je mogoče razveljaviti.',
       metaTitle: 'ATHLOS, športni operacijski sistem | Študija primera',
       metaDescription:
         'Kako smo zgradili ATHLOS: aplikacijo za športnike, nadzorno ploščo za trenerje in AI trenerja ZEUS, ki sme spremeniti trening le s privoljenjem športnika.',
@@ -68,6 +70,8 @@ export const caseStudies = {
     },
     {
       id: 'ais-command',
+      service: null,
+      answer: 'AIS Slovenia je zgradil AIS Command, CRM in portal za stranke na eni bazi. Osem agentov predlaga naslednje korake, opomnike in mesečne račune, izvedejo pa se le tri vrste dejanj, vsako po človeški potrditvi.',
       metaTitle: 'AIS Command, CRM in portal za stranke | Študija primera',
       metaDescription:
         'Kako smo zgradili AIS Command: CRM, projekte, storitve in račune za ekipo, portal za stranko in agente, ki predlagajo naslednje korake, a ničesar ne pošljejo sami.',
@@ -107,6 +111,8 @@ export const caseStudies = {
     },
     {
       id: 'aisos',
+      service: null,
+      answer: 'AISOS je agentni operacijski sistem AIS Slovenia: pet agentov vsako jutro ob 7.00 iz koledarja, e-pošte in nalog pripravi pregled dneva ter osnutke vsebin in računov. Nič ne gre ven brez potrditve.',
       metaTitle: 'AISOS, agentni operacijski sistem podjetja | Študija primera',
       metaDescription:
         'Kako deluje AISOS: agenti vsako jutro pripravijo pregled dneva iz koledarja, e-pošte in nalog, osnutke vsebin in računov ter povedo, kaj potrebuje človeka.',
@@ -148,6 +154,8 @@ export const caseStudies = {
     /* ── Za stranke ─────────────────────────────────────────────────── */
     {
       id: 'inspectus-vldr',
+      service: 'avtomatizacija-administracije',
+      answer: 'Za INSPECTUS je AIS Slovenia zgradil orodje, ki iz izvoza poročila o škodah v nekaj sekundah naredi urejeno preglednico po vozilih in kartico VLDR za vsako vozilo. Prva resnična serija julija 2026 je imela 314 vozil.',
       metaTitle: 'INSPECTUS VLDR: kartice za pregled vozil | Študija primera',
       metaDescription:
         'Kako iz izvoza poročila o škodah v nekaj sekundah nastanejo urejena preglednica po vozilih in kartica VLDR za vsako vozilo v obliki, ki jo zahteva proizvajalec.',
@@ -187,6 +195,8 @@ export const caseStudies = {
     },
     {
       id: 'inspectus-vin',
+      service: 'avtomatizacija-administracije',
+      answer: 'Za INSPECTUS je AIS Slovenia zasnoval in prototipiral filter, ki fotografije s pomola razvrsti po vozilih po številki VIN. Na testnem naboru je 29 od 30 posnetkov prebral na napravi; pilot na resnični ladji sledi.',
       metaTitle: 'INSPECTUS VIN filter: fotografije po vozilih | Študija primera',
       metaDescription:
         'Prototip filtra, ki fotografije s pomola razvrsti po vozilih: tablica z VIN odpre vozilo, posnetki za njo mu pripadajo, rezultat se preveri proti ladijskemu seznamu.',
@@ -225,6 +235,8 @@ export const caseStudies = {
     },
     {
       id: 'model-premazi',
+      service: 'avtomatizacija-administracije',
+      answer: 'AIS Slovenia je za proizvajalca premazov zgradil napovedni model, ki iz sestave izračuna gostoto, suho snov, viskoznost in prekrivnost z intervalom zaupanja in odkloni recepture zunaj učnih podatkov. Učen je na sintetičnih družinah receptur.',
       metaTitle: 'Napovedni model za formulacije premazov | Študija primera',
       metaDescription:
         'Model, ki iz sestave premaza izračuna gostoto, suho snov, viskoznost in prekrivnost, pove, kako zanesljiva je napoved, in odkloni recepture zunaj svojega znanja.',
@@ -263,6 +275,8 @@ export const caseStudies = {
     },
     {
       id: 'pacom',
+      service: 'avtomatizacija-prodaje',
+      answer: 'Za čistilni servis Pacom iz Novega mesta je AIS Slovenia aprila 2026 postavil marketinški sistem: tri pakete z garancijami, segmente strank, e-poštne sekvence in koledar objav, ki ga polni vsebinski agent in potrjuje človek.',
       metaTitle: 'Pacom: marketinški sistem za čistilni servis | Študija primera',
       metaDescription:
         'Sistem za obstoječe stranke čistilnega servisa Pacom iz Novega mesta: paketi z garancijami, segmenti, e-poštne sekvence in koledar objav z vsebinskim agentom.',
@@ -301,6 +315,8 @@ export const caseStudies = {
     },
     {
       id: 'zalife',
+      service: 'avtomatizacija-prodaje',
+      answer: 'Za ZaLife je AIS Slovenia postavil znamko in vsebinski sistem: sredstva znamke, ponudbe za šole, starše in podjetja, koledar objav in banko idej na enem mestu.',
       metaTitle: 'ZaLife: znamka in vsebinski sistem | Študija primera',
       metaDescription:
         'Znamka in vsebinski sistem za program osebnega razvoja najstnikov ZaLife: sredstva znamke, ponudbe za šole in starše, koledar objav in banka idej na enem mestu.',
@@ -340,6 +356,8 @@ export const caseStudies = {
     /* ── Drafted without source material, see the note at the top ─── */
     {
       id: 'elementum',
+      service: 'avtomatizacija-prodaje',
+      answer: 'Za Elementum je AIS Slovenia postavil spletnega svetovalca, ki v slovenščini ob vsaki uri odgovarja o nakupu in hrambi zlata in srebra, resna povpraševanja preda svetovalcem in ekipi vsako jutro pripravi tržni pregled.',
       metaTitle: 'Elementum: svetovalec za plemenite kovine | Študija primera',
       metaDescription:
         'Spletni svetovalec, ki v slovenščini odgovarja o nakupu in hrambi zlata in srebra, resna povpraševanja preda svetovalcem in ekipi zjutraj pripravi tržni pregled.',
@@ -377,6 +395,8 @@ export const caseStudies = {
     },
     {
       id: 'tower-spa',
+      service: 'avtomatizacija-prodaje',
+      answer: 'Za Tower Spa Celje je AIS Slovenia postavil asistenta za rezervacije, ki odgovarja o paketih, sprejme rezervacijo, pošlje opomnik dan prej in ob odpovedi sprosti termin. Skupine in dogodke preda lastniku.',
       metaTitle: 'Tower Spa Celje: asistent za rezervacije | Študija primera',
       metaDescription:
         'Asistent za rezervacije v wellnessu v srednjeveškem stolpu: odgovarja o paketih, sprejme rezervacijo, pošlje opomnik in ob odpovedi sprosti termin.',
@@ -414,6 +434,8 @@ export const caseStudies = {
     },
     {
       id: 'asya-grafy',
+      service: 'avtomatizacija-prodaje',
+      answer: 'Za Dr. Asya Grafy Bio Institute je AIS Slovenia postavil svetovalca za nego kože v spletni trgovini, ki iz dokumentacije izdelkov svetuje po tipu kože, predlaga vrstni red uporabe in izdelke pošlje v košarico. Zdravstvena vprašanja preda človeku.',
       metaTitle: 'Dr. Asya Grafy: svetovalec za nego kože | Študija primera',
       metaDescription:
         'Svetovalec za nego kože v spletni trgovini: iz dokumentacije o izdelkih svetuje po tipu kože, predlaga vrstni red in izdelke pošlje v košarico.',
@@ -452,6 +474,8 @@ export const caseStudies = {
     },
     {
       id: 'si-big',
+      service: 'spremljanje-trga',
+      answer: 'Za SI-BIG Group je AIS Slovenia postavil sistem, ki vsako jutro pregleda razpise, iskanja partnerjev in novice s šestih balkanskih trgov, jih oceni po merilih posamezne stranke in ekipi pripravi seznam za naprej.',
       metaTitle: 'SI-BIG: spremljanje razpisov na šestih trgih | Študija primera',
       metaDescription:
         'Sistem, ki vsako jutro pregleda razpise, iskanja partnerjev in novice s šestih balkanskih trgov, jih oceni po merilih stranke in ekipi pripravi seznam za naprej.',
@@ -489,6 +513,8 @@ export const caseStudies = {
     },
     {
       id: 'heva',
+      service: 'avtomatizacija-administracije',
+      answer: 'Za HEVA je AIS Slovenia postavil delovne naloge iz e-pošte in klicev: asistent prepozna naslov, težavo in nujnost, ustvari nalog, predlaga prostega monterja in po opravljenem delu pripravi osnutek računa.',
       metaTitle: 'HEVA: delovni nalogi iz e-pošte in klicev | Študija primera',
       metaDescription:
         'Delovni nalogi za upravljanje stavb: iz e-pošte in klicev asistent prepozna naslov, težavo in nujnost, ustvari nalog, predlaga monterja in pripravi račun.',
@@ -526,6 +552,8 @@ export const caseStudies = {
     },
     {
       id: 'epolac',
+      service: 'avtomatizacija-prodaje',
+      answer: 'Za Epolac iz Izraela je AIS Slovenia postavil tehničnega asistenta, ki iz tehničnih in varnostnih listov odgovarja v angleščini in hebrejščini, navede vir in izračuna porabo. Vprašanja o cenah preda prodaji.',
       metaTitle: 'Epolac: tehnični asistent za barve in premaze | Študija primera',
       metaDescription:
         'Tehnični asistent za proizvajalca barv in premazov: iz tehničnih in varnostnih listov odgovarja v angleščini in hebrejščini, navede vir in izračuna porabo.',

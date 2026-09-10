@@ -38,6 +38,8 @@ export function organizationNode() {
     email: site.contact.email,
     telephone: site.contact.phone,
     knowsLanguage: ['sl', 'en'],
+    ...(site.sameAs?.length ? { sameAs: site.sameAs } : {}),
+    location: { '@id': IDS.place },
     areaServed: {
       '@type': 'Country',
       name: 'Slovenija',
@@ -109,6 +111,8 @@ function webPageNode(page) {
     headline: page.headline || page.ogTitle || page.title,
     description: page.description,
     inLanguage: site.lang,
+    ...(page.datePublished ? { datePublished: page.datePublished } : {}),
+    ...(page.dateModified ? { dateModified: page.dateModified } : {}),
     isPartOf: { '@id': IDS.website },
     about: { '@id': IDS.organization },
     ...(page.breadcrumbs?.length ? { breadcrumb: { '@id': `${url(page.path)}#breadcrumb` } } : {}),
@@ -198,6 +202,77 @@ export function teamNodes() {
   }));
 }
 
+/** The company as a place: address, coordinates and languages, for local intent. */
+export function placeNode() {
+  return {
+    '@type': 'LocalBusiness',
+    '@id': IDS.place,
+    name: site.name,
+    legalName: site.legalName,
+    url: url('/'),
+    image: url(site.brand.logo),
+    telephone: site.contact.phone,
+    email: site.contact.email,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: site.contact.city,
+      addressRegion: site.contact.region,
+      addressCountry: site.contact.countryCode,
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: site.contact.latitude,
+      longitude: site.contact.longitude,
+    },
+    areaServed: { '@type': 'Country', name: 'Slovenija' },
+    knowsLanguage: ['sl', 'en'],
+    parentOrganization: { '@id': IDS.organization },
+  };
+}
+
+/** A case study as an Article about the client, dated from the page. */
+export function articleNode(item, product, page) {
+  return {
+    '@type': 'Article',
+    '@id': `${url(page.path)}#article`,
+    headline: item.metaTitle.split('|')[0].trim(),
+    name: product.name,
+    description: item.metaDescription,
+    inLanguage: site.lang,
+    url: url(page.path),
+    mainEntityOfPage: { '@id': `${url(page.path)}#webpage` },
+    image: url(`${product.picture.src}.jpg`),
+    ...(page.datePublished ? { datePublished: page.datePublished } : {}),
+    ...(page.dateModified ? { dateModified: page.dateModified } : {}),
+    author: { '@id': IDS.organization },
+    publisher: { '@id': IDS.organization },
+    about: product.client ? { '@type': 'Organization', name: product.client } : { '@id': IDS.organization },
+    keywords: (item.keywords ?? []).join(', '),
+    articleSection: product.kind,
+    isPartOf: { '@id': IDS.website },
+  };
+}
+
+/** A guide as an Article by the company, dated from the page. */
+export function guideArticleNode(guide, page) {
+  return {
+    '@type': 'Article',
+    '@id': `${url(page.path)}#article`,
+    headline: guide.title,
+    description: guide.metaDescription,
+    inLanguage: site.lang,
+    url: url(page.path),
+    mainEntityOfPage: { '@id': `${url(page.path)}#webpage` },
+    image: url(site.brand.ogImage),
+    ...(page.datePublished ? { datePublished: page.datePublished } : {}),
+    ...(page.dateModified ? { dateModified: page.dateModified } : {}),
+    author: { '@id': IDS.organization },
+    publisher: { '@id': IDS.organization },
+    keywords: (guide.keywords ?? []).join(', '),
+    isPartOf: { '@id': IDS.website },
+  };
+}
+
 export function contactPageNode(pagePath) {
   return {
     '@type': 'ContactPage',
@@ -219,7 +294,7 @@ export function buildGraph(page) {
     websiteNode(),
     webPageNode(page),
     breadcrumbNode(page),
-    ...(page.schema ?? []),
+    ...(page.schema ?? []).map((node) => (typeof node === 'function' ? node(page) : node)),
   ].filter(Boolean);
 
   return {

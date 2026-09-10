@@ -47,6 +47,7 @@ export function pageHero({ eyebrow, title, lead, cta }) {
           ? `<div class="btn-row"><a class="btn btn--primary" href="${esc(cta.href)}">${esc(cta.label)}</a></div>`
           : ''
       }
+      <p class="hero__meta">Posodobljeno <time datetime="{{dateModifiedIso}}">{{dateModified}}</time></p>
     </div>
   </div>
 </section>`;

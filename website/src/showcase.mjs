@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 import { esc, each } from './html.mjs';
+import { takeaway, sectionHead } from './sections.mjs';
 import site from '../content/site.mjs';
 import { intro as introCopy } from '../content/showcase.mjs';
 
@@ -247,14 +248,7 @@ export function clientsLine(data) {
    White section. A title and one sentence beside one product picture. The
    picture sits in a soft panel and leans a little toward the pointer. */
 
-function pillarPicture(picture) {
-  return `
-        <picture>
-          <source srcset="${esc(picture.src)}.webp" type="image/webp">
-          <img src="${esc(picture.src)}.jpg" alt="${esc(picture.alt)}"
-            width="${picture.width}" height="${picture.height}" loading="lazy" decoding="async">
-        </picture>`;
-}
+const pillarPicture = (picture) => projectPicture(picture, PICTURE_SIZES.half);
 
 export function pillarsSection(data) {
   return `
@@ -436,11 +430,21 @@ export function blogGrid(data) {
    tag and one short paragraph. Sides alternate. The home page shows the
    first four as tiles. */
 
-function projectPicture(picture) {
+/* Three webp sizes so a tile or a phone never downloads the 3200px master;
+   `sizes` says how wide the picture is laid out at each breakpoint. */
+export const PICTURE_SIZES = {
+  half: '(max-width: 900px) 100vw, 50vw',
+  quarter: '(max-width: 520px) 100vw, (max-width: 900px) 50vw, 25vw',
+  third: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
+  full: '(max-width: 1240px) 100vw, 1200px',
+};
+
+function projectPicture(picture, sizes = PICTURE_SIZES.half) {
+  const src = esc(picture.src);
   return `
         <picture>
-          <source srcset="${esc(picture.src)}.webp" type="image/webp">
-          <img src="${esc(picture.src)}.jpg" alt="${esc(picture.alt)}"
+          <source srcset="${src}-800.webp 800w, ${src}-1600.webp 1600w, ${src}.webp 3200w" sizes="${sizes}" type="image/webp">
+          <img src="${src}.jpg" alt="${esc(picture.alt)}"
             width="${picture.width}" height="${picture.height}" loading="lazy" decoding="async">
         </picture>`;
 }
@@ -500,7 +504,7 @@ export function productsTeaser(data) {
       <li class="ptile" style="--i:${i}">
         <a class="ptile__link" href="/produkti/#${esc(item.id)}">
           <span class="ptile__panel">
-            ${projectPicture(item.picture)}
+            ${projectPicture(item.picture, PICTURE_SIZES.quarter)}
           </span>
           <span class="ptile__name">${esc(item.name)}</span>
           <span class="ptile__kind">${esc(item.kind ?? item.kicker)}</span>
@@ -527,12 +531,14 @@ function studyParagraphs(list) {
   return each(list, (text) => `<p>${esc(text)}</p>`);
 }
 
-/** Index: every case study as a tile with a one-line summary. */
-export function caseStudyGrid(data, products) {
+/** Index: every case study as a tile with a one-line summary. With `head`
+    the same grid carries a visible heading, as on the service pages. */
+export function caseStudyGrid(data, products, head = null) {
+  if (!data.items.length) return '';
   return `
 <section class="section studies" aria-labelledby="studije-list" data-studies>
   <div class="shell">
-    <h2 class="visually-hidden" id="studije-list">Seznam študij primerov</h2>
+    ${head ? sectionHead({ ...head, id: 'studije-list' }) : '<h2 class="visually-hidden" id="studije-list">Seznam študij primerov</h2>'}
     <ul class="ptiles ptiles--studies">
       ${each(data.items, (item, i) => {
         const product = products.items.find((x) => x.id === item.id);
@@ -540,7 +546,7 @@ export function caseStudyGrid(data, products) {
       <li class="ptile" style="--i:${i}" data-reveal>
         <a class="ptile__link" href="/studije-primerov/${esc(item.id)}/">
           <span class="ptile__panel">
-            ${projectPicture(product.picture)}
+            ${projectPicture(product.picture, PICTURE_SIZES.third)}
           </span>
           <span class="ptile__name">${esc(product.name)}</span>
           <span class="ptile__kind">${esc(product.client ? `${product.kind} za ${product.client}` : product.kind)}</span>
@@ -554,19 +560,25 @@ export function caseStudyGrid(data, products) {
 }
 
 /** The body of one case study, below its page hero. */
-export function caseStudyArticle(item, product) {
+export function caseStudyArticle(item, product, service = null) {
+  const related = service
+    ? `<a class="link" href="/storitve/${esc(service.slug)}/">${esc(service.name)}</a>`
+    : `<a class="link" href="/produkti/#${esc(product.id)}">Lastni izdelek</a>`;
   return `
 <section class="section section--plain section--flush-top study" data-study>
   <div class="shell">
+    ${takeaway({ label: 'Na kratko', text: item.answer })}
     <div class="study__facts" data-reveal>
       <dl class="deflist deflist--facts">
         ${each(item.facts, (f) => `<div class="deflist__row"><dt>${esc(f.term)}</dt><dd>${esc(f.definition)}</dd></div>`)}
+        <div class="deflist__row"><dt>Posodobljeno</dt><dd><time datetime="{{dateModifiedIso}}">{{dateModified}}</time></dd></div>
       </dl>
+      <p class="study__service">${service ? 'Storitev' : 'Izdelek'}: ${related}</p>
     </div>
     <div class="study__visual" data-reveal>
       <div class="project__panel">
         <div class="project__frame" data-tilt>
-          ${projectPicture(product.picture)}
+          ${projectPicture(product.picture, PICTURE_SIZES.full)}
           <span class="pillar__glare"></span>
         </div>
       </div>

@@ -7,6 +7,7 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 
 import { esc, join, each, jsonLd, absolute } from './html.mjs';
 import { buildGraph } from './schema.mjs';
@@ -41,15 +42,17 @@ function head(page) {
     page.keywords?.length ? `<meta name="keywords" content="${esc(page.keywords.join(', '))}">` : null,
 
     /* Open Graph */
-    '<meta property="og:type" content="website">',
+    `<meta property="og:type" content="${page.ogType ?? 'website'}">`,
     `<meta property="og:site_name" content="${esc(site.name)}">`,
     `<meta property="og:locale" content="${site.locale}">`,
     `<meta property="og:title" content="${esc(page.ogTitle ?? page.title)}">`,
     `<meta property="og:description" content="${esc(page.description)}">`,
     `<meta property="og:url" content="${canonical}">`,
     `<meta property="og:image" content="${ogImage}">`,
-    '<meta property="og:image:width" content="1200">',
-    '<meta property="og:image:height" content="630">',
+    `<meta property="og:image:width" content="${page.ogImageWidth ?? 1200}">`,
+    `<meta property="og:image:height" content="${page.ogImageHeight ?? 630}">`,
+    page.ogType === 'article' && page.datePublished ? `<meta property="article:published_time" content="${page.datePublished}">` : null,
+    page.ogType === 'article' && page.dateModified ? `<meta property="article:modified_time" content="${page.dateModified}">` : null,
     `<meta property="og:image:alt" content="${esc(page.ogTitle ?? page.title)}">`,
 
     /* Twitter / X */
@@ -63,16 +66,15 @@ function head(page) {
     `<link rel="apple-touch-icon" href="${esc(site.brand.favicon)}">`,
     '<meta name="theme-color" content="#ffffff">',
 
-    /* Language alternates */
-    `<link rel="alternate" hreflang="sl-SI" href="${canonical}">`,
-    `<link rel="alternate" hreflang="x-default" href="${canonical}">`,
+    /* One language, one URL per page: no hreflang needed. */
 
-    /* Fonts — preconnect then load without blocking first paint */
+    /* Fonts: Google Sans Flex is self-hosted (see the top of styles.css), so the
+       two subsets every page needs are preloaded. The preconnects stay for the
+       JetBrains Mono sheet that the code-glow snippet loads from Google Fonts. */
+    '<link rel="preload" href="/fonts/google-sans-flex-latin.woff2" as="font" type="font/woff2" crossorigin>',
+    '<link rel="preload" href="/fonts/google-sans-flex-latin-ext.woff2" as="font" type="font/woff2" crossorigin>',
     '<link rel="preconnect" href="https://fonts.googleapis.com">',
     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>',
-    '<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@300;400;500;600&display=swap">',
-    '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@300;400;500;600&display=swap" media="print" onload="this.media=\'all\'">',
-    '<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@300;400;500;600&display=swap"></noscript>',
 
     '<link rel="stylesheet" href="/styles.css">',
     /* Marks the document as script-capable before first paint so entrance
@@ -97,6 +99,12 @@ try {
 } catch (e) {}
 </script>`,
     `<link rel="sitemap" type="application/xml" href="/sitemap.xml">`,
+    /* Chrome prerenders an internal link the moment it is hovered or pressed,
+       so the next page is already painted when the click lands. */
+    `<script type="speculationrules">
+{"prerender":[{"where":{"href_matches":"/*"},"eagerness":"moderate"}]}
+</script>`,
+    page.markdownPath ? `<link rel="alternate" type="text/markdown" href="${url(page.markdownPath)}" title="Markdown">` : null,
 
     `<script type="application/ld+json">${jsonLd(buildGraph(page))}</script>`,
   ]);
@@ -137,7 +145,7 @@ function header(page) {
 <header class="site-header">
   <div class="shell site-header__inner">
     <a class="brand" href="/" aria-label="${esc(site.name)}, domov">
-      <img src="${esc(site.brand.logo)}" alt="${esc(site.name)}" width="${site.brand.logoWidth}" height="${site.brand.logoHeight}" fetchpriority="high">
+      <img src="${esc(site.brand.logoWeb ?? site.brand.logo)}" alt="${esc(site.name)}" width="${site.brand.logoWidth}" height="${site.brand.logoHeight}" fetchpriority="high">
       <span class="visually-hidden">${esc(site.name)}</span>
     </a>
 
@@ -198,7 +206,7 @@ function footer() {
     site.footer.columns,
     (col) => `
       <div>
-        <h4>${esc(col.title)}</h4>
+        <p class="footer-title">${esc(col.title)}</p>
         <ul class="footer-links">
           ${each(col.links, (l) => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`)}
         </ul>
@@ -217,7 +225,7 @@ function footer() {
     <div class="footer-grid">
       <div class="footer-brand">
         <a class="brand" href="/" aria-label="${esc(site.name)}, domov">
-          <img src="${esc(site.brand.logo)}" alt="${esc(site.name)}" width="${site.brand.logoWidth}" height="${site.brand.logoHeight}" loading="lazy">
+          <img src="${esc(site.brand.logoWeb ?? site.brand.logo)}" alt="${esc(site.name)}" width="${site.brand.logoWidth}" height="${site.brand.logoHeight}" loading="lazy">
         </a>
         <p>${esc(site.footer.blurb)}</p>
       </div>
@@ -225,13 +233,13 @@ function footer() {
         ${columns}
       </div>
       <div class="footer-contact">
-        <h4>Kontakt</h4>
+        <p class="footer-title">Kontakt</p>
         <ul class="footer-links">
           <li><a href="mailto:${esc(site.contact.email)}">${esc(site.contact.email)}</a></li>
           <li><a href="${esc(site.contact.phoneHref)}">${esc(site.contact.phone)}</a></li>
           <li><span>${esc(site.contact.city)}, ${esc(site.contact.country)}</span></li>
         </ul>
-        <h4 class="footer-people__title">Ekipa</h4>
+        <p class="footer-title footer-people__title">Ekipa</p>
         <ul class="footer-people">
           ${people}
         </ul>
@@ -246,9 +254,55 @@ function footer() {
 </footer>`;
 }
 
+/* ── Content Security Policy ──────────────────────────────────────────────
+   Built per page from the inline scripts and inline handlers that page really
+   carries, as SHA-256 hashes, so nothing needs 'unsafe-inline' for scripts.
+   Styles keep 'unsafe-inline' because tiles set custom properties inline.
+   A meta policy cannot carry frame-ancestors; vercel.json sets X-Frame-Options. */
+
+const sha256 = (text) => `'sha256-${createHash('sha256').update(text, 'utf8').digest('base64')}'`;
+const unescapeAttr = (v) => v.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+
+function contentSecurityPolicy(html) {
+  const scripts = new Set();
+  for (const m of html.matchAll(/<script(?![^>]*\ssrc=)([^>]*)>([\s\S]*?)<\/script>/gi)) {
+    if (/type="application\/ld\+json"/.test(m[1])) continue;
+    scripts.add(sha256(m[2]));
+  }
+  const handlers = new Set();
+  for (const m of html.matchAll(/\son[a-z]+="([^"]*)"/gi)) handlers.add(sha256(unescapeAttr(m[1])));
+
+  const connect = ["'self'"];
+  try {
+    if (site.contact.formEndpoint) connect.push(new URL(site.contact.formEndpoint).origin);
+  } catch {}
+
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'inline-speculation-rules' ${[...scripts].join(' ')}${handlers.size ? ` 'unsafe-hashes' ${[...handlers].join(' ')}` : ''}`,
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com data:",
+    "img-src 'self' data:",
+    "media-src 'self'",
+    `connect-src ${connect.join(' ')} https://fonts.googleapis.com https://fonts.gstatic.com`,
+    "form-action 'self' mailto:",
+    "base-uri 'self'",
+    "object-src 'none'",
+    'upgrade-insecure-requests',
+  ].join('; ');
+}
+
 /* ── Document ─────────────────────────────────────────────────────────── */
 
 export function renderPage(page) {
+  const html = document(page);
+  return html.replace(
+    '<meta charset="utf-8">',
+    `<meta charset="utf-8">\n<meta http-equiv="Content-Security-Policy" content="${contentSecurityPolicy(html)}">`
+  );
+}
+
+function document(page) {
   return `<!doctype html>
 <html lang="${site.lang}">
 <head>

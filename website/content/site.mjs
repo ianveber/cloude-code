@@ -15,6 +15,15 @@ export const site = {
   foundingLocation: 'Ljubljana, Slovenija',
   copyrightYear: 2026,
 
+  /* Verified public profiles of the company, used as Organization.sameAs so
+     search and answer engines can tie the site to the same entity elsewhere.
+     Add only URLs that were opened and confirmed; an empty list emits nothing. */
+  sameAs: [],
+
+  /* IndexNow: the key is served at /<key>.txt and tools/indexnow.mjs submits
+     every sitemap URL to Bing, Yandex, Naver, Seznam and Yep after a deploy. */
+  indexNowKey: '373707ac9dafb9a7798caf5c6a3541e1',
+
   contact: {
     /* Where the contact form posts.
        Leave empty and the form falls back to opening the visitor's mail client
@@ -37,6 +46,9 @@ export const site = {
     /* The original logo is white-on-dark and disappears on a light page.
        logo-light.png is the same mark with the wordmark recoloured to ink. */
     logo: '/brand/logo-light.png',
+    /* Same lockup as webp for the header and footer <img>; schema and Open
+       Graph keep the PNG. */
+    logoWeb: '/brand/logo-light.webp',
     logoWidth: 133,
     logoHeight: 52,
     /* The brain alone, on a transparent ground, traced from the official
@@ -83,6 +95,7 @@ export const site = {
         { label: 'Ekipa', href: '/ekipa/', note: 'Ljudje za sistemi' },
         { label: 'Proces', href: '/proces/', note: 'Osem korakov uvedbe' },
         { label: 'Pogosta vprašanja', href: '/pogosta-vprasanja/', note: 'Odgovori pred začetkom' },
+        { label: 'Vodiči', href: '/vodici/', note: 'Kaj izbrati in koliko stane' },
       ],
     },
     { label: 'Kontakt', href: '/kontakt/' },
@@ -114,6 +127,7 @@ export const site = {
       {
         title: 'Objave',
         links: [
+          { label: 'Vodiči', href: '/vodici/' },
           { label: 'Novice', href: '/novice/' },
           { label: 'Dogodki', href: '/dogodki/' },
           { label: 'Blog', href: '/blog/' },
