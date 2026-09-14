@@ -342,6 +342,15 @@ rendered screen with a caption (`tools/pictures/details.html`, ids
 `node tools/pictures/render.mjs [id]`, then `node tools/pictures/variants.mjs`
 for the 800 and 1600 px sizes.
 
+Realistic product pictures: `tools/pictures/mockups.html` renders every
+product screen on a CSS laptop (ATHLOS, Tower Spa and HEVA also on a phone)
+in a studio scene, as `public/pictures/<id>-real`. Product rows on
+`/produkti/`, the home tiles and the top of each case study use these; the
+flat screens stay in the case-study detail figure. The scenes are pure CSS,
+no photos: the connected image account has no credits, so no AI
+backgrounds were generated. `realPicture(item)` in `src/showcase.mjs` is
+the only place that knows the naming.
+
 What each study rests on:
 
 - ATHLOS, AIS Command, AISOS, INSPECTUS VLDR, INSPECTUS VIN filter and the

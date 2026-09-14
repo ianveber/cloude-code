@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<title>AIS Slovenia, realistic product pictures: laptop and phone scenes</title>
+<style>
+  :root { --paper: #fff; --ink: #111318; --blue: #1d77fe; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1600px; height: 1000px; overflow: hidden; background: var(--paper); }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', system-ui, sans-serif; }
+  .stage { position: absolute; inset: 0; display: none; overflow: hidden; }
+  .stage.on { display: block; }
+
+  /* Studio backdrop: a wall that darkens toward the desk, the desk plane in
+     the lower third, two soft bokeh lights and a whisper of grain. */
+  .bg { position: absolute; inset: 0; background: linear-gradient(180deg, var(--wall-top) 0%, var(--wall-bottom) 66%, var(--desk-top) 66.3%, var(--desk-bottom) 100%); }
+  .bg::before { content: ''; position: absolute; left: 0; right: 0; top: 66%; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.55) 30%, rgba(255,255,255,.55) 70%, transparent); opacity: .7; }
+  .bokeh { position: absolute; border-radius: 50%; filter: blur(70px); }
+  .bokeh--a { width: 760px; height: 760px; left: -160px; top: -300px; background: radial-gradient(closest-side, var(--bokeh-a), transparent); }
+  .bokeh--b { width: 620px; height: 620px; right: -140px; top: 40px; background: radial-gradient(closest-side, var(--bokeh-b), transparent); }
+  .bokeh--c { width: 420px; height: 420px; left: 560px; top: -160px; background: radial-gradient(closest-side, rgba(255,255,255,.7), transparent); }
+  .grain { position: absolute; inset: 0; opacity: .045; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  .vignette { position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(17,19,24,.16) 100%); }
+
+  /* Laptop: lid and base in one 3D group seen slightly from above and the left. */
+  .scene { position: absolute; inset: 0; perspective: 2600px; perspective-origin: 52% 38%; }
+  .laptop { position: absolute; left: 250px; top: 40px; width: 1180px; height: 760px; transform-style: preserve-3d; transform-origin: 50% 100%; transform: rotateX(18deg) rotateY(-16deg) scale(.76); }
+  .lid { position: absolute; inset: 0; border-radius: 22px; background: linear-gradient(160deg, #1b1d23, #0d0e12 60%); padding: 20px 20px 30px; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.10), inset 0 1px 0 rgba(255,255,255,.18), 0 2px 0 rgba(0,0,0,.6); transform-style: preserve-3d; }
+  .lid::after { content: ''; position: absolute; left: 50%; top: 6px; width: 84px; height: 8px; margin-left: -42px; border-radius: 4px; background: #05060a; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); }
+  .lid::before { content: ''; position: absolute; left: 50%; top: 9px; width: 5px; height: 5px; margin-left: -2px; border-radius: 50%; background: #2a3140; box-shadow: 0 0 0 1px #0a0c12, 0 0 3px rgba(80,120,255,.6); z-index: 2; }
+  .screen { position: relative; width: 100%; height: 100%; border-radius: 9px; overflow: hidden; background: #000; }
+  .screen img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .glare { position: absolute; inset: 0; background: linear-gradient(112deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,.10) 26%, rgba(255,255,255,0) 48%); mix-blend-mode: screen; pointer-events: none; }
+  .base { position: absolute; left: -34px; top: 760px; width: 1248px; height: 330px; transform-origin: 50% 0; transform: rotateX(72deg); border-radius: 0 0 30px 30px; background: linear-gradient(180deg, #c9ccd3 0%, #bfc3ca 45%, #aeb2bb 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,.7); transform-style: preserve-3d; }
+  .base::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 26px; background: linear-gradient(180deg, #4b4f58, #8d919a 70%, #b3b7bf); }
+  .keys { position: absolute; left: 120px; right: 120px; top: 44px; height: 150px; border-radius: 12px; background: #8f939c; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); background-image: repeating-linear-gradient(90deg, transparent 0 58px, #a4a8b0 58px 62px), repeating-linear-gradient(180deg, transparent 0 34px, #a4a8b0 34px 38px); }
+  .pad { position: absolute; left: 50%; top: 214px; width: 340px; height: 92px; margin-left: -170px; border-radius: 12px; background: #b8bcc4; box-shadow: inset 0 0 0 1px rgba(0,0,0,.10); }
+  .lip { position: absolute; left: 0; right: 0; bottom: 0; height: 22px; transform-origin: 50% 100%; transform: rotateX(-72deg); background: linear-gradient(180deg, #a3a7b0, #6a6e77); border-radius: 0 0 30px 30px; }
+
+  /* Shadows on the desk and a faint reflection. */
+  .contact { position: absolute; left: 380px; top: 930px; width: 1000px; height: 70px; border-radius: 50%; background: rgba(17,19,24,.5); filter: blur(24px); }
+  .ambient { position: absolute; left: 300px; top: 730px; width: 1160px; height: 300px; border-radius: 50%; background: rgba(17,19,24,.28); filter: blur(70px); }
+  .reflection { display: none; position: absolute; left: 250px; top: 905px; width: 1180px; height: 420px; overflow: hidden; opacity: .16; transform: scaleY(-1); -webkit-mask-image: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,.8) 100%); mask-image: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,.8) 100%); filter: blur(2px); perspective: 2600px; }
+  .reflection .laptop { left: 0; top: -560px; transform: rotateX(-8deg) rotateY(-17deg) scale(.72); }
+  .reflection .base, .reflection .contact, .reflection .ambient { display: none; }
+
+  /* Phone in the left foreground, with a phone-shaped crop of a scene that
+     already shows the product on a phone. */
+  .pscene { position: absolute; left: 96px; top: 250px; width: 330px; height: 680px; perspective: 1800px; }
+  .phone { position: absolute; inset: 0; border-radius: 56px; background: linear-gradient(160deg, #1a1c22, #0a0b0f 70%); box-shadow: inset 0 0 0 2px #2c2f37, inset 0 0 0 4px #0a0b0f, 0 40px 60px rgba(17,19,24,.35), 0 8px 18px rgba(17,19,24,.25); transform: rotateY(13deg) rotateX(3deg); }
+  .phone::before, .phone::after { content: ''; position: absolute; width: 4px; border-radius: 2px; background: #2c2f37; }
+  .phone::before { left: -4px; top: 150px; height: 60px; box-shadow: 0 90px 0 #2c2f37; }
+  .phone::after { right: -4px; top: 190px; height: 92px; }
+  .pscreen { position: absolute; left: 12px; top: 12px; width: 306px; height: 656px; border-radius: 46px; overflow: hidden; background: #fff; background-repeat: no-repeat; }
+  .pglare { position: absolute; inset: 12px; border-radius: 46px; background: linear-gradient(120deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,.05) 35%, transparent 55%); mix-blend-mode: screen; pointer-events: none; }
+  .pshadow { position: absolute; left: 60px; top: 900px; width: 420px; height: 70px; border-radius: 50%; background: rgba(17,19,24,.5); filter: blur(22px); }
+  .has-phone .laptop { left: 400px; top: 70px; transform: rotateX(18deg) rotateY(-16deg) scale(.66); }
+  .has-phone .reflection { left: 380px; }
+  .has-phone .reflection .laptop { transform: rotateX(-8deg) rotateY(-17deg) scale(.66); }
+  .has-phone .contact { left: 520px; width: 900px; top: 880px; }
+  .has-phone .ambient { left: 430px; }
+</style>
+</head>
+<body>
+
+<!-- athlos -->
+<div class="stage on has-phone" id="athlos-real" style="--wall-top:#f3f2f8;--wall-bottom:#e4e2ee;--desk-top:#d6d4e2;--desk-bottom:#c4c2d2;--bokeh-a:rgba(124,92,255,.22);--bokeh-b:rgba(29,119,254,.14)">
+  <div class="bg"></div>
+  <div class="bokeh bokeh--a"></div><div class="bokeh bokeh--b"></div><div class="bokeh bokeh--c"></div>
+  <div class="grain"></div>
+  <div class="ambient"></div>
+  <div class="contact"></div>
+  <div class="reflection">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/athlos.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="scene">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/athlos.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+    <div class="pshadow"></div>
+    <div class="pscene"><div class="phone"><div class="pscreen" style="background-image:url('../../public/pictures/athlos.webp');background-size:1785.0px 1115.6px;background-position:-50.0px -263.3px"></div><div class="pglare"></div></div></div>
+  <div class="vignette"></div>
+</div>
+
+<!-- ais-command -->
+<div class="stage has-phone" id="ais-command-real" style="--wall-top:#f6f5f3;--wall-bottom:#e9e7e3;--desk-top:#dcd9d3;--desk-bottom:#cbc7c0;--bokeh-a:rgba(255,200,150,.18);--bokeh-b:rgba(29,119,254,.12)">
+  <div class="bg"></div>
+  <div class="bokeh bokeh--a"></div><div class="bokeh bokeh--b"></div><div class="bokeh bokeh--c"></div>
+  <div class="grain"></div>
+  <div class="ambient"></div>
+  <div class="contact"></div>
+  <div class="reflection">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/ais-command.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="scene">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/ais-command.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+    <div class="pshadow"></div>
+    <div class="pscene"><div class="phone"><div class="pscreen" style="background-image:url('../../public/pictures/ais-command-detail.webp');background-size:1422.2px 888.9px;background-position:-42.1px -143.1px"></div><div class="pglare"></div></div></div>
+  <div class="vignette"></div>
+</div>
+
+<!-- aisos -->
+<div class="stage" id="aisos-real" style="--wall-top:#f8f4ee;--wall-bottom:#eee5d8;--desk-top:#e2d6c5;--desk-bottom:#d1c3b0;--bokeh-a:rgba(255,190,120,.24);--bokeh-b:rgba(255,230,180,.18)">
+  <div class="bg"></div>
+  <div class="bokeh bokeh--a"></div><div class="bokeh bokeh--b"></div><div class="bokeh bokeh--c"></div>
+  <div class="grain"></div>
+  <div class="ambient"></div>
+  <div class="contact"></div>
+  <div class="reflection">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/aisos.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="scene">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/aisos.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="vignette"></div>
+</div>
+
+<!-- inspectus-vldr -->
+<div class="stage" id="inspectus-vldr-real" style="--wall-top:#f1f4f8;--wall-bottom:#dfe5ee;--desk-top:#cfd7e2;--desk-bottom:#bcc6d3;--bokeh-a:rgba(29,119,254,.16);--bokeh-b:rgba(120,150,190,.18)">
+  <div class="bg"></div>
+  <div class="bokeh bokeh--a"></div><div class="bokeh bokeh--b"></div><div class="bokeh bokeh--c"></div>
+  <div class="grain"></div>
+  <div class="ambient"></div>
+  <div class="contact"></div>
+  <div class="reflection">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/inspectus-vldr.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="scene">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/inspectus-vldr.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="vignette"></div>
+</div>
+
+<!-- inspectus-vin -->
+<div class="stage" id="inspectus-vin-real" style="--wall-top:#eff3f8;--wall-bottom:#dbe2eb;--desk-top:#cbd4df;--desk-bottom:#b8c2cf;--bokeh-a:rgba(29,119,254,.18);--bokeh-b:rgba(150,170,195,.18)">
+  <div class="bg"></div>
+  <div class="bokeh bokeh--a"></div><div class="bokeh bokeh--b"></div><div class="bokeh bokeh--c"></div>
+  <div class="grain"></div>
+  <div class="ambient"></div>
+  <div class="contact"></div>
+  <div class="reflection">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/inspectus-vin.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="scene">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/inspectus-vin.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="vignette"></div>
+</div>
+
+<!-- model-premazi -->
+<div class="stage" id="model-premazi-real" style="--wall-top:#f5f8f8;--wall-bottom:#e5eeee;--desk-top:#d6e2e2;--desk-bottom:#c3d3d3;--bokeh-a:rgba(60,180,170,.18);--bokeh-b:rgba(29,119,254,.10)">
+  <div class="bg"></div>
+  <div class="bokeh bokeh--a"></div><div class="bokeh bokeh--b"></div><div class="bokeh bokeh--c"></div>
+  <div class="grain"></div>
+  <div class="ambient"></div>
+  <div class="contact"></div>
+  <div class="reflection">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/model-premazi.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="scene">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/model-premazi.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="vignette"></div>
+</div>
+
+<!-- pacom -->
+<div class="stage" id="pacom-real" style="--wall-top:#f3f7f4;--wall-bottom:#e2ebe4;--desk-top:#d3dfd6;--desk-bottom:#c0cec4;--bokeh-a:rgba(80,190,120,.18);--bokeh-b:rgba(29,119,254,.10)">
+  <div class="bg"></div>
+  <div class="bokeh bokeh--a"></div><div class="bokeh bokeh--b"></div><div class="bokeh bokeh--c"></div>
+  <div class="grain"></div>
+  <div class="ambient"></div>
+  <div class="contact"></div>
+  <div class="reflection">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/pacom.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="scene">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/pacom.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="vignette"></div>
+</div>
+
+<!-- zalife -->
+<div class="stage" id="zalife-real" style="--wall-top:#fbf3ec;--wall-bottom:#f4e1d0;--desk-top:#ebd2bc;--desk-bottom:#dcbfa5;--bokeh-a:rgba(255,160,90,.22);--bokeh-b:rgba(255,210,160,.18)">
+  <div class="bg"></div>
+  <div class="bokeh bokeh--a"></div><div class="bokeh bokeh--b"></div><div class="bokeh bokeh--c"></div>
+  <div class="grain"></div>
+  <div class="ambient"></div>
+  <div class="contact"></div>
+  <div class="reflection">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/zalife.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="scene">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/zalife.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="vignette"></div>
+</div>
+
+<!-- elementum -->
+<div class="stage" id="elementum-real" style="--wall-top:#f9f5ec;--wall-bottom:#efe4cc;--desk-top:#e4d5b6;--desk-bottom:#d2c09b;--bokeh-a:rgba(230,180,70,.24);--bokeh-b:rgba(255,225,160,.18)">
+  <div class="bg"></div>
+  <div class="bokeh bokeh--a"></div><div class="bokeh bokeh--b"></div><div class="bokeh bokeh--c"></div>
+  <div class="grain"></div>
+  <div class="ambient"></div>
+  <div class="contact"></div>
+  <div class="reflection">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/elementum.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="scene">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/elementum.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="vignette"></div>
+</div>
+
+<!-- tower-spa -->
+<div class="stage has-phone" id="tower-spa-real" style="--wall-top:#f7f4f0;--wall-bottom:#e9e2d8;--desk-top:#dcd2c4;--desk-bottom:#c9bcab;--bokeh-a:rgba(210,170,120,.22);--bokeh-b:rgba(255,230,200,.16)">
+  <div class="bg"></div>
+  <div class="bokeh bokeh--a"></div><div class="bokeh bokeh--b"></div><div class="bokeh bokeh--c"></div>
+  <div class="grain"></div>
+  <div class="ambient"></div>
+  <div class="contact"></div>
+  <div class="reflection">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/tower-spa.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="scene">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/tower-spa.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+    <div class="pshadow"></div>
+    <div class="pscene"><div class="phone"><div class="pscreen" style="background-image:url('../../public/pictures/tower-spa-detail.webp');background-size:1422.2px 888.9px;background-position:-42.1px -143.1px"></div><div class="pglare"></div></div></div>
+  <div class="vignette"></div>
+</div>
+
+<!-- asya-grafy -->
+<div class="stage" id="asya-grafy-real" style="--wall-top:#faf4f3;--wall-bottom:#f0e1de;--desk-top:#e6d1cd;--desk-bottom:#d6bcb7;--bokeh-a:rgba(240,160,170,.20);--bokeh-b:rgba(255,220,220,.18)">
+  <div class="bg"></div>
+  <div class="bokeh bokeh--a"></div><div class="bokeh bokeh--b"></div><div class="bokeh bokeh--c"></div>
+  <div class="grain"></div>
+  <div class="ambient"></div>
+  <div class="contact"></div>
+  <div class="reflection">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/asya-grafy.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="scene">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/asya-grafy.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="vignette"></div>
+</div>
+
+<!-- si-big -->
+<div class="stage" id="si-big-real" style="--wall-top:#f0f4fa;--wall-bottom:#dde6f3;--desk-top:#cdd9ea;--desk-bottom:#b9c8dc;--bokeh-a:rgba(29,119,254,.20);--bokeh-b:rgba(110,150,210,.16)">
+  <div class="bg"></div>
+  <div class="bokeh bokeh--a"></div><div class="bokeh bokeh--b"></div><div class="bokeh bokeh--c"></div>
+  <div class="grain"></div>
+  <div class="ambient"></div>
+  <div class="contact"></div>
+  <div class="reflection">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/si-big.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="scene">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/si-big.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="vignette"></div>
+</div>
+
+<!-- heva -->
+<div class="stage has-phone" id="heva-real" style="--wall-top:#f1f6f6;--wall-bottom:#dfebeb;--desk-top:#cfdfdf;--desk-bottom:#bbd0d0;--bokeh-a:rgba(40,160,150,.20);--bokeh-b:rgba(29,119,254,.10)">
+  <div class="bg"></div>
+  <div class="bokeh bokeh--a"></div><div class="bokeh bokeh--b"></div><div class="bokeh bokeh--c"></div>
+  <div class="grain"></div>
+  <div class="ambient"></div>
+  <div class="contact"></div>
+  <div class="reflection">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/heva.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="scene">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/heva.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+    <div class="pshadow"></div>
+    <div class="pscene"><div class="phone"><div class="pscreen" style="background-image:url('../../public/pictures/heva-detail.webp');background-size:1422.2px 888.9px;background-position:-42.1px -143.1px"></div><div class="pglare"></div></div></div>
+  <div class="vignette"></div>
+</div>
+
+<!-- epolac -->
+<div class="stage" id="epolac-real" style="--wall-top:#f8f3f2;--wall-bottom:#eedfdc;--desk-top:#e3cfcb;--desk-bottom:#d3bab5;--bokeh-a:rgba(220,90,80,.18);--bokeh-b:rgba(255,200,190,.16)">
+  <div class="bg"></div>
+  <div class="bokeh bokeh--a"></div><div class="bokeh bokeh--b"></div><div class="bokeh bokeh--c"></div>
+  <div class="grain"></div>
+  <div class="ambient"></div>
+  <div class="contact"></div>
+  <div class="reflection">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/epolac.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="scene">
+    <div class="laptop">
+      <div class="lid"><div class="screen"><img src="../../public/pictures/epolac.webp" alt=""><div class="glare"></div></div></div>
+      <div class="base"><div class="keys"></div><div class="pad"></div><div class="lip"></div></div>
+    </div></div>
+  <div class="vignette"></div>
+</div>
+</body>
+</html>

@@ -440,6 +440,18 @@ export const PICTURE_SIZES = {
   full: '(max-width: 1240px) 100vw, 1200px',
 };
 
+/* The realistic picture of a product: its screen on a laptop (and a phone
+   where the product lives on one) in a studio scene, rendered from
+   tools/pictures/mockups.html as <id>-real. Same size as the flat screen. */
+export function realPicture(item) {
+  return {
+    src: `/pictures/${item.id}-real`,
+    alt: `${item.name} na prenosniku: ${item.picture.alt}`,
+    width: 1600,
+    height: 1000,
+  };
+}
+
 export function pictureMarkup(picture, sizes = PICTURE_SIZES.half) {
   return projectPicture(picture, sizes);
 }
@@ -479,9 +491,9 @@ export function productGrid(data) {
         <p class="project__more"><a class="link" href="/studije-primerov/${esc(item.id)}/">Študija primera</a></p>
       </div>
       <div class="project__visual" data-reveal>
-        <div class="project__panel">
+        <div class="project__panel project__panel--real">
           <div class="project__frame" data-tilt>
-            ${projectPicture(item.picture)}
+            ${projectPicture(realPicture(item))}
             <span class="pillar__glare"></span>
           </div>
         </div>
@@ -510,8 +522,8 @@ export function productsTeaser(data) {
         (item, i) => `
       <li class="ptile" style="--i:${i}">
         <a class="ptile__link" href="/produkti/#${esc(item.id)}">
-          <span class="ptile__panel">
-            ${projectPicture(item.picture, PICTURE_SIZES.quarter)}
+          <span class="ptile__panel ptile__panel--real">
+            ${projectPicture(realPicture(item), PICTURE_SIZES.quarter)}
           </span>
           <span class="ptile__name">${esc(item.name)}</span>
           <span class="ptile__kind">${esc(item.kind ?? item.kicker)}</span>
@@ -583,9 +595,9 @@ export function caseStudyArticle(item, product, service = null) {
       <p class="study__service">${service ? 'Storitev' : 'Izdelek'}: ${related}</p>
     </div>
     <div class="study__visual" data-reveal>
-      <div class="project__panel">
+      <div class="project__panel project__panel--real">
         <div class="project__frame" data-tilt>
-          ${projectPicture(product.picture, PICTURE_SIZES.full)}
+          ${projectPicture(realPicture(product), PICTURE_SIZES.full)}
           <span class="pillar__glare"></span>
         </div>
       </div>

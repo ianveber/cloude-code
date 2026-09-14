@@ -334,8 +334,8 @@ expect(
 expect(
   !/\bempty-state\b/.test(pages.products) &&
     (pages.products.match(/class="project" id="/g) ?? []).length >= 6 &&
-    /\/pictures\/(?:athlos|ais-command|aisos|inspectus-vldr|inspectus-vin|model-premazi|pacom|zalife)\.webp/.test(pages.products),
-  'Products page must list the real products and projects with rendered demo screens.'
+    (pages.products.match(/\/pictures\/[a-z0-9-]+-real-800\.webp/g) ?? []).length === 14,
+  'Products page must list the 14 products and projects, each with its realistic laptop picture.'
 );
 
 const order = [
