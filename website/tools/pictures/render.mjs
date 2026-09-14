@@ -8,7 +8,7 @@
  * to public/pictures as webp (served) plus jpg (fallback).
  *
  *   node tools/pictures/render.mjs            all scenes (pillars + products)
- *   node tools/pictures/render.mjs saas       one scene
+ *   node tools/pictures/render.mjs saas       one scene (or several ids)
  *
  * Only needed when the scene source changes; the encoded images are committed.
  * Needs Chrome and ffmpeg.
@@ -39,6 +39,8 @@ const SCALE = 2;
 const FILES = {
   'scene.html': ['saas', 'flow', 'security'],
   'products.html': ['inspectus-vldr', 'inspectus-vin', 'athlos', 'aisos', 'ais-command', 'model-premazi', 'pacom', 'zalife', 'elementum', 'tower-spa', 'asya-grafy', 'si-big', 'heva', 'epolac'],
+  'details.html': ['athlos-detail', 'ais-command-detail', 'aisos-detail', 'inspectus-vldr-detail', 'inspectus-vin-detail', 'model-premazi-detail', 'pacom-detail', 'zalife-detail', 'elementum-detail', 'tower-spa-detail', 'asya-grafy-detail', 'si-big-detail', 'heva-detail', 'epolac-detail'],
+  'blog.html': ['blog-kaj-je-ai-avtomatizacija', 'blog-kaj-je-ai-agent', 'blog-prvi-proces-za-avtomatizacijo', 'blog-sistem-mora-znati-reci-ne-vem', 'blog-kako-ai-odgovarja-iz-dokumentov', 'blog-koliko-casa-vzame-uvedba', 'blog-kaj-se-zgodi-z-vasimi-podatki', 'blog-ai-chatbot-v-slovenscini'],
 };
 const SCENES = Object.values(FILES).flat();
 
@@ -73,10 +75,11 @@ async function encode(id) {
 }
 
 async function main() {
-  const only = process.argv[2];
-  const scenes = only ? SCENES.filter((s) => s === only) : SCENES;
+  /* No argument renders everything; one or more ids render just those. */
+  const only = process.argv.slice(2);
+  const scenes = only.length ? SCENES.filter((s) => only.includes(s)) : SCENES;
   if (!scenes.length) {
-    console.error(`Unknown scene: ${only}. Choose one of ${SCENES.join(', ')}.`);
+    console.error(`Unknown scene: ${only.join(', ')}. Choose from ${SCENES.join(', ')}.`);
     process.exit(1);
   }
 

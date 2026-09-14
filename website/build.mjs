@@ -52,6 +52,8 @@ import {
   productsTeaser,
   caseStudyGrid,
   caseStudyArticle,
+  pictureMarkup,
+  PICTURE_SIZES,
   newsList,
   eventList,
 } from './src/showcase.mjs';
@@ -69,6 +71,7 @@ import {
 import { serviceFaq } from './content/faq-services.mjs';
 import { guides } from './content/guides.mjs';
 import { blogPosts } from './content/blog.mjs';
+import { deep } from './content/case-studies-deep.mjs';
 import { esc, absolute } from './src/html.mjs';
 import * as C from './content/content.mjs';
 import * as S from './content/showcase.mjs';
@@ -546,7 +549,8 @@ function caseStudiesIndexPage() {
   };
 }
 
-function caseStudyPage(item) {
+function caseStudyPage(base) {
+  const item = { ...base, ...(deep[base.id] ?? {}) };
   const product = productFor(item);
   const service = item.service ? C.services.find((s) => s.slug === item.service) : null;
   const body = [
@@ -570,7 +574,7 @@ function caseStudyPage(item) {
     ogImage: `${product.picture.src}.jpg`,
     ogImageWidth: product.picture.width,
     ogImageHeight: product.picture.height,
-    schema: [(page) => articleNode(item, product, page)],
+    schema: [(page) => articleNode(item, product, page), ...(item.faq?.length ? [faqNode(item.faq, `/studije-primerov/${item.id}/`)] : [])],
     body,
   };
 }
@@ -762,6 +766,7 @@ function blogPostPage(post) {
     pageHero({ eyebrow: post.kicker, title: post.title, lead: post.summary, cta: { label: 'Rezervirajte posvet', href: '/kontakt/' } }),
     `<section class="section guide-body">
   <div class="shell">
+    ${post.picture ? `<figure class="study__figure study__figure--lead" data-reveal>${pictureMarkup(post.picture, PICTURE_SIZES.full)}</figure>` : ''}
     <div class="study__text">
       ${post.sections
         .map(
@@ -786,7 +791,7 @@ function blogPostPage(post) {
     keywords: post.keywords,
     breadcrumbs: [HOME_CRUMB, { label: 'Blog', href: '/blog/' }, { label: post.title, href: `/blog/${post.slug}/` }],
     ogType: 'article',
-    schema: [(page) => guideArticleNode(post, page)],
+    schema: [(page) => guideArticleNode(post, page, post.picture)],
     body,
   };
 }

@@ -254,7 +254,7 @@ export function articleNode(item, product, page) {
 }
 
 /** A guide as an Article by the company, dated from the page. */
-export function guideArticleNode(guide, page) {
+export function guideArticleNode(guide, page, picture = null) {
   return {
     '@type': 'Article',
     '@id': `${url(page.path)}#article`,
@@ -263,7 +263,7 @@ export function guideArticleNode(guide, page) {
     inLanguage: site.lang,
     url: url(page.path),
     mainEntityOfPage: { '@id': `${url(page.path)}#webpage` },
-    image: url(site.brand.ogImage),
+    image: url(picture ? `${picture.src}.jpg` : site.brand.ogImage),
     ...(page.datePublished ? { datePublished: page.datePublished } : {}),
     ...(page.dateModified ? { dateModified: page.dateModified } : {}),
     author: { '@id': IDS.organization },

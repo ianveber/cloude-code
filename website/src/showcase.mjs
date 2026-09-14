@@ -363,8 +363,9 @@ export function immersiveCta(data) {
 
 function postCard(post, i) {
   return `
-      <li class="postcard" style="--i:${i}">
+      <li class="postcard${post.picture ? ' postcard--pic' : ''}" style="--i:${i}">
         <article>
+          ${post.picture && post.href ? `<a class="postcard__pic" href="${esc(post.href)}" tabindex="-1" aria-hidden="true">${projectPicture(post.picture, PICTURE_SIZES.third)}</a>` : ''}
           <p class="postcard__meta">
             <time datetime="${esc(post.date)}">${esc(post.dateLabel)}</time>
             ${post.kicker ? `<span class="postcard__kicker">${esc(post.kicker)}</span>` : ''}
@@ -438,6 +439,10 @@ export const PICTURE_SIZES = {
   third: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
   full: '(max-width: 1240px) 100vw, 1200px',
 };
+
+export function pictureMarkup(picture, sizes = PICTURE_SIZES.half) {
+  return projectPicture(picture, sizes);
+}
 
 function projectPicture(picture, sizes = PICTURE_SIZES.half) {
   const src = esc(picture.src);
@@ -590,6 +595,10 @@ export function caseStudyArticle(item, product, service = null) {
         <h2>Izziv</h2>
         ${studyParagraphs(item.challenge)}
       </section>
+      ${item.before?.length ? `<section class="study__section study__scene" data-reveal>
+        <h2>Kako je bilo prej</h2>
+        ${studyParagraphs(item.before)}
+      </section>` : ''}
       <section class="study__section" data-reveal>
         <h2>Kaj smo naredili</h2>
         ${studyParagraphs(item.build)}
@@ -597,12 +606,26 @@ export function caseStudyArticle(item, product, service = null) {
           ${each(item.parts, (part) => `<li><h3>${esc(part.name)}</h3><p>${esc(part.body)}</p></li>`)}
         </ul>
       </section>
+      ${item.detail ? `<figure class="study__figure" data-reveal>
+        <div class="project__panel"><div class="project__frame" data-tilt>${projectPicture({ ...item.detail, width: 1600, height: 1000 }, PICTURE_SIZES.full)}<span class="pillar__glare"></span></div></div>
+        <figcaption>${esc(item.detail.caption)}</figcaption>
+      </figure>` : ''}
+      ${item.practice?.length ? `<section class="study__section study__scene" data-reveal>
+        <h2>Kako je videti v praksi</h2>
+        ${studyParagraphs(item.practice)}
+      </section>` : ''}
       <section class="study__section" data-reveal>
         <h2>Kaj se je spremenilo</h2>
         <ul class="study__outcomes">
           ${each(item.outcome, (text) => `<li>${esc(text)}</li>`)}
         </ul>
       </section>
+      ${item.faq?.length ? `<section class="study__section" data-reveal>
+        <h2>Pogosta vprašanja o projektu</h2>
+        <div class="faq-list">
+          ${each(item.faq, (f) => `<details class="faq-item"><summary>${esc(f.q)}<span class="faq-item__icon" aria-hidden="true"></span></summary><div class="faq-item__answer"><p>${esc(f.a)}</p></div></details>`)}
+        </div>
+      </section>` : ''}
       <section class="study__section" data-reveal>
         <h2>Orodja</h2>
         <ul class="study__tags">

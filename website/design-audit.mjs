@@ -46,6 +46,8 @@ expect(
     (pages.products.match(/href="\/studije-primerov\/[a-z0-9-]+\/">Študija primera<\/a>/g) ?? []).length === 14 &&
     /<h2>Izziv<\/h2>/.test(pages.study) && /<h2>Kaj smo naredili<\/h2>/.test(pages.study) &&
     /<h2>Kaj se je spremenilo<\/h2>/.test(pages.study) && /<h2>Orodja<\/h2>/.test(pages.study) &&
+    /<h2>Kako je bilo prej<\/h2>/.test(pages.study) && /<h2>Kako je videti v praksi<\/h2>/.test(pages.study) &&
+    /<h2>Pogosta vprašanja o projektu<\/h2>/.test(pages.study) && /class="study__figure"/.test(pages.study) &&
     /class="deflist deflist--facts"/.test(pages.study),
   'Every one of the 14 projects has a case study page, linked from /produkti/ and listed on /studije-primerov/, with the four fixed parts.'
 );
@@ -319,12 +321,13 @@ expect(
 for (const [route, html, marker] of [
   ['news', pages.news, 'class="newsitem"'],
   ['events', pages.events, 'class="eventitem"'],
-  ['blog', pages.blog, 'class="postcard"'],
+  ['blog', pages.blog, 'class="postcard'],
 ]) {
   expect(!/\bempty-state\b/.test(html) && html.split(marker).length - 1 >= 3, `${route} must list at least three real entries and no empty state.`);
 }
 expect(
-  (pages.blog.match(/href="\/blog\/[a-z0-9-]+\/"/g) ?? []).length >= 4 &&
+  (pages.blog.match(/class="postcard__pic"/g) ?? []).length >= 8 &&
+  (pages.blog.match(/href="\/blog\/[a-z0-9-]+\/"/g) ?? []).length >= 8 &&
     (pages.products.match(/class="project__simple"/g) ?? []).length === 14,
   'Blog posts must link to their pages and every product must carry its plain-language lines.'
 );

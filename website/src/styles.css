@@ -3261,3 +3261,47 @@ html.motion-on .depth__b { animation: depthB 41s ease-in-out infinite alternate;
 }
 
 .eventitem__date { font-weight: 500; }
+
+/* ── Deeper case studies and illustrated posts ──────────────────────── */
+
+.study__scene p { color: var(--ink-soft); }
+
+.study__figure {
+  margin: 0;
+  max-width: 100%;
+}
+
+.study__figure figcaption {
+  margin-top: var(--space-2);
+  max-width: 60ch;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.study__figure--lead { margin-bottom: var(--space-5); }
+
+.study__figure--lead picture,
+.study__figure--lead img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+}
+
+.study__text .faq-list { margin-top: var(--space-2); }
+
+.postcard--pic { padding-top: 0; }
+
+.postcard__pic {
+  display: block;
+  margin: 0 calc(-1 * clamp(1.25rem, 3vw, 1.75rem)) var(--space-2);
+  border-radius: var(--radius) var(--radius) 0 0;
+  overflow: hidden;
+  background: var(--canvas);
+}
+
+.postcard__pic img {
+  display: block;
+  width: 100%;
+  height: auto;
+}

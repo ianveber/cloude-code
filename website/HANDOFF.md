@@ -331,6 +331,17 @@ Kaj smo naredili (with the parts of the system), Kaj se je spremenilo, Orodja.
 The audit fails if any of the 14 is missing, unlinked from `/produkti/`, or
 missing a part.
 
+Each study has two layers. The base entry (facts, challenge, build, parts,
+outcome, tools) is in `content/case-studies.mjs`; the deeper layer in
+`content/case-studies-deep.mjs`, keyed by id, adds "Kako je bilo prej" (one
+day before the system), "Kako je videti v praksi" (the same day with it),
+three "Pogosta vprašanja o projektu" (also emitted as FAQPage) and a second
+rendered screen with a caption (`tools/pictures/details.html`, ids
+`<id>-detail`). Blog posts carry an illustration each from
+`tools/pictures/blog.html` (ids `blog-<slug>`). Render new scenes with
+`node tools/pictures/render.mjs [id]`, then `node tools/pictures/variants.mjs`
+for the 800 and 1600 px sizes.
+
 What each study rests on:
 
 - ATHLOS, AIS Command, AISOS, INSPECTUS VLDR, INSPECTUS VIN filter and the

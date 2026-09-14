@@ -1,8 +1,8 @@
 {
   "/": {
-    "hash": "199297e11d4a78b0",
+    "hash": "61e912d1d4afc84c",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/404.html": {
     "hash": "87838861b3eacb97",
@@ -10,29 +10,49 @@
     "updated": "2026-09-10"
   },
   "/blog/": {
-    "hash": "0e66042ea58711e9",
+    "hash": "7f1718cd50e189bf",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
+  },
+  "/blog/ai-chatbot-v-slovenscini/": {
+    "hash": "15025dfb68f2368f",
+    "published": "2026-09-14",
+    "updated": "2026-09-14"
   },
   "/blog/kaj-je-ai-agent/": {
-    "hash": "2148312dcee19a14",
+    "hash": "f9eccec4384cb70b",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/blog/kaj-je-ai-avtomatizacija/": {
-    "hash": "628623fac41c9e7e",
+    "hash": "e5261c156a15c4b9",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
+  },
+  "/blog/kaj-se-zgodi-z-vasimi-podatki/": {
+    "hash": "6599a667f98adac2",
+    "published": "2026-09-14",
+    "updated": "2026-09-14"
+  },
+  "/blog/kako-ai-odgovarja-iz-dokumentov/": {
+    "hash": "3d967c997ac4b785",
+    "published": "2026-09-14",
+    "updated": "2026-09-14"
+  },
+  "/blog/koliko-casa-vzame-uvedba/": {
+    "hash": "ec19a5053b2d6bda",
+    "published": "2026-09-14",
+    "updated": "2026-09-14"
   },
   "/blog/prvi-proces-za-avtomatizacijo/": {
-    "hash": "770a38e16302ccba",
+    "hash": "fe3f9a2050c9eb6f",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/blog/sistem-mora-znati-reci-ne-vem/": {
-    "hash": "5437ec853fb8e6c9",
+    "hash": "71aaab4d208ea7bb",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/dogodki/": {
     "hash": "d77d4c5ab6931ef1",
@@ -100,74 +120,74 @@
     "updated": "2026-09-10"
   },
   "/studije-primerov/ais-command/": {
-    "hash": "55c45a2f161761e2",
+    "hash": "7609122f74749954",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/studije-primerov/aisos/": {
-    "hash": "ce77831111f92072",
+    "hash": "25a04686e4ed300c",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/studije-primerov/asya-grafy/": {
-    "hash": "7dccb39ecd67cac8",
+    "hash": "ebf474c803331141",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/studije-primerov/athlos/": {
-    "hash": "10fdd290aba8113a",
+    "hash": "6bdfe7fcbf7bd8aa",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/studije-primerov/elementum/": {
-    "hash": "a295d487044b5a18",
+    "hash": "50fe4847a9afda0b",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/studije-primerov/epolac/": {
-    "hash": "f1ed954387e35951",
+    "hash": "eef899e957418e92",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/studije-primerov/heva/": {
-    "hash": "68e55ae7356a8066",
+    "hash": "859b32722316d6e0",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/studije-primerov/inspectus-vin/": {
-    "hash": "195e3474c9362901",
+    "hash": "39c0ea5ba5f6d134",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/studije-primerov/inspectus-vldr/": {
-    "hash": "eff0fce203661b81",
+    "hash": "f1dcb830f9b153b8",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/studije-primerov/model-premazi/": {
-    "hash": "79059881bdd45541",
+    "hash": "bc0baf4b5e43b95c",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/studije-primerov/pacom/": {
-    "hash": "5b8372ff1f2d506a",
+    "hash": "a9930a1c04f848b6",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/studije-primerov/si-big/": {
-    "hash": "19c0536bb5acdb89",
+    "hash": "512482a5be1221f6",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/studije-primerov/tower-spa/": {
-    "hash": "4872f2cc63e04222",
+    "hash": "cdbffaf62a9b9ef9",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/studije-primerov/zalife/": {
-    "hash": "d8e7cf283a08de82",
+    "hash": "36639e94951577f3",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/vodici/": {
     "hash": "63c5fc6782a0e51f",
