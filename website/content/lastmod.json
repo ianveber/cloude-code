@@ -1,6 +1,6 @@
 {
   "/": {
-    "hash": "326d42ebd8626a55",
+    "hash": "e9645c80d67a419b",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },
@@ -90,7 +90,7 @@
     "updated": "2026-09-10"
   },
   "/produkti/": {
-    "hash": "ec282d5daef36559",
+    "hash": "945dcb7061e31803",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },
@@ -100,14 +100,14 @@
     "updated": "2026-09-10"
   },
   "/storitve/avtomatizacija-administracije/": {
-    "hash": "1a04ecf1038ad1c9",
+    "hash": "2eaef960747ed3c1",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/storitve/avtomatizacija-prodaje/": {
-    "hash": "5c48d312e74019ed",
+    "hash": "91727d4d80affa54",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/storitve/spremljanje-trga/": {
     "hash": "0fa3368277fa7bf6",
@@ -115,77 +115,77 @@
     "updated": "2026-09-10"
   },
   "/studije-primerov/": {
-    "hash": "3c95dadf8ab87331",
+    "hash": "69cc2bccde338c15",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-14"
   },
   "/studije-primerov/ais-command/": {
-    "hash": "5a401af22eed1a81",
+    "hash": "c18e7cec46916168",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },
   "/studije-primerov/aisos/": {
-    "hash": "092992641d35d539",
+    "hash": "25a04686e4ed300c",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },
   "/studije-primerov/asya-grafy/": {
-    "hash": "ca5ed9029f914d85",
+    "hash": "ebf474c803331141",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },
   "/studije-primerov/athlos/": {
-    "hash": "885d57ccc6b8837a",
+    "hash": "db7e294b22646986",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },
   "/studije-primerov/elementum/": {
-    "hash": "dd638bc1942d6c66",
+    "hash": "50fe4847a9afda0b",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },
   "/studije-primerov/epolac/": {
-    "hash": "0e4c31e3ed3c75f7",
+    "hash": "eef899e957418e92",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },
   "/studije-primerov/heva/": {
-    "hash": "0118266dcfbd686a",
+    "hash": "859b32722316d6e0",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },
   "/studije-primerov/inspectus-vin/": {
-    "hash": "e18032232d67b64c",
+    "hash": "08b66d7589e27abd",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },
   "/studije-primerov/inspectus-vldr/": {
-    "hash": "4fa779e5d4bebca8",
+    "hash": "4ae318ba102c2f07",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },
   "/studije-primerov/model-premazi/": {
-    "hash": "a21696bfc7bb026a",
+    "hash": "7363dbf864ce88d2",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },
   "/studije-primerov/pacom/": {
-    "hash": "be86eec84a720824",
+    "hash": "ac8751a510f44341",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },
   "/studije-primerov/si-big/": {
-    "hash": "47c5132d945f89a4",
+    "hash": "512482a5be1221f6",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },
   "/studije-primerov/tower-spa/": {
-    "hash": "6676646ef8756d2c",
+    "hash": "cdbffaf62a9b9ef9",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },
   "/studije-primerov/zalife/": {
-    "hash": "b84688b773131431",
+    "hash": "4392b515e1264c7f",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },

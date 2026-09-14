@@ -3305,20 +3305,3 @@ html.motion-on .depth__b { animation: depthB 41s ease-in-out infinite alternate;
   width: 100%;
   height: auto;
 }
-
-/* ── Realistic product pictures ─────────────────────────────────────────
-   The laptop scene is a finished picture, so its panel and tile drop the
-   inner padding and the blue wash and just round the corners. */
-
-.project__panel--real,
-.ptile__panel--real {
-  padding: 0;
-  background: var(--canvas);
-  overflow: hidden;
-}
-
-.project__panel--real .project__frame,
-.ptile__panel--real img {
-  border-radius: var(--radius);
-  box-shadow: none;
-}

@@ -24,7 +24,7 @@ export const deep = {
       { q: 'Ali lahko AI trener sam spremeni trening?', a: 'Samo, če športnik to dovoli. Privzeto vsako spremembo potrdi, lahko da stalno dovoljenje ali AI urejanje izklopi. Vsako spremembo je mogoče razveljaviti, trener pa za vsakogar v svoji ekipi.' },
       { q: 'Kje tečejo podatki športnikov?', a: 'V bazi z dostopom po vrsticah: športnik vidi svoje, trener svojo ekipo. Ključi do AI modelov nikoli ne zapustijo strežnika.' },
     ],
-    detail: { src: '/pictures/athlos-detail', alt: 'Trenerjev pogled na ekipo v ATHLOS z ocenami pripravljenosti in predlogom ZEUS, ki čaka na potrditev.', caption: 'Trener vidi pripravljenost cele ekipe. Desno ZEUS predlaga spremembo, ki jo mora športnik potrditi, spodaj je zgodovina z gumbom za razveljavitev.' },
+    detail: { src: '/pictures/athlos-detail', alt: 'Tri zaslone športnikove aplikacije ATHLOS: jutranji check-in, trening v teku po blokih in pogovor z ZEUS.', caption: 'Športnikova aplikacija, kot teče: jutranji check-in s štirimi vprašanji, trening po blokih z odkljukanimi serijami in pogovor z ZEUS, ki na prošnjo za lažji dan odgovori s programom za teden. Zasloni so iz demo načina aplikacije.' },
   },
 
   'ais-command': {
@@ -41,7 +41,7 @@ export const deep = {
       { q: 'Kaj stranka vidi v portalu?', a: 'Svoje projekte z napredkom, zdravje storitev z dosegljivostjo zadnjih 30 dni, mesečnim obsegom in zadnjim pregledom, račune in plačilo s kartico. Portal je narejen najprej za telefon.' },
       { q: 'Ali je AIS Command že v redni uporabi?', a: 'Je pred zagonom. Prvi pilot je v pripravi, plačila so še izklopljena. Na tej strani ne trdimo, da teče v produkciji, dokler ne bo.' },
     ],
-    detail: { src: '/pictures/ais-command-detail', alt: 'Portal AIS Command na telefonu s projekti, zdravjem storitve in računom, ob njem seznam predlogov agentov za potrditev.', caption: 'Stranka vidi projekte, stanje storitve in račune na telefonu. Desno so predlogi agentov za danes, vsak s potrdi in zavrni.' },
+    detail: { src: '/pictures/ais-command-detail', alt: 'Zaslon AIS Command: Pot dokumenta, šest polic po petih korakih od zavarovalnice do zavarovalniškega programa.', caption: 'Pot dokumenta v AIS Command, kot jo vidi ekipa: vsak dokument gre skozi istih pet korakov, izbrani ima svojo časovnico. Podatki na zaslonu so demo.' },
   },
 
   aisos: {
@@ -75,7 +75,7 @@ export const deep = {
       { q: 'Ali orodje potrebuje namestitev?', a: 'Ne. Teče v brskalniku na računalniku, prijava je z e-poštnim naslovom podjetja. Nova različica je za vse hkrati.' },
       { q: 'Koliko časa je prihranjenega?', a: 'Natančne številke ne objavljamo, ker je stranka ni izmerila. Kar vemo: ročno urejanje preglednic je odpadlo, obdelava serije 314 vozil traja nekaj sekund.' },
     ],
-    detail: { src: '/pictures/inspectus-vldr-detail', alt: 'Kartica VLDR za eno vozilo v obliki obrazca proizvajalca in seznam obdelav v Centru.', caption: 'Ena kartica na vozilo, do piksla po obrazcu proizvajalca. Desno zgodovina obdelav v Centru, med njimi prva resnična serija s 314 vozili.' },
+    detail: { src: '/pictures/inspectus-vldr-detail', alt: 'Kartica VLDR, kot jo natisne orodje: obrazec proizvajalca z modelom, serijsko številko, kodami poškodb in opombami.', caption: 'Kartica, kot jo orodje res natisne: obrazec proizvajalca z modelom, serijsko številko, kodami poškodb in opombami. Serijske številke so za prikaz zamenjane.' },
   },
 
   'inspectus-vin': {
@@ -92,7 +92,7 @@ export const deep = {
       { q: 'Kaj, če bralnik prebere napačno črko?', a: 'Prebrana številka se primerja s seznamom vozil z ladje. Program sme popraviti eno samo zamenljivo črko, in to le, če je popravek edini možen. Sicer gre posnetek v pregled.' },
       { q: 'Ali sistem že teče na resnični ladji?', a: 'Ne še. Zasnova in prototip razvrščanja sta narejena in preizkušena na testnih posnetkih, ponudba za uvedbo je iz avgusta 2026. Prvi pilot bo pokazal, kako se obnese na pomolu.' },
     ],
-    detail: { src: '/pictures/inspectus-vin-detail', alt: 'Sedem korakov filtra VIN, posnetki v vrstnem redu zajema razvrščeni po vozilih, opozorila in mapa Nerazvrščeno.', caption: 'Sedem korakov od posnetka do vozila. Tablica odpre vozilo, posnetki za njo mu pripadajo, neujemanja v obe smeri gredo v opozorila.' },
+    detail: { src: '/pictures/inspectus-vin-detail', alt: 'Filter VIN pred zagonom: trak tridesetih posnetkov v vrstnem redu zajema s časi in sedem korakov, ki čakajo.', caption: 'Pred zagonom: trideset posnetkov v vrstnem redu zajema, s časom iz fotografije, in sedem korakov, ki jih filter nato opravi. Vzorčni podatki, kot piše v orodju.' },
   },
 
   'model-premazi': {
@@ -109,7 +109,7 @@ export const deep = {
       { q: 'Kako natančen je?', a: 'Na sintetičnih družinah receptur je gostota s fizikalnim sidrom na R² 0,999, brez fizike 0,91. Viskoznost brez realnih meritev še ni zanesljiva in model to pokaže s širšim intervalom. Številke z realnimi podatki bodo objavljene, ko bodo.' },
       { q: 'Kako se model uporablja?', a: 'Trenutno iz ukazne vrstice: tabele surovin, receptur in meritev v mapi, receptura v datoteki, odgovor kot besedilo. Aplikacija pride, ko bodo realni podatki.' },
     ],
-    detail: { src: '/pictures/model-premazi-detail', alt: 'Napoved štirih lastnosti premaza z intervali zaupanja in dve zavrnitvi z razlogom.', caption: 'Štiri lastnosti z intervalom, ne le številka. Spodaj dve zavrnitvi: neznana surovina in receptura, ki je predaleč od učnih podatkov.' },
+    detail: { src: '/pictures/model-premazi-detail', alt: 'Terminal z ukazi modela za premaze: pomoč za demo in predict ter zagon demo z napovedjo štirih lastnosti.', caption: 'Model, kot ga tehnolog danes uporablja: ukazna vrstica z dvema ukazoma, demo na sintetičnih podatkih in predict za lastno recepturo. Vsaka seja je resnična.' },
   },
 
   pacom: {
@@ -126,7 +126,7 @@ export const deep = {
       { q: 'Kaj so garancije v paketih?', a: 'Pisarna: vračilo mesečnega zneska, če ne pride ista oseba. Dom: rezervna kolegica, da storitev nikoli ne odpade. Nova: prihod v 48 urah ali popust. Garancije so del ponudbe, ker jih Pacom lahko izpolni.' },
       { q: 'Kje sistem teče?', a: 'V Notionu, ki ga ekipa že pozna: pregled znamke, segmenti, sekvence, koledar, naloge in banka idej na enem mestu. Brez novega orodja, ki bi ga bilo treba učiti.' },
     ],
-    detail: { src: '/pictures/pacom-detail', alt: 'Koledar objav za en teden z osnutki agenta in potrjenimi objavami, ob njem trije paketi z garancijami.', caption: 'Teden v koledarju objav: rumeno so osnutki agenta, zeleno potrjene objave. Desno trije paketi, vsak z garancijo.' },
+    detail: { src: '/pictures/pacom-detail', alt: 'Koledar objav Pacom v Notionu za maj 2026: objavljene objave zeleno, osnutki agenta rumeno, ena čaka na potrditev.', caption: 'Koledar objav v Notionu, kot ga ekipa odpre vsak dan: zeleno objavljeno, rumeno osnutek agenta, modro čaka na potrditev.' },
   },
 
   zalife: {
@@ -143,7 +143,7 @@ export const deep = {
       { q: 'Ali AI piše objave tudi tukaj?', a: 'Lahko pripravi osnutek po koledarju, ko ekipa to želi. Vsako objavo potrdi človek. Pri ZaLife je poudarek najprej na redu: ena mapa, en koledar, ena resnica o znamki.' },
       { q: 'Kaj se je zgodilo z idejo za podjetja?', a: 'Iz banke idej je nastala ponudba: delavnica za starše zaposlenih kot del skrbi za zaposlene. To je primer, kako sistem spremeni idejo iz klepeta v ponudbo z naslednjim korakom.' },
     ],
-    detail: { src: '/pictures/zalife-detail', alt: 'Business HQ za ZaLife s pregledom znamke, ponudbami, banko idej in mapo sredstev znamke.', caption: 'Pregled znamke, ponudbe za šole, starše in podjetja, banka idej z ocenami in sredstva znamke, vse na eni strani.' },
+    detail: { src: '/pictures/zalife-detail', alt: 'Banka idej ZaLife v Notionu: osem idej z oceno, stanjem in naslednjim korakom.', caption: 'Banka idej v Notionu: vsaka ideja ima oceno, stanje in naslednji korak. Program za podjetja je iz te tabele postal ponudba.' },
   },
 
   elementum: {

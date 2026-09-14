@@ -342,14 +342,20 @@ rendered screen with a caption (`tools/pictures/details.html`, ids
 `node tools/pictures/render.mjs [id]`, then `node tools/pictures/variants.mjs`
 for the 800 and 1600 px sizes.
 
-Realistic product pictures: `tools/pictures/mockups.html` renders every
-product screen on a CSS laptop (ATHLOS, Tower Spa and HEVA also on a phone)
-in a studio scene, as `public/pictures/<id>-real`. Product rows on
-`/produkti/`, the home tiles and the top of each case study use these; the
-flat screens stay in the case-study detail figure. The scenes are pure CSS,
-no photos: the connected image account has no credits, so no AI
-backgrounds were generated. `realPicture(item)` in `src/showcase.mjs` is
-the only place that knows the naming.
+Product pictures are the real products, not drawings (Ian, 2026-09-14: "the
+exact version as it is"). Where the product runs, the picture is a real
+screenshot composed into a 1600×1000 frame by `tools/pictures/captures.html`
+from PNGs in `tools/pictures/real/` (ATHLOS from its built bundle in demo
+mode, AIS Command from the local dev server with client names sanitised,
+INSPECTUS VLDR from the tool with its sample report, the VIN filter from
+its demo). Where the product is not an app, the picture is its real
+surface: `tools/pictures/notion.html` replicates the Notion Business HQ
+pages for Pacom and ZaLife (structure and public facts real, internal
+targets and prices left out), `tools/pictures/terminal.html` is a verbatim
+CLI session of the coatings model including its own refusals. The six
+drafted clients keep their drawn scenes in `products.html` because no
+product exists. Laptop and phone mockups were tried and removed the same
+day; the connected image account has no credits, so no AI images anywhere.
 
 What each study rests on:
 
