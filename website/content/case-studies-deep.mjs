@@ -112,40 +112,6 @@ export const deep = {
     detail: { src: '/pictures/model-premazi-detail', alt: 'Terminal z ukazi modela za premaze: pomoč za demo in predict ter zagon demo z napovedjo štirih lastnosti.', caption: 'Model, kot ga tehnolog danes uporablja: ukazna vrstica z dvema ukazoma, demo na sintetičnih podatkih in predict za lastno recepturo. Vsaka seja je resnična.' },
   },
 
-  pacom: {
-    before: [
-      'Ponedeljek pri Pacomu. Direktorica ima v glavi trideset let strank, v telefonu tri neodgovorjena povpraševanja in na mizi ponudbo, ki jo bo napisala znova, ker je vsaka drugačna. Objava na Facebooku je bila zadnjič pred tremi tedni, ko je bil čas.',
-      'Na Googlu je podjetje ocenjeno z desetimi ocenami, čeprav ima stranke, ki mu zaupajo že dvajset let. Nihče jih ni prosil.',
-    ],
-    practice: [
-      'Isti ponedeljek z Business HQ. Vsako povpraševanje dobi enega od treh paketov, Pisarna, Dom ali Nova, z jasno ceno in garancijo. Ponudba je gotova v petih minutah, ker se ne piše znova.',
-      'Koledar objav za trideset dni je napolnjen: ekipa, prej in potem, pričevanja. Vsebinski agent po koledarju pripravi osnutek objave in sporočila, direktorica ju potrdi ali popravi na telefonu. Vzporedno teče kampanja za ocene: klic petdesetim najboljšim strankam, trideset ocen v tridesetih dneh.',
-    ],
-    faq: [
-      { q: 'Ali objave piše AI?', a: 'Osnutke pripravi vsebinski agent po koledarju in v tonu znamke. Vsako objavo pred objavo potrdi človek pri Pacomu. Nič ne gre ven samo.' },
-      { q: 'Kaj so garancije v paketih?', a: 'Pisarna: vračilo mesečnega zneska, če ne pride ista oseba. Dom: rezervna kolegica, da storitev nikoli ne odpade. Nova: prihod v 48 urah ali popust. Garancije so del ponudbe, ker jih Pacom lahko izpolni.' },
-      { q: 'Kje sistem teče?', a: 'V Notionu, ki ga ekipa že pozna: pregled znamke, segmenti, sekvence, koledar, naloge in banka idej na enem mestu. Brez novega orodja, ki bi ga bilo treba učiti.' },
-    ],
-    detail: { src: '/pictures/pacom-detail', alt: 'Koledar objav Pacom v Notionu za maj 2026: objavljene objave zeleno, osnutki agenta rumeno, ena čaka na potrditev.', caption: 'Koledar objav v Notionu, kot ga ekipa odpre vsak dan: zeleno objavljeno, rumeno osnutek agenta, modro čaka na potrditev.' },
-  },
-
-  zalife: {
-    before: [
-      'Šola prosi za ponudbo. Sodelavka išče zadnjo različico predstavitve v treh mapah, logotip v četrti, cenik v sporočilu izpred meseca dni. Ponudbo napiše znova, ker prejšnje ne najde. Objava na Instagramu čaka, dokler ne bo časa.',
-      'Na sestanku pade dobra ideja o delavnici za starše v podjetjih. Zapiše se v klepet in tam ostane.',
-    ],
-    practice: [
-      'Isti dan z Business HQ. Ponudba za šolo je v seznamu ponudb, s ceno in opombami, pripravljena za pošiljanje v nekaj minutah. Logotipi, predstavitve in fotografije so v eni mapi z opisom, kdaj se kaj uporabi. Nov sodelavec prebere pregled znamke in v pol ure ve, komu je program namenjen in kaj obljublja.',
-      'Ideja o delavnici za starše zaposlenih gre v banko idej z oceno in naslednjim korakom. Čez dva tedna je iz nje nastala ponudba za podjetja. Koledar objav ima stanje od ideje do objavljeno, zato je vidno, kaj manjka ta teden.',
-    ],
-    faq: [
-      { q: 'Kaj je Business HQ?', a: 'En prostor v Notionu s pregledom znamke, ponudbami, koledarjem objav, seznamom nalog in banko idej. Isto ogrodje, kot ga uporabljamo za druge stranke, prilagojeno programu za najstnike.' },
-      { q: 'Ali AI piše objave tudi tukaj?', a: 'Lahko pripravi osnutek po koledarju, ko ekipa to želi. Vsako objavo potrdi človek. Pri ZaLife je poudarek najprej na redu: ena mapa, en koledar, ena resnica o znamki.' },
-      { q: 'Kaj se je zgodilo z idejo za podjetja?', a: 'Iz banke idej je nastala ponudba: delavnica za starše zaposlenih kot del skrbi za zaposlene. To je primer, kako sistem spremeni idejo iz klepeta v ponudbo z naslednjim korakom.' },
-    ],
-    detail: { src: '/pictures/zalife-detail', alt: 'Banka idej ZaLife v Notionu: osem idej z oceno, stanjem in naslednjim korakom.', caption: 'Banka idej v Notionu: vsaka ideja ima oceno, stanje in naslednji korak. Program za podjetja je iz te tabele postal ponudba.' },
-  },
-
   elementum: {
     before: [
       'Sobota, 22.40. Obiskovalec na spletni strani bere o naložbenem zlatu in ima tri vprašanja: razlika med palico in kovancem, ali je zlato obdavčeno, kako poteka hramba. Napiše sporočilo. Odgovor dobi v ponedeljek dopoldne, ko je že kupil drugje.',

@@ -39,7 +39,6 @@ const SCALE = 2;
 const FILES = {
   'scene.html': ['saas', 'flow', 'security'],
   'products.html': ['aisos', 'elementum', 'tower-spa', 'asya-grafy', 'si-big', 'heva', 'epolac'],
-  'notion.html': ['pacom', 'zalife', 'pacom-detail', 'zalife-detail'],
   'terminal.html': ['model-premazi', 'model-premazi-detail'],
   'captures.html': ['athlos', 'ais-command', 'inspectus-vldr', 'inspectus-vin', 'athlos-detail', 'ais-command-detail', 'inspectus-vldr-detail', 'inspectus-vin-detail'],
   'details.html': ['aisos-detail', 'elementum-detail', 'tower-spa-detail', 'asya-grafy-detail', 'si-big-detail', 'heva-detail', 'epolac-detail'],

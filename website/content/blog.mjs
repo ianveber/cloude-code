@@ -48,7 +48,7 @@ export const blogPosts = [
         title: 'Kje se začne',
         paragraphs: [
           'Ne s celotnim podjetjem, ampak z enim procesom. Najboljši prvi proces se ponavlja vsak dan, ima jasen začetek in konec in ga je mogoče izmeriti. Kadar nekdo vsak dan pol ure prepisuje podatke iz sporočil v preglednico, je to pravi začetek.',
-          'Za INSPECTUS je bil prvi proces prepis poročila o škodah v kartice za vozila. Za HEVA prijave napak. Za Pacom ponudbe, ki so se pisale znova za vsako povpraševanje. Vsakič ena stvar, ki je bila vsak dan enaka.',
+          'Za INSPECTUS je bil prvi proces prepis poročila o škodah v kartice za vozila. Za HEVA prijave napak. Vsakič ena stvar, ki je bila vsak dan enaka.',
         ],
       },
       {

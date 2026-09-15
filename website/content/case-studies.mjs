@@ -7,8 +7,7 @@
  * short, concrete and free of dashes, like the rest of the site.
  *
  * Sources. ATHLOS, AIS Command, AISOS, both INSPECTUS projects and the
- * coatings model are written from their repositories; Pacom and ZaLife from
- * the Business HQ in Notion. The last six (Elementum, Tower Spa Celje,
+ * coatings model are written from their repositories. The last six (Elementum, Tower Spa Celje,
  * Dr. Asya Grafy, SI-BIG, HEVA, Epolac) are drafted without source material,
  * like their product entries, and carry `draft: true`. Ian confirms or
  * corrects them before the site goes live. Nothing here claims a wearable
@@ -21,9 +20,9 @@ export const caseStudies = {
   lead: 'Vsak projekt s te spletne strani, opisan od težave do sistema, ki teče. Kaj je bilo narobe, kaj smo zgradili in kaj se je spremenilo.',
   metaTitle: 'Študije primerov: AI sistemi, ki smo jih zgradili | AIS Slovenia',
   metaDescription:
-    'Štirinajst študij primerov AIS Slovenia: lastni izdelki in sistemi za stranke, od avtomatizacije dokumentov v pristanišču do AI svetovalcev in agentnih sistemov.',
+    'Dvanajst študij primerov AIS Slovenia: lastni izdelki in sistemi za stranke, od avtomatizacije dokumentov v pristanišču do AI svetovalcev in agentnih sistemov.',
   answer:
-    'AIS Slovenia je zgradil štirinajst sistemov: tri lastne izdelke (ATHLOS, AIS Command, AISOS) in enajst projektov za stranke, od avtomatizacije dokumentov za INSPECTUS do AI svetovalcev, asistentov za rezervacije in spremljanja trga. Vsaka študija pove, kaj je bilo prej, kaj smo naredili in kaj se je spremenilo.',
+    'AIS Slovenia je zgradil dvanajst sistemov: tri lastne izdelke (ATHLOS, AIS Command, AISOS) in devet projektov za stranke, od avtomatizacije dokumentov za INSPECTUS do AI svetovalcev, asistentov za rezervacije in spremljanja trga. Vsaka študija pove, kaj je bilo prej, kaj smo naredili in kaj se je spremenilo.',
 
   items: [
     /* ── Lastni izdelki ─────────────────────────────────────────────── */
@@ -271,85 +270,6 @@ export const caseStudies = {
         'Vse teče na sintetičnih družinah receptur; vsaka napoved je označena kot testna, dokler laboratorij ne vnese realnih meritev.',
       ],
       tools: ['Python', 'scikit-learn', 'Gaussovi procesi', 'pandas', 'pytest'],
-      draft: false,
-    },
-    {
-      id: 'pacom',
-      service: 'avtomatizacija-prodaje',
-      answer: 'Za čistilni servis Pacom iz Novega mesta je AIS Slovenia aprila 2026 postavil marketinški sistem: tri pakete z garancijami, segmente strank, e-poštne sekvence in koledar objav, ki ga polni vsebinski agent in potrjuje človek.',
-      metaTitle: 'Pacom: marketinški sistem za čistilni servis | Študija primera',
-      metaDescription:
-        'Sistem za obstoječe stranke čistilnega servisa Pacom iz Novega mesta: paketi z garancijami, segmenti, e-poštne sekvence in koledar objav z vsebinskim agentom.',
-      keywords: ['Pacom', 'čistilni servis Novo mesto', 'marketinški sistem', 'vsebinski koledar', 'e-poštne sekvence'],
-      summary:
-        'Sistem za obstoječe stranke čistilnega servisa iz Novega mesta: paketi z garancijami, segmenti strank, e-poštne sekvence in koledar objav, ki ga polni vsebinski agent. Objave potrdi človek.',
-      facts: [
-        { term: 'Stranka', definition: 'Čistilni servis Pacom, Novo mesto' },
-        { term: 'Panoga', definition: 'Čiščenje za podjetja in domove, Dolenjska' },
-        { term: 'Vrsta', definition: 'Marketinški sistem' },
-        { term: 'Obseg', definition: 'Ponudbeni paketi, segmenti in sekvence, vsebinski koledar, kampanja za ocene' },
-        { term: 'Stanje', definition: 'V uporabi od aprila 2026' },
-      ],
-      challenge: [
-        'Pacom čisti trideset let in njegova prednost je preprosta: ista oseba pride v iste prostore, vsakič. Te prednosti ni nihče povedal naglas. Ponudbe so nastajale za vsako povpraševanje posebej, objave takrat, ko je bil čas, ocene na Googlu pa niso odražale dvajsetletnih strank.',
-        'Cilj ni bil več oglasov, ampak sistem, ki obstoječe stranke drži, jih vabi k ocenam in novim daje jasno ponudbo.',
-      ],
-      build: [
-        'Najprej sporočilo: isti ključi, iste roke, isto zaupanje. Nato trije paketi z garancijo, ki to sporočilo dokazujejo: Pisarna za podjetja z vračilom mesečnega zneska, če ne pride ista oseba, Dom z rezervno kolegico, da storitev nikoli ne odpade, in Nova za novogradnje s prihodom v 48 urah.',
-        'Okrog tega teče Business HQ: pregled znamke, segmenti strank, e-poštne sekvence po prvem čiščenju, koledar objav, banka idej in seznam nalog. Vsebinski agent po koledarju pripravi osnutke objav in sporočil, oseba pri Pacomu jih potrdi. Vzporedno teče kampanja za ocene: klic petdesetim najboljšim strankam, trideset ocen v tridesetih dneh.',
-      ],
-      parts: [
-        { name: 'Ponudbeni paketi', body: 'Pisarna, Dom in Nova, vsak z jasno ceno in garancijo, ki jo je mogoče izpolniti.' },
-        { name: 'Segmenti in sekvence', body: 'Podjetja, družine in gradbinci, vsak s svojo e-poštno potjo po prvem čiščenju.' },
-        { name: 'Vsebinski koledar', body: 'Tridesetdnevni sprint: ekipa, prej in potem, pričevanja. Osnutke piše agent, potrdi jih človek.' },
-        { name: 'Ocene', body: 'Strukturirana kampanja za Google ocene iz obstoječih dolgoletnih strank.' },
-        { name: 'Oglasi', body: 'Ločeni kampanji za podjetja in domove v krogu 30 km, pripravljeni in čakata na zagon.' },
-      ],
-      outcome: [
-        'Znamka, paketi, vsebine in naloge so na enem mestu, ne v treh glavah.',
-        'Paketi z garancijami so zamenjali ponudbo za vsako povpraševanje posebej.',
-        'Objave nastajajo po koledarju, ne po navdihu, in vsaka gre čez človeka.',
-      ],
-      tools: ['Notion', 'Claude', 'E-poštne sekvence', 'Meta Ads', 'Google Business Profile'],
-      draft: false,
-    },
-    {
-      id: 'zalife',
-      service: 'avtomatizacija-prodaje',
-      answer: 'Za ZaLife je AIS Slovenia postavil znamko in vsebinski sistem: sredstva znamke, ponudbe za šole, starše in podjetja, koledar objav in banko idej na enem mestu.',
-      metaTitle: 'ZaLife: znamka in vsebinski sistem | Študija primera',
-      metaDescription:
-        'Znamka in vsebinski sistem za program osebnega razvoja najstnikov ZaLife: sredstva znamke, ponudbe za šole in starše, koledar objav in banka idej na enem mestu.',
-      keywords: ['ZaLife', 'osebni razvoj najstnikov', 'vsebinski sistem', 'znamka', 'ponudba za šole'],
-      summary:
-        'Znamka in vsebinski sistem za program osebnega razvoja najstnikov: sredstva znamke, ponudbe za šole in starše, koledar objav in banka idej na enem mestu, da ekipa ne išče več po mapah.',
-      facts: [
-        { term: 'Stranka', definition: 'ZaLife' },
-        { term: 'Panoga', definition: 'Izobraževanje, osebni razvoj mladih' },
-        { term: 'Vrsta', definition: 'Vsebinski sistem' },
-        { term: 'Obseg', definition: 'Business HQ, sredstva znamke, ponudbe in paketi, koledar objav, banka idej' },
-        { term: 'Stanje', definition: 'V uporabi' },
-      ],
-      challenge: [
-        'Program je bil dober, gradivo pa razpršeno: logotipi v eni mapi, predstavitve v drugi, ponudba za vsako šolo napisana znova. Objave so nastajale v presledkih, ideje so se izgubljale v pogovorih.',
-        'Ekipa je potrebovala en kraj, kjer so znamka, ponudbe in vsebine skupaj, in navado, da tja vsak teden kaj doda.',
-      ],
-      build: [
-        'Postavili smo Business HQ z enakim ogrodjem kot za druge stranke: pregled znamke s ciljno skupino in obljubo, ponudbe in paketi, koledar objav, seznam nalog in banka idej. Sredstva znamke, od logotipov do predstavitev, so v eni mapi z opisom, kdaj se kaj uporabi.',
-        'Iz banke idej so že zrasle nove ponudbe, na primer program za podjetja, ki delavnico za starše zaposlenih ponudi kot del skrbi za zaposlene.',
-      ],
-      parts: [
-        { name: 'Pregled znamke', body: 'Kdo je stranka, kaj program spremeni in v kakšnem času. Ena stran, ki jo prebere vsak nov sodelavec.' },
-        { name: 'Ponudbe in paketi', body: 'Ponudbe za šole, starše in podjetja z vsebino, ceno in opombami, pripravljene za pošiljanje.' },
-        { name: 'Koledar objav', body: 'Objave po tednih, s stanjem od ideje do objavljeno.' },
-        { name: 'Banka idej', body: 'Vsaka ideja z oceno in naslednjim korakom, da ne obstane v klepetu.' },
-      ],
-      outcome: [
-        'Vsa sredstva znamke in ponudbe na enem mestu, brez iskanja po mapah.',
-        'Nova ponudba za podjetja je nastala iz banke idej, ne iz naključja.',
-        'Objave imajo koledar in stanje, zato je vidno, kaj manjka.',
-      ],
-      tools: ['Notion', 'Claude'],
       draft: false,
     },
 

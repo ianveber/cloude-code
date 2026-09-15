@@ -162,7 +162,7 @@ push that touches `website/`.
 |---|---|
 | `/` | Full home narrative + intro |
 | `/produkti/` | Live: our products and the projects built for clients |
-| `/studije-primerov/` | Live: index of the 14 case studies |
+| `/studije-primerov/` | Live: index of the 12 case studies |
 | `/studije-primerov/<id>/` | Live: one case study per project (same ids as the products) |
 | `/vodici/` | Live: index of three guides |
 | `/vodici/<slug>/` | Live: chatbot or voice, cost structure, n8n/Make or custom |
@@ -195,7 +195,7 @@ Every product also carries `simple` (one plain sentence or two) and
 
 `products.items` is live: our own products (ATHLOS, AIS Command, AISOS) and
 the projects built for clients (INSPECTUS VLDR and VIN filter, the coating
-model, Pacom, ZaLife, Elementum, Tower Spa Celje, Dr. Asya Grafy Bio
+model, Elementum, Tower Spa Celje, Dr. Asya Grafy Bio
 Institute, SI-BIG, HEVA, Epolac). **The last six descriptions and screens
 were drafted at Ian's request without source material**, to fit each
 client's business and our three service areas; Ian confirms or corrects them
@@ -214,7 +214,7 @@ Team photos: files in `public/team/` plus `photo` / `photoWidth` / `photoHeight`
 on each member in `content/content.mjs`. Crop is CSS `4 / 5`.
 
 Clients: `clients.items` in `content/showcase.mjs` lists the clients
-(INSPECTUS, Pacom, ZaLife, Elementum, Tower Spa Celje, Dr. Asya Grafy Bio
+(INSPECTUS, Elementum, Tower Spa Celje, Dr. Asya Grafy Bio
 Institute, SI-BIG, HEVA, Epolac) and our own brands (AISOS, VETA, ATHLOS),
 each with a logo in `public/clients/` taken from the client's own website or
 our repositories. `tone: 'dark'` puts a dark disc behind a logo drawn for
@@ -364,8 +364,6 @@ What each study rests on:
   honest: AIS Command is pre-launch, the VIN filter is a prototype tested on
   synthetic images, the coatings model has only seen synthetic formulations.
   Do not "upgrade" those rows without new evidence.
-- Pacom and ZaLife: from the Business HQ in Notion. No client targets or
-  prices are published.
 - Elementum, Tower Spa Celje, Dr. Asya Grafy, SI-BIG, HEVA, Epolac: **drafted
   without source material** (`draft: true`), like their product entries, at
   Ian's request. Ian confirms or rewrites them before deploy; until then they
@@ -489,3 +487,8 @@ Phone: `+386 70 717 087`
 - Prefer editing `content/` over hard-coding strings in `src/`.
 - After UI changes, verify in a browser or `render-check` — a single
   screenshot is not verification.
+
+
+Pacom and ZaLife were removed from the whole site on 2026-09-15 at Ian's
+request: products, case studies, client logos, news, pictures and scenes.
+Do not add them back without him.

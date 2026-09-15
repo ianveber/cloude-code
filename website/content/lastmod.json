@@ -1,8 +1,8 @@
 {
   "/": {
-    "hash": "e9645c80d67a419b",
+    "hash": "e093e55ab6d2efba",
     "published": "2026-09-10",
-    "updated": "2026-09-14"
+    "updated": "2026-09-15"
   },
   "/404.html": {
     "hash": "87838861b3eacb97",
@@ -25,9 +25,9 @@
     "updated": "2026-09-14"
   },
   "/blog/kaj-je-ai-avtomatizacija/": {
-    "hash": "e5261c156a15c4b9",
+    "hash": "c542b015ee85da42",
     "published": "2026-09-10",
-    "updated": "2026-09-14"
+    "updated": "2026-09-15"
   },
   "/blog/kaj-se-zgodi-z-vasimi-podatki/": {
     "hash": "6599a667f98adac2",
@@ -70,9 +70,9 @@
     "updated": "2026-09-10"
   },
   "/novice/": {
-    "hash": "423b1b9d6882a5f7",
+    "hash": "38cbd8f0c876722e",
     "published": "2026-09-10",
-    "updated": "2026-09-10"
+    "updated": "2026-09-15"
   },
   "/o-podjetju/": {
     "hash": "7921c735727c5f88",
@@ -90,9 +90,9 @@
     "updated": "2026-09-10"
   },
   "/produkti/": {
-    "hash": "945dcb7061e31803",
+    "hash": "cf4ebda1919cc7ae",
     "published": "2026-09-10",
-    "updated": "2026-09-14"
+    "updated": "2026-09-15"
   },
   "/storitve/": {
     "hash": "6eff46e08cc3c7a7",
@@ -105,9 +105,9 @@
     "updated": "2026-09-14"
   },
   "/storitve/avtomatizacija-prodaje/": {
-    "hash": "91727d4d80affa54",
+    "hash": "33047286c2e9b093",
     "published": "2026-09-10",
-    "updated": "2026-09-14"
+    "updated": "2026-09-15"
   },
   "/storitve/spremljanje-trga/": {
     "hash": "0fa3368277fa7bf6",
@@ -115,9 +115,9 @@
     "updated": "2026-09-10"
   },
   "/studije-primerov/": {
-    "hash": "69cc2bccde338c15",
+    "hash": "6042cf9f2e18dd9b",
     "published": "2026-09-10",
-    "updated": "2026-09-14"
+    "updated": "2026-09-15"
   },
   "/studije-primerov/ais-command/": {
     "hash": "c18e7cec46916168",
@@ -169,11 +169,6 @@
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },
-  "/studije-primerov/pacom/": {
-    "hash": "ac8751a510f44341",
-    "published": "2026-09-10",
-    "updated": "2026-09-14"
-  },
   "/studije-primerov/si-big/": {
     "hash": "512482a5be1221f6",
     "published": "2026-09-10",
@@ -181,11 +176,6 @@
   },
   "/studije-primerov/tower-spa/": {
     "hash": "cdbffaf62a9b9ef9",
-    "published": "2026-09-10",
-    "updated": "2026-09-14"
-  },
-  "/studije-primerov/zalife/": {
-    "hash": "4392b515e1264c7f",
     "published": "2026-09-10",
     "updated": "2026-09-14"
   },

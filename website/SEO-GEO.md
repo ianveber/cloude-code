@@ -91,7 +91,7 @@ Checks
 5. `site.sameAs`: no LinkedIn, Facebook, Instagram or other profile could be
    confirmed for the company or the founders. Create a LinkedIn company page
    and add the URLs (LinkedIn is among the most cited domains).
-6. Brand mentions: ask INSPECTUS, Pacom and ZaLife to publish a short news
+6. Brand mentions: ask INSPECTUS to publish a short news
    item naming AIS Slovenia; pitch one Slovene outlet; consider one original
    data piece (a small survey of Slovenian SMEs on AI use).
 7. Confirm the six drafted case studies and, if you want prices on the cost

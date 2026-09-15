@@ -42,14 +42,14 @@ expect(
   'Code-glow background must be included verbatim right after <body> on every page, with the page content lifted above it.'
 );
 expect(
-  (pages.studies.match(/class="ptile__link" href="\/studije-primerov\/[a-z0-9-]+\/"/g) ?? []).length === 14 &&
-    (pages.products.match(/href="\/studije-primerov\/[a-z0-9-]+\/">Študija primera<\/a>/g) ?? []).length === 14 &&
+  (pages.studies.match(/class="ptile__link" href="\/studije-primerov\/[a-z0-9-]+\/"/g) ?? []).length === 12 &&
+    (pages.products.match(/href="\/studije-primerov\/[a-z0-9-]+\/">Študija primera<\/a>/g) ?? []).length === 12 &&
     /<h2>Izziv<\/h2>/.test(pages.study) && /<h2>Kaj smo naredili<\/h2>/.test(pages.study) &&
     /<h2>Kaj se je spremenilo<\/h2>/.test(pages.study) && /<h2>Orodja<\/h2>/.test(pages.study) &&
     /<h2>Kako je bilo prej<\/h2>/.test(pages.study) && /<h2>Kako je videti v praksi<\/h2>/.test(pages.study) &&
     /<h2>Pogosta vprašanja o projektu<\/h2>/.test(pages.study) && /class="study__figure"/.test(pages.study) &&
     /class="deflist deflist--facts"/.test(pages.study),
-  'Every one of the 14 projects has a case study page, linked from /produkti/ and listed on /studije-primerov/, with the four fixed parts.'
+  'Every one of the 12 projects has a case study page, linked from /produkti/ and listed on /studije-primerov/, with the four fixed parts.'
 );
 expect(
   /#code-glow\s*\{[^}]*--glow-cut:\s*0px;[^}]*mask-image:\s*linear-gradient\(to bottom, transparent calc\(var\(--glow-cut\) - 56px\), #000 var\(--glow-cut\)\)/s.test(styles) &&
@@ -328,14 +328,14 @@ for (const [route, html, marker] of [
 expect(
   (pages.blog.match(/class="postcard__pic"/g) ?? []).length >= 8 &&
   (pages.blog.match(/href="\/blog\/[a-z0-9-]+\/"/g) ?? []).length >= 8 &&
-    (pages.products.match(/class="project__simple"/g) ?? []).length === 14,
+    (pages.products.match(/class="project__simple"/g) ?? []).length === 12,
   'Blog posts must link to their pages and every product must carry its plain-language lines.'
 );
 expect(
   !/\bempty-state\b/.test(pages.products) &&
     (pages.products.match(/class="project" id="/g) ?? []).length >= 6 &&
-    (pages.products.match(/\/pictures\/(?:athlos|ais-command|aisos|inspectus-vldr|inspectus-vin|model-premazi|pacom|zalife|elementum|tower-spa|asya-grafy|si-big|heva|epolac)-800\.webp/g) ?? []).length === 14,
-  'Products page must list the 14 products and projects, each with its rendered picture.'
+    (pages.products.match(/\/pictures\/(?:athlos|ais-command|aisos|inspectus-vldr|inspectus-vin|model-premazi|elementum|tower-spa|asya-grafy|si-big|heva|epolac)-800\.webp/g) ?? []).length === 12,
+  'Products page must list the 12 products and projects, each with its rendered picture.'
 );
 
 const order = [

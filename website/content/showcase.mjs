@@ -56,7 +56,7 @@ export const buildStage = {
    Two rows of small pills, each with a client's logo and name, nothing else.
 
    Logos come from each client's own website (public/clients/). INSPECTUS,
-   Pacom, ZaLife, Elementum, Tower Spa Celje, Dr. Asya Grafy Bio Institute,
+   Elementum, Tower Spa Celje, Dr. Asya Grafy Bio Institute,
    SI-BIG, HEVA and Epolac are clients; AISOS, VETA and ATHLOS are our own
    products and brands. `tone: 'dark'` puts a dark disc behind a logo drawn
    for dark surfaces. Before a production deploy, confirm with each client
@@ -70,16 +70,6 @@ export const clients = {
       name: 'INSPECTUS',
       href: 'https://inspectus.si/',
       logo: { src: '/clients/inspectus.webp', width: 110, height: 41 },
-    },
-    {
-      name: 'Pacom',
-      href: 'https://pacom.si/',
-      logo: { src: '/clients/pacom.webp', width: 110, height: 95 },
-    },
-    {
-      name: 'ZaLife',
-      href: 'https://www.zalife.eu/',
-      logo: { src: '/clients/zalife.webp', width: 110, height: 45 },
     },
     {
       name: 'Elementum',
@@ -212,9 +202,9 @@ export const products = {
   homeTitle: 'Kaj smo zgradili',
   metaTitle: 'Izdelki in projekti | AIS Slovenia',
   metaDescription:
-    'SaaS izdelki, avtomatizacije in AI modeli, ki jih je AIS Slovenia zgradila zase in za stranke: ATHLOS, AIS Command, AISOS, INSPECTUS, Pacom in ZaLife.',
+    'SaaS izdelki, avtomatizacije in AI modeli, ki jih je AIS Slovenia zgradila zase in za stranke: ATHLOS, AIS Command, AISOS, INSPECTUS in napovedni model za premaze.',
   answer:
-    'AIS Slovenia razvija lastne izdelke (ATHLOS, AIS Command, AISOS) in gradi sisteme za stranke: avtomatizaciji za INSPECTUS, marketinški sistem za Pacom, vsebinski sistem za ZaLife in napovedni model za premaze.',
+    'AIS Slovenia razvija lastne izdelke (ATHLOS, AIS Command, AISOS) in gradi sisteme za stranke: avtomatizaciji za INSPECTUS, napovedni model za premaze ter svetovalce in asistente za stranke.',
   items: [
     {
       id: 'athlos',
@@ -277,28 +267,6 @@ export const products = {
       simple: 'Vpišete, iz česa je barva, in model pove, kako gosta bo in kako dobro bo prekrila, še preden jo kdo zmeša. Če ni prepričan, to pove.',
       forWhom: 'Za laboratorije in razvoj, kjer vsak poskus stane čas in material.',
       picture: { src: '/pictures/model-premazi', alt: 'Terminal z resnično sejo modela za premaze: napoved štirih lastnosti z intervali in dve zavrnitvi z razlogom.', width: 1600, height: 1000 },
-    },
-    {
-      id: 'pacom',
-      kicker: 'Za stranko',
-      kind: 'Marketinški sistem',
-      name: 'Pacom',
-      client: 'Čistilni servis Pacom',
-      body: 'Sistem za obstoječe stranke čistilnega servisa: CRM s segmenti, e-poštne sekvence po prvem čiščenju in vsebinski koledar, ki ga polni vsebinski agent. Objave in sporočila potrdi človek.',
-      simple: 'Vse, kar podjetje pove strankam, je na enem mestu: paketi, objave, sporočila. Objave pripravi agent, človek jih potrdi.',
-      forWhom: 'Za lokalna storitvena podjetja, ki hočejo obdržati stare stranke in dobiti nove.',
-      picture: { src: '/pictures/pacom', alt: 'Stran Pacom v Notionu: pregled znamke, aktivne kampanje in trije paketi z garancijami.', width: 1600, height: 1000 },
-    },
-    {
-      id: 'zalife',
-      kicker: 'Za stranko',
-      kind: 'Vsebinski sistem',
-      name: 'ZaLife',
-      client: 'ZaLife',
-      body: 'Znamka in vsebinski sistem za program osebnega razvoja najstnikov: sredstva znamke, ponudbe za šole in starše ter koledar objav na enem mestu, da ekipa ne išče več po mapah.',
-      simple: 'Logotipi, ponudbe in objave so v eni mapi, ne v treh glavah. Vsak nov sodelavec ve, kje je kaj.',
-      forWhom: 'Za znamke in programe, ki gradivo pošiljajo šolam, staršem in podjetjem.',
-      picture: { src: '/pictures/zalife', alt: 'Stran ZaLife v Notionu: pregled znamke, baze, ponudbe in banka idej.', width: 1600, height: 1000 },
     },
     {
       id: 'elementum',
@@ -382,16 +350,23 @@ export const news = {
   lead: 'Kratka obvestila o tem, kaj je AIS Slovenia zgradil in objavil. Samo stvari, ki so se res zgodile, z datumom.',
   metaTitle: 'Novice: kaj je novega pri AIS Slovenia',
   metaDescription:
-    'Novice AIS Slovenia: nova spletna stran s štirinajstimi študijami primerov, prva ladja za INSPECTUS v nekaj sekundah in skupni Business HQ za Pacom in ZaLife.',
+    'Novice AIS Slovenia: nova spletna stran z dvanajstimi študijami primerov in tremi vodiči ter prva ladja za INSPECTUS, obdelana v nekaj sekundah.',
   answer:
-    'AIS Slovenia objavlja kratke novice o opravljenem delu: septembra 2026 novo spletno stran s štirinajstimi študijami primerov in tremi vodiči, julija 2026 prvo resnično serijo 314 vozil za INSPECTUS in aprila 2026 skupni Business HQ za Pacom in ZaLife.',
+    'AIS Slovenia objavlja kratke novice o opravljenem delu: septembra 2026 novo spletno stran z dvanajstimi študijami primerov in tremi vodiči ter julija 2026 prvo resnično serijo 314 vozil za INSPECTUS.',
   items: [
     {
       date: '2026-09-10',
       dateLabel: '10. 9. 2026',
       kicker: 'Spletna stran',
-      title: 'Nova spletna stran s štirinajstimi študijami primerov in tremi vodiči',
+      title: 'Nova spletna stran z dvanajstimi študijami primerov in tremi vodiči',
       body: 'Vsak projekt, ki smo ga zgradili, ima zdaj svojo stran: kaj je bilo narobe, kaj smo naredili in kaj se je spremenilo. Dodali smo tri vodiče za podjetja, ki se šele odločajo, in celotno vsebino v obliki, ki jo lahko berejo tudi AI asistenti.',
+    },
+    {
+      date: '2026-09-14',
+      dateLabel: '14. 9. 2026',
+      kicker: 'Blog',
+      title: 'Osem zapisov na blogu in trije vodiči za podjetja, ki se odločajo',
+      body: 'Blog razlaga AI avtomatizacijo v preprostem jeziku: kaj je, kaj je AI agent, kako izbrati prvi proces, kaj se zgodi z vašimi podatki. Trije vodiči odgovarjajo na vprašanja pred odločitvijo: chatbot ali glasovni agent, koliko stane in kdaj vzeti n8n, Make ali sistem po meri.',
     },
     {
       date: '2026-07-14',
@@ -399,13 +374,6 @@ export const news = {
       kicker: 'Stranke',
       title: 'INSPECTUS: prva ladja s 314 vozili obdelana v nekaj sekundah',
       body: 'Orodje za pregled vozil v pristanišču je prvič teklo na resničnih podatkih. Iz izvoza s 380 vrsticami je nastalo 314 vrstic za poročilo in 314 kartic VLDR v obliki, ki jo zahteva proizvajalec. Ročno urejanje preglednic je odpadlo.',
-    },
-    {
-      date: '2026-04-25',
-      dateLabel: '25. 4. 2026',
-      kicker: 'Stranke',
-      title: 'Pacom in ZaLife dobita skupni Business HQ',
-      body: 'Čistilni servis iz Novega mesta in program za osebni razvoj najstnikov imata zdaj vsak svoj center: pregled znamke, ponudbe, koledar objav in banko idej na enem mestu. Objave pripravi vsebinski agent, potrdi jih človek.',
     },
   ],
   empty: {
