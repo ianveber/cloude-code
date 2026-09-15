@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<title>AIS blog picture source</title>
+<style>
+  /* Illustrations for the blog posts. One stage per post, 1600×1000 CSS px,
+     rendered by tools/pictures/render.mjs. These are not app screens but calm
+     editorial diagrams in the site's visual system: one idea per picture,
+     short Slovene labels, a single blue accent, readable at 700 px wide. */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --paper: #fff;
+    --canvas: #f4f5f7;
+    --ink: #111318;
+    --ink-soft: #353a44;
+    --muted: #69707d;
+    --faint: #9299a5;
+    --line: #e5e7eb;
+    --blue: #1d77fe;
+    --blue-soft: rgba(29, 119, 254, .10);
+    --green: #1f9d5a;
+    --green-soft: #e6f6ec;
+    --shadow: 0 1px 2px rgba(17,19,24,.04), 0 18px 44px rgba(17,19,24,.07);
+    --shadow-sm: 0 1px 2px rgba(17,19,24,.05), 0 6px 16px rgba(17,19,24,.05);
+  }
+
+  html, body { width: 1600px; height: 1000px; overflow: hidden; background: var(--paper); }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', system-ui, sans-serif; color: var(--ink); font-size: 22px; line-height: 1.3; -webkit-font-smoothing: antialiased; }
+
+  .stage { position: absolute; inset: 0; display: none; background: var(--canvas); padding: 80px 96px; }
+  .stage.on { display: block; }
+
+  /* shared vocabulary */
+  .title { font-size: 48px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+  .kicker { font-size: 23px; color: var(--muted); margin-top: 12px; }
+  .card { background: var(--paper); border-radius: 24px; box-shadow: var(--shadow); }
+  .label { font-size: 30px; font-weight: 650; letter-spacing: -0.02em; line-height: 1.15; }
+  .sub { font-size: 22px; color: var(--muted); }
+  .eyebrow { font-size: 17px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+  .chip { display: inline-flex; align-items: center; gap: 10px; height: 42px; padding: 0 18px; border-radius: 999px; font-size: 20px; font-weight: 600; white-space: nowrap; background: var(--paper); color: var(--ink-soft); box-shadow: var(--shadow-sm); }
+  .chip--blue { background: var(--blue); color: #fff; box-shadow: none; }
+  .chip--soft { background: var(--blue-soft); color: var(--blue); box-shadow: none; }
+  .chip--green { background: var(--green-soft); color: var(--green); box-shadow: none; }
+  .chip--grey { background: var(--line); color: var(--muted); box-shadow: none; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; height: 50px; padding: 0 26px; border-radius: 14px; background: var(--blue); color: #fff; font-size: 21px; font-weight: 650; }
+  .tick { width: 38px; height: 38px; border-radius: 50%; background: var(--green); position: relative; flex: none; }
+  .tick::after { content: ''; position: absolute; left: 13px; top: 8px; width: 9px; height: 16px; border: solid #fff; border-width: 0 3px 3px 0; transform: rotate(45deg); }
+  .cross { width: 38px; height: 38px; border-radius: 50%; background: var(--line); position: relative; flex: none; }
+  .cross::before, .cross::after { content: ''; position: absolute; left: 50%; top: 50%; width: 18px; height: 3px; border-radius: 2px; background: var(--muted); transform: translate(-50%, -50%) rotate(45deg); }
+  .cross::after { transform: translate(-50%, -50%) rotate(-45deg); }
+  .lines { position: absolute; left: 0; top: 0; overflow: visible; }
+  .lines path { fill: none; stroke: var(--faint); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .lines path.blue { stroke: var(--blue); }
+  .lines path.ink { stroke: var(--ink-soft); }
+  .lines path.dash { stroke-dasharray: 2 10; }
+
+  /* 1 · avtomatizacija */
+  .s1 { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; margin-top: 36px; }
+  .s1-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 18px; }
+  .s1-msg { height: 64px; border-radius: 16px; background: var(--paper); display: flex; align-items: center; gap: 14px; padding: 0 18px; font-size: 21px; font-weight: 600; color: var(--ink-soft); box-shadow: var(--shadow-sm); }
+  .g { display: block; width: 22px; height: 16px; border: 2.5px solid var(--faint); border-radius: 5px; flex: none; }
+  .g-call { width: 20px; height: 20px; border-radius: 50%; }
+  .g-chat { width: 22px; height: 18px; border-radius: 9px 9px 9px 2px; }
+  .g-form { width: 16px; height: 20px; border-radius: 4px; }
+  .s1-arrow { display: block; margin: 0 auto; }
+  .s1-result { padding: 30px 34px; height: 424px; display: flex; flex-direction: column; }
+  .s1-head { display: flex; justify-content: space-between; align-items: center; }
+  .s1-time { font-size: 40px; font-weight: 700; letter-spacing: -0.03em; color: var(--muted); }
+  .s1-rows { display: grid; gap: 17px; margin: 26px 0 auto; }
+  .s1-result > .sub { margin-top: 22px; }
+  .s1-row { display: flex; align-items: center; gap: 16px; }
+  .s1-row b { display: block; height: 14px; border-radius: 7px; background: var(--line); position: relative; }
+  .s1-row b.struck::after { content: ''; position: absolute; left: -6px; right: -6px; top: 50%; height: 3px; background: var(--faint); transform: rotate(-2deg); }
+  .box { width: 26px; height: 26px; border-radius: 7px; border: 2.5px solid var(--line); flex: none; position: relative; }
+  .box--x::after { content: ''; position: absolute; left: 7px; top: 1px; width: 7px; height: 13px; border: solid var(--faint); border-width: 0 3px 3px 0; transform: rotate(40deg); }
+  .s1-tasks { margin-top: 18px; }
+  .s1-task { display: flex; align-items: center; gap: 16px; font-size: 22px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .s1-task:first-child { border-top: 0; }
+  .dot { width: 28px; height: 28px; border-radius: 50%; background: var(--blue-soft); position: relative; flex: none; }
+  .dot::after { content: ''; position: absolute; left: 10px; top: 6px; width: 6px; height: 11px; border: solid var(--blue); border-width: 0 2.5px 2.5px 0; transform: rotate(45deg); }
+
+  /* 2 · agent */
+  .s2-loop { position: absolute; left: 96px; top: 190px; width: 940px; height: 700px; }
+  .node { position: absolute; width: 380px; height: 180px; border-radius: 24px; background: var(--paper); box-shadow: var(--shadow); padding: 34px 32px; }
+  .node .num { position: absolute; right: 24px; top: 22px; width: 36px; height: 36px; border-radius: 50%; background: var(--canvas); color: var(--muted); font-size: 18px; font-weight: 700; display: grid; place-items: center; }
+  .node .sub { margin-top: 8px; }
+  .node--blue { background: var(--blue); }
+  .node--blue .label { color: #fff; }
+  .node--blue .sub { color: rgba(255,255,255,.8); }
+  .node--blue .num { background: rgba(255,255,255,.2); color: #fff; }
+  .s2-when { position: absolute; left: 62px; top: 344px; }
+  .s2-cant { position: absolute; left: 1100px; top: 390px; width: 404px; padding: 32px 36px; }
+  .s2-cant .row { display: flex; align-items: center; gap: 16px; font-size: 26px; font-weight: 600; color: var(--ink-soft); margin-top: 18px; }
+  .s2-cant .sub { margin-top: 22px; font-size: 20px; }
+
+  /* 3 · prvi proces */
+  .s3 { display: grid; grid-template-columns: 640px 1fr; gap: 56px; margin-top: 56px; height: 656px; }
+  .s3-check { padding: 36px 40px; display: flex; flex-direction: column; }
+  .s3-q { flex: 1; display: flex; align-items: center; gap: 20px; font-size: 28px; font-weight: 600; border-top: 1px solid var(--line); }
+  .s3-q:nth-child(2) { border-top: 0; }
+  .s3-side { display: grid; grid-template-rows: 1fr 1fr auto; gap: 22px; }
+  .s3-ex { padding: 30px 36px; display: flex; flex-direction: column; }
+  .s3-ex .label { margin-top: 8px; }
+  .s3-ex .sub { margin-top: 6px; }
+  .s3-score { display: flex; align-items: center; gap: 8px; margin-top: auto; font-size: 20px; font-weight: 600; color: var(--muted); }
+  .s3-score .mini { width: 24px; height: 24px; border-radius: 50%; background: var(--green); position: relative; }
+  .s3-score .mini::after { content: ''; position: absolute; left: 8px; top: 4px; width: 6px; height: 11px; border: solid #fff; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg); }
+  .s3-score .mini--x { background: var(--line); }
+  .s3-score .mini--x::after { display: none; }
+  .s3-score .mini--x::before { content: ''; position: absolute; left: 50%; top: 50%; width: 11px; height: 2.5px; background: var(--faint); transform: translate(-50%, -50%) rotate(45deg); }
+  .s3-score .mini--x i { position: absolute; left: 50%; top: 50%; width: 11px; height: 2.5px; background: var(--faint); transform: translate(-50%, -50%) rotate(-45deg); }
+  .s3-score span:last-child { margin-left: 8px; }
+  .s3-no { background: transparent; box-shadow: none; border: 2px dashed #d6d9de; padding: 26px 36px; }
+  .s3-no .row { display: flex; align-items: center; justify-content: space-between; }
+  .s3-no .label { color: var(--faint); text-decoration: line-through; text-decoration-thickness: 3px; margin: 0; }
+  .s3-no .s3-score { margin-top: 14px; }
+
+  /* 4 · ne vem */
+  .s4-scale { position: absolute; left: 96px; top: 260px; width: 1408px; height: 170px; }
+  .s4-track { position: absolute; left: 0; right: 0; top: 62px; height: 52px; border-radius: 26px; background: var(--line); overflow: hidden; }
+  .s4-zone { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; padding: 0 30px; font-size: 21px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  .s4-zone--green { background: var(--green); color: #fff; }
+  .s4-num { position: absolute; top: 130px; transform: translateX(-50%); font-size: 21px; color: var(--faint); font-weight: 600; }
+  .s4-marker { position: absolute; top: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
+  .s4-marker i { width: 4px; height: 82px; border-radius: 2px; background: var(--ink); margin-top: 8px; }
+  .s4-cards { position: absolute; left: 96px; top: 500px; width: 1408px; height: 400px; display: grid; grid-template-columns: 1.35fr 1fr; gap: 40px; }
+  .s4-card { padding: 34px 38px; display: flex; flex-direction: column; }
+  .s4-msg { margin-top: 20px; padding: 22px 26px; border-radius: 20px 20px 20px 6px; background: var(--canvas); font-size: 25px; color: var(--ink-soft); }
+  .s4-msg--bot { background: var(--ink); color: #fff; border-radius: 20px 20px 6px 20px; align-self: flex-end; margin-top: 16px; font-size: 24px; }
+  .s4-why { display: flex; align-items: center; gap: 18px; margin-top: auto; padding-top: 26px; }
+
+  /* 5 · dokumenti */
+  .s5-docs { position: absolute; left: 96px; top: 300px; width: 360px; display: grid; gap: 24px; }
+  .doc { position: relative; height: 150px; border-radius: 22px; background: var(--paper); box-shadow: var(--shadow-sm); padding: 28px 30px; overflow: hidden; }
+  .doc::before { content: ''; position: absolute; right: 0; top: 0; width: 40px; height: 40px; background: linear-gradient(225deg, var(--canvas) 50%, #e3e5ea 50%); }
+  .doc b { display: block; font-size: 25px; font-weight: 650; }
+  .doc i { display: block; height: 9px; border-radius: 5px; background: var(--line); margin-top: 16px; width: 70%; }
+  .doc i + i { width: 48%; margin-top: 12px; }
+  .doc--hit { box-shadow: 0 0 0 3px var(--blue), var(--shadow); }
+  .doc--hit i + i { background: var(--blue-soft); width: 62%; }
+  .s5-q { position: absolute; left: 548px; top: 451px; width: 400px; }
+  .s5-a { position: absolute; left: 1040px; top: 378px; width: 464px; }
+  .bubble { margin-top: 14px; padding: 26px 30px; border-radius: 24px 24px 24px 6px; background: var(--paper); box-shadow: var(--shadow); font-size: 27px; line-height: 1.35; }
+  .bubble--dark { background: var(--ink); color: #fff; border-radius: 24px 24px 6px 24px; }
+  .bubble .chip { margin-top: 20px; height: 48px; font-size: 21px; }
+  .bubble--ghost { background: transparent; box-shadow: none; border: 2px dashed #cfd3da; color: var(--faint); margin-top: 26px; display: flex; align-items: center; gap: 16px; font-size: 25px; }
+  .bubble--ghost s { text-decoration-thickness: 3px; }
+
+  /* 6 · uvedba */
+  .s6-line { position: absolute; left: 140px; top: 490px; width: 1320px; height: 4px; border-radius: 2px; background: #d6d9de; }
+  .s6-step { position: absolute; top: 490px; width: 200px; margin-left: -100px; text-align: center; }
+  .s6-step i { display: block; width: 28px; height: 28px; border-radius: 50%; background: var(--paper); border: 4px solid var(--ink-soft); margin: -12px auto 0; }
+  .s6-step b { display: block; font-size: 25px; font-weight: 650; margin-top: 24px; }
+  .s6-step small { display: block; font-size: 20px; color: var(--muted); margin-top: 4px; }
+  .s6-step--blue i { width: 44px; height: 44px; border-color: var(--blue); background: var(--blue); margin-top: -20px; box-shadow: 0 0 0 10px var(--blue-soft); }
+  .s6-step--blue b { color: var(--blue); margin-top: 16px; }
+  .s6-week { position: absolute; top: 360px; height: 74px; }
+  .s6-week::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 22px; border: 3px solid #d6d9de; border-bottom: 0; border-radius: 14px 14px 0 0; }
+  .s6-week span { position: absolute; left: 0; right: 0; top: 0; text-align: center; font-size: 23px; font-weight: 600; color: var(--muted); }
+  .s6-week--open::before { border-right: 0; border-radius: 14px 0 0 0; }
+  .s6-call { position: absolute; left: 664px; top: 660px; width: 460px; padding: 28px 32px; text-align: center; }
+  .s6-call .label { color: var(--blue); font-size: 27px; }
+  .s6-call .sub { margin-top: 6px; }
+
+  /* 7 · podatki */
+  .s7-firm { position: absolute; left: 96px; top: 230px; width: 800px; height: 640px; padding: 36px 40px; }
+  .s7-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
+  .s7-snip { margin-top: 36px; height: 150px; border-radius: 20px; background: var(--canvas); padding: 26px 28px; display: grid; grid-template-columns: 300px 1fr; gap: 30px; align-items: center; }
+  .s7-snip .chip { align-self: start; }
+  .s7-snip .sub { margin-top: 12px; font-size: 20px; }
+  .s7-snip i { display: block; height: 10px; border-radius: 5px; background: #e1e4e9; margin-top: 14px; width: 80%; }
+  .s7-snip i:first-child { margin-top: 0; }
+  .s7-snip i.hit { background: var(--blue); width: 100%; }
+  .s7-snip i:last-child { width: 55%; }
+  .s7-tile { height: 200px; border-radius: 20px; background: var(--canvas); padding: 26px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .s7-tile b { font-size: 26px; font-weight: 650; letter-spacing: -0.01em; }
+  .s7-tile i { display: block; width: 44px; height: 44px; border-radius: 12px; border: 3px solid var(--faint); margin-bottom: auto; }
+  .s7-tile i.mail { border-radius: 8px; height: 34px; }
+  .s7-tile i.people { border-radius: 50%; }
+  .s7-log { position: absolute; left: 40px; bottom: 36px; right: 40px; display: flex; align-items: center; gap: 18px; }
+  .s7-model { position: absolute; left: 1180px; top: 520px; width: 324px; height: 220px; padding: 30px 34px; border: 2px dashed #cfd3da; background: transparent; box-shadow: none; }
+  .s7-model .sub { margin-top: 8px; }
+  .s7-lock { position: absolute; left: 1180px; top: 770px; width: 324px; height: 100px; padding: 22px 26px; display: flex; align-items: center; gap: 16px; font-size: 21px; font-weight: 600; color: var(--ink-soft); }
+  .lock { position: relative; width: 30px; height: 36px; flex: none; }
+  .lock::before { content: ''; position: absolute; left: 6px; top: 0; width: 18px; height: 20px; border: 3px solid var(--ink-soft); border-bottom: 0; border-radius: 10px 10px 0 0; }
+  .lock::after { content: ''; position: absolute; left: 0; top: 15px; width: 30px; height: 21px; border-radius: 6px; background: var(--ink-soft); }
+  .s7-lab { position: absolute; }
+
+  /* 8 · chatbot */
+  .phone { position: absolute; left: 150px; top: 70px; width: 440px; height: 860px; border-radius: 56px; background: #0c0d11; padding: 14px; box-shadow: 0 30px 70px rgba(17,19,24,.22); }
+  .phone__screen { width: 100%; height: 100%; border-radius: 44px; background: var(--paper); overflow: hidden; position: relative; padding: 70px 22px 24px; display: flex; flex-direction: column; }
+  .phone__notch { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 110px; height: 30px; border-radius: 15px; background: #0c0d11; }
+  .phone__head { display: flex; align-items: center; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+  .phone__head b { font-size: 22px; font-weight: 650; }
+  .phone__head small { display: block; color: var(--green); font-size: 16px; font-weight: 600; }
+  .phone__av { width: 40px; height: 40px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 16px; font-weight: 800; display: grid; place-items: center; }
+  .msgs { display: grid; gap: 14px; margin-top: 20px; }
+  .msg { max-width: 88%; padding: 14px 18px; border-radius: 20px 20px 20px 6px; background: var(--canvas); font-size: 22px; line-height: 1.32; }
+  .msg--me { justify-self: end; background: var(--blue); color: #fff; border-radius: 20px 20px 6px 20px; }
+  .msg .chip { height: 34px; font-size: 17px; padding: 0 14px; margin-top: 10px; }
+  .phone__input { margin-top: auto; height: 48px; border: 1px solid var(--line); border-radius: 16px; display: flex; align-items: center; padding: 0 16px; color: var(--faint); font-size: 18px; }
+  .s8-side { position: absolute; left: 700px; top: 205px; width: 804px; }
+  .s8-facts { display: grid; gap: 22px; margin-top: 48px; }
+  .s8-fact { display: flex; align-items: center; gap: 22px; padding: 30px 34px; }
+  .s8-fact b { display: block; font-size: 27px; font-weight: 650; letter-spacing: -0.01em; }
+  .s8-fact .sub { margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<!-- 1 · Kaj je AI avtomatizacija -->
+<div class="stage on" id="blog-kaj-je-ai-avtomatizacija">
+  <div class="title">Računalnik prevzame, kar se ponavlja</div>
+  <div class="s1">
+    <div>
+      <div class="eyebrow">Prej</div>
+      <div class="s1-grid">
+        <div class="s1-msg"><i class="g"></i>E-pošta</div>
+        <div class="s1-msg"><i class="g g-call"></i>Klic</div>
+        <div class="s1-msg"><i class="g g-chat"></i>Sporočilo</div>
+        <div class="s1-msg"><i class="g"></i>E-pošta</div>
+        <div class="s1-msg"><i class="g g-form"></i>Obrazec</div>
+        <div class="s1-msg"><i class="g g-call"></i>Klic</div>
+        <div class="s1-msg"><i class="g g-chat"></i>Sporočilo</div>
+        <div class="s1-msg"><i class="g"></i>E-pošta</div>
+        <div class="s1-msg"><i class="g g-call"></i>Klic</div>
+      </div>
+      <svg class="s1-arrow" width="644" height="72" viewBox="0 0 644 72"><path d="M322 8V58M308 44l14 14 14-14" fill="none" stroke="#9299a5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="card s1-result">
+        <div class="s1-head"><div class="label" style="color:var(--muted)">Ročno prepisano</div><div class="s1-time">45 min</div></div>
+        <div class="s1-rows">
+          <div class="s1-row"><i class="box box--x"></i><b style="width:64%"></b></div>
+          <div class="s1-row"><i class="box"></i><b style="width:82%"></b></div>
+          <div class="s1-row"><i class="box box--x"></i><b style="width:46%" class="struck"></b></div>
+          <div class="s1-row"><i class="box"></i><b style="width:58%"></b></div>
+          <div class="s1-row"><i class="box box--x"></i><b style="width:74%"></b></div>
+          <div class="s1-row"><i class="box"></i><b style="width:36%" class="struck"></b></div>
+        </div>
+        <div class="sub">vsak dan znova, dvakrat prepisano, ena pozabljena</div>
+      </div>
+    </div>
+    <div>
+      <div class="eyebrow" style="color:var(--blue)">Potem</div>
+      <div class="s1-grid">
+        <div class="s1-msg"><i class="g"></i>E-pošta</div>
+        <div class="s1-msg"><i class="g g-call"></i>Klic</div>
+        <div class="s1-msg"><i class="g g-chat"></i>Sporočilo</div>
+        <div class="s1-msg"><i class="g"></i>E-pošta</div>
+        <div class="s1-msg"><i class="g g-form"></i>Obrazec</div>
+        <div class="s1-msg"><i class="g g-call"></i>Klic</div>
+        <div class="s1-msg"><i class="g g-chat"></i>Sporočilo</div>
+        <div class="s1-msg"><i class="g"></i>E-pošta</div>
+        <div class="s1-msg"><i class="g g-call"></i>Klic</div>
+      </div>
+      <svg class="s1-arrow" width="644" height="72" viewBox="0 0 644 72"><path d="M107 6C107 36 322 22 322 46M537 6C537 36 322 22 322 46M322 6V58M308 44l14 14 14-14" fill="none" stroke="#1d77fe" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="card s1-result">
+        <div class="s1-head"><div class="label">Naloge za danes</div><span class="chip chip--soft">3 min pregleda</span></div>
+        <div class="s1-tasks">
+          <div class="s1-task"><i class="dot"></i>Pokliči g. Novaka do 11.00</div>
+          <div class="s1-task"><i class="dot"></i>Ponudba za Lesnino, rok petek</div>
+          <div class="s1-task"><i class="dot"></i>Reklamacija 2231, preveri dostavo</div>
+          <div class="s1-task"><i class="dot"></i>Sestanek prestavljen na sredo</div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:auto"><span class="btn">Potrdi</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2 · Kaj je AI agent -->
+<div class="stage" id="blog-kaj-je-ai-agent">
+  <div class="title">Predlaga agent, potrdi človek</div>
+  <div class="s2-loop">
+    <svg class="lines" width="940" height="700" viewBox="0 0 940 700">
+      <path d="M394 120H546M532 106l14 14-14 14"/>
+      <path d="M750 224V506M736 492l14 14 14-14"/>
+      <path d="M546 610H394M408 596l-14 14 14 14"/>
+      <path class="blue" d="M190 506V224M176 238l14-14 14 14"/>
+    </svg>
+    <div class="node" style="left:0;top:30px"><span class="num">1</span><div class="label">Prebere</div><div class="sub">koledar, e-pošta, naloge</div></div>
+    <div class="node" style="left:560px;top:30px"><span class="num">2</span><div class="label">Odloči po pravilih</div><div class="sub">kaj je nujno, kaj počaka</div></div>
+    <div class="node" style="left:560px;top:520px"><span class="num">3</span><div class="label">Predlaga</div><div class="sub">osnutek, ne dejanje</div></div>
+    <div class="node node--blue" style="left:0;top:520px"><span class="num">4</span><div class="label">Človek potrdi</div><div class="sub">zadnja beseda je vaša</div></div>
+    <span class="chip s2-when">vsako jutro ob 7.00</span>
+  </div>
+  <div class="card s2-cant">
+    <div class="eyebrow">Sam ne more</div>
+    <div class="row"><i class="cross"></i>poslati</div>
+    <div class="row"><i class="cross"></i>objaviti</div>
+    <div class="row"><i class="cross"></i>izdati</div>
+    <div class="sub">vsako dejanje navzven gre čez človeka</div>
+  </div>
+</div>
+
+<!-- 3 · Prvi proces za avtomatizacijo -->
+<div class="stage" id="blog-prvi-proces-za-avtomatizacijo">
+  <div class="title">Kateri proces avtomatizirati prvi</div>
+  <div class="kicker">Dolgočasen, pogost in merljiv. Tak zmaga.</div>
+  <div class="s3">
+    <div class="card s3-check">
+      <div class="eyebrow" style="margin-bottom:10px">Štiri vprašanja</div>
+      <div class="s3-q"><i class="tick"></i>Se ponavlja vsak dan?</div>
+      <div class="s3-q"><i class="tick"></i>Ima jasen vhod in izhod?</div>
+      <div class="s3-q"><i class="tick"></i>Se ga da izmeriti?</div>
+      <div class="s3-q"><i class="tick"></i>Napaka boli le malo?</div>
+    </div>
+    <div class="s3-side">
+      <div class="card s3-ex"><div class="eyebrow">Primer</div><div class="label">Prepis poročila v kartice</div><div class="sub">314 vozil</div><div class="s3-score"><i class="mini"></i><i class="mini"></i><i class="mini"></i><i class="mini"></i><span>4 od 4</span></div></div>
+      <div class="card s3-ex"><div class="eyebrow">Primer</div><div class="label">Prijave napak iz e-pošte in klicev</div><div class="sub">vsak dan, jasen vhod in izhod</div><div class="s3-score"><i class="mini"></i><i class="mini"></i><i class="mini"></i><i class="mini"></i><span>4 od 4</span></div></div>
+      <div class="card s3-ex s3-no"><div class="row"><div class="label">Pogajanja</div><span class="chip chip--grey">ne prvo</span></div><div class="s3-score"><i class="mini mini--x"><i></i></i><i class="mini mini--x"><i></i></i><i class="mini"></i><i class="mini mini--x"><i></i></i><span>1 od 4</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 4 · Sistem mora znati reči ne vem -->
+<div class="stage" id="blog-sistem-mora-znati-reci-ne-vem">
+  <div class="title">Ne vem je odgovor, ne napaka</div>
+  <div class="kicker">Pod pragom zaupanja sistem ne ugiba, ampak preda človeku</div>
+  <div class="s4-scale">
+    <div class="s4-track">
+      <div class="s4-zone" style="left:0;width:70%">pregled</div>
+      <div class="s4-zone s4-zone--green" style="left:70%;width:30%">samodejno</div>
+    </div>
+    <div class="s4-num" style="left:0">0</div>
+    <div class="s4-num" style="left:70%">70</div>
+    <div class="s4-num" style="left:100%">100</div>
+    <div class="s4-marker" style="left:41%"><span class="chip chip--blue">ocena 41</span><i></i></div>
+  </div>
+  <div class="s4-cards">
+    <div class="card s4-card">
+      <div class="eyebrow">Predano človeku</div>
+      <div class="s4-msg">"Pozdravljeni, a lahko račun prepišemo na drugo podjetje? Lastnik se je zamenjal."</div>
+      <div class="s4-msg s4-msg--bot">To predam sodelavki, odgovori danes.</div>
+      <div class="s4-why"><span class="chip chip--soft">ocena 41, pod pragom</span><span class="sub">odgovori sodelavka</span></div>
+    </div>
+    <div class="card s4-card">
+      <div class="eyebrow" style="color:var(--green)">Samodejno</div>
+      <div class="s4-msg">"Do kdaj ste odprti v petek?"</div>
+      <div class="s4-msg s4-msg--bot">V petek do 17.00.</div>
+      <div class="s4-why"><span class="chip chip--green">ocena 93</span><span class="sub">odgovor takoj</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 5 · Kako AI odgovarja iz dokumentov -->
+<div class="stage" id="blog-kako-ai-odgovarja-iz-dokumentov">
+  <div class="title">Odgovor ima vir</div>
+  <div class="kicker">Sistem odgovori samo iz vaših dokumentov in pove, od kod</div>
+  <svg class="lines" width="1600" height="1000" viewBox="0 0 1600 1000">
+    <path d="M470 549H534M520 535l14 14-14 14"/>
+    <path class="blue" d="M962 549H1026M1012 535l14 14-14 14"/>
+  </svg>
+  <div class="s5-docs">
+    <div class="doc"><b>Cenik 2026</b><i></i><i></i></div>
+    <div class="doc"><b>Pogosta vprašanja</b><i></i><i></i></div>
+    <div class="doc doc--hit"><b>Navodila za hrambo</b><i></i><i></i></div>
+  </div>
+  <div class="s5-q">
+    <div class="eyebrow">Vprašanje</div>
+    <div class="bubble bubble--dark">Kako dolgo moramo hraniti račune?</div>
+  </div>
+  <div class="s5-a">
+    <div class="eyebrow">Odgovor</div>
+    <div class="bubble">Račune hranite 10 let od konca poslovnega leta.<br><span class="chip chip--blue">Vir: Navodila za hrambo, 2. odstavek</span></div>
+    <div class="bubble bubble--ghost"><i class="cross"></i><s>Ugibanje</s><span style="font-size:21px">brez vira ne gre ven</span></div>
+  </div>
+</div>
+
+<!-- 6 · Koliko časa vzame uvedba -->
+<div class="stage" id="blog-koliko-casa-vzame-uvedba">
+  <div class="title">Koliko časa vzame uvedba</div>
+  <div class="kicker">Štiri tedne do sistema, ki dela. Potem raste.</div>
+  <div class="s6-week" style="left:100px;width:270px"><span>teden 1</span></div>
+  <div class="s6-week" style="left:477px;width:457px"><span>teden 2 do 3</span></div>
+  <div class="s6-week" style="left:1043px;width:268px"><span>teden 4</span></div>
+  <div class="s6-week s6-week--open" style="left:1400px;width:104px"><span>naprej</span></div>
+  <div class="s6-line"></div>
+  <div class="s6-step" style="left:140px"><i></i><b>Raziskava</b><small>kaj že imate</small></div>
+  <div class="s6-step" style="left:329px"><i></i><b>Diagnostika</b><small>kje boli</small></div>
+  <div class="s6-step" style="left:517px"><i></i><b>Potopitev</b><small>vaši podatki</small></div>
+  <div class="s6-step" style="left:706px"><i></i><b>Arhitektura</b><small>načrt rešitve</small></div>
+  <div class="s6-step s6-step--blue" style="left:894px"><i></i><b>Prototip</b></div>
+  <div class="s6-step" style="left:1083px"><i></i><b>Kalibracija</b><small>pravila in prag</small></div>
+  <div class="s6-step" style="left:1271px"><i></i><b>Uvedba</b><small>v vaša orodja</small></div>
+  <div class="s6-step" style="left:1460px"><i></i><b>Evolucija</b><small>vsak mesec bolje</small></div>
+  <svg class="lines" width="1600" height="1000" viewBox="0 0 1600 1000"><path class="blue" d="M894 566V646"/></svg>
+  <div class="card s6-call"><div class="label">delujoč demo na vaših podatkih</div><div class="sub">pred kakršnokoli uvedbo</div></div>
+</div>
+
+<!-- 7 · Kaj se zgodi z vašimi podatki -->
+<div class="stage" id="blog-kaj-se-zgodi-z-vasimi-podatki">
+  <div class="title">Podatki ostanejo pri vas</div>
+  <div class="kicker">Model dobi samo vprašanje in odlomek, ki ga potrebuje</div>
+  <div class="card s7-firm">
+    <div class="eyebrow">Vaše podjetje</div>
+    <div class="s7-tiles">
+      <div class="s7-tile"><i></i><b>Dokumenti</b></div>
+      <div class="s7-tile"><i class="mail"></i><b>E-pošta</b></div>
+      <div class="s7-tile"><i class="people"></i><b>Podatki strank</b></div>
+    </div>
+    <div class="s7-snip">
+      <div><span class="chip chip--soft">odlomek</span><div class="sub">samo del, ki odgovarja na vprašanje</div></div>
+      <div><i></i><i class="hit"></i><i></i></div>
+    </div>
+    <div class="s7-log"><span class="chip">Dnevnik: kdo, kdaj, kaj</span><span class="sub">vsak dostop zapisan</span></div>
+  </div>
+  <svg class="lines" width="1600" height="1000" viewBox="0 0 1600 1000">
+    <path class="blue" d="M912 600H1164M1150 586l14 14-14 14"/>
+    <path class="ink" d="M1164 680H912M926 666l-14 14 14 14"/>
+  </svg>
+  <span class="chip chip--soft s7-lab" style="left:920px;top:544px">vprašanje + odlomek</span>
+  <span class="chip s7-lab" style="left:975px;top:696px">odgovor</span>
+  <div class="card s7-model"><div class="label">Model</div><div class="sub">zunaj, brez spomina</div></div>
+  <div class="card s7-lock"><i class="lock"></i><span>Nič se ne uči na vaših podatkih</span></div>
+</div>
+
+<!-- 8 · AI chatbot v slovenščini -->
+<div class="stage" id="blog-ai-chatbot-v-slovenscini">
+  <div class="phone"><div class="phone__screen">
+    <div class="phone__notch"></div>
+    <div class="phone__head"><span class="phone__av">SN</span><div><b>Salon Nina</b><small>odgovori takoj</small></div></div>
+    <div class="msgs">
+      <div class="msg msg--me">A imate odprto v soboto?</div>
+      <div class="msg">Ja, v soboto smo odprti od 8.00 do 13.00. Želite rezervirati?</div>
+      <div class="msg msg--me">Prejšnji teden sem se naročila in nihče ni poklical nazaj.</div>
+      <div class="msg">Oprostite, to ni v redu. To predam sodelavki, odgovori danes.<br><span class="chip chip--soft">predano</span></div>
+    </div>
+    <div class="phone__input">Napišite sporočilo</div>
+  </div></div>
+  <div class="s8-side">
+    <div class="title">Klepet v slovenščini, ki zveni naravno</div>
+    <div class="kicker">Odgovori po domače, brez izmišljevanja</div>
+    <div class="s8-facts">
+      <div class="card s8-fact"><i class="tick"></i><div><b>sklanjatve pravilne</b><div class="sub">v soboto, ob osmih, do enih</div></div></div>
+      <div class="card s8-fact"><i class="tick"></i><div><b>ne izmišljuje cen</b><div class="sub">pove samo, kar je v ceniku</div></div></div>
+      <div class="card s8-fact"><i class="tick"></i><div><b>preda človeku</b><div class="sub">pritožba gre takoj naprej</div></div></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<title>AIS Slovenia, real product screenshots composed into picture frames</title>
+<style>
+  /* Real screenshots of the real products (tools/pictures/real/*.png,
+     captured at 2× from the running apps) laid into the site's 1600×1000
+     picture frame. Desktop captures fill the frame edge to edge; phone
+     captures sit side by side on the canvas grey with no device frame.
+     Nothing here is drawn: change the PNGs, re-render, and the site follows. */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1600px; height: 1000px; overflow: hidden; background: #f4f5f7; }
+  .stage { position: absolute; inset: 0; display: none; background: #f4f5f7; }
+  .stage.on { display: block; }
+  .full { position: absolute; inset: 0; width: 1600px; height: 1000px; object-fit: cover; object-position: top left; display: block; }
+  .phones { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 56px; padding: 30px 0; }
+  .phones img { display: block; height: 940px; width: auto; border-radius: 26px; box-shadow: 0 30px 70px rgba(17,19,24,.22), 0 0 0 1px rgba(17,19,24,.06); }
+  .pair { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 40px; align-items: center; }
+  /* The VLDR card is portrait: show the form from the model line down to the remarks, above the carrier block. */
+  .card { position: absolute; left: 40px; top: 0; width: 1520px; height: 1000px; object-fit: cover; object-position: 0 -230px; display: block; }
+  /* Coach screens render as a phone column centred in a desktop capture: crop that column. */
+  .col { position: relative; width: 404px; height: 940px; overflow: hidden; border-radius: 26px; box-shadow: 0 30px 70px rgba(17,19,24,.22), 0 0 0 1px rgba(17,19,24,.06); background: #fff; flex: none; }
+  .col img { position: absolute; left: -550px; top: 0; width: 1504px; height: 940px; display: block; }
+  .pair img { display: block; width: 100%; height: auto; border-radius: 14px; box-shadow: 0 24px 60px rgba(17,19,24,.18), 0 0 0 1px rgba(17,19,24,.06); }
+</style>
+</head>
+<body>
+<div class="stage on" id="athlos"><div class="phones"><img src="real/athlos-athlete-danes.png" alt=""><div class="col"><img src="real/athlos-coach-home.png" alt=""></div><div class="col"><img src="real/athlos-coach-builder.png" alt=""></div></div></div>
+<div class="stage" id="athlos-detail"><div class="phones"><img src="real/athlos-athlete-checkin.png" alt=""><img src="real/athlos-athlete-session.png" alt=""><img src="real/athlos-athlete-zeus.png" alt=""></div></div>
+<div class="stage" id="ais-command"><img class="full" src="real/aiscommand-demo-vin.png" alt=""></div>
+<div class="stage" id="ais-command-detail"><img class="full" src="real/aiscommand-demo-pipeline.png" alt=""></div>
+<div class="stage" id="inspectus-vldr"><img class="full" src="real/vldr-table.png" alt=""></div>
+<div class="stage" id="inspectus-vldr-detail"><img class="card" src="real/vldr-card.png" alt=""></div>
+<div class="stage" id="inspectus-vin"><img class="full" src="real/vin-sorted.png" alt=""></div>
+<div class="stage" id="inspectus-vin-detail"><img class="full" src="real/vin-start.png" alt=""></div>
+</body>
+</html>

@@ -1,0 +1,202 @@
+{
+  "/": {
+    "hash": "e093e55ab6d2efba",
+    "published": "2026-09-10",
+    "updated": "2026-09-15"
+  },
+  "/404.html": {
+    "hash": "87838861b3eacb97",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  },
+  "/blog/": {
+    "hash": "7f1718cd50e189bf",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/blog/ai-chatbot-v-slovenscini/": {
+    "hash": "15025dfb68f2368f",
+    "published": "2026-09-14",
+    "updated": "2026-09-14"
+  },
+  "/blog/kaj-je-ai-agent/": {
+    "hash": "f9eccec4384cb70b",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/blog/kaj-je-ai-avtomatizacija/": {
+    "hash": "c542b015ee85da42",
+    "published": "2026-09-10",
+    "updated": "2026-09-15"
+  },
+  "/blog/kaj-se-zgodi-z-vasimi-podatki/": {
+    "hash": "6599a667f98adac2",
+    "published": "2026-09-14",
+    "updated": "2026-09-14"
+  },
+  "/blog/kako-ai-odgovarja-iz-dokumentov/": {
+    "hash": "3d967c997ac4b785",
+    "published": "2026-09-14",
+    "updated": "2026-09-14"
+  },
+  "/blog/koliko-casa-vzame-uvedba/": {
+    "hash": "ec19a5053b2d6bda",
+    "published": "2026-09-14",
+    "updated": "2026-09-14"
+  },
+  "/blog/prvi-proces-za-avtomatizacijo/": {
+    "hash": "fe3f9a2050c9eb6f",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/blog/sistem-mora-znati-reci-ne-vem/": {
+    "hash": "71aaab4d208ea7bb",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/dogodki/": {
+    "hash": "d77d4c5ab6931ef1",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  },
+  "/ekipa/": {
+    "hash": "93a85936765816ca",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  },
+  "/kontakt/": {
+    "hash": "3dd6d28fc819343f",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  },
+  "/novice/": {
+    "hash": "38cbd8f0c876722e",
+    "published": "2026-09-10",
+    "updated": "2026-09-15"
+  },
+  "/o-podjetju/": {
+    "hash": "7921c735727c5f88",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  },
+  "/pogosta-vprasanja/": {
+    "hash": "fe20e0a57f2b8a99",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  },
+  "/proces/": {
+    "hash": "6a7edd5e4c494c57",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  },
+  "/produkti/": {
+    "hash": "cf4ebda1919cc7ae",
+    "published": "2026-09-10",
+    "updated": "2026-09-15"
+  },
+  "/storitve/": {
+    "hash": "6eff46e08cc3c7a7",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  },
+  "/storitve/avtomatizacija-administracije/": {
+    "hash": "2eaef960747ed3c1",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/storitve/avtomatizacija-prodaje/": {
+    "hash": "33047286c2e9b093",
+    "published": "2026-09-10",
+    "updated": "2026-09-15"
+  },
+  "/storitve/spremljanje-trga/": {
+    "hash": "0fa3368277fa7bf6",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  },
+  "/studije-primerov/": {
+    "hash": "6042cf9f2e18dd9b",
+    "published": "2026-09-10",
+    "updated": "2026-09-15"
+  },
+  "/studije-primerov/ais-command/": {
+    "hash": "c18e7cec46916168",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/studije-primerov/aisos/": {
+    "hash": "25a04686e4ed300c",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/studije-primerov/asya-grafy/": {
+    "hash": "ebf474c803331141",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/studije-primerov/athlos/": {
+    "hash": "db7e294b22646986",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/studije-primerov/elementum/": {
+    "hash": "50fe4847a9afda0b",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/studije-primerov/epolac/": {
+    "hash": "eef899e957418e92",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/studije-primerov/heva/": {
+    "hash": "859b32722316d6e0",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/studije-primerov/inspectus-vin/": {
+    "hash": "08b66d7589e27abd",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/studije-primerov/inspectus-vldr/": {
+    "hash": "4ae318ba102c2f07",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/studije-primerov/model-premazi/": {
+    "hash": "7363dbf864ce88d2",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/studije-primerov/si-big/": {
+    "hash": "512482a5be1221f6",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/studije-primerov/tower-spa/": {
+    "hash": "cdbffaf62a9b9ef9",
+    "published": "2026-09-10",
+    "updated": "2026-09-14"
+  },
+  "/vodici/": {
+    "hash": "63c5fc6782a0e51f",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  },
+  "/vodici/ai-chatbot-ali-glasovni-agent/": {
+    "hash": "3f793148001ef9df",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  },
+  "/vodici/koliko-stane-ai-avtomatizacija/": {
+    "hash": "ff037feee38c072a",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  },
+  "/vodici/n8n-make-ali-sistem-po-meri/": {
+    "hash": "ccbb66e145701168",
+    "published": "2026-09-10",
+    "updated": "2026-09-10"
+  }
+}

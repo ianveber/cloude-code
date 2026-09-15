@@ -1,0 +1,295 @@
+<!--
+  Code Glow Background
+  Drop-in: paste this whole block right after your opening <body> tag.
+  The canvas sits behind everything (z-index 0, pointer-events none); give your
+  own page content position: relative and z-index: 1 (or higher) so it paints on top.
+  Tuning lives in the CFG object at the top of the script.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&display=swap">
+<style>
+  html, body { background: #ffffff; }
+  #code-glow {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; display: block;
+  }
+</style>
+<canvas id="code-glow" aria-hidden="true"></canvas>
+<script>
+(function () {
+  var canvas = document.getElementById('code-glow');
+  var ctx = canvas.getContext('2d');
+
+  /* ---------- tuning ---------- */
+  var CFG = {
+    parallax: 0.55,        // background scrolls slower than the page
+    radius: 300,           // reveal radius around the pointer (px)
+    typeSpeed: 1.6,        // characters per frame while being revealed
+    maxAlpha: 0.62,        // how strong a fully lit line can get (keep it light)
+    afterglow: 0.09,       // how quickly a line fades once the light has moved on (higher = faster)
+    fadeOutBand: 140,      // px from the top edge where scrolled-past lines dissolve
+    lineHeight: 26,
+    fontSize: 13,
+    fontFamily: '"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace',
+    colors: [
+      { base: '#9cc3ff', glow: '#cfe1ff' },  // sky
+      { base: '#aaa6ff', glow: '#d7d4ff' },  // periwinkle
+      { base: '#c9b3ff', glow: '#e6dbff' },  // lilac
+      { base: '#a9d3f5', glow: '#d8ecfb' }   // ice
+    ]
+  };
+
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- the "code" ---------- */
+  var SNIPPETS = [
+    'import { createAgent } from "@ais/runtime";',
+    'import type { Signal, Reading } from "./types";',
+    '',
+    'const agent = createAgent({',
+    '  name: "inspector",',
+    '  model: "claude-fable-5-1",',
+    '  temperature: 0.2,',
+    '});',
+    '',
+    'export async function run(signal: Signal) {',
+    '  const readings = await agent.observe(signal);',
+    '  return readings.filter(r => r.confidence > 0.8);',
+    '}',
+    '',
+    'type Reading = {',
+    '  id: string;',
+    '  value: number;',
+    '  takenAt: Date;',
+    '  confidence: number;',
+    '};',
+    '',
+    'const stream = new EventSource("/api/events");',
+    'stream.onmessage = (e) => queue.push(JSON.parse(e.data));',
+    '',
+    'function debounce<T extends (...a: any[]) => void>(fn: T, ms = 120) {',
+    '  let t: number | undefined;',
+    '  return (...args: Parameters<T>) => {',
+    '    clearTimeout(t);',
+    '    t = window.setTimeout(() => fn(...args), ms);',
+    '  };',
+    '}',
+    '',
+    'export const schedule = (task: Task) => queue.enqueue(task, { retry: 3 });',
+    '',
+    'const lerp = (a: number, b: number, t: number) => a + (b - a) * t;',
+    'const clamp = (v: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));',
+    '',
+    'await db.insert(readings).values(batch).onConflictDoNothing();',
+    '',
+    'if (!session) redirect("/login");',
+    'const user = await getUser(session.userId);',
+    '',
+    'export default async function handler(req: Request) {',
+    '  const body = await req.json();',
+    '  const result = await pipeline.process(body);',
+    '  return Response.json(result, { status: 200 });',
+    '}',
+    '',
+    '// tokens cached for 60s to keep the edge warm',
+    'const cache = new Map<string, { at: number; value: string }>();',
+    '',
+    'for (const step of plan.steps) {',
+    '  const out = await step.execute(ctx);',
+    '  ctx = { ...ctx, ...out };',
+    '}',
+    '',
+    'const vec = await embed(text, { dimensions: 1024 });',
+    'const hits = await index.query(vec, { topK: 8 });',
+    '',
+    'useEffect(() => {',
+    '  const id = requestAnimationFrame(tick);',
+    '  return () => cancelAnimationFrame(id);',
+    '}, [tick]);'
+  ];
+
+  /* ---------- state ---------- */
+  var W = 0, H = 0, dpr = 1;
+  var lines = [];
+  var pointer = { x: -9999, y: -9999, has: false };
+  var scrollY = window.scrollY || 0;
+  var scrollActivity = 0;       // decays; rises while the page is scrolling
+  var lastScroll = scrollY;
+  var docHeight = 0;
+  var charW = 8;
+
+  function rand(a, b) { return a + Math.random() * (b - a); }
+
+  function buildLines() {
+    lines = [];
+    var pageHeight = Math.max(document.documentElement.scrollHeight, H);
+    docHeight = pageHeight * CFG.parallax + H;
+    var cols = Math.floor(W / (charW || 8));
+    var y = 40;
+    var i = 0;
+    // Lay snippets down in blocks, each block at its own column so the page feels like
+    // several files drifting past rather than one wall of text.
+    while (y < docHeight) {
+      var blockLen = Math.floor(rand(6, 14));
+      var palette = CFG.colors[Math.floor(Math.random() * CFG.colors.length)];
+      // pick a column, then pull it left so the block's longest line still fits on screen
+      var longest = 0;
+      for (var q = 0; q < blockLen; q++) longest = Math.max(longest, SNIPPETS[(i + q) % SNIPPETS.length].length);
+      var minX = 0.04 * W, maxX = Math.max(minX, W - 24 - longest * charW);
+      var startX = Math.min(rand(0.04, 0.62) * W, maxX);
+      for (var k = 0; k < blockLen && y < docHeight; k++) {
+        var si = i % SNIPPETS.length;
+        i++;
+        lines.push({
+          text: fitText(SNIPPETS[si], startX),
+          si: si,
+          x: startX,
+          docY: y,
+          progress: 0,
+          alpha: 0,
+          seen: false,
+          shine: Math.random(),
+          c: palette
+        });
+        y += CFG.lineHeight;
+      }
+      y += CFG.lineHeight * rand(2, 5);
+    }
+  }
+
+  function fitText(text, x) {
+    var cols = Math.floor((W - 20 - x) / charW);
+    return text.length > cols ? text.slice(0, Math.max(0, cols)) : text;
+  }
+  // once a line has faded out completely it becomes a different line of code,
+  // so the light never shows the same thing twice in the same place
+  function reload(L) {
+    L.si = (L.si + 7) % SNIPPETS.length;
+    if (!SNIPPETS[L.si]) L.si = (L.si + 1) % SNIPPETS.length;
+    L.text = fitText(SNIPPETS[L.si], L.x);
+    L.progress = 0;
+    L.seen = false;
+  }
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.font = '300 ' + CFG.fontSize + 'px ' + CFG.fontFamily;
+    charW = ctx.measureText('M').width;
+    buildLines();
+  }
+
+  /* ---------- input ---------- */
+  window.addEventListener('pointermove', function (e) {
+    pointer.x = e.clientX; pointer.y = e.clientY; pointer.has = true;
+  }, { passive: true });
+  window.addEventListener('pointerleave', function () { pointer.has = false; });
+  window.addEventListener('touchstart', function (e) {
+    var t = e.touches[0]; pointer.x = t.clientX; pointer.y = t.clientY; pointer.has = true;
+  }, { passive: true });
+  window.addEventListener('touchmove', function (e) {
+    var t = e.touches[0]; pointer.x = t.clientX; pointer.y = t.clientY; pointer.has = true;
+  }, { passive: true });
+  window.addEventListener('scroll', function () { scrollY = window.scrollY || 0; }, { passive: true });
+  window.addEventListener('resize', resize);
+
+  /* ---------- draw ---------- */
+  function shineGradient(x0, x1, c, t) {
+    // A soft highlight that slides along the line: base -> glow -> base
+    var g = ctx.createLinearGradient(x0, 0, x1, 0);
+    var p = clamp01(t);
+    g.addColorStop(0, c.base);
+    g.addColorStop(Math.max(0, p - 0.18), c.base);
+    g.addColorStop(p, c.glow);
+    g.addColorStop(Math.min(1, p + 0.18), c.base);
+    g.addColorStop(1, c.base);
+    return g;
+  }
+  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+
+  var frame = 0;
+  function tick() {
+    frame++;
+    var delta = Math.abs(scrollY - lastScroll);
+    lastScroll = scrollY;
+    scrollActivity = Math.min(1, scrollActivity * 0.9 + delta * 0.02);
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.font = '300 ' + CFG.fontSize + 'px ' + CFG.fontFamily;
+    ctx.textBaseline = 'middle';
+
+    var offset = scrollY * CFG.parallax;
+    var px = pointer.has ? pointer.x : W * 0.5;
+    var py = pointer.has ? pointer.y : H * 0.5;
+
+    for (var i = 0; i < lines.length; i++) {
+      var L = lines[i];
+      var y = L.docY - offset;
+      if (y < -40 || y > H + 40) {
+        // off-screen: dissolve and reset so it types in fresh next time it enters
+        if (L.alpha > 0) L.alpha *= 0.85;
+        if (L.seen && L.alpha < 0.01) reload(L);
+        continue;
+      }
+
+      // how strongly this line is being "revealed" right now
+      var textW = L.text.length * charW;
+      var nx = Math.max(L.x, Math.min(px, L.x + textW));       // nearest point on the line
+      var dx = (px - nx), dy = (py - y);
+      var d = Math.sqrt(dx * dx * 0.55 + dy * dy);               // horizontal counts less
+      var prox = pointer.has ? clamp01(1 - d / CFG.radius) : 0;
+      prox = prox * prox;
+      var scrollLift = pointer.has ? scrollActivity * clamp01(1 - d / (CFG.radius * 1.3)) * 0.45 : 0;
+      var energy = Math.max(prox, scrollLift);
+
+      // typing progress only moves forward while the line is lit
+      if (energy > 0.04 && L.progress < 1) {
+        L.progress = Math.min(1, L.progress + (reducedMotion ? 1 : CFG.typeSpeed * (0.5 + energy)) / Math.max(1, L.text.length));
+        L.seen = true;
+      }
+
+      // target alpha follows the light: bright under it, nothing once it has moved on
+      var target = L.seen ? energy * CFG.maxAlpha : 0;
+      // scrolled past -> dissolve near the top edge
+      if (y < CFG.fadeOutBand) target *= clamp01(y / CFG.fadeOutBand);
+      L.alpha += (target - L.alpha) * (target > L.alpha ? 0.14 : CFG.afterglow);
+
+      if (L.seen && L.alpha < 0.01 && energy < 0.04) { reload(L); continue; }
+      if (L.alpha < 0.01 || L.progress <= 0 || !L.text) continue;
+
+      var n = Math.max(0, Math.floor(L.progress * L.text.length));
+      var visible = L.text.slice(0, n);
+      if (!visible) continue;
+
+      var t = ((frame * 0.004) + L.shine) % 1;
+      ctx.globalAlpha = L.alpha;
+      ctx.shadowColor = L.c.glow;
+      ctx.shadowBlur = 10 + 10 * energy;
+      ctx.fillStyle = reducedMotion ? L.c.base : shineGradient(L.x, L.x + textW, L.c, t);
+      ctx.fillText(visible, L.x, y);
+
+      // caret while typing
+      if (L.progress < 1 && energy > 0.04 && Math.floor(frame / 18) % 2 === 0) {
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = L.c.base;
+        ctx.fillRect(L.x + n * charW + 1, y - CFG.fontSize * 0.55, 1.5, CFG.fontSize * 1.1);
+      }
+    }
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+    requestAnimationFrame(tick);
+  }
+
+  if (document.fonts && document.fonts.load) {
+    document.fonts.load('300 13px "JetBrains Mono"').then(resize, resize).then(function () {
+      requestAnimationFrame(tick);
+    });
+  } else {
+    resize();
+    requestAnimationFrame(tick);
+  }
+})();
+</script>

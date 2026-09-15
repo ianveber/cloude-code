@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<title>AIS, product detail picture source</title>
+<style>
+  /* Demo screens for the products page. One stage per product, rendered by
+     tools/pictures/render.mjs at 1600×1000 (captured at 2×). Light UI in
+     the site's own visual system; every screen is static and illustrative. */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --paper: #fff;
+    --canvas: #f4f5f8;
+    --ink: #111318;
+    --ink-soft: #353a44;
+    --muted: #69707d;
+    --faint: #9299a5;
+    --line: #e5e7eb;
+    --blue: #1d77fe;
+    --blue-soft: rgba(29, 119, 254, .10);
+    --green: #1f9d5a;
+    --green-soft: #e6f6ec;
+    --amber: #d98b0c;
+    --amber-soft: #fff4de;
+    --red: #d23b3b;
+    --red-soft: #fdecec;
+    --mono: ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+
+  html, body { width: 1600px; height: 1000px; overflow: hidden; background: var(--paper); }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', system-ui, sans-serif; color: var(--ink); font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+  .stage { position: absolute; inset: 0; display: none; background: var(--paper); }
+  .stage.on { display: block; }
+
+  .bar { height: 60px; display: flex; align-items: center; gap: 14px; padding: 0 28px; border-bottom: 1px solid var(--line); background: var(--paper); }
+  .bar__mark { width: 26px; height: 26px; border-radius: 8px; background: url('../../public/brand/favicon.png') center / cover no-repeat; }
+  .bar__mark--brand { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; color: #fff; font-size: 12px; font-weight: 800; letter-spacing: .02em; }
+  .bar__name { font-weight: 700; letter-spacing: -0.02em; font-size: 16px; }
+  .bar__crumb { color: var(--faint); font-size: 14px; }
+  .bar__crumb b { color: var(--ink-soft); font-weight: 600; }
+  .bar__spacer { flex: 1; }
+  .bar__pill { font-size: 13px; color: var(--muted); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; gap: 8px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; }
+  .dot--amber { background: var(--amber); }
+  .dot--blue { background: var(--blue); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #1d77fe, #6fb0ff); color: #fff; font-size: 12px; font-weight: 700; display: grid; place-items: center; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 38px; padding: 0 16px; border-radius: 10px; font-size: 14px; font-weight: 600; border: 1px solid #cfd3da; color: var(--ink); background: var(--paper); }
+  .btn--dark { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .btn--sm { height: 30px; padding: 0 12px; font-size: 13px; }
+
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 2px rgba(17,19,24,.04), 0 8px 24px rgba(17,19,24,.05); }
+  .card__head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px 0; }
+  .card__title { font-weight: 650; font-size: 15px; letter-spacing: -0.01em; }
+  .card__meta { font-size: 13px; color: var(--faint); }
+  .card__body { padding: 14px 22px 20px; }
+
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .pill { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .pill--ok { background: var(--green-soft); color: var(--green); }
+  .pill--wait { background: var(--amber-soft); color: var(--amber); }
+  .pill--blue { background: var(--blue-soft); color: var(--blue); }
+  .pill--red { background: var(--red-soft); color: var(--red); }
+  .pill--grey { background: var(--canvas); color: var(--muted); }
+
+  .body { position: absolute; inset: 60px 0 0; padding: 26px 32px; background: var(--canvas); }
+  .h1 { font-size: 24px; letter-spacing: -0.03em; font-weight: 700; }
+  .sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; }
+  .cols { display: grid; gap: 18px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { text-align: left; font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); font-weight: 600; padding: 8px 22px; border-bottom: 1px solid var(--line); }
+  td { padding: 11px 22px; border-bottom: 1px solid var(--line); color: var(--ink-soft); }
+  tr:last-child td { border-bottom: 0; }
+  td.num { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+  tr.sel td { background: var(--blue-soft); }
+
+  .kpi { padding: 16px 18px; }
+  .kpi__label { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; font-family: var(--mono); }
+  .kpi__value { font-size: 28px; font-weight: 700; letter-spacing: -0.03em; margin-top: 6px; }
+  .kpi__delta { font-size: 12.5px; margin-top: 4px; color: var(--green); font-weight: 600; }
+  .kpi__delta--flat { color: var(--muted); font-weight: 500; }
+
+  .bars { display: grid; gap: 10px; }
+  .bar-row { display: grid; grid-template-columns: 150px 1fr 60px; gap: 12px; align-items: center; font-size: 13px; color: var(--ink-soft); }
+  .bar-row i { display: block; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+  .bar-row i b { display: block; height: 100%; background: var(--blue); border-radius: 4px; }
+  .bar-row span { font-family: var(--mono); font-size: 12px; color: var(--muted); text-align: right; }
+
+  .list { list-style: none; display: grid; gap: 8px; }
+  .list li { display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 12px; background: var(--paper); border: 1px solid var(--line); font-size: 13.5px; }
+  .list b { display: block; font-weight: 650; }
+  .list small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .ico { width: 34px; height: 34px; border-radius: 10px; background: var(--canvas); display: grid; place-items: center; }
+  .ico i { width: 14px; height: 14px; border-radius: 4px; border: 2px solid var(--ink-soft); display: block; }
+  .ico i.blue { border-color: var(--blue); background: var(--blue-soft); }
+  .ico i.green { border-color: var(--green); background: var(--green-soft); }
+  .ico i.amber { border-color: var(--amber); background: var(--amber-soft); }
+  .ico i.round { border-radius: 50%; }
+
+  /* photo placeholders: soft gradients with a small camera glyph */
+  .photo { position: relative; border-radius: 10px; background: linear-gradient(135deg, #d9dde6, #b9c0cd 55%, #cfd5df); overflow: hidden; }
+  .photo::after { content: ''; position: absolute; left: 50%; top: 50%; width: 22px; height: 16px; transform: translate(-50%, -50%); border: 2px solid rgba(255,255,255,.7); border-radius: 4px; }
+  .photo--car { background: linear-gradient(160deg, #cbd3df, #8f9bb0 60%, #b6bfcc); }
+  .photo--plate { background: #fff; border: 1px solid var(--line); }
+  .photo--plate::after { display: none; }
+  .plate { position: absolute; inset: 30% 12%; border-radius: 4px; border: 2px solid var(--ink); display: grid; place-items: center; font-family: var(--mono); font-size: 11px; letter-spacing: .12em; font-weight: 700; }
+
+  /* phone */
+  .phone { width: 300px; height: 610px; border-radius: 42px; background: #0c0d11; padding: 11px; box-shadow: 0 30px 60px rgba(17,19,24,.25); }
+  .phone__screen { width: 100%; height: 100%; border-radius: 32px; background: var(--paper); overflow: hidden; position: relative; padding: 46px 18px 18px; }
+  .phone__notch { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 84px; height: 24px; border-radius: 12px; background: #0c0d11; }
+  .phone h2 { font-size: 21px; letter-spacing: -0.03em; font-weight: 700; }
+  .phone .sub { font-size: 12.5px; }
+  .block { border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-top: 10px; display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: center; }
+  .block b { font-size: 13.5px; font-weight: 650; }
+  .block small { color: var(--muted); font-size: 11.5px; }
+  .block.done { background: var(--green-soft); border-color: transparent; }
+  .block .check { width: 22px; height: 22px; border-radius: 50%; background: var(--green); position: relative; }
+  .block .check::after { content: ''; position: absolute; left: 8px; top: 5px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  .ring { width: 92px; height: 92px; }
+
+  .kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .col h4 { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); font-family: var(--mono); margin-bottom: 10px; display: flex; justify-content: space-between; }
+  .tcard { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; font-size: 13px; }
+  .tcard b { display: block; font-weight: 650; margin-bottom: 4px; }
+  .tcard small { color: var(--muted); font-size: 12px; }
+  .tcard .row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+
+  .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .day { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 10px; min-height: 120px; font-size: 12px; }
+  .day h5 { font-size: 11px; color: var(--faint); font-family: var(--mono); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+  .post { border-radius: 8px; padding: 6px 8px; margin-bottom: 6px; font-weight: 600; }
+  .post--ig { background: #fbe9f3; color: #b0286b; }
+  .post--tt { background: var(--canvas); color: var(--ink-soft); }
+  .post--yt { background: var(--red-soft); color: var(--red); }
+  .post--mail { background: var(--blue-soft); color: var(--blue); }
+
+  .swatches { display: flex; gap: 10px; }
+  .swatch { width: 64px; height: 64px; border-radius: 14px; border: 1px solid var(--line); position: relative; }
+  .swatch small { position: absolute; left: 0; right: 0; bottom: -18px; text-align: center; font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+  .field { display: grid; gap: 6px; }
+  .field label { font-size: 12.5px; color: var(--muted); }
+  .field .val { height: 40px; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; background: var(--paper); }
+  .field .val span { font-family: var(--mono); color: var(--faint); font-size: 12px; }
+  .slider { height: 6px; border-radius: 3px; background: var(--line); position: relative; margin: 10px 0 4px; }
+  .slider i { position: absolute; left: 0; top: 0; height: 100%; border-radius: 3px; background: var(--blue); }
+  .slider b { position: absolute; top: 50%; width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2px solid var(--blue); transform: translate(-50%, -50%); }
+
+  .agent { display: grid; grid-template-columns: 40px 1fr auto; gap: 14px; align-items: center; padding: 14px 16px; border-radius: 14px; background: var(--paper); border: 1px solid var(--line); }
+  .agent .av { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-size: 13px; font-weight: 800; color: #fff; background: var(--ink); }
+  .agent b { display: block; font-size: 14px; font-weight: 650; }
+  .agent small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+  /* details.html additions: second screens reuse everything above, plus these */
+  .phone--lg { width: 375px; height: 760px; }
+  .post--draft { background: var(--amber-soft); color: #8a5a06; }
+  .post--ok { background: var(--green-soft); color: var(--green); }
+  .post small { display: block; font-weight: 500; font-size: 11px; opacity: .85; margin-top: 2px; }
+  .steps { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .step { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--paper); font-size: 13px; font-weight: 600; }
+  .step i { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; font-family: var(--mono); background: var(--canvas); color: var(--muted); font-style: normal; margin-bottom: 10px; }
+  .step small { display: block; color: var(--muted); font-size: 11.5px; font-weight: 500; margin-top: 3px; }
+  .step--done { border-color: transparent; background: var(--green-soft); }
+  .step--done i { background: var(--green); color: #fff; }
+  .step--now { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
+  .step--now i { background: var(--blue); color: #fff; }
+  .slot { height: 76px; border: 1px solid var(--line); border-radius: 8px; background: var(--canvas); font-size: 11px; color: var(--faint); padding: 6px 9px; }
+  .slot b { display: block; font-size: 12.5px; margin-top: 4px; }
+  .slot--hit { background: var(--red-soft); border-color: #f1b7b7; color: var(--red); }
+  .chat { display: grid; gap: 10px; align-content: start; font-size: 13.5px; }
+  .chat .me { justify-self: end; max-width: 85%; background: var(--ink); color: #fff; border-radius: 14px 14px 4px 14px; padding: 10px 14px; }
+  .chat .ai { max-width: 88%; background: var(--canvas); border-radius: 14px 14px 14px 4px; padding: 10px 14px; }
+  .score { display: inline-flex; gap: 3px; }
+  .score i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); display: block; }
+  .score i.f { background: var(--blue); }
+  .folder { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--paper); font-size: 13px; }
+  .folder::before { content: ''; display: block; width: 28px; height: 20px; border-radius: 3px 6px 6px 6px; background: linear-gradient(180deg, #ffd27a, #f4b942); margin-bottom: 10px; }
+  .folder b { display: block; font-weight: 650; }
+  .folder small { color: var(--muted); font-size: 11.5px; }
+  .hit { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; background: var(--paper); font-size: 13.5px; margin-top: 10px; }
+  .hit b { display: block; font-weight: 650; }
+  .hit .row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .hit .why { color: var(--muted); font-size: 13px; margin-top: 6px; line-height: 1.45; }
+  .actions { display: flex; gap: 8px; }
+  .note { font-size: 12.5px; color: var(--muted); }
+  .doc h3 { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-family: var(--mono); color: var(--faint); margin: 24px 0 6px; }
+  .doc .row { display: grid; grid-template-columns: 96px 1fr auto; gap: 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .doc .row span:first-child { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+  .check-row { display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+  .check-row i { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #cfd3da; position: relative; flex: none; }
+  .check-row i.on { background: var(--green); border-color: var(--green); }
+  .check-row i.on::after { content: ''; position: absolute; left: 6px; top: 3px; width: 4px; height: 8px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  .progress { display: block; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+  .progress b { display: block; height: 100%; background: var(--blue); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ── ATHLOS · Ekipa ────────────────────────────────────────────────── -->
+<div class="stage on" id="athlos-detail">
+  <div class="bar"><span class="bar__mark--brand" style="background:#7e14ff">A</span><span class="bar__name">ATHLOS</span><span class="bar__crumb">/ <b>Trener · Ekipa</b></span><span class="bar__spacer"></span><span class="bar__pill"><span class="dot"></span>ZEUS je na voljo</span><span class="avatar">TR</span></div>
+  <div class="body">
+    <div class="head"><div><div class="h1">Ekipa</div><div class="sub">Sreda, 10. september · 8 športnikov · pripravljenost iz jutranjega vprašalnika in ure</div></div><span class="btn btn--dark">Nov trening</span></div>
+    <div class="cols" style="grid-template-columns: 1fr 520px">
+      <div style="display:grid;gap:14px;align-content:start">
+        <div class="cols" style="grid-template-columns:repeat(3,1fr)">
+          <div class="card kpi"><div class="kpi__label">Pripravljenost ekipe</div><div class="kpi__value">69</div><div class="kpi__delta kpi__delta--flat">povprečje · 5 poln trening, 2 lažji, 1 počitek</div></div>
+          <div class="card kpi"><div class="kpi__label">Predlogi ZEUS danes</div><div class="kpi__value">3</div><div class="kpi__delta kpi__delta--flat">1 čaka na trenerja</div></div>
+          <div class="card kpi"><div class="kpi__label">Spremembe ta teden</div><div class="kpi__value">7</div><div class="kpi__delta kpi__delta--flat">1 razveljavljena</div></div>
+        </div>
+        <div class="card" style="padding:18px 22px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Športniki danes</div><div class="card__meta">pripravljenost · današnji trening</div></div>
+          <ul class="list" style="margin-top:12px">
+            <li><span class="ico" style="font-size:11px;font-weight:700;color:var(--ink-soft)">SL</span><div><b>Sara L.</b><small>Sprinti 8 × 30 m · 17:00</small></div><span class="pill pill--ok">86 · poln trening</span></li>
+            <li><span class="ico" style="font-size:11px;font-weight:700;color:var(--ink-soft)">LK</span><div><b>Luka K.</b><small>Moč · spodnji del · 16:00</small></div><span class="pill pill--ok">82 · poln trening</span></li>
+            <li><span class="ico" style="font-size:11px;font-weight:700;color:var(--ink-soft)">MP</span><div><b>Maja P.</b><small>Intervali 6 × 400 m · 17:30</small></div><span class="pill pill--ok">79 · poln trening</span></li>
+            <li><span class="ico" style="font-size:11px;font-weight:700;color:var(--ink-soft)">TS</span><div><b>Tim S.</b><small>Moč · zgornji del · 16:00</small></div><span class="pill pill--ok">74 · poln trening</span></li>
+            <li><span class="ico" style="font-size:11px;font-weight:700;color:var(--ink-soft)">EB</span><div><b>Eva B.</b><small>Moč · spodnji del · 16:00</small></div><span class="pill pill--ok">71 · poln trening</span></li>
+            <li><span class="ico" style="font-size:11px;font-weight:700;color:var(--ink-soft)">NR</span><div><b>Nina R.</b><small>Počep, tehnika in mobilnost · 16:00 · predlog ZEUS čaka</small></div><span class="pill pill--wait">64 · lažji</span></li>
+            <li><span class="ico" style="font-size:11px;font-weight:700;color:var(--ink-soft)">JH</span><div><b>Jan H.</b><small>Lahek tek 40 min · 18:00</small></div><span class="pill pill--wait">58 · lažji</span></li>
+            <li><span class="ico" style="font-size:11px;font-weight:700;color:var(--ink-soft)">ŽM</span><div><b>Žan M.</b><small>Regeneracija · savna in raztezanje</small></div><span class="pill pill--red">38 · počitek</span></li>
+          </ul>
+        </div>
+      </div>
+      <div style="display:grid;gap:14px;align-content:start">
+        <div class="card" style="padding:18px 20px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">ZEUS · Nina R. · počep</div><span class="pill pill--wait">čaka trenerja</span></div>
+          <div class="chat" style="margin-top:14px;font-size:13px">
+            <div class="me">Danes sem res utrujena, noge so težke. Lahko malo znižamo počep?</div>
+            <div class="ai">Razumem. Pripravljenost 64, včeraj visoka obremenitev. Trenerju predlagam: <b>3 serije namesto 4, breme 60 kg</b> namesto 65 kg. Ogrevanje in tehnika ostaneta. Trener potrdi ali zavrne.</div>
+            <div class="actions" style="margin-top:2px"><span class="btn btn--sm btn--dark">Potrdi</span><span class="btn btn--sm">Zavrni</span><span class="note" style="align-self:center;margin-left:4px">Nina dobi odgovor v aplikaciji</span></div>
+          </div>
+        </div>
+        <div class="card" style="padding:18px 20px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Zgodovina sprememb</div><div class="card__meta">zadnjih 7 dni</div></div>
+          <ul class="list" style="margin-top:12px">
+            <li><span class="ico"><i class="green round"></i></span><div><b>Sara L. · sprinti 8 → 6 ponovitev</b><small>predlog ZEUS · potrdil trener · danes 07:40</small></div><span class="btn btn--sm">Razveljavi</span></li>
+            <li><span class="ico"><i class="round"></i></span><div><b>Jan H. · potisk s klopi 70 → 65 kg</b><small>predlog ZEUS · razveljavil trener · včeraj 18:20</small></div><span class="pill pill--grey">razveljavljeno</span></li>
+            <li><span class="ico"><i class="green round"></i></span><div><b>Žan M. · počitek namesto treninga</b><small>predlog ZEUS · potrdil trener · ponedeljek</small></div><span class="btn btn--sm">Razveljavi</span></li>
+          </ul>
+        </div>
+        <div class="card" style="padding:16px 20px">
+          <div class="card__title">Pravila za ZEUS</div>
+          <div style="margin-top:8px">
+            <div class="check-row"><i class="on"></i>Predlaga, ne izvede: vsaka sprememba treninga čaka trenerja</div>
+            <div class="check-row"><i class="on"></i>Vsaka sprememba ima avtorja, čas in razlog, vidne obema</div>
+            <div class="check-row" style="border-bottom:0"><i class="on"></i>Razveljavitev v 7 dneh vrne prejšnjo različico treninga</div>
+          </div>
+        </div>
+        <div class="note" style="display:flex;align-items:center;gap:8px;padding:0 4px"><span class="dot dot--blue"></span>AI urejanje: vprašaj pred vsako spremembo</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── AIS Command · portal za stranke ───────────────────────────────── -->
+<div class="stage" id="ais-command-detail">
+  <div class="bar"><span class="bar__mark"></span><span class="bar__name">AIS Command</span><span class="bar__crumb">/ <b>Portal za stranke</b></span><span class="bar__spacer"></span><span class="bar__pill"><span class="dot"></span>Stranka · INSPECTUS</span><span class="avatar">RT</span></div>
+  <div class="body" style="display:grid;grid-template-columns:440px 1fr;gap:28px;align-items:center">
+    <div class="phone phone--lg"><div class="phone__screen"><span class="phone__notch"></span>
+      <div class="sub">Portal za stranke · INSPECTUS</div>
+      <h2>Vaši projekti</h2>
+      <div class="block" style="grid-template-columns:1fr;gap:8px"><div style="display:flex;justify-content:space-between;align-items:center"><b>VLDR kartice</b><small>70 %</small></div><i class="progress"><b style="width:70%"></b></i><small>faza 2 · 3 od 4 korakov · naslednji: tisk iz centra</small></div>
+      <div class="block" style="grid-template-columns:1fr;gap:8px"><div style="display:flex;justify-content:space-between;align-items:center"><b>VIN filter · mobilna</b><small>35 %</small></div><i class="progress"><b style="width:35%"></b></i><small>branje na napravi · test na pomolu 18. 9.</small></div>
+      <div class="eyebrow" style="margin-top:18px">Zdravje storitve</div>
+      <div class="block" style="grid-template-columns:1fr;gap:0;padding:4px 14px">
+        <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px"><span style="color:var(--muted)">Dosegljivost, 30 dni</span><b>99,9 %</b></div>
+        <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px"><span style="color:var(--muted)">Mesečni obseg</span><b>1.240 sporočil</b></div>
+        <div style="display:flex;justify-content:space-between;padding:9px 0;font-size:13px"><span style="color:var(--muted)">Zadnji pregled</span><b>danes 06:45</b></div>
+      </div>
+      <div class="eyebrow" style="margin-top:18px">Računi</div>
+      <div class="block"><div><b>2026-042</b><br><small>4.800 € · VLDR kartice, faza 1</small></div><span class="pill pill--ok">plačan</span></div>
+      <div class="block"><div><b>2026-043</b><br><small>2.400 € · zapade 18. 9.</small></div><span class="btn btn--sm btn--dark">Plačaj</span></div>
+      <div class="eyebrow" style="margin-top:18px">Podpora</div>
+      <div class="block"><div><b>1 odprta zahteva</b><br><small>izvoz kartic v CSV · odgovor do 2 h</small></div><span class="pill pill--wait">v delu</span></div>
+    </div></div>
+    <div style="display:grid;gap:14px;align-content:center">
+      <div class="head" style="margin:0 0 6px"><div><div class="h1">Predlogi agentov, danes</div><div class="sub">Agenti pripravijo, človek potrdi. Stranka v portalu vidi samo potrjeno.</div></div><span class="pill pill--wait">3 čakajo</span></div>
+      <div class="card" style="padding:18px 22px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center">
+        <div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="pill pill--blue">naslednji korak pri poslu</span><span class="card__meta">Logistika, Koper · agent Prodaja · 06:40</span></div><div style="font-size:14px;margin-top:10px;color:var(--ink-soft)">Po včerajšnjem sestanku predlagam, da pošljemo povzetek in dva termina za demo obdelave dokumentov v četrtek.</div></div>
+        <div class="actions"><span class="btn btn--sm btn--dark">Potrdi</span><span class="btn btn--sm">Zavrni</span></div>
+      </div>
+      <div class="card" style="padding:18px 22px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center">
+        <div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="pill pill--ok">izdaja računa</span><span class="card__meta">INSPECTUS · agent Računi · 06:41</span></div><div style="font-size:14px;margin-top:10px;color:var(--ink-soft)">Mejnik 3 od 4 je potrjen. Osnutek računa 2026-044 za 2.400 € je pripravljen po pogodbi, rok plačila 15 dni.</div></div>
+        <div class="actions"><span class="btn btn--sm btn--dark">Potrdi</span><span class="btn btn--sm">Zavrni</span></div>
+      </div>
+      <div class="card" style="padding:18px 22px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center">
+        <div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="pill pill--wait">opomin za plačilo</span><span class="card__meta">Zobna ordinacija, Celje · agent Računi · 06:42</span></div><div style="font-size:14px;margin-top:10px;color:var(--ink-soft)">Račun 2026-039 je zapadel pred 6 dnevi. Prijazen opomin brez zamudnih obresti, s povezavo za plačilo.</div></div>
+        <div class="actions"><span class="btn btn--sm btn--dark">Potrdi</span><span class="btn btn--sm">Zavrni</span></div>
+      </div>
+      <div class="note" style="display:flex;align-items:center;gap:8px;padding:0 4px"><span class="dot dot--blue"></span>Nič ne gre ven brez potrditve. Vsak predlog ima avtorja, čas in razlog.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── AISOS · pregled dneva ─────────────────────────────────────────── -->
+<div class="stage" id="aisos-detail">
+  <div class="bar"><span class="bar__mark"></span><span class="bar__name">AISOS</span><span class="bar__crumb">/ <b>Pregled dneva</b></span><span class="bar__spacer"></span><span class="bar__pill"><span class="dot"></span>E-pošta</span><span class="bar__pill"><span class="dot"></span>Koledar</span><span class="bar__pill"><span class="dot"></span>Projekti</span><span class="bar__pill"><span class="dot"></span>Znanje</span><span class="bar__pill"><span class="dot"></span>Datoteke</span><span class="avatar">IV</span></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns: 1fr 440px;height:100%">
+      <div class="card doc" style="padding:30px 36px">
+        <div class="eyebrow">Pregled dneva</div>
+        <div class="h1" style="margin-top:8px">Sreda, 10. 9. 2026, 07:00</div>
+        <div class="sub">Pripravili agenti ob 06:52 iz e-pošte, koledarja in projektov. Nič ni bilo poslano.</div>
+        <h3>Koledar</h3>
+        <div class="row"><span>09:00</span><span>Stranka A · pregled ponudbe in koledarja objav</span><span class="pill pill--grey">Jernej P.</span></div>
+        <div class="row"><span>11:30</span><span>Tower Spa · klic o skupinskih rezervacijah</span><span class="pill pill--grey">na daljavo</span></div>
+        <div class="row"><span>15:00</span><span>Pregled tedna z ekipo</span><span class="pill pill--grey">pisarna</span></div>
+        <h3>Čaka na odgovor</h3>
+        <div class="row"><span>2 dni</span><span>Rok T., INSPECTUS · vprašanje o tisku kartic iz centra</span><span class="pill pill--wait">osnutek pripravljen</span></div>
+        <div class="row"><span>1 dan</span><span>Jernej P., Stranka A · potrditev cene v ponudbi</span><span class="pill pill--wait">osnutek pripravljen</span></div>
+        <div class="row"><span>6 ur</span><span>Sabina K., Stranka B · datum delavnice za starše</span><span class="pill pill--grey">odgovoriš ti</span></div>
+        <div class="row"><span>4 dni</span><span>Ana M., Zobna ordinacija · uvodni pogovor</span><span class="pill pill--grey">odgovoriš ti</span></div>
+        <h3>Roki ta teden</h3>
+        <div class="row"><span>četrtek</span><span>Ponudba Stranka A · CRM in e-poštne sekvence</span><span class="pill pill--blue">v delu</span></div>
+        <div class="row"><span>petek</span><span>Račun 2026-043 zapade · INSPECTUS</span><span class="pill pill--grey">opomnik nastavljen</span></div>
+        <div class="row"><span>petek</span><span>Podcast Stranka B · objava ob 20:00</span><span class="pill pill--ok">načrtovano</span></div>
+        <h3>Projekti</h3>
+        <div class="row"><span>INSPECTUS</span><span>VLDR kartice, faza 2 · 3 od 4 korakov · naslednji: tisk iz centra</span><span class="pill pill--ok">po načrtu</span></div>
+        <div class="row"><span>ATHLOS</span><span>Trenerska plošča · predlogi ZEUS v testu z dvema ekipama</span><span class="pill pill--ok">po načrtu</span></div>
+        <div class="row" style="border-bottom:0"><span>Stranka A</span><span>CRM in sekvence · čaka ponudbo, četrtek</span><span class="pill pill--wait">čaka tebe</span></div>
+      </div>
+      <div style="display:grid;gap:14px;align-content:start">
+        <div class="card" style="padding:18px 20px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Za potrditev</div><div class="card__meta">3 osnutki</div></div>
+          <div class="tcard" style="margin:12px 0 0"><div style="display:flex;justify-content:space-between;align-items:center"><b style="margin:0">Odgovor stranki · Rok T.</b><span class="pill pill--grey">e-pošta</span></div><small style="display:block;margin-top:6px">"Pozdravljeni, Rok. Tisk kartic iz centra je vklopljen, PDF nastane ob vsaki obdelavi in ostane v zgodovini ..."</small><div class="row" style="margin-top:12px"><div class="actions"><span class="btn btn--sm btn--dark">Potrdi</span><span class="btn btn--sm">Popravi</span><span class="btn btn--sm">Zavrni</span></div></div></div>
+          <div class="tcard" style="margin:10px 0 0"><div style="display:flex;justify-content:space-between;align-items:center"><b style="margin:0">Objava · LinkedIn, četrtek</b><span class="pill pill--grey">objava</span></div><small style="display:block;margin-top:6px">"Ista gospa pride k nam že 20 let. Nikoli nismo razmišljali o menjavi. Tako o Stranka Au govorijo stranke, ki jim ista oseba čisti iste prostore ..."</small><div class="row" style="margin-top:12px"><div class="actions"><span class="btn btn--sm btn--dark">Potrdi</span><span class="btn btn--sm">Popravi</span><span class="btn btn--sm">Zavrni</span></div></div></div>
+          <div class="tcard" style="margin:10px 0 0"><div style="display:flex;justify-content:space-between;align-items:center"><b style="margin:0">Račun · 2026-044, INSPECTUS</b><span class="pill pill--grey">račun</span></div><small style="display:block;margin-top:6px">2.400 € · mejnik 3 od 4 · rok plačila 15 dni · po pogodbi z dne 3. 6. 2026</small><div class="row" style="margin-top:12px"><div class="actions"><span class="btn btn--sm btn--dark">Potrdi</span><span class="btn btn--sm">Popravi</span><span class="btn btn--sm">Zavrni</span></div></div></div>
+        </div>
+        <div class="card" style="padding:18px 20px">
+          <div class="card__title">Ponoči opravljeno</div>
+          <ul class="list" style="margin-top:12px">
+            <li><span class="ico"><i class="blue"></i></span><div><b>E-pošta</b><small>23 sporočil razvrščenih · 4 osnutki odgovorov</small></div></li>
+            <li><span class="ico"><i class="green round"></i></span><div><b>Koledar</b><small>2 sestanka potrjena · 1 predlog termina poslan tebi</small></div></li>
+            <li><span class="ico"><i class="round"></i></span><div><b>Datoteke</b><small>6 dokumentov v projektne mape · 2 čakata na ime</small></div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── INSPECTUS · VLDR kartica ──────────────────────────────────────── -->
+<div class="stage" id="inspectus-vldr-detail">
+  <div class="bar"><span class="bar__mark--brand" style="background:#1f2a44">IN</span><span class="bar__name">INSPECTUS</span><span class="bar__crumb">/ <b>VLDR kartica · 1 od 314</b></span><span class="bar__spacer"></span><span class="bar__pill"><span class="dot"></span>PRIMER 1.xlsx · 14. 7. 2026</span><span class="btn btn--dark">Natisni</span></div>
+  <div class="body">
+    <div class="head"><div><div class="h1">VLDR kartica</div><div class="sub">Nastane iz survey reporta, en zapis na vozilo, poškodbe po položaju</div></div><span class="pill pill--ok">pripravljena za tisk</span></div>
+    <div class="cols" style="grid-template-columns: 1fr 400px">
+      <div class="card" style="padding:26px 30px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:17px;font-weight:700;letter-spacing:.08em">VEHICLE LOADING DAMAGE REPORT</div><span style="font-family:var(--mono);font-size:12px;color:var(--muted)">VLDR-1 · Grande Napoli · P2</span></div>
+        <div style="display:grid;grid-template-columns:1.2fr 1.5fr 1.2fr 1fr .6fr;gap:10px;margin-top:20px">
+          <div class="field"><label>Model</label><div class="val">Transit Custom</div></div>
+          <div class="field"><label>VIN</label><div class="val" style="font-family:var(--mono);font-size:13px;letter-spacing:.04em">WF0YXXTTGYPA12345</div></div>
+          <div class="field"><label>Ladja</label><div class="val">Grande Napoli</div></div>
+          <div class="field"><label>Datum</label><div class="val">14. 7. 2026</div></div>
+          <div class="field"><label>Pomol</label><div class="val">P2</div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:22px"><div class="eyebrow">Damages · 24 položajev</div><span class="note">2 zabeleženi · koda · stopnja · vrsta</span></div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:10px">
+          <div class="slot">1 · LF</div>
+          <div class="slot slot--hit">2 · LS<b>LS · 2 · praska</b></div>
+          <div class="slot">3 · LR</div>
+          <div class="slot">4 · RF</div>
+          <div class="slot">5 · RS</div>
+          <div class="slot slot--hit">6 · RR<b>RR · 1 · odrgnina</b></div>
+          <div class="slot">7 · FR</div>
+          <div class="slot">8 · RE</div>
+          <div class="slot">9 · RO</div>
+          <div class="slot">10 · BO</div>
+          <div class="slot">11 · TG</div>
+          <div class="slot">12 · WS</div>
+          <div class="slot">13 · LFD</div>
+          <div class="slot">14 · LRD</div>
+          <div class="slot">15 · RFD</div>
+          <div class="slot">16 · RRD</div>
+          <div class="slot">17 · LM</div>
+          <div class="slot">18 · RM</div>
+          <div class="slot">19 · LFW</div>
+          <div class="slot">20 · LRW</div>
+          <div class="slot">21 · RFW</div>
+          <div class="slot">22 · RRW</div>
+          <div class="slot">23 · INT</div>
+          <div class="slot">24 · KEY</div>
+        </div>
+        <div class="eyebrow" style="margin-top:22px">Remarks</div>
+        <div style="margin-top:8px;border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-height:88px;font-size:14px">Observation: transport film torn</div>
+        <div style="display:flex;justify-content:space-between;margin-top:18px;font-size:12.5px;color:var(--muted)"><span>Pregledal: R. T. · podpis na tiskani kartici</span><span>Kartica 1 od 314</span></div>
+      </div>
+      <div style="display:grid;gap:14px;align-content:start">
+        <div class="card" style="padding:18px 20px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Center · zgodovina obdelav</div><div class="card__meta">zadnje 3</div></div>
+          <ul class="list" style="margin-top:12px">
+            <li><span class="ico"><i class="green round"></i></span><div><b>11. 8. 2026 · Grande Ellade.xlsx</b><small>451 vrstic · 402 vozil · 402 kartic</small></div><span class="pill pill--ok">PDF</span></li>
+            <li><span class="ico"><i class="green round"></i></span><div><b>28. 7. 2026 · PRIMER 2.xlsx</b><small>212 vrstic · 176 vozil · 176 kartic</small></div><span class="pill pill--ok">PDF</span></li>
+            <li><span class="ico"><i class="green round"></i></span><div><b>14. 7. 2026 · PRIMER 1.xlsx</b><small>380 vrstic · 314 vozil · 314 kartic · prva resnična serija</small></div><span class="pill pill--ok">PDF</span></li>
+          </ul>
+        </div>
+        <div class="cols" style="grid-template-columns:1fr 1fr">
+          <div class="card kpi"><div class="kpi__label">Kartic skupaj</div><div class="kpi__value">892</div><div class="kpi__delta kpi__delta--flat">v 3 obdelavah</div></div>
+          <div class="card kpi"><div class="kpi__label">Čas obdelave</div><div class="kpi__value">sekunde</div><div class="kpi__delta">prej ročno v preglednicah</div></div>
+        </div>
+        <div class="card" style="padding:16px 20px">
+          <div class="card__title">Kaj center shrani</div>
+          <div class="note" style="margin-top:8px;line-height:1.5">Vhodni izvoz, vsako kartico kot zapis in PDF za tisk. Vrstice z opombo ostanejo označene, da jih pregleda človek.</div>
+        </div>
+        <div class="card" style="padding:16px 20px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Vrstice z opombo</div><span class="pill pill--wait">12</span></div>
+          <ul class="list" style="margin-top:10px">
+            <li><span class="ico"><i class="amber"></i></span><div><b>WF0KXXWPGKPB20981</b><small>3 poškodbe, streha in vrata · opomba surveyorja</small></div></li>
+            <li><span class="ico"><i class="amber"></i></span><div><b>WF0FXXWPGFPB77840</b><small>koda položaja manjka · dopolni ročno</small></div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── INSPECTUS · VIN filter, obdelava ──────────────────────────────── -->
+<div class="stage" id="inspectus-vin-detail">
+  <div class="bar"><span class="bar__mark--brand" style="background:#1f2a44">IN</span><span class="bar__name">INSPECTUS</span><span class="bar__crumb">/ <b>Pametni filter · obdelava</b></span><span class="bar__spacer"></span><span class="bar__pill"><span class="dot"></span>186 fotografij · 30 tablic</span><span class="btn btn--dark">Preveri s seznamom</span></div>
+  <div class="body">
+    <div class="head"><div><div class="h1">Obdelava · pomol P2, 10. 9.</div><div class="sub">Sedem korakov, vsak preverljiv. Trenutno: zanesljivost.</div></div><span class="pill pill--blue">korak 6 od 7</span></div>
+    <div class="cols" style="grid-template-columns: 1fr 380px">
+      <div style="display:grid;gap:14px;align-content:start">
+        <div class="card" style="padding:16px 18px">
+          <div class="steps">
+            <div class="step step--done"><i>1</i>Vrstni red iz EXIF<small>186 posnetkov</small></div>
+            <div class="step step--done"><i>2</i>Vrsta posnetka<small>30 tablic · 156 vozil</small></div>
+            <div class="step step--done"><i>3</i>Branje VIN<small>29 na napravi</small></div>
+            <div class="step step--done"><i>4</i>Razvrščanje<small>27 skupin</small></div>
+            <div class="step step--done"><i>5</i>Ladijski seznam<small>2 neujemanji</small></div>
+            <div class="step step--now"><i>6</i>Zanesljivost<small>v teku</small></div>
+            <div class="step"><i>7</i>Zapis vozila<small>čaka</small></div>
+          </div>
+        </div>
+        <div class="card" style="padding:16px 18px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Posnetki v vrstnem redu zajema</div><div class="card__meta">09:41 do 09:52 · prvih 24</div></div>
+          <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:8px;margin-top:12px">
+            <div class="photo photo--plate" style="height:82px"><span class="plate">VIN</span></div><div class="photo photo--car" style="height:82px"></div><div class="photo photo--car" style="height:82px"></div><div class="photo" style="height:82px"></div><div class="photo photo--car" style="height:82px"></div><div class="photo photo--car" style="height:82px"></div>
+            <div class="photo photo--plate" style="height:82px"><span class="plate">VIN</span></div><div class="photo photo--car" style="height:82px"></div><div class="photo" style="height:82px"></div><div class="photo photo--car" style="height:82px"></div><div class="photo photo--car" style="height:82px"></div><div class="photo" style="height:82px"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:8px;margin-top:8px">
+            <div style="grid-column:span 6;border-top:2px solid var(--green);padding-top:6px;display:flex;justify-content:space-between;align-items:center"><span style="font-family:var(--mono);font-size:12px">WF0YXXTTGYPA12345</span><span class="pill pill--ok">5 posnetkov · na seznamu</span></div>
+            <div style="grid-column:span 6;border-top:2px solid var(--green);padding-top:6px;display:flex;justify-content:space-between;align-items:center"><span style="font-family:var(--mono);font-size:12px">WF0FXXWPGFPB77812</span><span class="pill pill--ok">5 posnetkov · na seznamu</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:8px;margin-top:16px">
+            <div class="photo photo--plate" style="height:82px"><span class="plate">VIN</span></div><div class="photo photo--car" style="height:82px"></div><div class="photo" style="height:82px"></div><div class="photo photo--car" style="height:82px"></div><div class="photo photo--car" style="height:82px"></div>
+            <div class="photo photo--plate" style="height:82px;border-color:#f3c98a"><span class="plate" style="border-color:var(--amber);color:var(--amber)">VIN</span></div><div class="photo photo--car" style="height:82px"></div><div class="photo photo--car" style="height:82px"></div><div class="photo" style="height:82px"></div><div class="photo photo--car" style="height:82px"></div><div class="photo" style="height:82px"></div><div class="photo photo--car" style="height:82px"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:8px;margin-top:8px">
+            <div style="grid-column:span 5;border-top:2px solid var(--green);padding-top:6px;display:flex;justify-content:space-between;align-items:center"><span style="font-family:var(--mono);font-size:12px">WF0YXXTTGYPA12351</span><span class="pill pill--ok">4 posnetki</span></div>
+            <div style="grid-column:span 7;border-top:2px solid var(--amber);padding-top:6px;display:flex;justify-content:space-between;align-items:center"><span style="font-family:var(--mono);font-size:12px">WF0KXXWPGKPB20981</span><span class="pill pill--wait">6 posnetkov · ni na seznamu</span></div>
+          </div>
+          <div class="note" style="margin-top:14px">Tablica z VIN odpre vozilo. Posnetki za njo mu pripadajo do naslednje tablice.</div>
+        </div>
+        <div class="card">
+          <div class="card__head"><div class="card__title">Zapis vozila · predogled</div><div class="card__meta">korak 7 zapiše šele po preverjeni zanesljivosti</div></div>
+          <table style="margin-top:10px">
+            <thead><tr><th>VIN</th><th>Posnetkov</th><th>Seznam</th><th>Zanesljivost</th><th>Zapis</th></tr></thead>
+            <tbody>
+              <tr><td class="num" style="color:var(--ink)">WF0YXXTTGYPA12345</td><td>5</td><td><span class="pill pill--ok">na seznamu</span></td><td><span class="pill pill--ok">0,98</span></td><td class="num">čaka korak 7</td></tr>
+              <tr><td class="num" style="color:var(--ink)">WF0FXXWPGFPB77812</td><td>5</td><td><span class="pill pill--ok">na seznamu</span></td><td><span class="pill pill--ok">0,97</span></td><td class="num">čaka korak 7</td></tr>
+              <tr><td class="num" style="color:var(--ink)">WF0YXXTTGYPA12351</td><td>4</td><td><span class="pill pill--ok">na seznamu</span></td><td><span class="pill pill--blue">0,91</span></td><td class="num">čaka korak 7</td></tr>
+              <tr><td class="num" style="color:var(--ink)">WF0KXXWPGKPB20981</td><td>6</td><td><span class="pill pill--wait">ni na seznamu</span></td><td><span class="pill pill--wait">0,74 · prebrano v oblaku</span></td><td class="num">ročni pregled</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="display:grid;gap:14px;align-content:start">
+        <div class="card" style="padding:16px 18px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Opozorila</div><span class="pill pill--wait">2</span></div>
+          <ul class="list" style="margin-top:10px">
+            <li><span class="ico"><i class="amber"></i></span><div><b>VIN ni na seznamu razkladanja</b><small>WF0KXXWPGKPB20981 · 6 posnetkov · 09:47</small></div></li>
+            <li><span class="ico"><i class="amber"></i></span><div><b>Vozilo s seznama brez fotografij</b><small>WF0KXXWPGKPB21003 · pomol P2 · vrstica 118</small></div></li>
+          </ul>
+        </div>
+        <div class="card" style="padding:16px 18px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Nerazvrščeno</div><span class="pill pill--grey">3</span></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px"><div class="photo" style="height:70px"></div><div class="photo photo--car" style="height:70px"></div><div class="photo" style="height:70px"></div></div>
+          <div class="note" style="margin-top:10px">Posnetki pred prvo tablico. Pripiši vozilu ali črtaj.</div>
+        </div>
+        <div class="card kpi"><div class="kpi__label">Branje VIN</div><div class="kpi__value">29 od 30</div><div class="kpi__delta">prebranih na napravi</div><div class="note" style="margin-top:6px">1 tablica poslana v oblak zaradi odseva na foliji</div></div>
+        <div class="card kpi"><div class="kpi__label">Razvrščeno samodejno</div><div class="kpi__value">183</div><div class="kpi__delta">98 % posnetkov · 3 ročno</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Model za premaze · rezultat ───────────────────────────────────── -->
+<div class="stage" id="model-premazi-detail">
+  <div class="bar"><span class="bar__mark"></span><span class="bar__name">Model za premaze</span><span class="bar__crumb">/ <b>Rezultat napovedi</b></span><span class="bar__spacer"></span><span class="bar__pill"><span class="dot dot--amber"></span>Model v1.4 · testni podatki</span></div>
+  <div class="body">
+    <div style="padding:12px 16px;border-radius:12px;background:var(--amber-soft);color:#8a5a06;font-size:13.5px;font-weight:600;margin-bottom:18px;display:flex;gap:10px;align-items:center"><span class="dot dot--amber"></span>Testni podatki: model še ni videl realnih formulacij</div>
+    <div class="head"><div><div class="h1">Napoved · recept R-0192</div><div class="sub">Notranja disperzijska barva, bela · 6 surovin · 100,0 %</div></div><span class="pill pill--ok">zaupanje visoko · 4 od 4 lastnosti</span></div>
+    <div class="cols" style="grid-template-columns: 520px 1fr">
+      <div style="display:grid;gap:14px;align-content:start">
+        <div class="card">
+          <div class="card__head"><div class="card__title">Recept</div><div class="card__meta">masni delež</div></div>
+          <table style="margin-top:10px">
+            <thead><tr><th>Surovina</th><th>Vloga</th><th style="text-align:right">Masni %</th></tr></thead>
+            <tbody>
+              <tr><td>Vezivo</td><td>akrilna disperzija</td><td class="num" style="text-align:right">42,0</td></tr>
+              <tr><td>Pigment TiO<sub>2</sub></td><td>belina, prekrivnost</td><td class="num" style="text-align:right">18,5</td></tr>
+              <tr><td>Polnilo</td><td>kalcit</td><td class="num" style="text-align:right">12,0</td></tr>
+              <tr><td>Topilo</td><td>glikol, koalescent</td><td class="num" style="text-align:right">20,5</td></tr>
+              <tr><td>Aditivi</td><td>dispergator, odpenjevalec</td><td class="num" style="text-align:right">2,0</td></tr>
+              <tr><td>Voda</td><td>nastavitev viskoznosti</td><td class="num" style="text-align:right">5,0</td></tr>
+              <tr><td><b>Skupaj</b></td><td></td><td class="num" style="text-align:right;color:var(--ink);font-weight:700">100,0</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card" style="padding:18px 22px">
+          <div class="card__title">Najbližje učne formulacije</div>
+          <div class="bars" style="margin-top:14px">
+            <div class="bar-row"><span style="text-align:left;font-family:inherit;color:var(--ink)">R-0117</span><i><b style="width:29%;background:var(--green)"></b></i><span>1,2</span></div>
+            <div class="bar-row"><span style="text-align:left;font-family:inherit;color:var(--ink)">R-0088</span><i><b style="width:46%;background:var(--green)"></b></i><span>1,9</span></div>
+            <div class="bar-row"><span style="text-align:left;font-family:inherit;color:var(--ink)">R-0141</span><i><b style="width:63%;background:var(--amber)"></b></i><span>2,6</span></div>
+          </div>
+          <div class="note" style="margin-top:12px">Razdalja od učnih podatkov, meja 3,1. Pod mejo model napove, nad njo odkloni.</div>
+        </div>
+      </div>
+      <div style="display:grid;gap:14px;align-content:start">
+        <div class="cols" style="grid-template-columns:repeat(2,1fr)">
+          <div class="card kpi"><div class="kpi__label">Gostota</div><div class="kpi__value">1,38 g/cm³</div><div class="kpi__delta kpi__delta--flat">± 0,01 · 95 % interval</div></div>
+          <div class="card kpi"><div class="kpi__label">Suha snov</div><div class="kpi__value">58,4 %</div><div class="kpi__delta kpi__delta--flat">± 0,3 · 95 % interval</div></div>
+          <div class="card kpi"><div class="kpi__label">Viskoznost</div><div class="kpi__value">1.120 mPa·s</div><div class="kpi__delta kpi__delta--flat">± 140 · 95 % interval</div></div>
+          <div class="card kpi"><div class="kpi__label">Prekrivnost</div><div class="kpi__value">97,1 %</div><div class="kpi__delta kpi__delta--flat">± 0,8 · 95 % interval</div></div>
+        </div>
+        <div class="card" style="padding:18px 22px;background:var(--red-soft);border-color:#f1b7b7;box-shadow:none">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="pill pill--red" style="background:#fff">Odklonjeno</span><b style="font-size:14px">Odklonjeno: surovina 'Aditiv X-9' ni v katalogu</b></div>
+          <div class="note" style="margin-top:8px;color:#8a2c2c">Model napoveduje samo za surovine z znano sestavo. Dodaj surovino v katalog ali izberi znano zamenjavo.</div>
+        </div>
+        <div class="card" style="padding:18px 22px;background:var(--red-soft);border-color:#f1b7b7;box-shadow:none">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="pill pill--red" style="background:#fff">Brez napovedi</span><b style="font-size:14px">Razdalja od učnih podatkov 4,2, meja 3,1: brez napovedi</b></div>
+          <div class="note" style="margin-top:8px;color:#8a2c2c">Različica recepta s 30 % polnila je predaleč od tega, kar je model videl. Raje brez odgovora kot izmišljen.</div>
+        </div>
+        <div class="card" style="padding:18px 22px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Občutljivost napovedi</div><div class="card__meta">kaj se zgodi ob majhni spremembi recepta</div></div>
+          <ul class="list" style="margin-top:12px">
+            <li><span class="ico"><i class="blue"></i></span><div><b>Pigment TiO<sub>2</sub> +1,0 %</b><small>prekrivnost +0,4 % · gostota +0,01 g/cm³</small></div><span class="pill pill--ok">v obsegu</span></li>
+            <li><span class="ico"><i class="blue"></i></span><div><b>Voda +1,0 %</b><small>viskoznost pade za približno 90 mPa·s · suha snov 57,8 %</small></div><span class="pill pill--ok">v obsegu</span></li>
+            <li><span class="ico"><i class="amber"></i></span><div><b>Polnilo +2,0 %</b><small>suha snov +1,1 % · prekrivnost brez spremembe</small></div><span class="pill pill--wait">ob robu podatkov</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Elementum · spletni svetovalec ────────────────────────────────── -->
+<div class="stage" id="elementum-detail">
+  <div class="bar"><span class="bar__mark--brand" style="background:#2b3a4a">E</span><span class="bar__name">Elementum</span><span class="bar__crumb">/ <b>Spletni svetovalec</b></span><span class="bar__spacer"></span><span class="bar__pill"><span class="dot"></span>Odgovarja 24/7 · iz lastnih virov</span><span class="avatar">SV</span></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns: 1fr 380px;height:100%">
+      <div style="display:grid;gap:14px;align-content:start">
+        <div class="head" style="margin:0 0 6px"><div><div class="h1">Jutranji tržni pregled, 10. 9.</div><div class="sub">pripravljeno ob 6:30 za svetovalce · 6 virov · cene v EUR na unčo</div></div><span class="btn btn--dark">Pošlji ekipi</span></div>
+        <div class="cols" style="grid-template-columns:repeat(3,1fr)">
+          <div class="card kpi"><div class="kpi__label">Zlato · EUR/oz</div><div class="kpi__value">2.418 €</div><div class="kpi__delta">+0,3 % · +6 € od včeraj</div></div>
+          <div class="card kpi"><div class="kpi__label">Srebro · EUR/oz</div><div class="kpi__value">29,1 €</div><div class="kpi__delta">+0,7 % · +0,2 € od včeraj</div></div>
+          <div class="card kpi"><div class="kpi__label">Povpraševanja čez noč</div><div class="kpi__value">11</div><div class="kpi__delta kpi__delta--flat">7 s kontaktom za klic</div></div>
+        </div>
+        <div class="card" style="padding:18px 22px">
+          <div class="card__title">Novice</div>
+          <ul class="list" style="margin-top:12px">
+            <li><span class="ico"><i class="blue"></i></span><div><b>Centralne banke so v avgustu kupile 37 ton zlata</b><small>povzetek dveh virov · podpira povpraševanje po fizičnem zlatu</small></div><span class="pill pill--blue">trg</span></li>
+            <li><span class="ico"><i class="blue"></i></span><div><b>ECB je pustila obrestne mere nespremenjene</b><small>tečaj EUR/USD miren · cene v evrih stabilne</small></div><span class="pill pill--blue">trg</span></li>
+            <li><span class="ico"><i class="blue"></i></span><div><b>Srebro: industrijsko povpraševanje iz sončnih modulov raste</b><small>tretje četrtletje zapored · vir: poročilo panoge</small></div><span class="pill pill--blue">trg</span></li>
+          </ul>
+        </div>
+        <div class="card" style="padding:18px 22px">
+          <div class="card__title">Poteze konkurence</div>
+          <ul class="list" style="margin-top:12px">
+            <li><span class="ico"><i class="amber"></i></span><div><b>Konkurent A je znižal premijo na srebrne palice 1 kg</b><small>za 1,5 % · zaznano včeraj 16:10 v spletni trgovini</small></div><span class="pill pill--wait">konkurenca</span></li>
+            <li><span class="ico"><i class="amber"></i></span><div><b>Konkurent B uvaja brezplačno hrambo prvo leto</b><small>objava na spletni strani · pogoj: nakup nad 10.000 €</small></div><span class="pill pill--wait">konkurenca</span></li>
+          </ul>
+        </div>
+        <div class="card" style="padding:18px 22px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Predano svetovalcem čez noč</div><div class="card__meta">7 kontaktov, 2 nujna</div></div>
+          <ul class="list" style="margin-top:12px">
+            <li><span class="ico"><i class="green round"></i></span><div><b>Hramba zlata · vprašanje o zavarovanju</b><small>Petra M. · želi klic popoldne · odgovor iz: Hramba in zavarovanje</small></div><span class="pill pill--ok">klic danes</span></li>
+            <li><span class="ico"><i class="green round"></i></span><div><b>Nakup 10 kovancev po 1 oz · za podjetje</b><small>Andrej K. · vprašal o računu na podjetje · predano Marku</small></div><span class="pill pill--ok">klic danes</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="card" style="display:grid;grid-template-rows:auto 1fr auto;overflow:hidden">
+        <div style="background:#2b3a4a;color:#fff;padding:14px 18px;display:flex;align-items:center;gap:10px"><span class="bar__mark--brand" style="background:rgba(255,255,255,.16);width:30px;height:30px">E</span><div><b style="font-size:14px">Elementum · svetovalec</b><br><small style="opacity:.75;font-size:12px">odgovarja takoj, tudi ponoči</small></div><span class="bar__spacer"></span><span class="dot"></span></div>
+        <div class="chat" style="padding:18px 18px 0">
+          <div class="ai">Pozdravljeni. Vprašajte o nakupu, prodaji ali hrambi plemenitih kovin.</div>
+          <div class="me">Kako je pri vas s hrambo zlata? Je zavarovano?</div>
+          <div class="ai">Zlato hranimo v trezorju v Ljubljani, ločeno po strankah. Vsak kos je zavarovan za polno tržno vrednost. Dvig je mogoč ob predhodni najavi v dveh delovnih dneh.<div class="note" style="margin-top:8px;font-size:12px">Vir: Hramba in zavarovanje</div></div>
+          <div class="me">Koliko stane hramba?</div>
+          <div class="ai">Hramba stane 0,5 % vrednosti na leto, zavarovanje je vključeno. Obračun je mesečni, brez vezave.<div class="note" style="margin-top:8px;font-size:12px">Vir: Cenik hrambe 2026</div></div>
+          <div class="ai" style="max-width:100%">Želite, da vas pokliče svetovalec?
+            <div style="display:grid;gap:8px;margin-top:10px">
+              <div class="field"><div class="val" style="height:36px;font-size:13px;color:var(--faint)">Ime</div></div>
+              <div class="field"><div class="val" style="height:36px;font-size:13px;color:var(--faint)">Telefon</div></div>
+              <span class="btn btn--sm btn--dark" style="justify-self:start">Pokličite me</span>
+            </div>
+          </div>
+          <div class="note" style="font-size:11.5px">Svetovalec pokliče v delovnem času, običajno v eni uri.</div>
+        </div>
+        <div style="margin:14px 18px 18px;height:42px;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;padding:0 14px;color:var(--faint);font-size:13px">Napišite sporočilo</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Tower Spa Celje · rezervacija v klepetu ───────────────────────── -->
+<div class="stage" id="tower-spa-detail">
+  <div class="bar"><span class="bar__mark--brand" style="background:#8a6a2e">T</span><span class="bar__name">Tower Spa Celje</span><span class="bar__crumb">/ <b>Asistent · pogovor</b></span><span class="bar__spacer"></span><span class="bar__pill"><span class="dot"></span>Odgovarja tudi ponoči</span><span class="avatar">TS</span></div>
+  <div class="body" style="display:grid;grid-template-columns:440px 1fr;gap:28px;align-items:center">
+    <div class="phone phone--lg"><div class="phone__screen"><span class="phone__notch"></span>
+      <div class="sub">Tower Spa Celje · asistent</div>
+      <h2>Rezervacija</h2>
+      <div class="chat" style="margin-top:14px;font-size:12.5px">
+        <div class="me">Bi imeli v soboto savno za dva?</div>
+        <div class="ai">Seveda. V soboto, 13. 9., so za paket Savna za dva prosti termini:<div style="display:flex;gap:6px;margin-top:8px"><span class="pill pill--grey">11:00</span><span class="pill pill--grey">15:00</span><span class="pill pill--blue">17:00</span></div></div>
+        <div class="me">17:00, prosim.</div>
+        <div class="ai" style="max-width:92%">Rezervirano. Povzetek:
+          <div style="margin-top:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:12px"><span style="color:var(--muted)">Paket</span><b>Savna za dva</b><span style="color:var(--muted)">Datum</span><b>sobota, 13. 9. 2026</b><span style="color:var(--muted)">Ura</span><b>17:00, 90 min</b><span style="color:var(--muted)">Cena</span><b>48 €, plačilo na recepciji</b></div>
+          <div class="note" style="margin-top:8px;font-size:12px;display:flex;gap:6px;align-items:center"><span class="dot dot--blue"></span>Opomnik: petek 17:00</div>
+        </div>
+        <div class="me">Super, hvala!</div>
+        <div class="ai">Z veseljem. Če boste želeli še masažo, mi le napišite, termin dodam k rezervaciji.</div>
+      </div>
+      <div style="margin-top:14px;height:38px;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;padding:0 12px;color:var(--faint);font-size:12px">Napišite sporočilo</div>
+    </div></div>
+    <div style="display:grid;gap:14px;align-content:center">
+      <div class="head" style="margin:0 0 6px"><div><div class="h1">Za lastnika</div><div class="sub">Kar asistent ne sme sprejeti sam, preda s povzetkom in kontaktom</div></div><span class="pill pill--wait">1 čaka</span></div>
+      <div class="card" style="padding:18px 22px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Skupinska rezervacija · 12 oseb, rojstni dan</div><span class="pill pill--wait">predano lastniku · 22:14</span></div>
+        <div style="margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--canvas);font-size:13.5px;color:var(--ink-soft)">"Za rojstni dan bi radi prišli v soboto popoldne, 12 oseb, savna in jacuzzi, če se da tudi s pogostitvijo. Kaj je mogoče?"</div>
+        <div style="display:grid;grid-template-columns:.6fr 1.2fr 1.3fr 1fr;gap:10px;margin-top:14px">
+          <div class="field"><label>Oseb</label><div class="val">12</div></div>
+          <div class="field"><label>Termin</label><div class="val">sobota, 20. 9., popoldne</div></div>
+          <div class="field"><label>Želje</label><div class="val">savna, jacuzzi, pogostitev</div></div>
+          <div class="field"><label>Kontakt</label><div class="val">Petra M. · WhatsApp</div></div>
+        </div>
+        <div class="actions" style="margin-top:14px;align-items:center"><span class="btn btn--dark">Pokliči Petro</span><span class="btn">Odgovori v klepetu</span><span class="note" style="margin-left:6px">Asistent je Petri sporočil, da se lastnik oglasi zjutraj.</span></div>
+      </div>
+      <div class="cols" style="grid-template-columns:repeat(3,1fr)">
+        <div class="card kpi"><div class="kpi__label">Rezervacij ta teden</div><div class="kpi__value">23</div><div class="kpi__delta">17 prek asistenta</div></div>
+        <div class="card kpi"><div class="kpi__label">Predano lastniku</div><div class="kpi__value">2</div><div class="kpi__delta kpi__delta--flat">skupine in dogodki</div></div>
+        <div class="card kpi"><div class="kpi__label">Opomniki poslani</div><div class="kpi__value">19</div><div class="kpi__delta kpi__delta--flat">dan pred terminom</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Dr. Asya Grafy Bio Institute · rutina ─────────────────────────── -->
+<div class="stage" id="asya-grafy-detail">
+  <div class="bar"><span class="bar__mark--brand" style="background:#9a7a3a">AG</span><span class="bar__name">Dr. Asya Grafy Bio Institute</span><span class="bar__crumb">/ <b>Svetovalec · rutina</b></span><span class="bar__spacer"></span><span class="bar__pill"><span class="dot"></span>Svetovalec teče</span><span class="avatar">AG</span></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns: 1fr 340px">
+      <div style="display:grid;gap:14px;align-content:start">
+        <div class="card" style="padding:16px 22px">
+          <div class="chat">
+            <div class="me">suha, občutljiva koža, rdečica</div>
+            <div class="ai">Hvala. Pripravila sem rutino za suho in občutljivo kožo, ki je nagnjena k rdečici. Vsak korak ima razlog, vse iz dokumentacije o izdelkih.</div>
+          </div>
+        </div>
+        <div class="head" style="margin:6px 0 0"><div><div class="h1">Vaša rutina</div><div class="sub">6 korakov · razlogi iz dokumentacije o izdelkih</div></div><span class="pill pill--ok">tip kože: suha, občutljiva</span></div>
+        <div class="cols" style="grid-template-columns:1fr 1fr">
+          <div class="card" style="padding:18px 20px">
+            <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Jutro</div><div class="card__meta">3 koraki</div></div>
+            <div style="display:grid;gap:8px;margin-top:12px">
+              <div class="agent" style="padding:12px 14px"><div class="photo" style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#e8dcc4,#c9b48a)"></div><div><b>1 · Blag čistilni gel</b><small>brez mila, ne izsuši in ne draži</small></div><span class="btn btn--sm">V košarico</span></div>
+              <div class="agent" style="padding:12px 14px"><div class="photo" style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#f0e6d2,#d4c19b)"></div><div><b>2 · Serum za vlago</b><small>hialuron veže vodo in pomiri</small></div><span class="btn btn--sm">V košarico</span></div>
+              <div class="agent" style="padding:12px 14px"><div class="photo" style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#efe3cf,#c9ad7c)"></div><div><b>3 · Dnevna krema SPF 30</b><small>zaščita, manj rdečice ob soncu</small></div><span class="btn btn--sm">V košarico</span></div>
+            </div>
+          </div>
+          <div class="card" style="padding:18px 20px">
+            <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Večer</div><div class="card__meta">3 koraki</div></div>
+            <div style="display:grid;gap:8px;margin-top:12px">
+              <div class="agent" style="padding:12px 14px"><div class="photo" style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#e9e0d0,#bfae8f)"></div><div><b>1 · Čistilno mleko</b><small>odstrani nečistoče brez sušenja</small></div><span class="btn btn--sm">V košarico</span></div>
+              <div class="agent" style="padding:12px 14px"><div class="photo" style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#eadfc9,#c4a97a)"></div><div><b>2 · Pomirjevalni serum</b><small>niacinamid umiri rdečico</small></div><span class="btn btn--sm">V košarico</span></div>
+              <div class="agent" style="padding:12px 14px"><div class="photo" style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#e5d9c2,#b89f72)"></div><div><b>3 · Nočna krema za obnovo</b><small>ceramidi čez noč obnovijo pregrado</small></div><span class="btn btn--sm">V košarico</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:18px 22px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Kako uporabljati</div><div class="card__meta">iz navodil k izdelkom</div></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px">
+            <div class="tcard" style="margin:0"><b>Prvi teden</b><small>serume vsak drugi dan, kremi vsak dan. Koža se navadi brez pekočega občutka.</small></div>
+            <div class="tcard" style="margin:0"><b>Vrstni red</b><small>od najbolj tekočega do najgostejšega. Med serumom in kremo počakajte 2 minuti.</small></div>
+            <div class="tcard" style="margin:0"><b>Če koža zapeče</b><small>izpustite serum za en dan in nadaljujte s kremo. Če se ponovi, nam pišite.</small></div>
+          </div>
+        </div>
+        <div class="card" style="padding:16px 22px;background:var(--canvas);box-shadow:none;display:flex;gap:14px;align-items:center"><span class="ico" style="background:#fff"><i class="round"></i></span><div><b style="font-size:14px;font-weight:650">Vprašanje o rozacei smo predali svetovalki, odgovori v enem dnevu</b><div class="note" style="margin-top:3px">Zdravstvena vprašanja gredo vedno človeku, svetovalec jih ne rešuje sam.</div></div></div>
+      </div>
+      <div style="display:grid;gap:14px;align-content:start">
+        <div class="card" style="padding:18px 20px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Košarica</div><div class="card__meta">6 izdelkov</div></div>
+          <table style="margin-top:8px;font-size:13px">
+            <tbody>
+              <tr><td style="padding:9px 0">Blag čistilni gel</td><td class="num" style="padding:9px 0;text-align:right">18 €</td></tr>
+              <tr><td style="padding:9px 0">Serum za vlago</td><td class="num" style="padding:9px 0;text-align:right">42 €</td></tr>
+              <tr><td style="padding:9px 0">Dnevna krema SPF 30</td><td class="num" style="padding:9px 0;text-align:right">38 €</td></tr>
+              <tr><td style="padding:9px 0">Čistilno mleko</td><td class="num" style="padding:9px 0;text-align:right">19 €</td></tr>
+              <tr><td style="padding:9px 0">Pomirjevalni serum</td><td class="num" style="padding:9px 0;text-align:right">44 €</td></tr>
+              <tr><td style="padding:9px 0">Nočna krema za obnovo</td><td class="num" style="padding:9px 0;text-align:right">46 €</td></tr>
+            </tbody>
+          </table>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)"><b style="font-size:15px">Skupaj</b><b style="font-size:18px;letter-spacing:-.02em">207 €</b></div>
+          <span class="btn btn--dark" style="width:100%;margin-top:12px">Na blagajno</span>
+          <div class="note" style="margin-top:10px;text-align:center;font-size:12px">Brezplačna dostava nad 60 €</div>
+        </div>
+        <div class="card kpi"><div class="kpi__label">Rutin ta mesec</div><div class="kpi__value">318</div><div class="kpi__delta">74 % s košarico</div></div>
+        <div class="card" style="padding:18px 20px">
+          <div class="card__title">Pogosta vprašanja</div>
+          <ul class="list" style="margin-top:12px">
+            <li><span class="ico"><i class="round"></i></span><div><b>Lahko serum uporabljam z retinolom?</b><small>odgovor iz dokumentacije · 312 krat</small></div></li>
+            <li><span class="ico"><i class="round"></i></span><div><b>Koliko časa zdrži ena tuba?</b><small>približno 2 meseca · 246 krat</small></div></li>
+            <li><span class="ico"><i class="amber"></i></span><div><b>Rozacea, ekcem, alergije</b><small>vedno predano svetovalki · 37 krat</small></div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SI-BIG · jutranji seznam ──────────────────────────────────────── -->
+<div class="stage" id="si-big-detail">
+  <div class="bar"><span class="bar__mark--brand" style="background:#1f2a44">SB</span><span class="bar__name">SI-BIG</span><span class="bar__crumb">/ <b>Jutranji seznam</b></span><span class="bar__spacer"></span><span class="bar__pill"><span class="dot"></span>Pregledano 42 virov · danes 6:00</span><span class="avatar">SB</span></div>
+  <div class="body">
+    <div class="head"><div><div class="h1">Jutranji seznam, 10. 9.</div><div class="sub">Zadetki po strankah, vsak z razlogom in oceno. Pošlje se šele po tvojem pregledu.</div></div>
+      <div style="display:flex;gap:10px">
+        <div class="card kpi" style="padding:10px 16px;min-width:150px"><div class="kpi__label">Pregledanih virov</div><div class="kpi__value" style="font-size:22px;margin-top:2px">42</div></div>
+        <div class="card kpi" style="padding:10px 16px;min-width:150px"><div class="kpi__label">Zadetkov</div><div class="kpi__value" style="font-size:22px;margin-top:2px">9</div></div>
+        <div class="card kpi" style="padding:10px 16px;min-width:150px"><div class="kpi__label">Poslano</div><div class="kpi__value" style="font-size:22px;margin-top:2px">6</div></div>
+      </div>
+    </div>
+    <div class="cols" style="grid-template-columns:repeat(3,1fr)">
+      <div class="card" style="padding:16px 18px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Strojegradnja, Celje</div><div class="card__meta">3 zadetki</div></div>
+        <div class="hit"><b>Oprema za čistilno napravo, javni razpis</b><div class="row"><span class="pill pill--grey">SRB</span><span class="pill pill--ok">87</span><span class="note">rok 24. 9.</span></div><div class="why">Ustreza referencam iz Novega Sada, isti tip opreme in obseg.</div><div class="actions" style="margin-top:10px"><span class="btn btn--sm btn--dark">Pošlji</span><span class="btn btn--sm">Črtaj</span></div></div>
+        <div class="hit"><b>Obnova črpališča, Tuzla</b><div class="row"><span class="pill pill--grey">BIH</span><span class="pill pill--blue">74</span><span class="note">rok 8. 10.</span></div><div class="why">Manjši obseg, oprema iz kataloga stranke. Potreben lokalni partner.</div><div class="actions" style="margin-top:10px"><span class="btn btn--sm btn--dark">Pošlji</span><span class="btn btn--sm">Črtaj</span></div></div>
+        <div class="hit"><b>Dobava rezervoarjev za vodovod, Bitola</b><div class="row"><span class="pill pill--grey">MKD</span><span class="pill pill--blue">61</span><span class="note">odprto</span></div><div class="why">Razpis odprt, brez lokalnega partnerja. Vredno pogleda, ne prioriteta.</div><div class="actions" style="margin-top:10px"><span class="btn btn--sm btn--dark">Pošlji</span><span class="btn btn--sm">Črtaj</span></div></div>
+      </div>
+      <div class="card" style="padding:16px 18px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Proizvajalec premazov, Ljubljana</div><div class="card__meta">3 zadetki</div></div>
+        <div class="hit"><b>Distributer išče dobavitelja gradbenih premazov</b><div class="row"><span class="pill pill--grey">BIH</span><span class="pill pill--ok">82</span><span class="note">novo včeraj</span></div><div class="why">Tri skladišča, išče evropskega proizvajalca. Ujema se z asortimanom.</div><div class="actions" style="margin-top:10px"><span class="btn btn--sm btn--dark">Pošlji</span><span class="btn btn--sm">Črtaj</span></div></div>
+        <div class="hit"><b>Razpis: protikorozijska zaščita mostov, Reka</b><div class="row"><span class="pill pill--grey">HRV</span><span class="pill pill--blue">69</span><span class="note">rok 30. 9.</span></div><div class="why">Zahteva certifikat, ki ga stranka ima. Obseg srednji.</div><div class="actions" style="margin-top:10px"><span class="btn btn--sm btn--dark">Pošlji</span><span class="btn btn--sm">Črtaj</span></div></div>
+        <div class="hit"><b>Trgovec s talnimi premazi, Split</b><div class="row"><span class="pill pill--grey">HRV</span><span class="pill pill--wait">55</span><span class="note">odprto</span></div><div class="why">Majhen obseg, a nova regija. Primerno za uvodni klic.</div><div class="actions" style="margin-top:10px"><span class="btn btn--sm btn--dark">Pošlji</span><span class="btn btn--sm">Črtaj</span></div></div>
+      </div>
+      <div class="card" style="padding:16px 18px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Logistika, Koper</div><div class="card__meta">3 zadetki</div></div>
+        <div class="hit"><b>Iskanje partnerja za logistični center, Bar</b><div class="row"><span class="pill pill--grey">MNE</span><span class="pill pill--ok">78</span><span class="note">odprto</span></div><div class="why">Pristanišče Bar išče povezavo s severnim Jadranom. Koper je logična izbira.</div><div class="actions" style="margin-top:10px"><span class="btn btn--sm btn--dark">Pošlji</span><span class="btn btn--sm">Črtaj</span></div></div>
+        <div class="hit"><b>Skladišče v Beogradu, dolgoročni najem</b><div class="row"><span class="pill pill--grey">SRB</span><span class="pill pill--blue">66</span><span class="note">novo včeraj</span></div><div class="why">Blizu obvoznice, 4.000 m². Ustreza načrtu za hub v Srbiji.</div><div class="actions" style="margin-top:10px"><span class="btn btn--sm btn--dark">Pošlji</span><span class="btn btn--sm">Črtaj</span></div></div>
+        <div class="hit"><b>Prevozi za tekstilno tovarno, Skader</b><div class="row"><span class="pill pill--grey">ALB</span><span class="pill pill--wait">58</span><span class="note">odprto</span></div><div class="why">Redne linije, majhen obseg. Vredno samo v paketu z drugimi strankami.</div><div class="actions" style="margin-top:10px"><span class="btn btn--sm btn--dark">Pošlji</span><span class="btn btn--sm">Črtaj</span></div></div>
+      </div>
+    </div>
+    <div class="cols" style="grid-template-columns:repeat(3,1fr);margin-top:18px">
+      <div class="card" style="padding:16px 18px;display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start"><span class="ico"><i class="green round"></i></span><div style="font-size:13px"><b style="display:block;font-weight:650">Včeraj poslano · Strojegradnja, 2</b><span class="note">odgovor: razpis v Novem Sadu jih zanima, prosijo za razpisno dokumentacijo</span></div></div>
+      <div class="card" style="padding:16px 18px;display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start"><span class="ico"><i class="green round"></i></span><div style="font-size:13px"><b style="display:block;font-weight:650">Včeraj poslano · Premazi, 2</b><span class="note">odgovor: klic z distributerjem iz Tuzle v četrtek ob 10:00</span></div></div>
+      <div class="card" style="padding:16px 18px;display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start"><span class="ico"><i class="amber"></i></span><div style="font-size:13px"><b style="display:block;font-weight:650">Včeraj poslano · Logistika, 2</b><span class="note">brez odziva · opomnik v petek, potem črtamo</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── HEVA · nalog na telefonu in osnutek računa ────────────────────── -->
+<div class="stage" id="heva-detail">
+  <div class="bar"><span class="bar__mark--brand" style="background:#2a9d8f">H</span><span class="bar__name">HEVA</span><span class="bar__crumb">/ <b>Nalog 2026-0918</b></span><span class="bar__spacer"></span><span class="bar__pill"><span class="dot"></span>Monter · Miha · na terenu</span><span class="avatar">HV</span></div>
+  <div class="body" style="display:grid;grid-template-columns:440px 1fr;gap:28px;align-items:center">
+    <div class="phone phone--lg"><div class="phone__screen"><span class="phone__notch"></span>
+      <div class="sub">Nalog 2026-0918 · nujno · Miha</div>
+      <h2 style="font-size:19px">Ulica XIV. divizije 14, Celje</h2>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center"><span class="pill pill--red">Puščanje pri števcih</span><span class="pill pill--grey">klet</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px"><div class="photo" style="height:72px"></div><div class="photo" style="height:72px;background:linear-gradient(135deg,#c9d1dd,#9aa5b5)"></div></div>
+      <div class="block" style="margin-top:10px"><div><b>Upravnik · Jože K.</b><br><small>ključ pri hišniku, vhod z dvorišča</small></div><span class="pill pill--blue">pokliči</span></div>
+      <div style="margin-top:10px">
+        <div class="check-row"><i class="on"></i>Zapri glavni ventil</div>
+        <div class="check-row"><i class="on"></i>Zamenjaj spojko pri števcu</div>
+        <div class="check-row"><i></i>Preveri tesnjenje po 10 min</div>
+        <div class="check-row" style="border-bottom:0"><i></i>Fotografija in podpis stranke</div>
+      </div>
+      <div class="eyebrow" style="margin-top:10px">Opomba monterja</div>
+      <div style="margin-top:6px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12.5px;color:var(--ink-soft)">Voda odstranjena, tla suha. Priporočam menjavo ventila ob naslednjem obisku.</div>
+      <div class="eyebrow" style="margin-top:10px">Material in čas</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
+        <div class="field"><label>Cev PE 25</label><div class="val" style="height:36px;font-size:13px">1 m</div></div>
+        <div class="field"><label>Spojka</label><div class="val" style="height:36px;font-size:13px">2 kos</div></div>
+        <div class="field"><label>Čas</label><div class="val" style="height:36px;font-size:13px">1,5 h</div></div>
+      </div>
+      <span class="btn btn--dark" style="width:100%;height:46px;margin-top:14px;font-size:15px">Zaključi nalog</span>
+      <div class="note" style="margin-top:10px;text-align:center;font-size:11.5px">Naslednji nalog: 13:00 · Kersnikova, servis dvigala</div>
+    </div></div>
+    <div style="display:grid;gap:14px;align-content:center">
+      <div class="head" style="margin:0 0 6px"><div><div class="h1">Osnutek računa</div><div class="sub">Nastane iz naloga, ko monter pritisne Zaključi. Pisarna ga pregleda in pošlje.</div></div><span class="pill pill--wait">čaka na potrditev v pisarni</span></div>
+      <div class="card">
+        <div class="card__head"><div class="card__title">Račun 2026-0187 · osnutek</div><div class="card__meta">iz naloga 2026-0918 · Miha · 10:36</div></div>
+        <table style="margin-top:10px">
+          <thead><tr><th>Postavka</th><th>Količina</th><th style="text-align:right">Cena</th><th style="text-align:right">Znesek</th></tr></thead>
+          <tbody>
+            <tr><td>Delo monterja · puščanje pri števcih</td><td class="num">1,5 h</td><td class="num" style="text-align:right">38,00 €</td><td class="num" style="text-align:right;color:var(--ink)">57,00 €</td></tr>
+            <tr><td>Cev PE 25</td><td class="num">1 m</td><td class="num" style="text-align:right">6,40 €</td><td class="num" style="text-align:right;color:var(--ink)">6,40 €</td></tr>
+            <tr><td style="border-bottom:1px solid var(--line)">Spojka 25 mm</td><td class="num" style="border-bottom:1px solid var(--line)">2 kos</td><td class="num" style="text-align:right;border-bottom:1px solid var(--line)">4,90 €</td><td class="num" style="text-align:right;color:var(--ink);border-bottom:1px solid var(--line)">9,80 €</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:14px 22px 0;display:grid;gap:6px;font-size:13.5px">
+          <div style="display:flex;justify-content:space-between;color:var(--muted)"><span>Brez DDV</span><span style="font-family:var(--mono);font-size:12.5px">73,20 €</span></div>
+          <div style="display:flex;justify-content:space-between;color:var(--muted)"><span>DDV 22 %</span><span style="font-family:var(--mono);font-size:12.5px">16,10 €</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:700;margin-top:4px"><span>Skupaj</span><span>89,30 €</span></div>
+        </div>
+        <div style="padding:16px 22px 20px;display:flex;gap:8px;align-items:center"><span class="btn btn--dark">Potrdi in pošlji</span><span class="btn">Popravi</span><span class="note" style="margin-left:6px">Pošlje se upravniku na e-pošto, kopija v arhiv.</span></div>
+      </div>
+      <div class="card" style="padding:18px 22px">
+        <div class="card__title">Kako je nastal</div>
+        <ul class="list" style="margin-top:10px">
+          <li><span class="ico"><i class="blue"></i></span><div><b>07:12 · e-pošta upravnika</b><small>asistent je prepoznal naslov in nujnost, ustvaril nalog</small></div></li>
+          <li><span class="ico"><i class="round"></i></span><div><b>09:00 · Miha na naslovu</b><small>fotografiji stanja, dve od štirih točk opravljeni</small></div></li>
+          <li><span class="ico"><i class="green round"></i></span><div><b>10:36 · osnutek računa</b><small>iz materiala in časa v nalogu, čaka pisarno</small></div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Epolac · technical answer ─────────────────────────────────────── -->
+<div class="stage" id="epolac-detail">
+  <div class="bar"><span class="bar__mark--brand" style="background:#d23b3b">E</span><span class="bar__name">Epolac</span><span class="bar__crumb">/ <b>Technical assistant</b></span><span class="bar__spacer"></span><span class="bar__pill"><span class="dot"></span>214 data sheets indexed</span><span class="avatar">EP</span></div>
+  <div class="body">
+    <div class="cols" style="grid-template-columns: 1fr 460px;height:100%">
+      <div class="card" style="padding:22px;display:grid;grid-template-rows:auto 1fr auto">
+        <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Ask about any product</div><div class="card__meta">answers only from indexed documents</div></div>
+        <div class="chat" style="margin-top:16px">
+          <div class="me">How do I thin EPOLAC 2K primer for airless spray?</div>
+          <div class="ai" style="max-width:92%">
+            <div>Thin only after both components are mixed. The data sheet gives this sequence for airless application:</div>
+            <ol style="margin:10px 0 0 20px;display:grid;gap:7px">
+              <li>Mix component A with hardener B at 4 : 1 by weight. Stir mechanically for 3 minutes.</li>
+              <li>Let the mix stand for 10 minutes (induction time) at 15 to 25 °C.</li>
+              <li>Add EPOLAC Thinner 21, up to 10 % by volume, in small portions until the primer flows evenly off the stirrer.</li>
+              <li>Airless setup: tip 0.017 to 0.021 in, 180 to 220 bar, 60 mesh filter.</li>
+              <li>Pot life at 20 °C is 4 hours. Do not add thinner once the mix starts to thicken.</li>
+            </ol>
+            <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap"><span class="pill pill--grey">Source: TDS EPOLAC 2K Primer, section 4.2, rev. 03/2026</span></div>
+          </div>
+          <div class="me">Thanks. And for brush application?</div>
+          <div class="ai">For brush or roller, thin with Thinner 21 up to 5 % by volume, or apply unthinned on small areas. Same mixing ratio and induction time.<div style="display:flex;gap:6px;margin-top:10px"><span class="pill pill--grey">Source: TDS EPOLAC 2K Primer, section 4.1</span></div></div>
+          <div class="me">What is the recoat window at 10 °C?</div>
+          <div class="ai">At 10 °C the second coat can go on after 16 hours and within 5 days without abrading. After 5 days, sand lightly and remove the dust. Below 5 °C do not apply.<div style="display:flex;gap:6px;margin-top:10px"><span class="pill pill--grey">Source: TDS EPOLAC 2K Primer, section 5.1</span></div></div>
+          <div class="me">Can it go over old alkyd paint?</div>
+          <div class="ai">No. EPOLAC 2K Primer is not compatible with alkyd coatings. Remove the old paint to bare steel (St 2 minimum), or ask sales for the alkyd-compatible system.<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap"><span class="pill pill--grey">Source: TDS EPOLAC 2K Primer, section 3.4</span><span class="pill pill--wait">handed to sales</span></div></div>
+        </div>
+        <div>
+          <div style="margin-top:14px;height:44px;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;padding:0 14px;color:var(--faint);font-size:13px">Type a question, English or Hebrew</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><span class="note">Every answer carries its source. No source, no answer.</span><span dir="rtl" style="font-size:14px;color:var(--ink-soft)">המערכת עונה גם בעברית</span></div>
+        </div>
+      </div>
+      <div style="display:grid;gap:14px;align-content:start">
+        <div class="card" style="padding:18px 22px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Consumption</div><div class="card__meta">EPOLAC 2K Primer</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+            <div class="field"><label>Area</label><div class="val">120 m²</div></div>
+            <div class="field"><label>Coats</label><div class="val">2</div></div>
+            <div class="field"><label>Theoretical coverage</label><div class="val">8 m²/L <span>per coat</span></div></div>
+            <div class="field"><label>Surface</label><div class="val">smooth steel <span>no loss</span></div></div>
+          </div>
+          <div style="margin-top:14px;padding:14px 16px;border-radius:12px;background:var(--canvas);display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center">
+            <span class="note">Result</span><b style="font-size:24px;letter-spacing:-.02em">30 L</b>
+            <span class="note">Suggested packaging</span><b style="font-size:15px">2 × 20 L</b>
+          </div>
+          <div class="note" style="margin-top:10px">120 m² × 2 coats / 8 m² per L = 30 L. Add 10 to 15 % for airless overspray.</div>
+        </div>
+        <div class="card" style="padding:18px 22px">
+          <div class="card__title">Documents used</div>
+          <ul class="list" style="margin-top:12px">
+            <li><span class="ico"><i class="blue"></i></span><div><b>TDS EPOLAC 2K Primer</b><small>rev. 03/2026 · sections 4.1 to 4.3</small></div><span class="pill pill--ok">current</span></li>
+            <li><span class="ico"><i class="blue"></i></span><div><b>TDS EPOLAC Thinner 21</b><small>rev. 01/2026</small></div><span class="pill pill--ok">current</span></li>
+            <li><span class="ico"><i class="round"></i></span><div><b>Application guide: airless spray</b><small>internal · 6 pages</small></div><span class="pill pill--ok">current</span></li>
+          </ul>
+        </div>
+        <div class="card" style="padding:18px 22px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="card__title">Languages this month</div><div class="card__meta">2.380 questions</div></div>
+          <div class="bars" style="margin-top:12px">
+            <div class="bar-row" style="grid-template-columns:90px 1fr 60px"><span style="text-align:left;font-family:inherit;color:var(--ink)">English</span><i><b style="width:71%"></b></i><span>71 %</span></div>
+            <div class="bar-row" style="grid-template-columns:90px 1fr 60px"><span style="text-align:left;font-family:inherit;color:var(--ink)">Hebrew</span><i><b style="width:22%"></b></i><span>22 %</span></div>
+            <div class="bar-row" style="grid-template-columns:90px 1fr 60px"><span style="text-align:left;font-family:inherit;color:var(--ink)">Other</span><i><b style="width:7%;background:var(--faint)"></b></i><span>7 %</span></div>
+          </div>
+        </div>
+        <div class="note" style="padding:12px 16px;border:1px dashed #cfd3da;border-radius:12px;display:flex;gap:8px;align-items:center"><span class="dot dot--amber"></span>Prices and projects go to sales. The assistant answers technical questions only.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
