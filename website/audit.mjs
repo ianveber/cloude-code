@@ -57,6 +57,8 @@ async function walk(dir) {
   const out = [];
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
+    /* The admin is a private app, not a page: noindex, disallowed, unlinked. */
+    if (entry.isDirectory() && dir === DIST && entry.name === 'admin') continue;
     if (entry.isDirectory()) out.push(...(await walk(full)));
     else if (entry.name.endsWith('.html')) out.push(full);
   }

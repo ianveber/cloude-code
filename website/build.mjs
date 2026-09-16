@@ -6,8 +6,9 @@
  * and derives sitemap.xml, robots.txt and llms.txt from the same page list — so
  * adding a page automatically registers it everywhere it needs to appear.
  *
- *   node build.mjs            build into ./dist
- *   node build.mjs --serve    build, then serve ./dist on http://localhost:4321
+ *   node build.mjs                    build into ./dist
+ *   node build.mjs --serve            build, then serve ./dist on http://localhost:4321
+ *   node build.mjs --serve --admin    the same, with the admin at /admin and drafts built (noindex)
  */
 
 import { mkdir, writeFile, rm, cp, readFile } from 'node:fs/promises';
@@ -75,6 +76,8 @@ import { deep } from './content/case-studies-deep.mjs';
 import { esc, absolute } from './src/html.mjs';
 import * as C from './content/content.mjs';
 import * as S from './content/showcase.mjs';
+import { loadCmsFromDir, organize, cmsItemPage, toListItem } from './src/cms.mjs';
+import { closingCta } from './src/closing-cta.mjs';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.join(ROOT, 'dist');
@@ -86,12 +89,33 @@ const url = (p) => absolute(site.origin, p);
 
 const HOME_CRUMB = { label: 'Domov', href: '/' };
 
+/* Content written in the admin (content/cms/*). Drafts are built only when
+   CMS_DRAFTS=1 (the local admin server), and then as noindex pages. */
+let CMS = organize([]);
+
+const byDateDesc = (a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0);
+
 /* Blog data with a link and a card summary per post; the index and the home
-   teaser read this, each post gets its own page below. */
-const BLOG = {
-  ...S.blog,
-  items: blogPosts.map((post) => ({ ...post, href: `/blog/${post.slug}/`, body: post.summary })),
-};
+   teaser read this, each post gets its own page below. News and events merge
+   the hand-written items with the ones from the admin, newest first. */
+let BLOG = { ...S.blog, items: [] };
+let NEWS = { ...S.news };
+let EVENTS = { ...S.events };
+
+export async function refreshCms() {
+  CMS = await loadCmsFromDir(ROOT, { drafts: process.env.CMS_DRAFTS === '1' });
+  BLOG = {
+    ...S.blog,
+    items: [...blogPosts.map((post) => ({ ...post, href: `/blog/${post.slug}/`, body: post.summary })), ...CMS.blog.filter((i) => !i.parent).map(toListItem)].sort(byDateDesc),
+  };
+  NEWS = { ...S.news, items: [...S.news.items, ...CMS.novice.filter((i) => !i.parent).map(toListItem)].sort(byDateDesc) };
+  EVENTS = {
+    ...S.events,
+    items: [...CMS.dogodki.filter((i) => !i.parent).map(toListItem).sort(byDateDesc), ...S.events.items],
+  };
+  return CMS;
+}
+await refreshCms();
 
 /* 2026-09-10 → 10. 9. 2026, the way a date is written in Slovene. */
 const formatDate = (iso) => {
@@ -99,12 +123,6 @@ const formatDate = (iso) => {
   return `${d}. ${m}. ${y}`;
 };
 
-const closingCta = ctaBand({
-  title: 'Preverimo, ali je avtomatizacija smiselna za vas',
-  lead: 'Rezervirajte uvodni pogovor in preverite, ali je AI avtomatizacija smiselna za vaše podjetje.',
-  primary: { label: 'Rezervirajte posvet', href: '/kontakt/' },
-  secondary: { label: 'Pogosta vprašanja', href: '/pogosta-vprasanja/' },
-});
 
 /* ── Page definitions ─────────────────────────────────────────────────── */
 
@@ -674,18 +692,18 @@ function guidePage(guide) {
 function newsPage() {
   const body = [
     pageHero({
-      eyebrow: S.news.eyebrow,
-      title: S.news.title,
-      lead: S.news.lead,
+      eyebrow: NEWS.eyebrow,
+      title: NEWS.title,
+      lead: NEWS.lead,
     }),
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
-    ${takeaway({ label: 'Na kratko', text: S.news.answer })}
+    ${takeaway({ label: 'Na kratko', text: NEWS.answer })}
   </div>
 </section>`,
 
-    newsList(S.news),
+    newsList(NEWS),
     closingCta,
   ].join('\n');
 
@@ -704,18 +722,18 @@ function newsPage() {
 function eventsPage() {
   const body = [
     pageHero({
-      eyebrow: S.events.eyebrow,
-      title: S.events.title,
-      lead: S.events.lead,
+      eyebrow: EVENTS.eyebrow,
+      title: EVENTS.title,
+      lead: EVENTS.lead,
     }),
 
     `<section class="section section--plain section--flush-top">
   <div class="shell">
-    ${takeaway({ label: 'Na kratko', text: S.events.answer })}
+    ${takeaway({ label: 'Na kratko', text: EVENTS.answer })}
   </div>
 </section>`,
 
-    eventList(S.events),
+    eventList(EVENTS),
     closingCta,
   ].join('\n');
 
@@ -811,6 +829,7 @@ export function collectPages() {
     eventsPage(),
     blogPage(),
     ...blogPosts.map(blogPostPage),
+    ...CMS.all.map((item) => cmsItemPage(item, { closingCta, all: CMS.all })),
     aboutPage(),
     teamPage(),
     faqPage(),
@@ -876,7 +895,9 @@ function robotsTxt() {
     'Amazonbot',
     'cohere-ai',
   ];
-  const group = (agents) => `${agents.map((a) => `User-agent: ${a}`).join('\n')}\nAllow: /`;
+  /* The admin and its API are for us, not for any index. */
+  const hidden = 'Disallow: /admin/\nDisallow: /api/';
+  const group = (agents) => `${agents.map((a) => `User-agent: ${a}`).join('\n')}\nAllow: /\n${hidden}`;
 
   return `# robots.txt — ${site.name}
 # Search and answer engines may read, index and cite everything here.
@@ -885,6 +906,7 @@ function robotsTxt() {
 
 User-agent: *
 Allow: /
+${hidden}
 Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 # Answer engines and the fetchers they use while answering
@@ -987,12 +1009,18 @@ async function build() {
   const started = Date.now();
   const lastmod = new Date().toISOString().slice(0, 10);
 
+  await refreshCms();
+
   await rm(DIST, { recursive: true, force: true });
   await mkdir(DIST, { recursive: true });
 
   if (existsSync(PUBLIC)) {
     await cp(PUBLIC, DIST, { recursive: true });
   }
+
+  /* The admin's live preview renders Markdown with the same code as the build. */
+  await mkdir(path.join(DIST, 'admin'), { recursive: true });
+  await cp(path.join(ROOT, 'src', 'md.mjs'), path.join(DIST, 'admin', 'md.js'));
 
   /* Comments and indentation carry nothing to the browser. */
   const css = (await readFile(path.join(ROOT, 'src', 'styles.css'), 'utf8'))
@@ -1014,8 +1042,9 @@ async function build() {
     const prev = previous[page.path];
     const entry = prev && prev.hash === hash ? prev : { hash, published: prev?.published ?? lastmod, updated: lastmod };
     manifest[page.path] = entry;
-    page.datePublished = entry.published;
-    page.dateModified = entry.updated;
+    /* Admin content carries its own dates; everything else follows the manifest. */
+    page.datePublished = page.datePublished ?? entry.published;
+    page.dateModified = page.dateModified ?? entry.updated;
     if (!page.noindex && !page.path.endsWith('.html')) page.markdownPath = `${page.path}index.md`;
   }
   await writeFile(
@@ -1071,16 +1100,45 @@ async function serve(port = Number(process.env.PORT) || 4321) {
     '.html': 'text/html; charset=utf-8',
     '.css': 'text/css; charset=utf-8',
     '.js': 'text/javascript; charset=utf-8',
+    '.mjs': 'text/javascript; charset=utf-8',
+    '.json': 'application/json; charset=utf-8',
+    '.md': 'text/markdown; charset=utf-8',
     '.png': 'image/png',
     '.jpg': 'image/jpeg',
+    '.webp': 'image/webp',
+    '.ico': 'image/x-icon',
     '.svg': 'image/svg+xml',
+    '.mp4': 'video/mp4',
+    '.webm': 'video/webm',
+    '.woff2': 'font/woff2',
     '.xml': 'application/xml; charset=utf-8',
     '.txt': 'text/plain; charset=utf-8',
   };
 
   const distRoot = DIST.endsWith(path.sep) ? DIST : DIST + path.sep;
 
+  /* --admin mounts the admin API on this server, against the local files,
+     and rebuilds the site after every save so drafts can be browsed. The
+     password hash and session secret come from website/.env.admin. */
+  let admin = null;
+  if (process.argv.includes('--admin') || process.env.ADMIN === '1') {
+    await loadEnvFile(path.join(ROOT, '.env.admin'));
+    process.env.CMS_DRAFTS = '1';
+    const { createAdminHandler } = await import('./api/_lib/handler.mjs');
+    let building = Promise.resolve();
+    const rebuild = () => {
+      building = building.then(() => build()).catch((err) => console.error('Rebuild failed:', err.message));
+      return building;
+    };
+    admin = createAdminHandler({ root: ROOT, store: 'local', collectPages, onChange: rebuild });
+    if (!process.env.ADMIN_PASSWORD_HASH) {
+      console.warn('ADMIN_PASSWORD_HASH is not set: run `node tools/admin/hash-password.mjs` and put the line into website/.env.admin');
+    }
+    if (process.env.CMS_DRAFTS === '1') await rebuild();
+  }
+
   const handler = async (req, res) => {
+    if (admin && new URL(req.url, 'http://x').pathname.startsWith('/api/admin')) return admin(req, res);
     const raw = decodeURIComponent(new URL(req.url, 'http://x').pathname);
     const rel = raw.replace(/^\/+/, '');
     let file = path.resolve(DIST, rel);
@@ -1130,6 +1188,18 @@ async function serve(port = Number(process.env.PORT) || 4321) {
   console.log(`Serving ${DIST}`);
   console.log(`  http://localhost:${port}`);
   console.log(`  http://127.0.0.1:${port}`);
+  if (admin) console.log(`  http://localhost:${port}/admin/  (admin, local files)`);
+}
+
+/* KEY=VALUE lines into process.env, without overriding what is already set. */
+async function loadEnvFile(file) {
+  if (!existsSync(file)) return;
+  for (const line of (await readFile(file, 'utf8')).split('\n')) {
+    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
+    if (!m || line.trim().startsWith('#')) continue;
+    const value = m[2].replace(/^(['"])(.*)\1$/, '$2');
+    if (process.env[m[1]] === undefined) process.env[m[1]] = value;
+  }
 }
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));

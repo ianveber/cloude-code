@@ -338,6 +338,25 @@ expect(
   'Products page must list the 12 products and projects, each with its rendered picture.'
 );
 
+/* ── Admin (2026-09-16) ──────────────────────────────────────────────────
+   The editor lives at /admin and its API under /api/admin. Nothing on the
+   public pages may point at it, search engines are told to stay out, and
+   the admin page itself is noindex. */
+{
+  const dist = await import('node:fs/promises');
+  const robots = await dist.readFile('dist/robots.txt', 'utf8');
+  expect(/Disallow: \/admin\//.test(robots) && /Disallow: \/api\//.test(robots), 'robots.txt must disallow /admin/ and /api/.');
+  const adminPage = await dist.readFile('dist/admin/index.html', 'utf8').catch(() => '');
+  expect(/<meta name="robots" content="noindex/.test(adminPage), 'The admin page must carry a noindex robots meta.');
+  const publicPages = Object.values(pages).join('\n');
+  expect(!/href="\/admin/.test(publicPages), 'Public pages must not link to /admin.');
+  const sitemap = await dist.readFile('dist/sitemap.xml', 'utf8');
+  expect(!/\/admin\//.test(sitemap), 'The sitemap must not list /admin/.');
+  const styles = await dist.readFile('src/styles.css', 'utf8');
+  expect(/\.cms-body/.test(styles) && /\.cms-preview-bar/.test(styles), 'Admin content pages need their body and preview styles.');
+}
+
+
 const order = [
   'data-intro-stage',
   'data-intro',

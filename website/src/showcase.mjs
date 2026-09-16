@@ -14,6 +14,7 @@ import { esc, each } from './html.mjs';
 import { takeaway, sectionHead } from './sections.mjs';
 import site from '../content/site.mjs';
 import { intro as introCopy } from '../content/showcase.mjs';
+import { uploadPicture } from './cms.mjs';
 
 /* The two paths of the official brain, read once from the traced SVG so the
    hero can stack them in 3D and colour each layer from CSS. */
@@ -435,6 +436,7 @@ export function pictureMarkup(picture, sizes = PICTURE_SIZES.half) {
 }
 
 function projectPicture(picture, sizes = PICTURE_SIZES.half) {
+  if (picture.upload) return uploadPicture(picture, sizes);
   const src = esc(picture.src);
   return `
         <picture>
@@ -649,7 +651,7 @@ export function newsList(data) {
             <time datetime="${esc(item.date)}">${esc(item.dateLabel)}</time>
             <span class="newsitem__kicker">${esc(item.kicker)}</span>
           </p>
-          <h3>${esc(item.title)}</h3>
+          <h3>${item.href ? `<a href="${esc(item.href)}">${esc(item.title)}</a>` : esc(item.title)}</h3>
           <p>${esc(item.body)}</p>
         </article>
       </li>`
@@ -682,7 +684,7 @@ export function eventList(data) {
           </p>
           <div class="eventitem__body">
             <p class="eventitem__kicker">${esc(item.kicker)}</p>
-            <h3>${esc(item.title)}</h3>
+            <h3>${item.href ? `<a href="${esc(item.href)}">${esc(item.title)}</a>` : esc(item.title)}</h3>
             <p>${esc(item.body)}</p>
             <p class="eventitem__where">
               <span class="chip">${esc(item.mode)}</span>

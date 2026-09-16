@@ -9,14 +9,18 @@
   },
   "scripts": {
     "build": "node build.mjs",
-    "check": "node build.mjs && node audit.mjs && node design-audit.mjs && node render-check.mjs",
+    "check": "node build.mjs && node audit.mjs && node design-audit.mjs && node tools/admin/check.mjs && node render-check.mjs",
     "audit": "node audit.mjs",
     "dev": "node build.mjs --serve",
     "serve": "node build.mjs --serve",
     "render-check": "node render-check.mjs",
     "indexnow": "node tools/indexnow.mjs",
     "pictures": "node tools/pictures/render.mjs && node tools/pictures/variants.mjs",
-    "lighthouse": "node tools/lighthouse.mjs"
+    "lighthouse": "node tools/lighthouse.mjs",
+    "admin": "node build.mjs --serve --admin",
+    "admin:password": "node tools/admin/hash-password.mjs",
+    "admin:check": "node tools/admin/check.mjs",
+    "admin:reindex": "node tools/admin/reindex.mjs"
   },
   "devDependencies": {
     "puppeteer-core": "^24.43.1"
