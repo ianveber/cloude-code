@@ -354,6 +354,23 @@ expect(
   expect(!/\/admin\//.test(sitemap), 'The sitemap must not list /admin/.');
   const styles = await dist.readFile('src/styles.css', 'utf8');
   expect(/\.cms-body/.test(styles) && /\.cms-preview-bar/.test(styles), 'Admin content pages need their body and preview styles.');
+  /* Cookie choice (2026-09-16): every page carries the hidden banner and the
+     consent script; the beacon runs only after consent; the cookie page exists
+     and the footer links to it. */
+  expect(
+    Object.values(pages).every((html) => /class="consent" data-consent hidden/.test(html) && /<script src="\/js\/consent\.js" defer><\/script>/.test(html) && /data-consent-open/.test(html)),
+    'Every page needs the hidden cookie banner, the consent script and a footer button that reopens it.'
+  );
+  const cookiePage = await dist.readFile('dist/piskotki/index.html', 'utf8').catch(() => '');
+  expect(/ais_consent/.test(cookiePage) && /ais_sid/.test(cookiePage), 'The cookie page must name both cookies.');
+  const consentJs = await dist.readFile('public/js/consent.js', 'utf8');
+  expect(
+    /if \(!choice\) show\(false\);\s*else if \(choice\.analytics\) track\(\);/.test(consentJs) &&
+      /if \(analytics\) track\(\);/.test(consentJs) &&
+      (consentJs.match(/\btrack\(\);/g) ?? []).length === 2,
+    'The beacon must run only after the visitor allowed analytics.'
+  );
+  expect(/\.consent__panel\s*\{[^}]*box-shadow: var\(--shadow-popover\)/s.test(styles) && !/\.consent[^{]*\{[^}]*border:\s*1px/.test(styles), 'The cookie panel is a soft popover, without borders.');
 }
 
 

@@ -45,6 +45,7 @@ const PATHS = [
   '/ekipa/',
   '/pogosta-vprasanja/',
   '/kontakt/',
+  '/piskotki/',
 ];
 
 /* Common desktop, laptop, tablet and phone widths, plus the exact widths

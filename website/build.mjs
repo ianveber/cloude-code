@@ -78,6 +78,7 @@ import * as C from './content/content.mjs';
 import * as S from './content/showcase.mjs';
 import { loadCmsFromDir, organize, cmsItemPage, toListItem } from './src/cms.mjs';
 import { closingCta } from './src/closing-cta.mjs';
+import { cookies as COOKIES } from './content/cookies.mjs';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.join(ROOT, 'dist');
@@ -459,6 +460,50 @@ function contactPage() {
   };
 }
 
+function cookiesPage() {
+  const rows = COOKIES.table.map((c) => ({ term: c.name, definition: `${c.purpose} Traja ${c.duration}. ${c.kind}.` }));
+  const body = [
+    pageHero({ eyebrow: COOKIES.eyebrow, title: COOKIES.title, lead: COOKIES.lead }),
+    `<section class="section section--plain section--flush-top">
+  <div class="shell">
+    ${takeaway({ label: 'Na kratko', text: COOKIES.answer })}
+  </div>
+</section>`,
+    `<section class="section guide-body">
+  <div class="shell">
+    <div class="study__text">
+      ${COOKIES.sections
+        .map(
+          (s) => `
+      <section class="study__section" data-reveal>
+        <h2>${esc(s.title)}</h2>
+        ${s.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('\n')}
+      </section>`
+        )
+        .join('\n')}
+      <section class="study__section" data-reveal>
+        <h2>Seznam piškotkov</h2>
+        <div class="cookie-table">${definitionList(rows)}</div>
+        <p class="btn-row"><button class="btn btn--secondary" type="button" data-consent-open>Nastavitve piškotkov</button></p>
+      </section>
+    </div>
+  </div>
+</section>`,
+    closingCta,
+  ].join('\n');
+
+  return {
+    path: '/piskotki/',
+    title: COOKIES.metaTitle,
+    description: COOKIES.metaDescription,
+    keywords: COOKIES.keywords,
+    breadcrumbs: [HOME_CRUMB, { label: 'Piškotki', href: '/piskotki/' }],
+    priority: '0.3',
+    changefreq: 'yearly',
+    body,
+  };
+}
+
 function notFoundPage() {
   const body = `
 <section class="hero">
@@ -834,6 +879,7 @@ export function collectPages() {
     teamPage(),
     faqPage(),
     contactPage(),
+    cookiesPage(),
     notFoundPage(),
   ];
 }
@@ -1018,9 +1064,10 @@ async function build() {
     await cp(PUBLIC, DIST, { recursive: true });
   }
 
-  /* The admin's live preview renders Markdown with the same code as the build. */
+  /* IH's editor renders Markdown and cleans HTML with the same code as the build. */
   await mkdir(path.join(DIST, 'admin'), { recursive: true });
   await cp(path.join(ROOT, 'src', 'md.mjs'), path.join(DIST, 'admin', 'md.js'));
+  await cp(path.join(ROOT, 'src', 'clean-html.mjs'), path.join(DIST, 'admin', 'clean-html.js'));
 
   /* Comments and indentation carry nothing to the browser. */
   const css = (await readFile(path.join(ROOT, 'src', 'styles.css'), 'utf8'))
@@ -1137,8 +1184,14 @@ async function serve(port = Number(process.env.PORT) || 4321) {
     if (process.env.CMS_DRAFTS === '1') await rebuild();
   }
 
+  /* The page-view beacon records into data/analytics.json locally. */
+  const { createAnalytics, createHitHandler } = await import('./api/_lib/analytics.mjs');
+  const hit = createHitHandler({ analytics: createAnalytics({ root: ROOT }) });
+
   const handler = async (req, res) => {
-    if (admin && new URL(req.url, 'http://x').pathname.startsWith('/api/admin')) return admin(req, res);
+    const pathname = new URL(req.url, 'http://x').pathname;
+    if (admin && pathname.startsWith('/api/admin')) return admin(req, res);
+    if (pathname === '/api/hit') return hit(req, res);
     const raw = decodeURIComponent(new URL(req.url, 'http://x').pathname);
     const rel = raw.replace(/^\/+/, '');
     let file = path.resolve(DIST, rel);

@@ -24,8 +24,9 @@ const codeGlow = readFileSync(new URL('./code-glow.html', import.meta.url), 'utf
 /* ── Head ─────────────────────────────────────────────────────────────── */
 
 function head(page) {
-  const canonical = url(page.path);
+  const canonical = page.canonical ?? url(page.path);
   const ogImage = url(page.ogImage ?? site.brand.ogImage);
+  const ogDescription = page.ogDescription ?? page.description;
 
   return join([
     '<meta charset="utf-8">',
@@ -37,7 +38,9 @@ function head(page) {
     page.noindex ? null : `<link rel="canonical" href="${canonical}">`,
     page.noindex
       ? '<meta name="robots" content="noindex, follow">'
-      : '<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">',
+      : page.nofollow
+        ? '<meta name="robots" content="index, nofollow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">'
+        : '<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">',
     `<meta name="author" content="${esc(site.legalName)}">`,
     page.keywords?.length ? `<meta name="keywords" content="${esc(page.keywords.join(', '))}">` : null,
 
@@ -46,7 +49,7 @@ function head(page) {
     `<meta property="og:site_name" content="${esc(site.name)}">`,
     `<meta property="og:locale" content="${site.locale}">`,
     `<meta property="og:title" content="${esc(page.ogTitle ?? page.title)}">`,
-    `<meta property="og:description" content="${esc(page.description)}">`,
+    `<meta property="og:description" content="${esc(ogDescription)}">`,
     `<meta property="og:url" content="${canonical}">`,
     `<meta property="og:image" content="${ogImage}">`,
     `<meta property="og:image:width" content="${page.ogImageWidth ?? 1200}">`,
@@ -58,7 +61,7 @@ function head(page) {
     /* Twitter / X */
     '<meta name="twitter:card" content="summary_large_image">',
     `<meta name="twitter:title" content="${esc(page.ogTitle ?? page.title)}">`,
-    `<meta name="twitter:description" content="${esc(page.description)}">`,
+    `<meta name="twitter:description" content="${esc(ogDescription)}">`,
     `<meta name="twitter:image" content="${ogImage}">`,
 
     /* Icons + theme */
@@ -248,10 +251,41 @@ function footer() {
     <p class="footer-wordmark" data-footer-mark aria-hidden="true">${esc(site.footer.wordmark)}</p>
     <div class="footer-bottom">
       <span>&copy; ${site.copyrightYear} ${esc(site.legalName)}. Vse pravice pridržane.</span>
+      <span class="footer-legal"><a href="/piskotki/">Piškotki</a><button class="footer-consent" type="button" data-consent-open>Nastavitve piškotkov</button></span>
       <span>${esc(site.contact.city)}, ${esc(site.contact.country)}</span>
     </div>
   </div>
 </footer>`;
+}
+
+/* ── Cookie choice ─────────────────────────────────────────────────────
+   Hidden until consent.js finds no stored choice. Two buttons decide at
+   once; Nastavitve opens the one switch there is. */
+
+function consent() {
+  return `
+<div class="consent" data-consent hidden role="dialog" aria-modal="false" aria-labelledby="consent-title">
+  <div class="consent__panel">
+    <p class="consent__title" id="consent-title">Piškotki</p>
+    <p class="consent__text">Nujni piškotek si zapomni vašo izbiro. Če dovolite še analitiko, štejemo oglede strani brez oglaševalskih sledilcev in brez prodaje podatkov. <a href="/piskotki/">Kaj točno shranimo</a></p>
+    <div class="consent__options" data-consent-options hidden>
+      <div class="consent__row">
+        <span class="consent__label"><b>Nujni</b><span>Vedno vklopljeni. Zapomnijo si izbiro.</span></span>
+        <span class="consent__fixed">Vklopljeno</span>
+      </div>
+      <label class="consent__row">
+        <span class="consent__label"><b>Analitika</b><span>Šteje oglede strani. Brez oglasov.</span></span>
+        <input class="consent__switch" type="checkbox" data-consent-analytics checked>
+      </label>
+    </div>
+    <div class="consent__actions">
+      <button class="btn btn--primary" type="button" data-consent-accept>Sprejmi vse</button>
+      <button class="btn btn--secondary" type="button" data-consent-necessary>Samo nujni</button>
+      <button class="btn btn--secondary" type="button" data-consent-settings>Nastavitve</button>
+      <button class="btn btn--primary" type="button" data-consent-save hidden>Shrani izbiro</button>
+    </div>
+  </div>
+</div>`;
 }
 
 /* ── Content Security Policy ──────────────────────────────────────────────
@@ -318,7 +352,9 @@ ${breadcrumbs(page)}
 ${page.body}
 </main>
 ${footer()}
+${consent()}
 <script src="/js/motion.js" defer></script>
+<script src="/js/consent.js" defer></script>
 </body>
 </html>
 `;

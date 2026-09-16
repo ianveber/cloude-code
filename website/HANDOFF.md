@@ -461,9 +461,10 @@ Vercel project **root directory = `website/`**.
 `vercel.json`: `npm run build` → `dist/`, trailing slashes, static headers,
 one serverless function for the admin API (`api/admin/[...route].js`).
 
-Environment variables (only the admin needs them; the site builds without):
+Environment variables (only IH needs them; the site builds without):
 `ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET`, `GITHUB_TOKEN`, `GITHUB_REPO`,
-`GITHUB_BRANCH`, `CMS_ROOT`. What each is and how to make them: `ADMIN.md`.
+`GITHUB_BRANCH`, `CMS_ROOT`, and for analytics `UPSTASH_REDIS_REST_URL` and
+`UPSTASH_REDIS_REST_TOKEN`. What each is and how to make them: `IH.md`.
 
 After a production deploy:
 
@@ -493,32 +494,42 @@ Known implementation notes:
 
 ---
 
-## Admin (2026-09-16)
+## IH, the workspace behind the site (2026-09-16)
 
 Ian asked for "very detailed software for the backend... nobody else has
-access except us" so the team can add news, blog posts, events and pages
-with text, pictures and SEO fields, keep drafts, upload, publish and link
-subpages. It is `ADMIN.md` in full; the short version:
+access except us", then named it IH and asked for cookies with analytics
+shown inside it, a different design, a one-page editor with the category
+panel on the right, richer SEO, picture editing and free text editing. It
+is `IH.md` in full; the short version:
 
-- `/admin/` is a small private app (`public/admin/`), password-gated,
-  `noindex`, disallowed in `robots.txt`, linked from nowhere. The design
-  audit fails if a public page links to it.
+- `/admin/` is the IH app (`public/admin/`): ink rail, list drawer, the
+  page as a document in the middle, the panel on the right (Objava, Kje na
+  spletni strani, Slike, Besedilo, SEO, Povezano, Ogledi). Password-gated,
+  `noindex`, disallowed in `robots.txt`, linked from nowhere; the design
+  audit fails if a public page links to it. Its stylesheet is its own
+  (`ih.css`), so the site's design rules do not apply to it.
+- Text is HTML from a contenteditable editor (`editor.js`), cleaned with an
+  allow-list (`src/clean-html.mjs`) in the browser, in the API and in the
+  build. Pictures go through `picture-tool.js` (crop, rotate, size,
+  quality) and are stored in four variants.
 - `/api/admin/*` is one Node function (`api/_lib/handler.mjs`). Locally
   (`npm run admin`) it writes files and rebuilds; on Vercel every save is a
-  commit on the deployed branch through the GitHub API, so publishing is
-  deploying.
-- Content is one JSON per item in `content/cms/<collection>/`, pictures in
-  `public/uploads/<year>/` (four sizes). `src/cms.mjs` is the model, the
-  checks and the page template; `src/md.mjs` renders the Markdown, in the
-  build and in the editor's live preview. Drafts never reach a production
-  build; `CMS_DRAFTS=1` (set by `--admin`) builds them as noindex pages.
-- `npm run admin:check` walks the API end to end and is part of
-  `npm run check`.
+  commit on the deployed branch through the GitHub API.
+- Cookies: every page has the banner from `src/layout.mjs` and
+  `public/js/consent.js`; the choice lives in `ais_consent`. With consent the
+  page posts a beacon to `/api/hit` (`api/_lib/analytics.mjs`), counted per
+  day in Upstash Redis on Vercel or `data/analytics.json` locally, and IH
+  shows the numbers. `/piskotki/` (`content/cookies.mjs`) explains it.
+- Content is one JSON per item in `content/cms/<collection>/`, categories
+  in `content/cms/categories.json`, pictures in `public/uploads/<year>/`.
+  `src/cms.mjs` is the model, the checks and the page template. Drafts
+  never reach a production build.
+- `npm run admin:check` walks the API, the beacon and the analytics end to
+  end and is part of `npm run check`.
 
-The rules from the rest of this file still hold for admin content: it uses
-the same hero, bands, pictures and structured data as hand-written pages.
-Nothing written in the admin should name a client company either; the
-marquee stays the only place.
+The rules from the rest of this file still hold for content written in IH:
+same hero, bands, pictures and structured data as hand-written pages, no
+client company names, no dashes in copy.
 
 ## Adding a page
 

@@ -1,13 +1,16 @@
 /**
- * The content layer behind the admin: what a news item, blog post, event or
- * page looks like as data, how it is checked, and how it becomes a page.
+ * The content layer behind IH: what a news item, blog post, event or page
+ * looks like as data, how it is checked, and how it becomes a page.
  *
  * Items live as one JSON file each in content/cms/<collection>/<slug>.json.
- * The admin API writes them (locally or as commits to the repository); the
- * build reads them next to the hand-written content and renders a page per
- * item with the same templates the rest of the site uses. Drafts are left
- * out of the build unless CMS_DRAFTS=1 (the local admin preview), and even
- * then they are noindex.
+ * IH's API writes them (locally or as commits to the repository); the build
+ * reads them next to the hand-written content and renders a page per item
+ * with the same templates the rest of the site uses. Drafts are left out of
+ * the build unless CMS_DRAFTS=1 (the local IH preview), and then noindex.
+ *
+ * Bodies are HTML from IH's editor (format "html", cleaned on the way in
+ * and on the way out) or Markdown from the first version (format
+ * "markdown"); both render through the same picture helper.
  */
 
 import { readdir, readFile } from 'node:fs/promises';
@@ -16,9 +19,10 @@ import path from 'node:path';
 
 import { site } from '../content/site.mjs';
 import { esc, each, absolute } from './html.mjs';
-import { pageHero } from './sections.mjs';
-import { IDS } from './schema.mjs';
+import { pageHero, faqSection } from './sections.mjs';
+import { IDS, faqNode } from './schema.mjs';
 import { renderMarkdown, markdownToText } from './md.mjs';
+import { cleanHtml, htmlToText } from './clean-html.mjs';
 
 const url = (p) => absolute(site.origin, p);
 
@@ -30,7 +34,7 @@ export const COLLECTIONS = {
     singular: 'Novica',
     crumb: { label: 'Novice', href: '/novice/' },
     back: 'Vse novice',
-    article: true,
+    article: 'NewsArticle',
   },
   blog: {
     key: 'blog',
@@ -39,7 +43,7 @@ export const COLLECTIONS = {
     singular: 'Zapis',
     crumb: { label: 'Blog', href: '/blog/' },
     back: 'Vsi zapisi',
-    article: true,
+    article: 'Article',
   },
   dogodki: {
     key: 'dogodki',
@@ -62,11 +66,22 @@ export const COLLECTIONS = {
 
 export const COLLECTION_KEYS = Object.keys(COLLECTIONS);
 
+/* The categories a list shows under a title. Editors may add more; the
+   defaults are the ones the hand-written items already use. */
+export const DEFAULT_CATEGORIES = {
+  novice: ['Spletna stran', 'Stranke', 'Izdelki', 'Blog', 'Podjetje'],
+  blog: ['Osnove', 'Nasvet', 'Kako gradimo', 'Primer', 'Vodič'],
+  dogodki: ['Za vodstvo', 'Za ekipo', 'Za vse'],
+  strani: ['Stran', 'Storitev', 'Ponudba', 'Pravno'],
+};
+
+export const SCHEMA_TYPES = ['auto', 'Article', 'NewsArticle', 'BlogPosting', 'Event', 'WebPage', 'none'];
+
 /* First path segments the site already uses; a page slug may not take them. */
 export const RESERVED_SLUGS = new Set([
-  'admin', 'api', 'uploads', 'pictures', 'js', 'fonts', 'brand', 'clients', 'video', 'team',
-  'produkti', 'studije-primerov', 'vodici', 'storitve', 'proces', 'novice', 'dogodki', 'blog',
-  'o-nas', 'ekipa', 'pogosta-vprasanja', 'kontakt', 'sitemap.xml', 'robots.txt', 'llms.txt', 'styles.css', '404',
+  'admin', 'ih', 'api', 'uploads', 'pictures', 'js', 'fonts', 'brand', 'clients', 'video', 'team', 'data',
+  'produkti', 'studije-primerov', 'vodici', 'storitve', 'proces', 'novice', 'dogodki', 'blog', 'piskotki',
+  'o-podjetju', 'o-nas', 'ekipa', 'pogosta-vprasanja', 'kontakt', 'sitemap.xml', 'robots.txt', 'llms.txt', 'styles.css', '404',
 ]);
 
 export const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -97,6 +112,13 @@ export function dateLabel(iso) {
 const str = (v, max = 5000) => String(v ?? '').replace(/\r\n?/g, '\n').trim().slice(0, max);
 const bool = (v) => v === true || v === 'true' || v === 1;
 
+/** Plain text of an item's body, whatever its format. */
+export function bodyText(item) {
+  return item.format === 'html' ? htmlToText(item.body) : markdownToText(item.body);
+}
+
+export const wordCount = (text) => (String(text ?? '').match(/[\p{L}\p{N}]+/gu) ?? []).length;
+
 /* ── Normalisation and checks ─────────────────────────────────────────── */
 
 /**
@@ -114,14 +136,21 @@ export function normalizeItem(raw, collectionKey) {
   const slug = str(src.slug || slugify(title), 80);
   const status = src.status === 'published' ? 'published' : 'draft';
   const date = str(src.date, 10) || new Date().toISOString().slice(0, 10);
+  const format = src.format === 'html' ? 'html' : 'markdown';
+  const body = format === 'html' ? cleanHtml(str(src.body, 400000)) : str(src.body, 200000);
   const picture = normalizePicture(src.picture);
-  const seo = normalizeSeo(src.seo, title, str(src.summary, 400));
+  const summary = str(src.summary, 400);
+  const seo = normalizeSeo(src.seo, title, summary);
   const links = Array.isArray(src.links)
     ? src.links
         .map((l) => ({ label: str(l?.label, 120), href: str(l?.href, 500) }))
         .filter((l) => l.label && l.href && /^(https?:\/\/|\/|mailto:|tel:)/.test(l.href))
         .slice(0, 20)
     : [];
+  const cta =
+    src.cta && typeof src.cta === 'object' && str(src.cta.label, 60) && /^(https?:\/\/|\/|mailto:|tel:)/.test(str(src.cta.href, 300))
+      ? { label: str(src.cta.label, 60), href: str(src.cta.href, 300) }
+      : null;
 
   const item = {
     collection: collectionKey,
@@ -129,11 +158,13 @@ export function normalizeItem(raw, collectionKey) {
     parent: str(src.parent, 80),
     status,
     title,
-    kicker: str(src.kicker, 60),
-    summary: str(src.summary, 400),
+    kicker: str(src.kicker ?? src.category, 60),
+    summary,
     date,
-    body: str(src.body, 200000),
+    format,
+    body,
     picture,
+    cta,
     seo,
     links,
     createdAt: str(src.createdAt, 40) || new Date().toISOString(),
@@ -161,13 +192,15 @@ export function normalizeItem(raw, collectionKey) {
 
   /* soft problems: fine for a draft, not for publishing */
   if (!item.summary) problems.push('Dodajte kratek povzetek; prikaže se na seznamu in v iskalnikih.');
-  if (!markdownToText(item.body)) problems.push('Besedilo je prazno.');
+  if (!bodyText(item)) problems.push('Besedilo je prazno.');
   if (item.picture && !item.picture.alt) problems.push('Slika potrebuje opis (za bralnike zaslona in iskalnike).');
   if (!seo.metaDescription) problems.push('Dodajte meta opis.');
   else if (seo.metaDescription.length > LIMITS.descMax) problems.push(`Meta opis je predolg (${seo.metaDescription.length} znakov, največ ${LIMITS.descMax}).`);
   else if (seo.metaDescription.length < LIMITS.descMin) problems.push(`Meta opis je kratek (${seo.metaDescription.length} znakov, priporočeno vsaj ${LIMITS.descMin}).`);
   if (seo.metaTitle.length > LIMITS.titleMax + 10) problems.push(`Meta naslov je predolg (${seo.metaTitle.length} znakov).`);
   if (collection.event && !item.event.dateLabel && !item.date) problems.push('Dogodek potrebuje datum ali oznako termina.');
+  if (format === 'html' && /<img\b(?![^>]*\balt="[^"]+")/i.test(body)) problems.push('Vsaka slika v besedilu potrebuje opis.');
+  for (const f of seo.faq) if (!f.q || !f.a) problems.push('Vsako vprašanje v razdelku Pogosta vprašanja potrebuje odgovor.');
 
   return { item, errors, problems };
 }
@@ -179,6 +212,7 @@ function normalizePicture(p) {
   return {
     src,
     alt: str(p.alt, 300),
+    caption: str(p.caption, 300),
     width: Number(p.width) > 0 ? Math.round(Number(p.width)) : 1600,
     height: Number(p.height) > 0 ? Math.round(Number(p.height)) : 1000,
     upload: src.startsWith('/uploads/'),
@@ -195,13 +229,41 @@ function normalizeSeo(s, title, summary) {
         .map((k) => k.trim())
         .filter(Boolean)
         .slice(0, 12);
+  const canonical = str(seo.canonical, 300);
+  const faq = Array.isArray(seo.faq)
+    ? seo.faq
+        .map((f) => ({ q: str(f?.q, 200), a: str(f?.a, 1500) }))
+        .filter((f) => f.q || f.a)
+        .slice(0, 20)
+    : [];
   return {
     metaTitle: str(seo.metaTitle, 120) || (title ? `${title} | ${site.name}` : ''),
     metaDescription: str(seo.metaDescription, 400) || summary.slice(0, LIMITS.descMax),
     keywords,
+    ogTitle: str(seo.ogTitle, 120),
+    ogDescription: str(seo.ogDescription, 300),
     ogImage: str(seo.ogImage, 300),
+    canonical: /^https?:\/\/[^\s]+$/.test(canonical) ? canonical : '',
     noindex: bool(seo.noindex),
+    nofollow: bool(seo.nofollow),
+    schemaType: SCHEMA_TYPES.includes(seo.schemaType) ? seo.schemaType : 'auto',
+    faq,
   };
+}
+
+/* ── Categories ───────────────────────────────────────────────────────── */
+
+export function normalizeCategories(raw) {
+  const out = {};
+  for (const key of COLLECTION_KEYS) {
+    const list = Array.isArray(raw?.[key]) ? raw[key] : DEFAULT_CATEGORIES[key];
+    const seen = new Set();
+    out[key] = list
+      .map((c) => str(c, 40))
+      .filter((c) => c && !seen.has(c.toLowerCase()) && seen.add(c.toLowerCase()))
+      .slice(0, 40);
+  }
+  return out;
 }
 
 /* ── Paths and relations ──────────────────────────────────────────────── */
@@ -249,7 +311,7 @@ export function parentChain(item, all) {
   return chain;
 }
 
-/* ── Loading from disk (the build and the local admin) ────────────────── */
+/* ── Loading from disk (the build and the local IH) ───────────────────── */
 
 export async function loadCmsFromDir(root, { drafts = false } = {}) {
   const dir = path.join(root, 'content', 'cms');
@@ -291,19 +353,27 @@ const SIZES = {
   third: '(min-width: 1100px) 320px, (min-width: 768px) 45vw, calc(100vw - 2rem)',
 };
 
-/** Responsive markup for a picture uploaded through the admin. */
+/** Responsive markup for a picture uploaded through IH. */
 export function uploadPicture(picture, sizes = SIZES.full, { eager = false } = {}) {
   const src = esc(picture.src);
-  const webp = picture.webp !== false ? `<source srcset="${src}-800.webp 800w, ${src}-1600.webp 1600w" sizes="${sizes}" type="image/webp">` : '';
+  const big = Number(picture.width) > 0 ? Math.round(picture.width) : 1600;
+  const small = Math.min(800, big);
+  const webp = picture.webp !== false ? `<source srcset="${src}-800.webp ${small}w, ${src}-1600.webp ${big}w" sizes="${sizes}" type="image/webp">` : '';
   return `
         <picture>
           ${webp}
-          <img src="${src}-1600.jpg" srcset="${src}-800.jpg 800w, ${src}-1600.jpg 1600w" sizes="${sizes}" alt="${esc(picture.alt)}"
+          <img src="${src}-1600.jpg" srcset="${src}-800.jpg ${small}w, ${src}-1600.jpg ${big}w" sizes="${sizes}" alt="${esc(picture.alt)}"
             width="${picture.width}" height="${picture.height}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">
         </picture>`;
 }
 
 export const pictureUrl = (picture) => (picture.upload ? `${picture.src}-1600.jpg` : `${picture.src}.jpg`);
+
+/** The body as HTML for the page: cleaned HTML or rendered Markdown. */
+export function renderBody(item, { picture } = {}) {
+  const pic = picture ?? ((src, alt) => uploadPicture({ src, alt, width: 1600, height: 1000, upload: true }, SIZES.full));
+  return item.format === 'html' ? cleanHtml(item.body, { picture: pic }) : renderMarkdown(item.body, { picture: pic });
+}
 
 /** The shape the list templates (news list, event list, blog cards) read. */
 export function toListItem(item) {
@@ -327,9 +397,17 @@ export function toListItem(item) {
   return base;
 }
 
-function articleNode(item, page) {
+function schemaTypeFor(item) {
+  const c = COLLECTIONS[item.collection];
+  if (item.seo.schemaType !== 'auto') return item.seo.schemaType;
+  if (c.article) return c.article;
+  if (c.event) return 'Event';
+  return 'WebPage';
+}
+
+function articleNode(item, page, type) {
   return {
-    '@type': item.collection === 'novice' ? 'NewsArticle' : 'Article',
+    '@type': type,
     '@id': `${url(page.path)}#article`,
     headline: item.title,
     description: item.seo.metaDescription,
@@ -342,12 +420,14 @@ function articleNode(item, page) {
     author: { '@id': IDS.organization },
     publisher: { '@id': IDS.organization },
     keywords: item.seo.keywords.join(', '),
+    ...(item.kicker ? { articleSection: item.kicker } : {}),
     isPartOf: { '@id': IDS.website },
   };
 }
 
 function eventNode(item, page) {
-  const online = /daljav|videoklic|online|splet/i.test(item.event.mode ?? '');
+  const ev = item.event ?? {};
+  const online = /daljav|videoklic|online|splet/i.test(ev.mode ?? '');
   return {
     '@type': 'Event',
     '@id': `${url(page.path)}#event`,
@@ -360,7 +440,7 @@ function eventNode(item, page) {
     eventStatus: 'https://schema.org/EventScheduled',
     location: online
       ? { '@type': 'VirtualLocation', url: url(page.path) }
-      : { '@type': 'Place', name: item.event.place || site.contact.city, address: { '@type': 'PostalAddress', addressLocality: site.contact.city, addressCountry: site.contact.countryCode } },
+      : { '@type': 'Place', name: ev.place || site.contact.city, address: { '@type': 'PostalAddress', addressLocality: site.contact.city, addressCountry: site.contact.countryCode } },
     organizer: { '@id': IDS.organization },
     image: url(item.picture ? pictureUrl(item.picture) : site.brand.ogImage),
   };
@@ -381,8 +461,7 @@ export function cmsItemPage(item, { closingCta, all, preview = false }) {
   const chain = parentChain(item, all);
   const href = item.href ?? itemPath(item, all);
   const label = item.dateLabel ?? dateLabel(item.date);
-  const picture = (src, alt) => uploadPicture({ src, alt, width: 1600, height: 1000, upload: true }, SIZES.full);
-  const bodyHtml = renderMarkdown(item.body, { picture });
+  const bodyHtml = renderBody(item);
 
   const facts = item.event
     ? rows([
@@ -416,8 +495,12 @@ export function cmsItemPage(item, { closingCta, all, preview = false }) {
       </section>`
     : '';
 
+  const faq = item.seo.faq.filter((f) => f.q && f.a);
+  const faqHtml = faq.length ? faqSection({ eyebrow: '', title: 'Pogosta vprašanja', lead: '' }, { items: faq }) : '';
+
   const backHref = chain.length ? chain[chain.length - 1].href : collection.base;
   const backLabel = chain.length ? chain[chain.length - 1].title : collection.back;
+  const cta = item.cta ?? { label: 'Rezervirajte posvet', href: '/kontakt/' };
 
   const body = [
     preview ? '<div class="cms-preview-bar" role="status">Predogled. Tako bo stran videti, ko jo objavite.</div>' : '',
@@ -425,11 +508,17 @@ export function cmsItemPage(item, { closingCta, all, preview = false }) {
       eyebrow: item.kicker || collection.singular,
       title: item.title,
       lead: item.summary,
-      cta: { label: 'Rezervirajte posvet', href: '/kontakt/' },
+      cta,
     }),
     `<section class="section guide-body cms-page">
   <div class="shell">
-    ${item.picture ? `<figure class="study__figure study__figure--lead" data-reveal>${item.picture.upload ? uploadPicture(item.picture, SIZES.full, { eager: true }) : legacyPicture(item.picture)}</figure>` : ''}
+    ${
+      item.picture
+        ? `<figure class="study__figure study__figure--lead" data-reveal>${item.picture.upload ? uploadPicture(item.picture, SIZES.full, { eager: true }) : legacyPicture(item.picture)}${
+            item.picture.caption ? `<figcaption>${esc(item.picture.caption)}</figcaption>` : ''
+          }</figure>`
+        : ''
+    }
     <div class="study__text cms-body">
       ${item.collection !== 'strani' ? `<p class="cms-date">${item.event ? 'Termin' : 'Objavljeno'} <time datetime="${esc(item.date)}">${esc(label)}</time></p>` : ''}
       ${facts}
@@ -440,6 +529,7 @@ export function cmsItemPage(item, { closingCta, all, preview = false }) {
     </div>
   </div>
 </section>`,
+    faqHtml,
     closingCta,
   ].join('\n');
 
@@ -448,19 +538,24 @@ export function cmsItemPage(item, { closingCta, all, preview = false }) {
   for (const p of chain) crumbs.push({ label: p.title, href: p.href });
   crumbs.push({ label: item.title, href });
 
+  const type = schemaTypeFor(item);
   const page = {
     path: href,
     title: item.seo.metaTitle || `${item.title} | ${site.name}`,
     description: item.seo.metaDescription || item.summary,
     keywords: item.seo.keywords,
     breadcrumbs: crumbs,
-    ogType: collection.article ? 'article' : 'website',
+    ogType: /Article|BlogPosting/.test(type) ? 'article' : 'website',
     noindex: item.seo.noindex || item.status !== 'published',
+    nofollow: item.seo.nofollow,
     changefreq: 'monthly',
     priority: '0.6',
     cms: true,
     body,
   };
+  if (item.seo.ogTitle) page.ogTitle = item.seo.ogTitle;
+  if (item.seo.ogDescription) page.ogDescription = item.seo.ogDescription;
+  if (item.seo.canonical) page.canonical = item.seo.canonical;
   if (item.seo.ogImage) page.ogImage = item.seo.ogImage;
   else if (item.picture) {
     page.ogImage = pictureUrl(item.picture);
@@ -472,7 +567,10 @@ export function cmsItemPage(item, { closingCta, all, preview = false }) {
   if (item.updatedAt) page.dateModified = item.updatedAt.slice(0, 10);
   if (page.datePublished && page.dateModified && page.dateModified < page.datePublished) page.dateModified = page.datePublished;
 
-  page.schema = collection.article ? [(p) => articleNode(item, p)] : collection.event ? [(p) => eventNode(item, p)] : [];
+  page.schema = [];
+  if (/Article|BlogPosting/.test(type)) page.schema.push((p) => articleNode(item, p, type));
+  else if (type === 'Event') page.schema.push((p) => eventNode(item, p));
+  if (faq.length) page.schema.push(faqNode(faq, href));
   return page;
 }
 
@@ -485,7 +583,7 @@ function legacyPicture(picture) {
         </picture>`;
 }
 
-/* ── The index the admin lists from ───────────────────────────────────── */
+/* ── The index IH lists from ──────────────────────────────────────────── */
 
 export function indexEntry(item) {
   return {

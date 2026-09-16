@@ -1,5 +1,5 @@
 /**
- * The admin API. One handler serves every route under /api/admin, on Vercel
+ * IH's API. One handler serves every route under /api/admin, on Vercel
  * (api/admin/[...route].js) and on the local dev server (build.mjs --serve
  * --admin). Everything except login needs a valid session cookie; every
  * change goes through the store, which is either the local folder or a
@@ -11,15 +11,18 @@
  *   GET    /me
  *   GET    /status
  *   GET    /pages                       every page of the site, for link pickers
+ *   GET    /categories                  { novice: [...], blog: [...], ... }
+ *   PUT    /categories                  the same shape back
  *   GET    /items?collection=blog       index entries
  *   GET    /items/:c/:slug              the full item
- *   PUT    /items/:c/:slug[?from=old]   save (create, update or rename)
+ *   PUT    /items/:c/:slug[?from=old&fromCollection=c2]   save, rename or move
  *   POST   /items/:c/:slug/status       { status }
  *   DELETE /items/:c/:slug
  *   POST   /upload                      { name, alt, width, height, webp, files: [{ suffix, data }] }
  *   GET    /media
  *   DELETE /media                       { src }
  *   POST   /preview                     { item }  → text/html of the page as it would publish
+ *   GET    /analytics?days=30           page views, sessions, pages, referrers, devices, countries
  */
 
 import { randomBytes } from 'node:crypto';
@@ -29,7 +32,9 @@ import { closingCta } from '../../src/closing-cta.mjs';
 import {
   COLLECTIONS,
   COLLECTION_KEYS,
+  DEFAULT_CATEGORIES,
   normalizeItem,
+  normalizeCategories,
   organize,
   cmsItemPage,
   indexEntry,
@@ -41,22 +46,25 @@ import { readBody, json, fail, parseCookies, cookie, isSecure, clientIp, sameOri
 import { verifyPassword, createSession, verifySession, loginAllowed, noteFailure, noteSuccess } from './auth.mjs';
 import { createLocalStore } from './store-local.mjs';
 import { createGithubStore } from './store-github.mjs';
+import { createAnalytics } from './analytics.mjs';
 
 const COOKIE = 'ais_admin';
 const INDEX_PATH = 'content/cms/index.json';
+const CATEGORIES_PATH = 'content/cms/categories.json';
 const UPLOAD_SUFFIXES = new Set(['-800.webp', '-1600.webp', '-800.jpg', '-1600.jpg']);
 const MAX_FILE = 3 * 1024 * 1024;
 
-export function createAdminHandler({ root, store: storeMode, onChange, env = process.env, collectPages = null } = {}) {
+export function createAdminHandler({ root, store: storeMode, onChange, env = process.env, collectPages = null, analytics = null } = {}) {
   const local = storeMode === 'local' || (!env.GITHUB_TOKEN && !env.VERCEL);
   const store = local
     ? createLocalStore({ root, onChange })
     : createGithubStore({ token: env.GITHUB_TOKEN, repo: env.GITHUB_REPO, branch: env.GITHUB_BRANCH, subdir: env.CMS_ROOT ?? 'website' });
+  const stats = analytics ?? createAnalytics({ root: local ? root : null, env });
 
   const passwordHash = env.ADMIN_PASSWORD_HASH ?? '';
   const secret = env.ADMIN_SESSION_SECRET || (local ? randomBytes(32).toString('base64url') : '');
 
-  /* ── index ─────────────────────────────────────────────────────────── */
+  /* ── index and categories ──────────────────────────────────────────── */
 
   async function loadIndex() {
     const text = await store.read(INDEX_PATH);
@@ -82,6 +90,19 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
       ) + '\n',
   });
 
+  async function loadCategories() {
+    const text = await store.read(CATEGORIES_PATH);
+    let raw = null;
+    try {
+      raw = text ? JSON.parse(text) : null;
+    } catch {
+      raw = null;
+    }
+    return normalizeCategories(raw ?? DEFAULT_CATEGORIES);
+  }
+
+  const categoriesFile = (cats) => ({ path: CATEGORIES_PATH, content: JSON.stringify(cats, null, 2) + '\n' });
+
   const itemPath = (c, slug) => `content/cms/${c}/${slug}.json`;
 
   async function readItem(c, slug) {
@@ -101,7 +122,7 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
   const authed = (req) => verifySession(parseCookies(req)[COOKIE], secret);
 
   async function login(req, res) {
-    if (!passwordHash) return fail(res, 503, 'Geslo za urejanje še ni nastavljeno. Glejte ADMIN.md.', { setup: true });
+    if (!passwordHash) return fail(res, 503, 'Geslo za IH še ni nastavljeno. Glejte IH.md.', { setup: true });
     const ip = clientIp(req);
     if (!loginAllowed(ip)) return fail(res, 429, 'Preveč poskusov. Poskusite čez 15 minut.');
     const body = await readBody(req);
@@ -126,7 +147,11 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
     const idx = await loadIndex();
     const c = query.get('collection');
     const items = c ? idx.items.filter((i) => i.collection === c) : idx.items;
-    return json(res, { ok: true, items, collections: COLLECTION_KEYS.map((k) => ({ key: k, label: COLLECTIONS[k].label, singular: COLLECTIONS[k].singular, base: COLLECTIONS[k].base })) });
+    return json(res, {
+      ok: true,
+      items,
+      collections: COLLECTION_KEYS.map((k) => ({ key: k, label: COLLECTIONS[k].label, singular: COLLECTIONS[k].singular, base: COLLECTIONS[k].base })),
+    });
   }
 
   async function getItem(res, c, slug) {
@@ -142,9 +167,11 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
     if (!parseCollection(c)) return fail(res, 404, 'Neznana zbirka.');
     const body = await readBody(req);
     const raw = { ...(body.item ?? body), collection: c, slug };
-    const existing = await readItem(c, slug);
     const from = query.get('from');
-    const previous = existing ?? (from && SLUG_RE.test(from) && from !== slug ? await readItem(c, from) : null);
+    const fromCollection = parseCollection(query.get('fromCollection')) ?? c;
+    const moving = Boolean(from && SLUG_RE.test(from) && (from !== slug || fromCollection !== c));
+    const existing = await readItem(c, slug);
+    const previous = existing ?? (moving ? await readItem(fromCollection, from) : null);
 
     if (previous) {
       raw.createdAt = previous.createdAt ?? raw.createdAt;
@@ -156,7 +183,7 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
     if (item.status === 'published' && !item.publishedAt) item.publishedAt = new Date().toISOString();
 
     const idx = await loadIndex();
-    if (!existing && from !== slug && idx.items.some((i) => i.collection === c && i.slug === slug)) return fail(res, 409, 'Ta naslov URL že obstaja.');
+    if (!existing && idx.items.some((i) => i.collection === c && i.slug === slug)) return fail(res, 409, 'Ta naslov URL že obstaja.');
     if (item.parent) {
       const parent = idx.items.find((i) => i.collection === c && i.slug === item.parent);
       if (!parent) return fail(res, 400, 'Nadrejena stran ne obstaja.');
@@ -166,23 +193,35 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
     const files = [itemFile(item)];
     let idxItems = idx.items.filter((i) => !(i.collection === c && i.slug === slug));
 
-    /* rename: drop the old file, move the children along */
-    if (from && from !== slug && SLUG_RE.test(from) && previous) {
-      files.push({ path: itemPath(c, from), delete: true });
-      idxItems = idxItems.filter((i) => !(i.collection === c && i.slug === from));
-      for (const child of idx.items.filter((i) => i.collection === c && i.parent === from)) {
-        const full = await readItem(c, child.slug);
+    /* rename or move: drop the old file, move the children along (a move to
+       another collection leaves the children where they were, without parent) */
+    if (moving && previous) {
+      files.push({ path: itemPath(fromCollection, from), delete: true });
+      idxItems = idxItems.filter((i) => !(i.collection === fromCollection && i.slug === from));
+      for (const child of idx.items.filter((i) => i.collection === fromCollection && i.parent === from)) {
+        const full = await readItem(fromCollection, child.slug);
         if (!full) continue;
-        full.parent = slug;
+        full.parent = fromCollection === c ? slug : '';
         files.push(itemFile(full));
-        idxItems = idxItems.map((i) => (i.collection === c && i.slug === child.slug ? { ...i, parent: slug } : i));
+        idxItems = idxItems.map((i) => (i.collection === fromCollection && i.slug === child.slug ? { ...i, parent: full.parent } : i));
+      }
+    }
+
+    /* a new category is remembered for next time */
+    let catFiles = [];
+    if (item.kicker) {
+      const cats = await loadCategories();
+      if (!cats[c].some((k) => k.toLowerCase() === item.kicker.toLowerCase())) {
+        cats[c].push(item.kicker);
+        catFiles = [categoriesFile(normalizeCategories(cats))];
       }
     }
 
     idxItems.push(indexEntry(item));
-    files.push(indexFile({ ...idx, items: idxItems }));
+    files.push(indexFile({ ...idx, items: idxItems }), ...catFiles);
     const verb = item.status === 'published' ? 'objavi' : 'shrani osnutek';
-    const result = await store.write(files, `cms: ${verb} ${c}/${slug}${from && from !== slug ? ` (prej ${from})` : ''}`);
+    const note = moving ? ` (prej ${fromCollection}/${from})` : '';
+    const result = await store.write(files, `ih: ${verb} ${c}/${slug}${note}`);
     return json(res, { ok: true, item, problems, commit: result.commit, commitUrl: result.url ?? null, href: pathOf(item, idxItems) });
   }
 
@@ -199,7 +238,7 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
     const idx = await loadIndex();
     const idxItems = idx.items.filter((i) => !(i.collection === c && i.slug === slug));
     idxItems.push(indexEntry(item));
-    const result = await store.write([itemFile(item), indexFile({ ...idx, items: idxItems })], `cms: ${status === 'published' ? 'objavi' : 'umakni'} ${c}/${slug}`);
+    const result = await store.write([itemFile(item), indexFile({ ...idx, items: idxItems })], `ih: ${status === 'published' ? 'objavi' : 'umakni'} ${c}/${slug}`);
     return json(res, { ok: true, item, commit: result.commit, commitUrl: result.url ?? null, href: pathOf(item, idxItems) });
   }
 
@@ -218,8 +257,21 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
       idxItems = idxItems.map((i) => (i.collection === c && i.slug === child.slug ? { ...i, parent: '' } : i));
     }
     files.push(indexFile({ ...idx, items: idxItems }));
-    const result = await store.write(files, `cms: izbriši ${c}/${slug}`);
+    const result = await store.write(files, `ih: izbriši ${c}/${slug}`);
     return json(res, { ok: true, commit: result.commit });
+  }
+
+  /* ── categories ────────────────────────────────────────────────────── */
+
+  async function getCategories(res) {
+    return json(res, { ok: true, categories: await loadCategories() });
+  }
+
+  async function putCategories(req, res) {
+    const body = await readBody(req);
+    const cats = normalizeCategories(body.categories ?? body);
+    await store.write([categoriesFile(cats)], 'ih: kategorije');
+    return json(res, { ok: true, categories: cats });
   }
 
   /* ── media ─────────────────────────────────────────────────────────── */
@@ -229,7 +281,7 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
     const files = Array.isArray(body.files) ? body.files : [];
     if (!files.length) return fail(res, 400, 'Ni datotek.');
     const year = new Date().getFullYear();
-    let base = slugify(String(body.name ?? 'slika').replace(/\.[a-z0-9]+$/i, '')) || 'slika';
+    const base = slugify(String(body.name ?? 'slika').replace(/\.[a-z0-9]+$/i, '')) || 'slika';
     const idx = await loadIndex();
     const taken = new Set(idx.media.map((m) => m.src));
     let src = `/uploads/${year}/${base}`;
@@ -260,7 +312,7 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
       uploadedAt: new Date().toISOString(),
     };
     out.push(indexFile({ ...idx, media: [...idx.media, entry] }));
-    const result = await store.write(out, `cms: naloži sliko ${src}`);
+    const result = await store.write(out, `ih: naloži sliko ${src}`);
     return json(res, { ok: true, picture: { src, alt: entry.alt, width: entry.width, height: entry.height, upload: true, webp }, media: entry, commit: result.commit });
   }
 
@@ -284,7 +336,7 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
     if (used.length) return fail(res, 409, `Slika je v uporabi: ${used.join(', ')}. Najprej jo odstranite tam.`);
     const files = [...UPLOAD_SUFFIXES].map((s) => ({ path: `public${src}${s}`, delete: true }));
     files.push(indexFile({ ...idx, media: idx.media.filter((m) => m.src !== src) }));
-    const result = await store.write(files, `cms: izbriši sliko ${src}`);
+    const result = await store.write(files, `ih: izbriši sliko ${src}`);
     return json(res, { ok: true, commit: result.commit });
   }
 
@@ -297,7 +349,7 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
     return usage;
   };
 
-  /* ── preview and pages ─────────────────────────────────────────────── */
+  /* ── preview, pages, status, analytics ─────────────────────────────── */
 
   async function preview(req, res) {
     const body = await readBody(req);
@@ -339,7 +391,21 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
     const counts = {};
     for (const k of COLLECTION_KEYS) counts[k] = { published: 0, draft: 0 };
     for (const it of idx.items) counts[it.collection] && (counts[it.collection][it.status === 'published' ? 'published' : 'draft'] += 1);
-    return json(res, { ok: true, ...store.info(), lastCommit: last, counts, media: idx.media.length, siteOrigin: 'https://ais-slovenia.si' });
+    return json(res, {
+      ok: true,
+      ...store.info(),
+      lastCommit: last,
+      counts,
+      media: idx.media.length,
+      siteOrigin: 'https://ais-slovenia.si',
+      analytics: { configured: stats.configured, mode: stats.mode },
+    });
+  }
+
+  async function analyticsView(res, query) {
+    const days = Math.min(365, Math.max(1, Number(query.get('days')) || 30));
+    const data = await stats.query(days);
+    return json(res, { ok: true, ...data });
   }
 
   /* ── router ────────────────────────────────────────────────────────── */
@@ -359,12 +425,15 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
       if (parts[0] === 'login' && method === 'POST') return login(req, res);
       if (parts[0] === 'logout' && method === 'POST') return logout(req, res);
 
-      if (!passwordHash) return fail(res, 503, 'Geslo za urejanje še ni nastavljeno. Glejte ADMIN.md.', { setup: true });
+      if (!passwordHash) return fail(res, 503, 'Geslo za IH še ni nastavljeno. Glejte IH.md.', { setup: true });
       if (!authed(req)) return fail(res, 401, 'Prijavite se.', { authenticated: false });
 
       if (parts[0] === 'me') return json(res, { ok: true, authenticated: true, mode: store.mode });
       if (parts[0] === 'status' && method === 'GET') return status(res);
       if (parts[0] === 'pages' && method === 'GET') return pages(res);
+      if (parts[0] === 'categories' && method === 'GET') return getCategories(res);
+      if (parts[0] === 'categories' && method === 'PUT') return putCategories(req, res);
+      if (parts[0] === 'analytics' && method === 'GET') return analyticsView(res, u.searchParams);
       if (parts[0] === 'items') {
         if (parts.length === 1 && method === 'GET') return listItems(req, res, u.searchParams);
         if (parts.length === 3 && method === 'GET') return getItem(res, parts[1], parts[2]);
@@ -380,7 +449,7 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
       return fail(res, 404, 'Ni take poti.');
     } catch (err) {
       const status = err.status ?? (err instanceof SyntaxError ? 400 : 500);
-      if (status >= 500) console.error('[admin]', err);
+      if (status >= 500) console.error('[ih]', err);
       return fail(res, status, status >= 500 ? `Ni uspelo: ${err.message}` : err.message);
     }
   };
@@ -397,9 +466,11 @@ const indexToItem = (e) => ({
   kicker: e.kicker,
   summary: e.summary,
   date: e.date,
+  format: 'markdown',
   body: '',
-  picture: e.picture ? { src: e.picture, alt: '', width: 1600, height: 1000, upload: e.picture.startsWith('/uploads/'), webp: true } : null,
-  seo: { metaTitle: '', metaDescription: '', keywords: [], ogImage: '', noindex: false },
+  picture: e.picture ? { src: e.picture, alt: '', caption: '', width: 1600, height: 1000, upload: e.picture.startsWith('/uploads/'), webp: true } : null,
+  cta: null,
+  seo: { metaTitle: '', metaDescription: '', keywords: [], ogTitle: '', ogDescription: '', ogImage: '', canonical: '', noindex: false, nofollow: false, schemaType: 'auto', faq: [] },
   links: [],
   updatedAt: e.updatedAt,
   publishedAt: e.publishedAt,

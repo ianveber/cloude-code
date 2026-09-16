@@ -1,6 +1,6 @@
 {
   "/": {
-    "hash": "c370a6fdabbd87ed",
+    "hash": "e4eb9aaad577746c",
     "published": "2026-09-10",
     "updated": "2026-09-16"
   },
@@ -10,9 +10,9 @@
     "updated": "2026-09-10"
   },
   "/blog/": {
-    "hash": "7f1718cd50e189bf",
+    "hash": "8e3b7296ae422128",
     "published": "2026-09-10",
-    "updated": "2026-09-14"
+    "updated": "2026-09-16"
   },
   "/blog/ai-chatbot-v-slovenscini/": {
     "hash": "854e78551d2aed60",
@@ -70,7 +70,7 @@
     "updated": "2026-09-10"
   },
   "/novice/": {
-    "hash": "dcb62817ab9dfb5c",
+    "hash": "a03e56dce2026850",
     "published": "2026-09-10",
     "updated": "2026-09-16"
   },
@@ -78,6 +78,11 @@
     "hash": "7921c735727c5f88",
     "published": "2026-09-10",
     "updated": "2026-09-10"
+  },
+  "/piskotki/": {
+    "hash": "763d73e7e15c5c57",
+    "published": "2026-09-16",
+    "updated": "2026-09-16"
   },
   "/pogosta-vprasanja/": {
     "hash": "fe20e0a57f2b8a99",
