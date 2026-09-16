@@ -1026,6 +1026,17 @@ p { text-wrap: pretty; }
   color: var(--line);
 }
 
+.breadcrumbs li {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.breadcrumbs li:last-child {
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.35;
+}
+
 .breadcrumbs a {
   display: inline-flex;
   align-items: center;
@@ -1786,7 +1797,7 @@ html.motion-on main {
 
 .postgrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(1rem, 2.5vw, 1.5rem);
   margin-top: clamp(2rem, 5vw, 3rem);
   padding: 0;
@@ -2284,89 +2295,65 @@ html:not(.is-intro) .intro { display: none; }
   position: relative;
   max-width: 1240px;
   margin-inline: auto;
-  aspect-ratio: 16 / 8.8;
+  aspect-ratio: 16 / 9;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+/* Three slots on one orbit, a third of a cycle apart. The two back poses
+   are variables so phones can pull them in without touching the keyframes;
+   --x/--y/--z/--s is a slot's resting pose, used when motion is off. */
+.build__rig {
+  --bx: -62%; --by: -30%; --bz: -360px; --bs: 0.62;
+  --cx: 62%;  --cy: 30%;  --cz: -360px; --cs: 0.62;
 }
 
 .build__screen {
   --x: 0%;
   --y: 0%;
+  --z: 0px;
   --s: 1;
   --o: 1;
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 58%;
+  width: 56%;
   margin: 0;
-  transform: translate(-50%, -50%) translate(var(--x), var(--y)) scale(var(--s));
+  transform: translate(-50%, -50%) translate3d(var(--x), var(--y), var(--z)) scale(var(--s));
   opacity: var(--o);
-  transition:
-    transform 1.6s cubic-bezier(0.2, 0.7, 0.1, 1),
-    opacity 1.2s ease;
-  cursor: pointer;
+  will-change: transform;
 }
 
-/* The three spots. */
-.build__screen.is-active {
-  --x: 0%;
-  --y: 0%;
-  --s: 1;
-  --o: 1;
-  z-index: 3;
-  cursor: default;
+.build__screen--b { --x: var(--bx); --y: var(--by); --z: var(--bz); --s: var(--bs); --o: 0.92; }
+.build__screen--c { --x: var(--cx); --y: var(--cy); --z: var(--cz); --s: var(--cs); --o: 0.92; }
+
+html.motion-on .build__screen {
+  animation: stageOrbit 21s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+  animation-delay: calc(var(--i) * -7s);
 }
 
-.build__screen.is-left {
-  --x: -42%;
-  --y: -34%;
-  --s: 0.5;
-  --o: 0.62;
-  z-index: 1;
+/* The pointer holds the scene; off screen it stops to save the battery. */
+.build__stage:hover .build__screen,
+.build:not(.is-on) .build__screen { animation-play-state: paused; }
+
+@keyframes stageOrbit {
+  0%      { transform: translate(-50%, -50%) translate3d(0%, 0%, 0px) scale(1); opacity: 1; }
+  12%     { transform: translate(-50%, -50%) translate3d(2%, -2%, 20px) scale(1.02); opacity: 1; }
+  24%     { transform: translate(-50%, -50%) translate3d(-1.5%, 1.5%, 0px) scale(0.99); opacity: 1; }
+  33.333% { transform: translate(-50%, -50%) translate3d(var(--bx), var(--by), var(--bz)) scale(var(--bs)); opacity: 0.92; }
+  46%     { transform: translate(-50%, -50%) translate3d(calc(var(--bx) - 4%), calc(var(--by) + 6%), calc(var(--bz) - 50px)) scale(calc(var(--bs) - 0.05)); opacity: 0.88; }
+  58%     { transform: translate(-50%, -50%) translate3d(calc(var(--bx) + 4%), calc(var(--by) - 5%), calc(var(--bz) + 40px)) scale(calc(var(--bs) + 0.04)); opacity: 0.92; }
+  66.666% { transform: translate(-50%, -50%) translate3d(var(--cx), var(--cy), var(--cz)) scale(var(--cs)); opacity: 0.92; }
+  78%     { transform: translate(-50%, -50%) translate3d(calc(var(--cx) - 4%), calc(var(--cy) + 6%), calc(var(--cz) - 50px)) scale(calc(var(--cs) - 0.05)); opacity: 0.88; }
+  90%     { transform: translate(-50%, -50%) translate3d(calc(var(--cx) * 0.55), calc(var(--cy) * 0.5), calc(var(--cz) * 0.35)) scale(0.84); opacity: 0.96; }
+  100%    { transform: translate(-50%, -50%) translate3d(0%, 0%, 0px) scale(1); opacity: 1; }
 }
 
-.build__screen.is-right {
-  --x: 44%;
-  --y: 34%;
-  --s: 0.5;
-  --o: 0.62;
-  z-index: 2;
-}
-
-/* Nothing sits still: the front screen breathes, the back ones drift. */
-html.motion-on .build__screen.is-active .build__frame {
-  animation: stageBreathe 6s ease-in-out infinite;
-}
-
-html.motion-on .build__screen.is-left .build__frame,
-html.motion-on .build__screen.is-right .build__frame {
-  animation: stageDrift 7s ease-in-out infinite;
-}
-
-html.motion-on .build__screen.is-right .build__frame { animation-delay: -3.5s; }
-
-@keyframes stageBreathe {
-  0%, 100% { transform: scale(1) translate3d(0, 0, 0); }
-  50% { transform: scale(1.025) translate3d(0.4%, -0.6%, 0); }
-}
-
-@keyframes stageDrift {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(1.2%, -2.6%, 0); }
-}
-
+/* Every screen carries a soft blue halo; the front one is simply nearer. */
 .build__frame {
-  position: relative;
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: var(--d-panel);
-  box-shadow: 0 50px 110px rgba(0, 0, 0, 0.6);
-  transition: box-shadow 0.9s ease;
-}
-
-/* The front screen carries a soft blue halo. */
-.build__screen.is-active .build__frame {
   box-shadow:
     0 60px 130px rgba(0, 0, 0, 0.7),
-    0 0 90px rgba(29, 119, 254, 0.28);
+    0 0 90px rgba(29, 119, 254, 0.22);
 }
 
 .build__video {
@@ -2375,37 +2362,6 @@ html.motion-on .build__screen.is-right .build__frame { animation-delay: -3.5s; }
   height: auto;
   aspect-ratio: 16 / 10;
   object-fit: cover;
-}
-
-.build__tabs {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-2);
-  margin-top: clamp(1.5rem, 4vw, 2.5rem);
-  padding-inline: var(--gutter);
-}
-
-.build__tab {
-  min-height: 44px;
-  padding: 0.6rem 1.3rem;
-  font: inherit;
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--d-ink);
-  background: rgba(255, 255, 255, 0.08);
-  border: 0;
-  border-radius: var(--control-radius);
-  cursor: pointer;
-  transition: background-color 0.25s ease, color 0.25s ease;
-}
-
-.build__tab:hover { background: rgba(255, 255, 255, 0.14); }
-
-.build__tab.is-active {
-  background: var(--paper);
-  color: var(--ink);
 }
 
 /* ── Clients marquee ──────────────────────────────────────────────────────
@@ -3001,7 +2957,7 @@ html.motion-on .depth__b { animation: depthB 41s ease-in-out infinite alternate;
     height: auto;
   }
   .postgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .build__screen { width: 66%; }
+  .build__screen { width: 56%; }
 }
 
 @media (max-width: 1024px) {
@@ -3022,23 +2978,17 @@ html.motion-on .depth__b { animation: depthB 41s ease-in-out infinite alternate;
 @media (max-width: 768px) {
   .brand-brain { min-height: 18rem; }
   .brand-brain__rig { width: min(17rem, 72vw); }
+  /* Phones keep the same orbit in a taller frame, with the back screens
+     tucked closer so all three stay inside the panel. */
   .build__rig {
-    aspect-ratio: auto;
-    display: grid;
-    gap: var(--space-4);
+    aspect-ratio: 1 / 1.05;
+    perspective: 1000px;
+    --bx: -30%; --by: -58%; --bz: -240px; --bs: 0.62;
+    --cx: 30%;  --cy: 58%;  --cz: -240px; --cs: 0.62;
   }
-  .build__rig .build__frame { animation: none !important; }
-  .build__screen,
-  .build__screen.is-active,
-  .build__screen.is-left,
-  .build__screen.is-right {
-    position: static;
-    width: 100%;
-    transform: none;
-    opacity: 1;
-    filter: none;
-    cursor: default;
-  }
+  .build__screen { width: 72%; }
+  /* Three link groups side by side, so no group is left hanging under another. */
+  .footer-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); }
   .teamgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .footer-grid { grid-template-columns: 1fr; }
   .eventitem > article { grid-template-columns: 1fr; }

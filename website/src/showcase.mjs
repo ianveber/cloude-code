@@ -130,13 +130,14 @@ export function emptyState({ id, eyebrow, title, body, action }) {
 
 /* ── Build stage ──────────────────────────────────────────────────────────
    The one dark block: a rounded black panel inside the page margins. Three
-   clips take turns in front. Left alone the stage moves in beats: the front
-   clip holds, the three spread out side by side, then gather again with the
-   next clip in front. The tabs beneath bring any clip forward. The clips are
-   decorative and silent, so they are muted, looped and marked aria-hidden;
-   the tabs carry the meaning. */
+   clips float in one shared space and never stop moving: each drifts along
+   the same orbit, a third of a cycle apart, so one is always large in front
+   while the other two hang smaller behind it, and all three keep changing
+   size and place while they play. Pure CSS (see stageOrbit in styles.css);
+   the pointer pauses it. The clips are decorative and silent, so they are
+   muted, looped and marked aria-hidden; the captions carry the meaning. */
 
-const STAGE_POSITION = ['is-left', 'is-active', 'is-right'];
+const STAGE_SLOT = ['build__screen--a', 'build__screen--b', 'build__screen--c'];
 
 function stageScreen(screen, index) {
   const sources = each(
@@ -145,7 +146,7 @@ function stageScreen(screen, index) {
   );
 
   return `
-      <figure class="build__screen ${STAGE_POSITION[index]}" data-build-screen="${index}">
+      <figure class="build__screen ${STAGE_SLOT[index]}" data-build-screen="${index}" style="--i:${index}">
         <div class="build__frame">
           <video
             class="build__video"
@@ -161,13 +162,6 @@ function stageScreen(screen, index) {
       </figure>`;
 }
 
-function stageTab(screen, index) {
-  const active = index === 1;
-  return `
-      <button class="build__tab${active ? ' is-active' : ''}" type="button"
-        data-build-tab="${index}" aria-pressed="${active ? 'true' : 'false'}">${esc(screen.label)}</button>`;
-}
-
 export function buildStage(data) {
   return `
 <section class="build" id="kako-nastane" aria-labelledby="build-title" data-build>
@@ -181,10 +175,6 @@ export function buildStage(data) {
       <div class="build__rig" data-build-rig>
         ${each(data.screens, stageScreen)}
       </div>
-    </div>
-
-    <div class="build__tabs" data-build-tabs>
-      ${each(data.screens, stageTab)}
     </div>
   </div>
 </section>`;

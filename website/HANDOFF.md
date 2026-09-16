@@ -23,8 +23,9 @@ The home page is a product narrative, not a template landing page:
 1. Typed intro: white screen, the bare brain, "AIS Slovenia" typed with a caret (home only)
 2. Hero: headline left, two pill buttons, the 3D brain slab on the right (white,
    the code glow is masked out of this section)
-3. Build stage: a rounded black panel where the three clips circle through
-   front, back-left and back-right, three seconds each in front (the only dark block)
+3. Build stage: a rounded black panel where the three clips orbit without
+   stopping, all visible at once, one big in front and two smaller behind,
+   trading size and place as they go (the only dark block); no tabs under it
 4. Clients: two marquee rows of small pills (logo + name), top row drifting left, bottom row right, no descriptions
 5. Three pillars: a title, one sentence and a rendered product picture in a soft panel
 6. Products and projects: four tiles from `products.items`, linking to `/produkti/`
@@ -194,17 +195,26 @@ Every product also carries `simple` (one plain sentence or two) and
 `forWhom`, rendered under its description.
 
 `products.items` is live: our own products (ATHLOS, AIS Command, AISOS) and
-the projects built for clients (INSPECTUS VLDR and VIN filter, the coating
-model, Elementum, Tower Spa Celje, Dr. Asya Grafy Bio
-Institute, SI-BIG, HEVA, Epolac). **The last six descriptions and screens
-were drafted at Ian's request without source material**, to fit each
-client's business and our three service areas; Ian confirms or corrects them
+nine projects built for clients, named after what they do, never after the
+client (Ian, 2026-09-16: "remove all names of companies on case studies...
+just keep the names of the projects"). Ids and names: `vldr-kartice` (VLDR
+kartice), `pametni-filter-vin` (Pametni filter VIN), `model-premazi` (Model
+za premaze), `svetovalec-plemenite-kovine`, `asistent-rezervacije`,
+`svetovalec-nega-koze`, `spremljanje-razpisov`, `delovni-nalogi`,
+`tehnicni-asistent`. The client is described only by its trade (a port
+inspection company, a precious-metals dealer, a wellness in a tower, a
+cosmetics institute, a consultancy, a building manager, a coatings maker).
+Company names live in one place only, the clients marquee. Products carry
+no `client` field and the studies have no "Stranka" row; the design audit
+greps the built product and study pages for every client name and fails
+if one returns. **The last six projects were drafted at Ian's request
+without source material** (`draft: true`); Ian confirms or corrects them
 before a production deploy. Each has a demo screen rendered from
 `tools/pictures/products.html` (`node tools/pictures/render.mjs`). The
 screens are drawn after the real systems; the numbers on them are
 illustrative. Add a project by adding a stage to `products.html`, listing its
 id in `FILES` in `render.mjs`, rendering, and adding the item to
-`products.items`. The design audit expects at least six projects with
+`products.items`. The design audit expects the twelve ids above with
 rendered pictures on `/produkti/`.
 
 Do **not** add placeholder titles, fake dates, or “Rezervirano” tiles. The
@@ -217,8 +227,11 @@ Clients: `clients.items` in `content/showcase.mjs` lists the clients
 (INSPECTUS, Elementum, Tower Spa Celje, Dr. Asya Grafy Bio
 Institute, SI-BIG, HEVA, Epolac) and our own brands (AISOS, VETA, ATHLOS),
 each with a logo in `public/clients/` taken from the client's own website or
-our repositories. `tone: 'dark'` puts a dark disc behind a logo drawn for
-dark surfaces (Epolac). Items alternate between the two marquee rows; each
+our repositories. VETA is the real whale mark from `~/builds/veta-site`
+(`public/brand/whale.svg`), ATHLOS the real favicon from the Athloss repo;
+both replaced drawn stand-ins on 2026-09-16. `tone: 'dark'` puts a dark disc
+behind a logo drawn for dark surfaces (Epolac). This marquee is the only
+place on the site where a client company is named. Items alternate between the two marquee rows; each
 row repeats its pills four times so the loop is seamless on wide screens.
 **Before a production deploy, confirm with each client that their logo may
 appear here.** Never add a client that does not exist; the render check
@@ -262,16 +275,24 @@ arrival at the home page; a hop from another page of the site after it has
 played skips it. `?nointro` or `sessionStorage.ais-intro = 'skip'` turns it
 off for tooling and previews.
 
-Build stage: our clips, the choreography of the Antigravity hero film. The
-three screens circle three spots. The front one holds **3 s** big in the
-centre with a soft blue halo and breathes slowly; the other two wait small
-and dim at the back left and back right and drift. Every beat each screen
-moves one spot on (**1.6 s** of travel): the front one recedes up and left,
-the back-left one crosses the space down to the right, the back-right one
-grows into the centre. Nothing ever sits still. Pointer over the stage
-pauses the beats. Clicks on a screen or tab, and the arrow keys, bring a
-screen forward at once. `buildStage` also runs under reduced motion (without
-the beats) because the tabs are real controls.
+Build stage (rewritten 2026-09-16, "resemble Antigravity more... changing
+size, not shape, and changing positions... all three together, some smaller
+and some bigger"): the three clips are always on screen and never stop.
+One CSS animation, `stageOrbit` (21 s, in `src/styles.css`), carries a screen
+through the three poses, front, back-left, back-right, with drift between
+them; the three figures share it with `animation-delay: calc(var(--i) * -7s)`,
+so at every moment one is big in front and two are smaller behind, and they
+keep trading size and place. Poses are variables on `.build__rig` (`--bx`,
+`--by`, `--bz`, `--bs` for back-left, `--cx`... for back-right) so the phone
+breakpoint can retune them (closer, in a taller 1 / 1.05 frame at 72 %
+width). `preserve-3d` and a 1400 px perspective give the depth. JS is only
+an IntersectionObserver that sets `.is-on` on the section; the animation
+runs only while the stage is on screen and pauses under the pointer. There
+are **no tabs** under the stage any more (Ian: "remove the buttons
+Automatizacija and Estetic"); the design audit fails if `build__tab`
+returns, and the render check requires three `.build__screen` figures with
+at least two distinct widths, opacity above 0.5 and movement after 2.6 s.
+Under reduced motion the three screens hold their three poses.
 
 **Removed on purpose:** particles, bouncing chips, custom cursor, magnetic
 buttons, the CTA wireframe canvas, the glossy brain slab, the tab countdown
@@ -325,11 +346,13 @@ Mechanics an agent must keep intact:
 
 Every project on `/produkti/` has a page under `/studije-primerov/<id>/`, plus
 an index at `/studije-primerov/`. Copy lives in `content/case-studies.mjs`
-(one entry per product id; the name, kind, client and picture come from the
+(one entry per product id; the name, kind and picture come from the
 product record, so they cannot drift). Four fixed parts on every page: Izziv,
 Kaj smo naredili (with the parts of the system), Kaj se je spremenilo, Orodja.
-The audit fails if any of the 14 is missing, unlinked from `/produkti/`, or
-missing a part.
+The audit fails if any of the 12 is missing, unlinked from `/produkti/`, or
+missing a part. No client company is named on any study, product, blog post
+or guide (the marquee is the only place); the design audit greps the built
+pages for the names.
 
 Each study has two layers. The base entry (facts, challenge, build, parts,
 outcome, tools) is in `content/case-studies.mjs`; the deeper layer in
@@ -348,25 +371,26 @@ screenshot composed into a 1600×1000 frame by `tools/pictures/captures.html`
 from PNGs in `tools/pictures/real/` (ATHLOS from its built bundle in demo
 mode, AIS Command from the local dev server with client names sanitised,
 INSPECTUS VLDR from the tool with its sample report, the VIN filter from
-its demo). Where the product is not an app, the picture is its real
-surface: `tools/pictures/notion.html` replicates the Notion Business HQ
-pages for Pacom and ZaLife (structure and public facts real, internal
-targets and prices left out), `tools/pictures/terminal.html` is a verbatim
-CLI session of the coatings model including its own refusals. The six
-drafted clients keep their drawn scenes in `products.html` because no
-product exists. Laptop and phone mockups were tried and removed the same
+its demo, with "INSPECTUS" removed from the captured DOM). Where the
+product is not an app, the picture is its real surface:
+`tools/pictures/terminal.html` is a verbatim CLI session of the coatings
+model including its own refusals. The six drafted projects keep their drawn
+scenes in `products.html` because no product exists. Picture files are
+named after the product ids above (`public/pictures/<id>.webp|jpg`,
+`<id>-800.webp`, `<id>-1600.webp`, and `<id>-detail...`). Laptop and phone mockups were tried and removed the same
 day; the connected image account has no credits, so no AI images anywhere.
 
 What each study rests on:
 
-- ATHLOS, AIS Command, AISOS, INSPECTUS VLDR, INSPECTUS VIN filter and the
+- ATHLOS, AIS Command, AISOS, VLDR kartice, Pametni filter VIN and the
   coatings model: written from their repositories. Their "Stanje" rows are
   honest: AIS Command is pre-launch, the VIN filter is a prototype tested on
   synthetic images, the coatings model has only seen synthetic formulations.
   Do not "upgrade" those rows without new evidence.
-- Elementum, Tower Spa Celje, Dr. Asya Grafy, SI-BIG, HEVA, Epolac: **drafted
-  without source material** (`draft: true`), like their product entries, at
-  Ian's request. Ian confirms or rewrites them before deploy; until then they
+- The six drafted projects (precious-metals adviser, reservation
+  assistant, skin-care adviser, tender monitoring, work orders, technical
+  assistant): **drafted without source material** (`draft: true`), like
+  their product entries, at Ian's request. Ian confirms or rewrites them before deploy; until then they
   must not be quoted anywhere else.
 
 No client quotes, no invented metrics. The only numbers on these pages come
@@ -380,7 +404,7 @@ Both are generated, not filmed or photographed.
 - Clips: source `tools/video/scene.html`, renderer `node tools/video/render.mjs`,
   outputs in `public/video/` (webm, mp4, poster).
 - Pictures: sources `tools/pictures/scene.html` (three pillars) and
-  `tools/pictures/products.html` (eight products and projects), renderer
+  `tools/pictures/products.html` (AISOS and the six drafted projects), renderer
   `node tools/pictures/render.mjs`, outputs in `public/pictures/` (webp + jpg
   at 3200×2000). The `<picture>` markup in `src/showcase.mjs` expects both.
 
@@ -390,6 +414,16 @@ detected, otherwise set `CHROME_PATH`) and ffmpeg.
 ---
 
 ## Visual system (short)
+
+Phones come first (Ian, 2026-09-16: "optimized for phone use more than
+computer use"). Every band is checked at 320 to 1920 px by the render check;
+the 768 px breakpoint in `src/styles.css` is where the stage, tiles, blog
+grid, footer link groups and breadcrumbs take their phone shapes. The blog
+index is a four-column grid on desktop (`.postgrid`, eight posts make two
+even rows), two columns on tablets and one on phones, so no row is left
+with a hole. Breadcrumb items are 44 px tall and vertically centred so the
+current page's crumb lines up with the links. Footer link groups sit three
+across on phones.
 
 - Paper `#fff`, canvas `#f4f5f7` (tiles), ink `#111318`, AIS blue `#1d77fe`
 - Controls are pills (`--control-radius: 100px`), tiles 24px, panels 28px,

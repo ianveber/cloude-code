@@ -221,17 +221,17 @@ expect(
   'Tile, panel and control radii must use three distinct tokens.'
 );
 expect(
-  /\.build__screen\.is-left\s*\{/.test(styles) &&
-    /\.build__screen\.is-right\s*\{/.test(styles) &&
-    /\.build__screen\.is-active\s*\{/.test(styles) &&
-    /class="build__screen is-active"/.test(home) &&
-    /class="build__screen is-left"/.test(home) &&
-    /class="build__screen is-right"/.test(home),
-  'Build stage must ship its first pose in HTML so it reads without JS.'
+  /@keyframes stageOrbit/.test(styles) &&
+    /\.build__screen--b \{/.test(styles) &&
+    /class="build__screen build__screen--a"/.test(home) &&
+    /class="build__screen build__screen--c"/.test(home) &&
+    !/build__tab/.test(home),
+  'Build stage: three screens on one continuous orbit, no tab buttons.'
 );
 expect(
-  /@media \(max-width: 768px\)[\s\S]*\.build__screen\.is-right\s*\{[^}]*position:\s*static;/.test(styles),
-  'Build stage must stack its screens on small screens.'
+  /@media \(max-width: 768px\)[\s\S]*\.build__rig \{\n    aspect-ratio: 1 \/ 1\.05;/.test(styles) &&
+    /@media \(max-width: 768px\)[\s\S]*--bx: -30%; --by: -58%;/.test(styles),
+  'Build stage keeps its orbit on phones, in a taller frame with the back screens tucked in.'
 );
 expect(
   !/function (?:particles|bouncers|cursor|magnetic)\(/.test(motion) &&
@@ -334,7 +334,7 @@ expect(
 expect(
   !/\bempty-state\b/.test(pages.products) &&
     (pages.products.match(/class="project" id="/g) ?? []).length >= 6 &&
-    (pages.products.match(/\/pictures\/(?:athlos|ais-command|aisos|inspectus-vldr|inspectus-vin|model-premazi|elementum|tower-spa|asya-grafy|si-big|heva|epolac)-800\.webp/g) ?? []).length === 12,
+    (pages.products.match(/\/pictures\/(?:athlos|ais-command|aisos|vldr-kartice|pametni-filter-vin|model-premazi|svetovalec-plemenite-kovine|asistent-rezervacije|svetovalec-nega-koze|spremljanje-razpisov|delovni-nalogi|tehnicni-asistent)-800\.webp/g) ?? []).length === 12,
   'Products page must list the 12 products and projects, each with its rendered picture.'
 );
 

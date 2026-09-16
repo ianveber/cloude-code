@@ -30,7 +30,7 @@ const PATHS = [
   '/produkti/',
   '/studije-primerov/',
   '/studije-primerov/athlos/',
-  '/studije-primerov/heva/',
+  '/studije-primerov/delovni-nalogi/',
   '/storitve/',
   '/storitve/avtomatizacija-administracije/',
   '/storitve/avtomatizacija-prodaje/',
@@ -146,21 +146,14 @@ function findProblems(path, width) {
   }
 
   if (path === '/' && width === 1440) {
-    /* Build stage: three screens, the active one in front and widest. */
+    /* Build stage: three orbiting screens and no tab buttons. The motion
+       itself (sizes, opacity, movement) is checked by checkBuildStage. */
     const screens = [...document.querySelectorAll('.build__screen')];
-    const active = document.querySelector('.build__screen.is-active');
-    if (screens.length !== 3 || !active) {
-      components.push(`build stage has ${screens.length} screens and ${active ? 'an' : 'no'} active screen`);
-    } else {
-      const widths = screens.map((screen) => screen.getBoundingClientRect().width);
-      const activeWidth = active.getBoundingClientRect().width;
-      if (activeWidth < Math.max(...widths) - 1) {
-        components.push('build stage active screen is not the widest');
-      }
+    if (screens.length !== 3) {
+      components.push(`build stage has ${screens.length} screens; expected 3`);
     }
-    const tabs = [...document.querySelectorAll('.build__tab')];
-    if (tabs.length !== 3 || tabs.filter((tab) => tab.getAttribute('aria-pressed') === 'true').length !== 1) {
-      components.push('build stage tabs must be three buttons with exactly one pressed');
+    if (document.querySelector('.build__tab')) {
+      components.push('build stage tabs must be gone');
     }
 
     /* Clients wall: a logo and a brand name per client, nothing else. */
@@ -295,35 +288,28 @@ async function checkBuildStage(page, base) {
       document.documentElement.classList.contains('motion-on') ||
       document.documentElement.classList.contains('motion-off')
   );
-
-  /* A tab click brings its screen to the front. */
-  await page.click('.build__tab[data-build-tab="2"]');
-  await new Promise((resolve) => setTimeout(resolve, 60));
-  const clicked = await page.evaluate(() => ({
-    screen: document.querySelector('.build__screen[data-build-screen="2"]')?.classList.contains('is-active'),
-    tab: document.querySelector('.build__tab[data-build-tab="2"]')?.getAttribute('aria-pressed'),
-    pressed: document.querySelectorAll('.build__tab[aria-pressed="true"]').length,
-  }));
-  if (!clicked.screen || clicked.tab !== 'true' || clicked.pressed !== 1) {
-    return `Build stage — tab click did not bring its screen forward (${JSON.stringify(clicked)})`;
-  }
-
-  /* Arrow keys move through the screens. */
-  await page.$eval('.build__tab[data-build-tab="2"]', (tab) => tab.focus());
-  await page.keyboard.press('ArrowRight');
-  await new Promise((resolve) => setTimeout(resolve, 60));
-  const keyed = await page.evaluate(() =>
-    document.querySelector('.build__screen[data-build-screen="0"]')?.classList.contains('is-active')
-  );
-  if (!keyed) return 'Build stage — ArrowRight did not advance to the next screen';
-
-  /* A side screen click brings it forward too. */
-  await page.$eval('.build__screen[data-build-screen="1"]', (screen) => screen.click());
-  await new Promise((resolve) => setTimeout(resolve, 60));
-  const sided = await page.evaluate(() =>
-    document.querySelector('.build__screen[data-build-screen="1"]')?.classList.contains('is-active')
-  );
-  if (!sided) return 'Build stage — clicking a side screen did not bring it forward';
+  await page.evaluate(() => {
+    const s = document.querySelector('[data-build]');
+    s.scrollIntoView({ block: 'center' });
+  });
+  const read = () =>
+    page.evaluate(() =>
+      [...document.querySelectorAll('.build__screen')].map((el) => {
+        const r = el.getBoundingClientRect();
+        return { w: Math.round(r.width), x: Math.round(r.left), o: getComputedStyle(el).opacity };
+      })
+    );
+  await new Promise((resolve) => setTimeout(resolve, 400));
+  const first = await read();
+  if (first.length !== 3) return `Build stage — expected 3 screens, found ${first.length}`;
+  const widths = new Set(first.map((s) => s.w));
+  if (widths.size < 2) return `Build stage — screens should differ in size (${first.map((s) => s.w).join(', ')})`;
+  if (first.some((s) => Number(s.o) < 0.5)) return 'Build stage — every screen must stay visible';
+  await new Promise((resolve) => setTimeout(resolve, 2600));
+  const second = await read();
+  const moved = first.some((s, i) => Math.abs(s.w - second[i].w) > 2 || Math.abs(s.x - second[i].x) > 2);
+  if (!moved) return 'Build stage — screens did not change size or place while playing';
+  if (await page.$('.build__tab')) return 'Build stage — tab buttons must be gone';
   return null;
 }
 

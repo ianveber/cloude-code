@@ -6,9 +6,9 @@
  * problem, what we built, the parts of the system, what changed. Copy is
  * short, concrete and free of dashes, like the rest of the site.
  *
- * Sources. ATHLOS, AIS Command, AISOS, both INSPECTUS projects and the
- * coatings model are written from their repositories. The last six (Elementum, Tower Spa Celje,
- * Dr. Asya Grafy, SI-BIG, HEVA, Epolac) are drafted without source material,
+ * Sources. ATHLOS, AIS Command, AISOS, both pregledovalno podjetje projects and the
+ * coatings model are written from their repositories. The last six (prodajalec plemenitih kovin, wellness v stolpu,
+ * kozmetični inštitut, svetovalno podjetje, upravnik stavb, proizvajalec barv in premazov) are drafted without source material,
  * like their product entries, and carry `draft: true`. Ian confirms or
  * corrects them before the site goes live. Nothing here claims a wearable
  * sync, a payment flow or a production launch that the code does not have.
@@ -22,7 +22,7 @@ export const caseStudies = {
   metaDescription:
     'Dvanajst študij primerov AIS Slovenia: lastni izdelki in sistemi za stranke, od avtomatizacije dokumentov v pristanišču do AI svetovalcev in agentnih sistemov.',
   answer:
-    'AIS Slovenia je zgradil dvanajst sistemov: tri lastne izdelke (ATHLOS, AIS Command, AISOS) in devet projektov za stranke, od avtomatizacije dokumentov za INSPECTUS do AI svetovalcev, asistentov za rezervacije in spremljanja trga. Vsaka študija pove, kaj je bilo prej, kaj smo naredili in kaj se je spremenilo.',
+    'AIS Slovenia je zgradil dvanajst sistemov: tri lastne izdelke (ATHLOS, AIS Command, AISOS) in devet projektov za stranke, od avtomatizacije dokumentov v pristanišču do AI svetovalcev, asistentov za rezervacije in spremljanja trga. Vsaka študija pove, kaj je bilo prej, kaj smo naredili in kaj se je spremenilo.',
 
   items: [
     /* ── Lastni izdelki ─────────────────────────────────────────────── */
@@ -152,17 +152,16 @@ export const caseStudies = {
 
     /* ── Za stranke ─────────────────────────────────────────────────── */
     {
-      id: 'inspectus-vldr',
+      id: 'vldr-kartice',
       service: 'avtomatizacija-administracije',
-      answer: 'Za INSPECTUS je AIS Slovenia zgradil orodje, ki iz izvoza poročila o škodah v nekaj sekundah naredi urejeno preglednico po vozilih in kartico VLDR za vsako vozilo. Prva resnična serija julija 2026 je imela 314 vozil.',
-      metaTitle: 'INSPECTUS VLDR: kartice za pregled vozil | Študija primera',
+      answer: 'Za pregledovalno podjetje v pristanišču je AIS Slovenia zgradil orodje, ki iz izvoza poročila o škodah v nekaj sekundah naredi urejeno preglednico po vozilih in kartico VLDR za vsako vozilo. Prva resnična serija julija 2026 je imela 314 vozil.',
+      metaTitle: 'VLDR kartice: kartice za pregled vozil | Študija primera',
       metaDescription:
         'Kako iz izvoza poročila o škodah v nekaj sekundah nastanejo urejena preglednica po vozilih in kartica VLDR za vsako vozilo v obliki, ki jo zahteva proizvajalec.',
-      keywords: ['INSPECTUS', 'VLDR', 'pregled vozil v pristanišču', 'avtomatizacija dokumentov', 'Luka Koper'],
+      keywords: ['VLDR', 'pregled vozil v pristanišču', 'avtomatizacija dokumentov'],
       summary:
         'Iz izvoza poročila o škodah v nekaj sekundah nastanejo urejena preglednica po vozilih in kartica VLDR za vsako vozilo, v obliki, ki jo zahteva proizvajalec.',
       facts: [
-        { term: 'Stranka', definition: 'INSPECTUS, pregled vozil v pristanišču Koper' },
         { term: 'Panoga', definition: 'Logistika, pregled novih vozil ob razkladanju ladij' },
         { term: 'Vrsta', definition: 'Avtomatizacija dokumentov' },
         { term: 'Obseg', definition: 'Spletno orodje, Center s prijavo in zgodovino obdelav, preverjanje z AI' },
@@ -193,17 +192,16 @@ export const caseStudies = {
       draft: false,
     },
     {
-      id: 'inspectus-vin',
+      id: 'pametni-filter-vin',
       service: 'avtomatizacija-administracije',
-      answer: 'Za INSPECTUS je AIS Slovenia zasnoval in prototipiral filter, ki fotografije s pomola razvrsti po vozilih po številki VIN. Na testnem naboru je 29 od 30 posnetkov prebral na napravi; pilot na resnični ladji sledi.',
-      metaTitle: 'INSPECTUS VIN filter: fotografije po vozilih | Študija primera',
+      answer: 'Za pregledovalno podjetje v pristanišču je AIS Slovenia zasnoval in prototipiral filter, ki fotografije s pomola razvrsti po vozilih po številki VIN. Na testnem naboru je 29 od 30 posnetkov prebral na napravi; pilot na resnični ladji sledi.',
+      metaTitle: 'Pametni filter VIN: fotografije po vozilih | Študija primera',
       metaDescription:
         'Prototip filtra, ki fotografije s pomola razvrsti po vozilih: tablica z VIN odpre vozilo, posnetki za njo mu pripadajo, rezultat se preveri proti ladijskemu seznamu.',
-      keywords: ['INSPECTUS', 'VIN', 'razvrščanje fotografij', 'OCR', 'pregled vozil'],
+      keywords: ['VIN', 'razvrščanje fotografij', 'OCR', 'pregled vozil'],
       summary:
         'Prototip filtra, ki fotografije s pomola razvrsti po vozilih: tablica z VIN odpre vozilo, posnetki za njo mu pripadajo, rezultat se v obe smeri preveri proti ladijskemu seznamu.',
       facts: [
-        { term: 'Stranka', definition: 'INSPECTUS, pregled vozil v pristanišču Koper' },
         { term: 'Panoga', definition: 'Logistika, dokumentiranje škod na vozilih' },
         { term: 'Vrsta', definition: 'Avtomatizacija' },
         { term: 'Obseg', definition: 'Zasnova sedmih korakov, delujoč prototip razvrščanja, ponudba za uvedbo' },
@@ -243,7 +241,6 @@ export const caseStudies = {
       summary:
         'Model, ki iz sestave premaza izračuna gostoto, suho snov, viskoznost in prekrivnost, preden kdo kaj zmeša. Pove, kako zanesljiva je napoved, in recepture zunaj svojega znanja odkloni.',
       facts: [
-        { term: 'Stranka', definition: 'Proizvajalec barv in premazov, ime ni objavljeno' },
         { term: 'Panoga', definition: 'Kemija, razvoj premazov' },
         { term: 'Vrsta', definition: 'AI model' },
         { term: 'Obseg', definition: 'Model, ocena zanesljivosti, zavrnitev zunaj podatkov, ukazna vrstica za laboratorij' },
@@ -275,17 +272,16 @@ export const caseStudies = {
 
     /* ── Drafted without source material, see the note at the top ─── */
     {
-      id: 'elementum',
+      id: 'svetovalec-plemenite-kovine',
       service: 'avtomatizacija-prodaje',
-      answer: 'Za Elementum je AIS Slovenia postavil spletnega svetovalca, ki v slovenščini ob vsaki uri odgovarja o nakupu in hrambi zlata in srebra, resna povpraševanja preda svetovalcem in ekipi vsako jutro pripravi tržni pregled.',
-      metaTitle: 'Elementum: svetovalec za plemenite kovine | Študija primera',
+      answer: 'Za prodajalca plemenitih kovin je AIS Slovenia postavil spletnega svetovalca, ki v slovenščini ob vsaki uri odgovarja o nakupu in hrambi zlata in srebra, resna povpraševanja preda svetovalcem in ekipi vsako jutro pripravi tržni pregled.',
+      metaTitle: 'Svetovalec za plemenite kovine | Študija primera',
       metaDescription:
         'Spletni svetovalec, ki v slovenščini odgovarja o nakupu in hrambi zlata in srebra, resna povpraševanja preda svetovalcem in ekipi zjutraj pripravi tržni pregled.',
-      keywords: ['Elementum', 'plemenite kovine', 'AI svetovalec', 'spletni klepet', 'tržni pregled'],
+      keywords: ['plemenite kovine', 'AI svetovalec', 'spletni klepet', 'tržni pregled'],
       summary:
         'Spletni svetovalec, ki obiskovalcem v slovenščini odgovarja o nakupu in hrambi zlata in srebra, tudi ponoči, resna povpraševanja preda svetovalcem, zjutraj pa ekipi pripravi kratek tržni pregled.',
       facts: [
-        { term: 'Stranka', definition: 'Elementum, plemenite kovine' },
         { term: 'Panoga', definition: 'Prodaja in hramba naložbenega zlata in srebra' },
         { term: 'Vrsta', definition: 'Avtomatizacija prodaje' },
         { term: 'Obseg', definition: 'Svetovalec na spletni strani, predaja svetovalcem, jutranji tržni pregled' },
@@ -314,17 +310,16 @@ export const caseStudies = {
       draft: true,
     },
     {
-      id: 'tower-spa',
+      id: 'asistent-rezervacije',
       service: 'avtomatizacija-prodaje',
-      answer: 'Za Tower Spa Celje je AIS Slovenia postavil asistenta za rezervacije, ki odgovarja o paketih, sprejme rezervacijo, pošlje opomnik dan prej in ob odpovedi sprosti termin. Skupine in dogodke preda lastniku.',
-      metaTitle: 'Tower Spa Celje: asistent za rezervacije | Študija primera',
+      answer: 'Za wellness v stolpu je AIS Slovenia postavil asistenta za rezervacije, ki odgovarja o paketih, sprejme rezervacijo, pošlje opomnik dan prej in ob odpovedi sprosti termin. Skupine in dogodke preda lastniku.',
+      metaTitle: 'Asistent za rezervacije v wellnessu | Študija primera',
       metaDescription:
         'Asistent za rezervacije v wellnessu v srednjeveškem stolpu: odgovarja o paketih, sprejme rezervacijo, pošlje opomnik in ob odpovedi sprosti termin.',
-      keywords: ['Tower Spa Celje', 'asistent za rezervacije', 'wellness', 'AI rezervacije', 'opomniki'],
+      keywords: ['asistent za rezervacije', 'wellness', 'AI rezervacije', 'opomniki'],
       summary:
         'Asistent za rezervacije v wellnessu v srednjeveškem stolpu. Odgovarja o paketih, savnah in masažah, sprejme rezervacijo, pošlje opomnik dan prej in ob odpovedi sprosti termin. Skupine in dogodke preda lastniku.',
       facts: [
-        { term: 'Stranka', definition: 'Tower Spa Celje' },
         { term: 'Panoga', definition: 'Wellness in gostinstvo' },
         { term: 'Vrsta', definition: 'Avtomatizacija prodaje' },
         { term: 'Obseg', definition: 'Asistent za vprašanja in rezervacije, opomniki, odpovedi, predaja lastniku' },
@@ -353,17 +348,16 @@ export const caseStudies = {
       draft: true,
     },
     {
-      id: 'asya-grafy',
+      id: 'svetovalec-nega-koze',
       service: 'avtomatizacija-prodaje',
-      answer: 'Za Dr. Asya Grafy Bio Institute je AIS Slovenia postavil svetovalca za nego kože v spletni trgovini, ki iz dokumentacije izdelkov svetuje po tipu kože, predlaga vrstni red uporabe in izdelke pošlje v košarico. Zdravstvena vprašanja preda človeku.',
-      metaTitle: 'Dr. Asya Grafy: svetovalec za nego kože | Študija primera',
+      answer: 'Za kozmetični inštitut je AIS Slovenia postavil svetovalca za nego kože v spletni trgovini, ki iz dokumentacije izdelkov svetuje po tipu kože, predlaga vrstni red uporabe in izdelke pošlje v košarico. Zdravstvena vprašanja preda človeku.',
+      metaTitle: 'Svetovalec za nego kože v spletni trgovini | Študija primera',
       metaDescription:
         'Svetovalec za nego kože v spletni trgovini: iz dokumentacije o izdelkih svetuje po tipu kože, predlaga vrstni red in izdelke pošlje v košarico.',
-      keywords: ['Dr. Asya Grafy', 'svetovalec za nego kože', 'spletna trgovina', 'AI svetovalec', 'kozmetika'],
+      keywords: ['kozmetični inštitut', 'svetovalec za nego kože', 'spletna trgovina', 'AI svetovalec', 'kozmetika'],
       summary:
         'Svetovalec za nego kože v spletni trgovini. Iz dokumentacije o izdelkih odgovori na vprašanja o suhi, občutljivi ali zreli koži, predlaga vrstni red izdelkov in vsakega pošlje v košarico. Zdravstvena vprašanja preda človeku.',
       facts: [
-        { term: 'Stranka', definition: 'Dr. Asya Grafy Bio Institute' },
         { term: 'Panoga', definition: 'Kozmetika in nega kože' },
         { term: 'Vrsta', definition: 'AI svetovalec' },
         { term: 'Obseg', definition: 'Svetovalec v spletni trgovini, priporočila po tipu kože, vrstni red uporabe, košarica' },
@@ -393,17 +387,16 @@ export const caseStudies = {
       draft: true,
     },
     {
-      id: 'si-big',
+      id: 'spremljanje-razpisov',
       service: 'spremljanje-trga',
-      answer: 'Za SI-BIG Group je AIS Slovenia postavil sistem, ki vsako jutro pregleda razpise, iskanja partnerjev in novice s šestih balkanskih trgov, jih oceni po merilih posamezne stranke in ekipi pripravi seznam za naprej.',
-      metaTitle: 'SI-BIG: spremljanje razpisov na šestih trgih | Študija primera',
+      answer: 'Za svetovalno podjetje je AIS Slovenia postavil sistem, ki vsako jutro pregleda razpise, iskanja partnerjev in novice s šestih balkanskih trgov, jih oceni po merilih posamezne stranke in ekipi pripravi seznam za naprej.',
+      metaTitle: 'Spremljanje razpisov na šestih trgih | Študija primera',
       metaDescription:
         'Sistem, ki vsako jutro pregleda razpise, iskanja partnerjev in novice s šestih balkanskih trgov, jih oceni po merilih stranke in ekipi pripravi seznam za naprej.',
-      keywords: ['SI-BIG', 'spremljanje razpisov', 'balkanski trgi', 'spremljanje trga', 'iskanje partnerjev'],
+      keywords: ['spremljanje razpisov', 'balkanski trgi', 'spremljanje trga', 'iskanje partnerjev'],
       summary:
         'Sistem, ki vsako jutro pregleda razpise, iskanja partnerjev in novice s šestih balkanskih trgov, jih oceni po merilih posamezne stranke in ekipi pripravi seznam, ki ga pošlje naprej.',
       facts: [
-        { term: 'Stranka', definition: 'SI-BIG Group' },
         { term: 'Panoga', definition: 'Poslovno povezovanje in svetovanje na Balkanu' },
         { term: 'Vrsta', definition: 'Spremljanje trga' },
         { term: 'Obseg', definition: 'Zajem virov, ocena po merilih stranke, jutranji seznam, pošiljanje naprej' },
@@ -432,17 +425,16 @@ export const caseStudies = {
       draft: true,
     },
     {
-      id: 'heva',
+      id: 'delovni-nalogi',
       service: 'avtomatizacija-administracije',
-      answer: 'Za HEVA je AIS Slovenia postavil delovne naloge iz e-pošte in klicev: asistent prepozna naslov, težavo in nujnost, ustvari nalog, predlaga prostega monterja in po opravljenem delu pripravi osnutek računa.',
-      metaTitle: 'HEVA: delovni nalogi iz e-pošte in klicev | Študija primera',
+      answer: 'Za upravnika stavb je AIS Slovenia postavil delovne naloge iz e-pošte in klicev: asistent prepozna naslov, težavo in nujnost, ustvari nalog, predlaga prostega monterja in po opravljenem delu pripravi osnutek računa.',
+      metaTitle: 'Delovni nalogi iz e-pošte in klicev | Študija primera',
       metaDescription:
         'Delovni nalogi za upravljanje stavb: iz e-pošte in klicev asistent prepozna naslov, težavo in nujnost, ustvari nalog, predlaga monterja in pripravi račun.',
-      keywords: ['HEVA', 'upravljanje nepremičnin', 'delovni nalogi', 'avtomatizacija administracije', 'vzdrževanje stavb'],
+      keywords: ['upravljanje nepremičnin', 'delovni nalogi', 'avtomatizacija administracije', 'vzdrževanje stavb'],
       summary:
         'Delovni nalogi za upravljanje in vzdrževanje stavb. Iz e-pošte in telefonskih klicev asistent prepozna naslov, težavo in nujnost, ustvari nalog in predlaga prostega monterja. Ekipa nalog dobi na telefon, po opravljenem delu pa gre račun ven sam.',
       facts: [
-        { term: 'Stranka', definition: 'HEVA, upravljanje nepremičnin' },
         { term: 'Panoga', definition: 'Upravljanje in vzdrževanje stavb' },
         { term: 'Vrsta', definition: 'Avtomatizacija administracije' },
         { term: 'Obseg', definition: 'Zajem prijav, delovni nalogi, razporejanje, nalogi na telefonu, računi' },
@@ -471,17 +463,16 @@ export const caseStudies = {
       draft: true,
     },
     {
-      id: 'epolac',
+      id: 'tehnicni-asistent',
       service: 'avtomatizacija-prodaje',
-      answer: 'Za Epolac iz Izraela je AIS Slovenia postavil tehničnega asistenta, ki iz tehničnih in varnostnih listov odgovarja v angleščini in hebrejščini, navede vir in izračuna porabo. Vprašanja o cenah preda prodaji.',
-      metaTitle: 'Epolac: tehnični asistent za barve in premaze | Študija primera',
+      answer: 'Za proizvajalca barv in premazov iz Izraela je AIS Slovenia postavil tehničnega asistenta, ki iz tehničnih in varnostnih listov odgovarja v angleščini in hebrejščini, navede vir in izračuna porabo. Vprašanja o cenah preda prodaji.',
+      metaTitle: 'Tehnični asistent za barve in premaze | Študija primera',
       metaDescription:
         'Tehnični asistent za proizvajalca barv in premazov: iz tehničnih in varnostnih listov odgovarja v angleščini in hebrejščini, navede vir in izračuna porabo.',
-      keywords: ['Epolac', 'tehnični asistent', 'barve in premazi', 'tehnični listi', 'AI asistent hebrejščina'],
+      keywords: ['tehnični asistent', 'barve in premazi', 'tehnični listi', 'AI asistent hebrejščina'],
       summary:
         'Tehnični asistent za proizvajalca barv in premazov. Iz tehničnih in varnostnih listov odgovarja na vprašanja izvajalcev in distributerjev v angleščini in hebrejščini, navede vir in izračuna porabo. Vprašanja o cenah in projektih preda prodaji.',
       facts: [
-        { term: 'Stranka', definition: 'Epolac, Izrael' },
         { term: 'Panoga', definition: 'Proizvodnja barv in premazov' },
         { term: 'Vrsta', definition: 'AI asistent' },
         { term: 'Obseg', definition: 'Znanje iz tehničnih in varnostnih listov, odgovori v dveh jezikih z virom, izračun porabe, predaja prodaji' },

@@ -38,10 +38,10 @@ const SCALE = 2;
 /* Scenes live in two files: the three pillar screens and the product demos. */
 const FILES = {
   'scene.html': ['saas', 'flow', 'security'],
-  'products.html': ['aisos', 'elementum', 'tower-spa', 'asya-grafy', 'si-big', 'heva', 'epolac'],
+  'products.html': ['aisos', 'svetovalec-plemenite-kovine', 'asistent-rezervacije', 'svetovalec-nega-koze', 'spremljanje-razpisov', 'delovni-nalogi', 'tehnicni-asistent'],
   'terminal.html': ['model-premazi', 'model-premazi-detail'],
-  'captures.html': ['athlos', 'ais-command', 'inspectus-vldr', 'inspectus-vin', 'athlos-detail', 'ais-command-detail', 'inspectus-vldr-detail', 'inspectus-vin-detail'],
-  'details.html': ['aisos-detail', 'elementum-detail', 'tower-spa-detail', 'asya-grafy-detail', 'si-big-detail', 'heva-detail', 'epolac-detail'],
+  'captures.html': ['athlos', 'ais-command', 'vldr-kartice', 'pametni-filter-vin', 'athlos-detail', 'ais-command-detail', 'vldr-kartice-detail', 'pametni-filter-vin-detail'],
+  'details.html': ['aisos-detail', 'svetovalec-plemenite-kovine-detail', 'asistent-rezervacije-detail', 'svetovalec-nega-koze-detail', 'spremljanje-razpisov-detail', 'delovni-nalogi-detail', 'tehnicni-asistent-detail'],
   'blog.html': ['blog-kaj-je-ai-avtomatizacija', 'blog-kaj-je-ai-agent', 'blog-prvi-proces-za-avtomatizacijo', 'blog-sistem-mora-znati-reci-ne-vem', 'blog-kako-ai-odgovarja-iz-dokumentov', 'blog-koliko-casa-vzame-uvedba', 'blog-kaj-se-zgodi-z-vasimi-podatki', 'blog-ai-chatbot-v-slovenscini'],
 };
 const SCENES = Object.values(FILES).flat();

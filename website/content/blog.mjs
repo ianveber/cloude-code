@@ -48,7 +48,7 @@ export const blogPosts = [
         title: 'Kje se začne',
         paragraphs: [
           'Ne s celotnim podjetjem, ampak z enim procesom. Najboljši prvi proces se ponavlja vsak dan, ima jasen začetek in konec in ga je mogoče izmeriti. Kadar nekdo vsak dan pol ure prepisuje podatke iz sporočil v preglednico, je to pravi začetek.',
-          'Za INSPECTUS je bil prvi proces prepis poročila o škodah v kartice za vozila. Za HEVA prijave napak. Vsakič ena stvar, ki je bila vsak dan enaka.',
+          'Za pregledovalno podjetje v pristanišču je bil prvi proces prepis poročila o škodah v kartice za vozila. Za upravnika stavb prijave napak. Vsakič ena stvar, ki je bila vsak dan enaka.',
         ],
       },
       {
@@ -130,7 +130,7 @@ export const blogPosts = [
       {
         title: 'Dobri prvi primeri',
         paragraphs: [
-          'Prepisovanje podatkov iz sporočil v preglednico ali sistem. Priprava vedno istega dokumenta iz vedno istih podatkov. Odgovarjanje na ista vprašanja strank. Pregledovanje istih virov vsako jutro. Za INSPECTUS je bil prvi proces prepis poročila o škodah v kartice za 314 vozil. Za HEVA prijave napak, ki so prihajale po e-pošti in telefonu.',
+          'Prepisovanje podatkov iz sporočil v preglednico ali sistem. Priprava vedno istega dokumenta iz vedno istih podatkov. Odgovarjanje na ista vprašanja strank. Pregledovanje istih virov vsako jutro. Za pregledovalno podjetje v pristanišču je bil prvi proces prepis poročila o škodah v kartice za 314 vozil. Za upravnika stavb prijave napak, ki so prihajale po e-pošti in telefonu.',
         ],
       },
       {
@@ -177,7 +177,7 @@ export const blogPosts = [
       {
         title: 'Kako to rešujemo',
         paragraphs: [
-          'Vsak odgovor ima vir. Svetovalec na spletni strani odgovarja samo iz dokumentov, ki jih je potrdila stranka, in če česa ni v virih, tega ne izmisli. Vsaka razvrstitev ima oceno. Filter fotografij za INSPECTUS vsak posnetek označi z oceno zaupanja; nizka ocena pomeni pregled, ne ugibanje. Model za premaze recepturo, ki je preveč drugačna od vsega, kar pozna, preprosto odkloni, in pove, zakaj.',
+          'Vsak odgovor ima vir. Svetovalec na spletni strani odgovarja samo iz dokumentov, ki jih je potrdila stranka, in če česa ni v virih, tega ne izmisli. Vsaka razvrstitev ima oceno. Filter fotografij za pregledovalno podjetje v pristanišču vsak posnetek označi z oceno zaupanja; nizka ocena pomeni pregled, ne ugibanje. Model za premaze recepturo, ki je preveč drugačna od vsega, kar pozna, preprosto odkloni, in pove, zakaj.',
         ],
       },
       {
@@ -231,7 +231,7 @@ export const blogPosts = [
       {
         title: 'Kaj se zgodi, ko odgovora ni',
         paragraphs: [
-          'Če noben odlomek ni dovolj blizu vprašanju, sistem ne izmisli odgovora. Pove, da tega v virih ni, in ponudi človeka. Pri Elementum tako na vprašanje o gibanju cen svetovalec odgovori, da o tem ne svetuje, in ponudi klic.',
+          'Če noben odlomek ni dovolj blizu vprašanju, sistem ne izmisli odgovora. Pove, da tega v virih ni, in ponudi človeka. Pri prodajalcu plemenitih kovin tako na vprašanje o gibanju cen svetovalec odgovori, da o tem ne svetuje, in ponudi klic.',
         ],
       },
       {
@@ -243,7 +243,7 @@ export const blogPosts = [
       {
         title: 'Primer iz našega dela',
         paragraphs: [
-          'Za Epolac, proizvajalca barv in premazov, so vir tehnični in varnostni listi za več sto izdelkov. Izvajalec na gradbišču vpraša, kako redčiti temeljni premaz za brezzračno brizganje. Sistem najde odstavek o redčenju v pravem listu, sestavi korake in ob njih izpiše izdelek, list in odstavek. Ko tehnična služba list popravi, je popravljen tudi vsak prihodnji odgovor. Nihče ne uči sistema; ekipa ureja dokumente, kot jih je urejala prej.',
+          'Za proizvajalca barv in premazov so vir tehnični in varnostni listi za več sto izdelkov. Izvajalec na gradbišču vpraša, kako redčiti temeljni premaz za brezzračno brizganje. Sistem najde odstavek o redčenju v pravem listu, sestavi korake in ob njih izpiše izdelek, list in odstavek. Ko tehnična služba list popravi, je popravljen tudi vsak prihodnji odgovor. Nihče ne uči sistema; ekipa ureja dokumente, kot jih je urejala prej.',
         ],
       },
       {
@@ -283,7 +283,7 @@ export const blogPosts = [
       {
         title: 'Drugi in tretji teden: prototip',
         paragraphs: [
-          'Prototip teče na vaših podatkih in ga preizkusite pred odločitvijo. Pri INSPECTUS je bil prototip orodje, ki je iz resničnega izvoza naredilo kartice. Ko ga vidite, veste, ali je vredno naprej. Če ni, se tukaj pošteno konča.',
+          'Prototip teče na vaših podatkih in ga preizkusite pred odločitvijo. Pri pregledovalnem podjetju v pristanišču je bil prototip orodje, ki je iz resničnega izvoza naredilo kartice. Ko ga vidite, veste, ali je vredno naprej. Če ni, se tukaj pošteno konča.',
         ],
       },
       {
@@ -349,7 +349,7 @@ export const blogPosts = [
       {
         title: 'Primer: fotografije s pomola',
         paragraphs: [
-          'Pri filtru fotografij za INSPECTUS je bilo vprašanje podatkov jasno od prvega dne: posnetki vozil ne smejo po nepotrebnem zapuščati naprave. Zato bralnik številk VIN teče na telefonu in v oblak gre samo posnetek, ki ga bralnik ne reši, brez shranjevanja. Na testnem naboru je bilo 29 od 30 posnetkov prebranih na napravi. Sistem je zasnovan okrog tega, kaj sme zapustiti podjetje, ne obratno.',
+          'Pri filtru fotografij za pregledovalno podjetje v pristanišču je bilo vprašanje podatkov jasno od prvega dne: posnetki vozil ne smejo po nepotrebnem zapuščati naprave. Zato bralnik številk VIN teče na telefonu in v oblak gre samo posnetek, ki ga bralnik ne reši, brez shranjevanja. Na testnem naboru je bilo 29 od 30 posnetkov prebranih na napravi. Sistem je zasnovan okrog tega, kaj sme zapustiti podjetje, ne obratno.',
         ],
       },
       {
@@ -390,7 +390,7 @@ export const blogPosts = [
       {
         title: 'Kaj mora znati poleg odgovarjanja',
         paragraphs: [
-          'Vprašati nazaj, ko vprašanje ni jasno. Priznati, ko odgovora ni. Predati človeku s povzetkom, ne z golim kontaktom. In se ustaviti pri stvareh, ki niso njegove: cene po dogovoru, pritožbe, zdravstvena vprašanja. Pri Tower Spa Celje asistent rezervira termine, skupine pa preda lastniku. Pri Dr. Asya Grafy svetuje o negi, o boleznih pa ne.',
+          'Vprašati nazaj, ko vprašanje ni jasno. Priznati, ko odgovora ni. Predati človeku s povzetkom, ne z golim kontaktom. In se ustaviti pri stvareh, ki niso njegove: cene po dogovoru, pritožbe, zdravstvena vprašanja. V wellnessu v stolpu asistent rezervira termine, skupine pa preda lastniku. Pri kozmetičnem inštitutu svetuje o negi, o boleznih pa ne.',
         ],
       },
       {

@@ -55,9 +55,9 @@ export const buildStage = {
 /* ── Clients marquee ────────────────────────────────────────────────────
    Two rows of small pills, each with a client's logo and name, nothing else.
 
-   Logos come from each client's own website (public/clients/). INSPECTUS,
-   Elementum, Tower Spa Celje, Dr. Asya Grafy Bio Institute,
-   SI-BIG, HEVA and Epolac are clients; AISOS, VETA and ATHLOS are our own
+   Logos come from each client's own website (public/clients/). pregledovalno podjetje,
+   prodajalec plemenitih kovin, wellness v stolpu, kozmetični inštitut,
+   svetovalno podjetje, upravnik stavb and proizvajalec barv in premazov are clients; AISOS, VETA and ATHLOS are our own
    products and brands. `tone: 'dark'` puts a dark disc behind a logo drawn
    for dark surfaces. Before a production deploy, confirm with each client
    that their logo may appear here. */
@@ -108,7 +108,7 @@ export const clients = {
     },
     {
       name: 'VETA',
-      logo: { src: '/clients/veta.svg', width: 512, height: 512 },
+      logo: { src: '/clients/veta.svg', width: 1000, height: 1000 },
     },
     {
       name: 'ATHLOS',
@@ -190,8 +190,8 @@ export const teamShowcase = {
    numbers on the screens are illustrative.
 
    The first eight entries are described from our repositories and Notion.
-   The last six (Elementum, Tower Spa Celje, Dr. Asya Grafy, SI-BIG, HEVA,
-   Epolac) were drafted at Ian's request without source material, to fit each
+   The last six (prodajalec plemenitih kovin, wellness v stolpu, kozmetični inštitut, svetovalno podjetje, upravnik stavb,
+   proizvajalec barv in premazov) were drafted at Ian's request without source material, to fit each
    client's business and our service areas. Ian confirms or corrects them
    before a production deploy. */
 
@@ -202,9 +202,9 @@ export const products = {
   homeTitle: 'Kaj smo zgradili',
   metaTitle: 'Izdelki in projekti | AIS Slovenia',
   metaDescription:
-    'SaaS izdelki, avtomatizacije in AI modeli, ki jih je AIS Slovenia zgradila zase in za stranke: ATHLOS, AIS Command, AISOS, INSPECTUS in napovedni model za premaze.',
+    'SaaS izdelki, avtomatizacije in AI modeli AIS Slovenia: ATHLOS, AIS Command, AISOS, pregled vozil v pristanišču, model za premaze in asistenti za stranke.',
   answer:
-    'AIS Slovenia razvija lastne izdelke (ATHLOS, AIS Command, AISOS) in gradi sisteme za stranke: avtomatizaciji za INSPECTUS, napovedni model za premaze ter svetovalce in asistente za stranke.',
+    'AIS Slovenia razvija lastne izdelke (ATHLOS, AIS Command, AISOS) in gradi sisteme za stranke: avtomatizaciji za pregled vozil v pristanišču, napovedni model za premaze ter svetovalce in asistente za stranke.',
   items: [
     {
       id: 'athlos',
@@ -237,26 +237,24 @@ export const products = {
       picture: { src: '/pictures/aisos', alt: 'AISOS z jutranjim pregledom, seznamom agentov in nalogami, ki čakajo na človeka.', width: 1600, height: 1000 },
     },
     {
-      id: 'inspectus-vldr',
+      id: 'vldr-kartice',
       kicker: 'Za stranko',
       kind: 'Avtomatizacija',
-      name: 'INSPECTUS VLDR',
-      client: 'INSPECTUS',
+      name: 'VLDR kartice',
       body: 'Dokumentacijski cevovod za pregled vozil v pristanišču. Sistem prebere izvoz poročila o škodah, uredi podatke po vozilih in za vsako vozilo natisne kartico VLDR v obliki, ki jo zahteva proizvajalec. Ročno urejanje preglednic je odpadlo.',
       simple: 'Preglednico s škodami spustite v orodje. Iz nje nastane kartica za vsako vozilo, točno taka, kot jo hoče proizvajalec.',
       forWhom: 'Za podjetja, ki po istem obrazcu izpolnjujejo stotine dokumentov.',
-      picture: { src: '/pictures/inspectus-vldr', alt: 'Zaslon orodja VLDR po obdelavi: 314 vozil obdelanih, zavihek VIN-FILAJ s tabelo modelov, VIN in poškodb.', width: 1600, height: 1000 },
+      picture: { src: '/pictures/vldr-kartice', alt: 'Zaslon orodja VLDR po obdelavi: 314 vozil obdelanih, zavihek VIN-FILAJ s tabelo modelov, VIN in poškodb.', width: 1600, height: 1000 },
     },
     {
-      id: 'inspectus-vin',
+      id: 'pametni-filter-vin',
       kicker: 'Za stranko',
       kind: 'Avtomatizacija',
-      name: 'INSPECTUS VIN filter',
-      client: 'INSPECTUS',
+      name: 'Pametni filter VIN',
       body: 'Pametni filter fotografij s pomola. Tablica s številko VIN odpre vozilo, posnetki za njo mu pripadajo, rezultat pa se v obe smeri preveri proti ladijskemu seznamu razkladanja. Neujemanja dobi človek na pregled.',
       simple: 'Telefon slika tablico in nato škode. Sistem ve, katere slike so od katerega avta, in pove, če kaj manjka.',
       forWhom: 'Za ekipe na terenu, ki fotografirajo veliko stvari in jih pozneje težko razvrstijo.',
-      picture: { src: '/pictures/inspectus-vin', alt: 'Zaslon filtra VIN po razvrščanju: sedem korakov opravljenih, štiri razvrščena vozila s fotografijami in predal Nerazvrščeno.', width: 1600, height: 1000 },
+      picture: { src: '/pictures/pametni-filter-vin', alt: 'Zaslon filtra VIN po razvrščanju: sedem korakov opravljenih, štiri razvrščena vozila s fotografijami in predal Nerazvrščeno.', width: 1600, height: 1000 },
     },
     {
       id: 'model-premazi',
@@ -269,70 +267,64 @@ export const products = {
       picture: { src: '/pictures/model-premazi', alt: 'Terminal z resnično sejo modela za premaze: napoved štirih lastnosti z intervali in dve zavrnitvi z razlogom.', width: 1600, height: 1000 },
     },
     {
-      id: 'elementum',
+      id: 'svetovalec-plemenite-kovine',
       kicker: 'Za stranko',
       kind: 'Avtomatizacija prodaje',
-      name: 'Elementum',
-      client: 'Elementum, plemenite kovine',
+      name: 'Svetovalec za plemenite kovine',
       body: 'Spletni svetovalec, ki obiskovalcem v slovenščini odgovarja o nakupu in hrambi zlata in srebra, tudi ponoči, in resna povpraševanja preda svetovalcem. Zjutraj ekipa dobi kratek tržni pregled: cene, novice in premiki konkurence, zbrani iz virov, ki jih prej pregledovali ročno.',
       simple: 'Obiskovalec vpraša o zlatu, svetovalec odgovori iz preverjenih virov, tudi ob polnoči. Resno povpraševanje dobi človek zjutraj.',
       forWhom: 'Za prodajalce, ki dobijo ista vprašanja vsak dan.',
-      picture: { src: '/pictures/elementum', alt: 'Jutranji tržni pregled za svetovalce ob pogovoru spletnega svetovalca s stranko.', width: 1600, height: 1000 },
+      picture: { src: '/pictures/svetovalec-plemenite-kovine', alt: 'Jutranji tržni pregled za svetovalce ob pogovoru spletnega svetovalca s stranko.', width: 1600, height: 1000 },
     },
     {
-      id: 'tower-spa',
+      id: 'asistent-rezervacije',
       kicker: 'Za stranko',
       kind: 'Avtomatizacija prodaje',
-      name: 'Tower Spa Celje',
-      client: 'Tower Spa Celje',
+      name: 'Asistent za rezervacije',
       body: 'Asistent za rezervacije v wellnessu v srednjeveškem stolpu. Odgovarja na vprašanja o paketih, savnah in masažah, sprejme rezervacijo, pošlje opomnik dan prej in ob odpovedi sprosti termin. Vprašanja za skupine in dogodke preda lastniku.',
       simple: 'Gost napiše, kdaj bi prišel, asistent najde termin in ga potrdi. Dan prej gosta spomni.',
       forWhom: 'Za wellnesse, salone in vse, ki rezervirajo termine.',
-      picture: { src: '/pictures/tower-spa', alt: 'Tedenski pregled rezervacij Tower Spa z zadnjimi sporočili strank.', width: 1600, height: 1000 },
+      picture: { src: '/pictures/asistent-rezervacije', alt: 'Tedenski pregled rezervacij wellness z zadnjimi sporočili strank.', width: 1600, height: 1000 },
     },
     {
-      id: 'asya-grafy',
+      id: 'svetovalec-nega-koze',
       kicker: 'Za stranko',
       kind: 'AI svetovalec',
-      name: 'Dr. Asya Grafy Bio Institute',
-      client: 'Dr. Asya Grafy Bio Institute',
+      name: 'Svetovalec za nego kože',
       body: 'Svetovalec za nego kože v spletni trgovini. Iz dokumentacije o izdelkih odgovori na vprašanja o suhi, občutljivi ali zreli koži, predlaga vrstni red izdelkov in vsak izdelek pošlje v košarico. Zdravstvena vprašanja preda človeku.',
       simple: 'Vpišete, kakšno kožo imate, in svetovalec pove, kateri izdelki so za vas in v kakšnem vrstnem redu. Z enim klikom v košarico.',
       forWhom: 'Za spletne trgovine z izdelki, ki potrebujejo razlago.',
-      picture: { src: '/pictures/asya-grafy', alt: 'Svetovalec za nego kože v mobilni trgovini ob pregledu najpogostejših vprašanj strank.', width: 1600, height: 1000 },
+      picture: { src: '/pictures/svetovalec-nega-koze', alt: 'Svetovalec za nego kože v mobilni trgovini ob pregledu najpogostejših vprašanj strank.', width: 1600, height: 1000 },
     },
     {
-      id: 'si-big',
+      id: 'spremljanje-razpisov',
       kicker: 'Za stranko',
       kind: 'Spremljanje trga',
-      name: 'SI-BIG',
-      client: 'SI-BIG Group',
+      name: 'Spremljanje razpisov',
       body: 'Sistem, ki vsako jutro pregleda razpise, iskanja partnerjev in novice s šestih balkanskih trgov, jih oceni po merilih posamezne stranke in ekipi pripravi seznam, ki ga pošlje naprej. Iskanje, ki je prej vzelo dopoldne, je zdaj pregled ob kavi.',
       simple: 'Vsako jutro pregleda razpise in novice na šestih trgih in pove, kateri so za vas. Vi samo preberete seznam.',
       forWhom: 'Za svetovalce in podjetja, ki delajo na več trgih hkrati.',
-      picture: { src: '/pictures/si-big', alt: 'Seznam priložnosti po balkanskih trgih, ocenjenih po ujemanju s strankami.', width: 1600, height: 1000 },
+      picture: { src: '/pictures/spremljanje-razpisov', alt: 'Seznam priložnosti po balkanskih trgih, ocenjenih po ujemanju s strankami.', width: 1600, height: 1000 },
     },
     {
-      id: 'heva',
+      id: 'delovni-nalogi',
       kicker: 'Za stranko',
       kind: 'Avtomatizacija administracije',
-      name: 'HEVA',
-      client: 'HEVA, upravljanje nepremičnin',
+      name: 'Delovni nalogi',
       body: 'Delovni nalogi za upravljanje in vzdrževanje stavb. Iz e-pošte in telefonskih klicev asistent prepozna naslov, težavo in nujnost, ustvari nalog in predlaga prostega monterja. Ekipa nalog dobi na telefon, po opravljenem delu pa gre račun ven sam.',
       simple: 'Stanovalec napiše, da pušča pipa. Sistem naredi nalog, izbere monterja in po opravilu pripravi račun.',
       forWhom: 'Za upravnike stavb in servise, ki dobijo prijave po e-pošti in telefonu.',
-      picture: { src: '/pictures/heva', alt: 'Tabla delovnih nalogov HEVA: novo iz sporočil, razporejeno in opravljeno.', width: 1600, height: 1000 },
+      picture: { src: '/pictures/delovni-nalogi', alt: 'Tabla delovnih nalogov upravnika stavb: novo iz sporočil, razporejeno in opravljeno.', width: 1600, height: 1000 },
     },
     {
-      id: 'epolac',
+      id: 'tehnicni-asistent',
       kicker: 'Za stranko',
       kind: 'AI asistent',
-      name: 'Epolac',
-      client: 'Epolac, Izrael',
+      name: 'Tehnični asistent',
       body: 'Tehnični asistent za proizvajalca barv in premazov. Iz tehničnih in varnostnih listov odgovarja na vprašanja izvajalcev in distributerjev v angleščini in hebrejščini, navede vir in izračuna porabo. Vprašanja o cenah in projektih preda prodaji.',
       simple: 'Mojster na gradbišču vpraša, kako redčiti barvo. Asistent odgovori iz tehničnega lista, v njegovem jeziku, in pove, koliko barve potrebuje.',
       forWhom: 'Za proizvajalce z veliko izdelki in tehnično dokumentacijo.',
-      picture: { src: '/pictures/epolac', alt: 'Tehnični asistent Epolac odgovarja na vprašanje o hidroizolaciji z navedbo tehničnega lista.', width: 1600, height: 1000 },
+      picture: { src: '/pictures/tehnicni-asistent', alt: 'Tehnični asistent proizvajalca barv in premazov odgovarja na vprašanje o hidroizolaciji z navedbo tehničnega lista.', width: 1600, height: 1000 },
     },
   ],
   empty: {
@@ -350,9 +342,9 @@ export const news = {
   lead: 'Kratka obvestila o tem, kaj je AIS Slovenia zgradil in objavil. Samo stvari, ki so se res zgodile, z datumom.',
   metaTitle: 'Novice: kaj je novega pri AIS Slovenia',
   metaDescription:
-    'Novice AIS Slovenia: nova spletna stran z dvanajstimi študijami primerov in tremi vodiči ter prva ladja za INSPECTUS, obdelana v nekaj sekundah.',
+    'Novice AIS Slovenia: nova spletna stran z dvanajstimi študijami primerov in tremi vodiči ter prva ladja v pristanišču, obdelana v nekaj sekundah.',
   answer:
-    'AIS Slovenia objavlja kratke novice o opravljenem delu: septembra 2026 novo spletno stran z dvanajstimi študijami primerov in tremi vodiči ter julija 2026 prvo resnično serijo 314 vozil za INSPECTUS.',
+    'AIS Slovenia objavlja kratke novice o opravljenem delu: septembra 2026 novo spletno stran z dvanajstimi študijami primerov in tremi vodiči ter julija 2026 prvo resnično serijo 314 vozil za pregledovalno podjetje v pristanišču.',
   items: [
     {
       date: '2026-09-10',
@@ -372,7 +364,7 @@ export const news = {
       date: '2026-07-14',
       dateLabel: '14. 7. 2026',
       kicker: 'Stranke',
-      title: 'INSPECTUS: prva ladja s 314 vozili obdelana v nekaj sekundah',
+      title: 'Pregled vozil v pristanišču: prva ladja s 314 vozili obdelana v nekaj sekundah',
       body: 'Orodje za pregled vozil v pristanišču je prvič teklo na resničnih podatkih. Iz izvoza s 380 vrsticami je nastalo 314 vrstic za poročilo in 314 kartic VLDR v obliki, ki jo zahteva proizvajalec. Ročno urejanje preglednic je odpadlo.',
     },
   ],

@@ -32,13 +32,13 @@ export const guides = {
           title: 'Kdaj je AI chatbot prava izbira',
           paragraphs: [
             'Kadar vaše stranke sprašujejo na spletni strani, v e-pošti ali v sporočilih in kadar so odgovori vezani na dokumente: cenike, pakete, tehnične liste, pogoje. Chatbot lahko pokaže povezavo, sliko ali gumb v košarico in pogovor se shrani, tako da ga lahko človek prevzame z vso zgodovino.',
-            'Chatbot je tudi varnejši prvi korak. Odgovori se pregledujejo, viri se popravijo, in dokler sistem ni dovolj dober, teče v testnem obdobju na resničnih vprašanjih. Za Dr. Asya Grafy Bio Institute je AIS Slovenia tako postavil svetovalca, ki iz dokumentacije izdelkov svetuje po tipu kože in izdelke pošlje v košarico.',
+            'Chatbot je tudi varnejši prvi korak. Odgovori se pregledujejo, viri se popravijo, in dokler sistem ni dovolj dober, teče v testnem obdobju na resničnih vprašanjih. Za kozmetični inštitut je AIS Slovenia tako postavil svetovalca, ki iz dokumentacije izdelkov svetuje po tipu kože in izdelke pošlje v košarico.',
           ],
         },
         {
           title: 'Kdaj je glasovni agent prava izbira',
           paragraphs: [
-            'Kadar stranke kličejo in kadar klic, na katerega se nihče ne oglasi, pomeni izgubljen posel: rezervacije, prijave napak, vprašanja o delovnem času in cenah. Glasovni agent se oglasi takoj, v slovenščini, in ob vsaki uri. Za wellness Tower Spa Celje asistent AIS Slovenia sprejme rezervacijo, pošlje opomnik in ob odpovedi sprosti termin.',
+            'Kadar stranke kličejo in kadar klic, na katerega se nihče ne oglasi, pomeni izgubljen posel: rezervacije, prijave napak, vprašanja o delovnem času in cenah. Glasovni agent se oglasi takoj, v slovenščini, in ob vsaki uri. V wellnessu v stolpu asistent AIS Slovenia sprejme rezervacijo, pošlje opomnik in ob odpovedi sprosti termin.',
             'Glas ima strožja pravila. Odgovor mora biti kratek, agent mora prepoznati, kdaj klic preda človeku, in vsak klic mora biti zapisan. Zato je glasovni agent smiseln tam, kjer so vprašanja predvidljiva, ne kot prvi poskus.',
           ],
         },
@@ -137,7 +137,7 @@ export const guides = {
       title: 'n8n, Make ali sistem po meri: kdaj kaj',
       lead: 'Orodja brez programiranja so odlična za povezave med aplikacijami. Sistem po meri je potreben takrat, ko proces odloča, ne le prenaša.',
       answer:
-        'n8n in Make sta pravi izbiri, kadar je treba povezati orodja in prenašati podatke po jasnih pravilih: nov naročnik v CRM, sporočilo v kanal, vrstica v preglednico. Sistem po meri je potreben, kadar proces bere dokumente, odloča po pravilih z izjemami, potrebuje lastne podatke in sledljivost ali kadar mora delovati zanesljivo pri tisočih zapisov. AIS Slovenia uporablja oboje: lastni agentni sistem AISOS teče na n8n, sistem za pregled vozil INSPECTUS pa je zgrajen po meri, ker 314 vozil na ladjo in pravila proizvajalca prenesejo nič napak.',
+        'n8n in Make sta pravi izbiri, kadar je treba povezati orodja in prenašati podatke po jasnih pravilih: nov naročnik v CRM, sporočilo v kanal, vrstica v preglednico. Sistem po meri je potreben, kadar proces bere dokumente, odloča po pravilih z izjemami, potrebuje lastne podatke in sledljivost ali kadar mora delovati zanesljivo pri tisočih zapisov. AIS Slovenia uporablja oboje: lastni agentni sistem AISOS teče na n8n, sistem za pregled vozil v pristanišču pa je zgrajen po meri, ker 314 vozil na ladjo in pravila proizvajalca prenesejo nič napak.',
       sections: [
         {
           title: 'Kdaj zadostujeta n8n ali Make',
@@ -149,7 +149,7 @@ export const guides = {
           title: 'Kdaj je potreben sistem po meri',
           paragraphs: [
             'Kadar vhod ni strukturiran: e-pošta v vseh oblikah, fotografije, dokumenti z izjemami. Kadar so pravila zapletena in se mora vsaka odločitev dati razložiti. Kadar gre za velike količine ali za podatke, ki ne smejo zapustiti podjetja. In kadar mora sistem imeti lasten vmesnik, na primer nadzorno ploščo za ekipo ali portal za stranke.',
-            'Za INSPECTUS je AIS Slovenia zgradil orodje po meri, ker pravilo za opombe in oblika kartice proizvajalca ne dopuščata približkov. Za AISOS pa uporablja n8n, ker agenti berejo koledar, e-pošto in naloge in pripravljajo osnutke, kar so tokovi, ki jih orodje brez programiranja opravi dobro.',
+            'Za pregledovalno podjetje v pristanišču je AIS Slovenia zgradil orodje po meri, ker pravilo za opombe in oblika kartice proizvajalca ne dopuščata približkov. Za AISOS pa uporablja n8n, ker agenti berejo koledar, e-pošto in naloge in pripravljajo osnutke, kar so tokovi, ki jih orodje brez programiranja opravi dobro.',
           ],
         },
         {

@@ -61,7 +61,7 @@ export const deep = {
     detail: { src: '/pictures/aisos-detail', alt: 'Jutranji pregled dneva v AISOS s koledarjem, seznamom ljudi, ki čakajo na odgovor, roki in osnutki za potrditev.', caption: 'Pregled dneva ob sedmih: koledar, kdo čaka, kateri roki so blizu, in desno osnutki, ki čakajo na potrditev.' },
   },
 
-  'inspectus-vldr': {
+  'vldr-kartice': {
     before: [
       'Ladja je razložena v sredo. V četrtek zjutraj pregledovalec izvozi poročilo: 380 vrstic, vsaka vrstica ena škoda. Sodelavka jih začne združevati po vozilih v novi preglednici, pri tem iz opomb ročno briše razred, ki ga proizvajalec ne želi videti.',
       'Popoldne odpre obrazec proizvajalca in ga izpolnjuje vozilo za vozilom. Pri vozilu 140 zamenja dve številki VIN. Napaka gre v petek naprej k proizvajalcu in se vrne čez teden dni z vprašanjem.',
@@ -75,10 +75,10 @@ export const deep = {
       { q: 'Ali orodje potrebuje namestitev?', a: 'Ne. Teče v brskalniku na računalniku, prijava je z e-poštnim naslovom podjetja. Nova različica je za vse hkrati.' },
       { q: 'Koliko časa je prihranjenega?', a: 'Natančne številke ne objavljamo, ker je stranka ni izmerila. Kar vemo: ročno urejanje preglednic je odpadlo, obdelava serije 314 vozil traja nekaj sekund.' },
     ],
-    detail: { src: '/pictures/inspectus-vldr-detail', alt: 'Kartica VLDR, kot jo natisne orodje: obrazec proizvajalca z modelom, serijsko številko, kodami poškodb in opombami.', caption: 'Kartica, kot jo orodje res natisne: obrazec proizvajalca z modelom, serijsko številko, kodami poškodb in opombami. Serijske številke so za prikaz zamenjane.' },
+    detail: { src: '/pictures/vldr-kartice-detail', alt: 'Kartica VLDR, kot jo natisne orodje: obrazec proizvajalca z modelom, serijsko številko, kodami poškodb in opombami.', caption: 'Kartica, kot jo orodje res natisne: obrazec proizvajalca z modelom, serijsko številko, kodami poškodb in opombami. Serijske številke so za prikaz zamenjane.' },
   },
 
-  'inspectus-vin': {
+  'pametni-filter-vin': {
     before: [
       'Ladja z dvesto vozili. Dva pregledovalca na pomolu, vsak s svojim telefonom, fotografirata tablico in nato škode, vozilo za vozilom. Do večera je na dveh telefonih več tisoč posnetkov, oštevilčenih tako, kot ju je oštevilčil telefon.',
       'Naslednji dan sodelavka odpira posnetke enega za drugim in ugiba, kje se konča eno vozilo in začne drugo. Če je pregledovalec tablico fotografiral dvakrat, je vozilo dvakrat. Če je pozabil, so škode pripisane sosednjemu.',
@@ -92,7 +92,7 @@ export const deep = {
       { q: 'Kaj, če bralnik prebere napačno črko?', a: 'Prebrana številka se primerja s seznamom vozil z ladje. Program sme popraviti eno samo zamenljivo črko, in to le, če je popravek edini možen. Sicer gre posnetek v pregled.' },
       { q: 'Ali sistem že teče na resnični ladji?', a: 'Ne še. Zasnova in prototip razvrščanja sta narejena in preizkušena na testnih posnetkih, ponudba za uvedbo je iz avgusta 2026. Prvi pilot bo pokazal, kako se obnese na pomolu.' },
     ],
-    detail: { src: '/pictures/inspectus-vin-detail', alt: 'Filter VIN pred zagonom: trak tridesetih posnetkov v vrstnem redu zajema s časi in sedem korakov, ki čakajo.', caption: 'Pred zagonom: trideset posnetkov v vrstnem redu zajema, s časom iz fotografije, in sedem korakov, ki jih filter nato opravi. Vzorčni podatki, kot piše v orodju.' },
+    detail: { src: '/pictures/pametni-filter-vin-detail', alt: 'Filter VIN pred zagonom: trak tridesetih posnetkov v vrstnem redu zajema s časi in sedem korakov, ki čakajo.', caption: 'Pred zagonom: trideset posnetkov v vrstnem redu zajema, s časom iz fotografije, in sedem korakov, ki jih filter nato opravi. Vzorčni podatki, kot piše v orodju.' },
   },
 
   'model-premazi': {
@@ -112,7 +112,7 @@ export const deep = {
     detail: { src: '/pictures/model-premazi-detail', alt: 'Terminal z ukazi modela za premaze: pomoč za demo in predict ter zagon demo z napovedjo štirih lastnosti.', caption: 'Model, kot ga tehnolog danes uporablja: ukazna vrstica z dvema ukazoma, demo na sintetičnih podatkih in predict za lastno recepturo. Vsaka seja je resnična.' },
   },
 
-  elementum: {
+  'svetovalec-plemenite-kovine': {
     before: [
       'Sobota, 22.40. Obiskovalec na spletni strani bere o naložbenem zlatu in ima tri vprašanja: razlika med palico in kovancem, ali je zlato obdavčeno, kako poteka hramba. Napiše sporočilo. Odgovor dobi v ponedeljek dopoldne, ko je že kupil drugje.',
       'V ponedeljek zjutraj vsak svetovalec pol ure pregleduje cene, novice in konkurenco, preden lahko začne z delom. Isti pregled, trikrat.',
@@ -126,10 +126,10 @@ export const deep = {
       { q: 'Kaj se zgodi s povpraševanjem?', a: 'Svetovalec zbere ime, kontakt in kratek povzetek pogovora in ga preda svetovalcu, ne v splošni nabiralnik. Svetovalec pokliče s pripravljenim ozadjem.' },
       { q: 'Od kod so podatki v jutranjem pregledu?', a: 'Iz virov, ki jih je ekipa prej pregledovala ročno: cene, novice in strani konkurence. Agent jih strne v pregled, ki ga ekipa prebere v petih minutah.' },
     ],
-    detail: { src: '/pictures/elementum-detail', alt: 'Spletni svetovalec Elementum odgovori o hrambi zlata z navedbo vira in ponudi klic svetovalca, ob njem jutranji tržni pregled.', caption: 'Odgovor z virom in ponudba, da pokliče svetovalec. Levo jutranji tržni pregled, ki ga ekipa prebere ob kavi.' },
+    detail: { src: '/pictures/svetovalec-plemenite-kovine-detail', alt: 'Spletni svetovalec prodajalca plemenitih kovin odgovori o hrambi zlata z navedbo vira in ponudi klic svetovalca, ob njem jutranji tržni pregled.', caption: 'Odgovor z virom in ponudba, da pokliče svetovalec. Levo jutranji tržni pregled, ki ga ekipa prebere ob kavi.' },
   },
 
-  'tower-spa': {
+  'asistent-rezervacije': {
     before: [
       'Petek zvečer v stolpu. Ena oseba skrbi za goste v savni, medtem ko telefon zvoni in na Instagramu čakajo štiri sporočila o prostih terminih za soboto. Odgovori pridejo ob enajstih, ko sta dva gosta že rezervirala drugje.',
       'V soboto ob dvanajstih odpove par, ki je imel termin ob petih. Termin ostane prazen, ker ni časa, da bi ga kdo ponudil naprej.',
@@ -143,10 +143,10 @@ export const deep = {
       { q: 'Ali lahko rezervacijo tudi spremeni ali odpove?', a: 'Da. Odpoved je en korak, sproščen termin gre gostom s čakalnega seznama. Spremembo termina asistent uredi enako kot novo rezervacijo.' },
       { q: 'Kaj gre k lastniku?', a: 'Skupine, dogodki in posebne želje, torej vse, česar ni v ponudbi. Lastnik dobi povzetek pogovora in kontakt, ne odprtega klepeta.' },
     ],
-    detail: { src: '/pictures/tower-spa-detail', alt: 'Rezervacija savne v klepetu na telefonu s potrditvijo in opomnikom, ob njej povpraševanje skupine, predano lastniku.', caption: 'Gost izbere termin v klepetu in dobi potrditev z opomnikom. Desno povpraševanje za skupino, ki gre k lastniku s povzetkom.' },
+    detail: { src: '/pictures/asistent-rezervacije-detail', alt: 'Rezervacija savne v klepetu na telefonu s potrditvijo in opomnikom, ob njej povpraševanje skupine, predano lastniku.', caption: 'Gost izbere termin v klepetu in dobi potrditev z opomnikom. Desno povpraševanje za skupino, ki gre k lastniku s povzetkom.' },
   },
 
-  'asya-grafy': {
+  'svetovalec-nega-koze': {
     before: [
       'Obiskovalka spletne trgovine ima suho, občutljivo kožo in rdečico. Na strani je šestnajst izdelkov z dobrimi opisi. Prebere tri, se ne odloči in napiše sporočilo. Ekipa odgovori naslednji dan, ko je zavihek že zaprt.',
       'V nabiralniku je vsak teden isto: kateri izdelek zame, v kakšnem vrstnem redu, ali se ta dva skladata. Med njimi tudi vprašanje o rozacei, na katero ekipa ne sme odgovoriti.',
@@ -160,12 +160,12 @@ export const deep = {
       { q: 'Kaj se zgodi z zdravstvenimi vprašanji?', a: 'Svetovalec jih prepozna, jih ne odgovarja in jih preda človeku s povzetkom. Vprašanja o boleznih, zdravilih in nosečnosti so vedno pri človeku.' },
       { q: 'Ali svetovalec sili v nakup?', a: 'Ne. Predlaga rutino z razlogi, v košarico gre samo tisto, kar obiskovalec sam klikne. Priporočila so dosledna, ker vsi berejo isto dokumentacijo.' },
     ],
-    detail: { src: '/pictures/asya-grafy-detail', alt: 'Priporočena jutranja in večerna rutina za nego kože z razlogi in gumbi za košarico, ob njej predano zdravstveno vprašanje.', caption: 'Rutina za jutro in večer, vsak korak z razlogom in gumbom v košarico. Spodaj vprašanje, ki je šlo k človeku.' },
+    detail: { src: '/pictures/svetovalec-nega-koze-detail', alt: 'Priporočena jutranja in večerna rutina za nego kože z razlogi in gumbi za košarico, ob njej predano zdravstveno vprašanje.', caption: 'Rutina za jutro in večer, vsak korak z razlogom in gumbom v košarico. Spodaj vprašanje, ki je šlo k človeku.' },
   },
 
-  'si-big': {
+  'spremljanje-razpisov': {
     before: [
-      'Osem zjutraj v pisarni SI-BIG. Svetovalka odpre portale za razpise v Srbiji, Bosni in Makedoniji, nato zbornične novice, nato iskanja partnerjev. Bere v treh jezikih in za vsako od enajstih strank presoja, ali je kaj zanjo. Ob enajstih je pri polovici virov in začne pravo delo.',
+      'Osem zjutraj v pisarni svetovalno podjetje. Svetovalka odpre portale za razpise v Srbiji, Bosni in Makedoniji, nato zbornične novice, nato iskanja partnerjev. Bere v treh jezikih in za vsako od enajstih strank presoja, ali je kaj zanjo. Ob enajstih je pri polovici virov in začne pravo delo.',
       'Ko je teden gost, viri počakajo. Razpis z rokom v ponedeljek se pokaže v torek.',
     ],
     practice: [
@@ -177,10 +177,10 @@ export const deep = {
       { q: 'Kako ve, kaj je za katero stranko?', a: 'Vsaka stranka ima svoja merila: panogo, države, velikost, rok. Vsak zadetek dobi oceno in razlog. Črtani zadetki znižajo oceno podobnih pri naslednjem pregledu.' },
       { q: 'Ali gre kaj strankam brez pregleda?', a: 'Ne. Seznam pregleda svetovalka in pošlje samo, kar potrdi. Sistem pripravlja, človek odloča.' },
     ],
-    detail: { src: '/pictures/si-big-detail', alt: 'Jutranji seznam zadetkov po strankah s trgi, ocenami in razlogi ter gumbi za pošiljanje ali črtanje.', caption: 'Jutranji seznam po strankah: trg, ocena in razlog za vsak zadetek, pošlji ali črtaj z enim klikom.' },
+    detail: { src: '/pictures/spremljanje-razpisov-detail', alt: 'Jutranji seznam zadetkov po strankah s trgi, ocenami in razlogi ter gumbi za pošiljanje ali črtanje.', caption: 'Jutranji seznam po strankah: trg, ocena in razlog za vsak zadetek, pošlji ali črtaj z enim klikom.' },
   },
 
-  heva: {
+  'delovni-nalogi': {
     before: [
       'Torek, 7.12. V nabiralnik upravnika pride sporočilo: v kleti pušča cev pri števcih, voda je na tleh. Sporočilo prebere ob devetih, ga prepiše v nalog, pokliče dva monterja, prvi je zaseden. Ob enajstih je nalog dodeljen, klet pa je pod vodo že štiri ure.',
       'Ob koncu tedna pisarna prepisuje opravljeno delo iz sporočil in listkov v račune. Ena ura za dvigalo je pozabljena, en račun gre napačnemu naslovu.',
@@ -194,10 +194,10 @@ export const deep = {
       { q: 'Kaj, če asistent prijave ne razume?', a: 'Vsaka prepoznava ima stopnjo zaupanja. Nejasne prijave gredo dispečerju v pregled z izvirnim sporočilom, ne v nalog z ugibanjem.' },
       { q: 'Ali gredo računi ven sami?', a: 'Nastane osnutek iz opravljenega dela. Potrdi ga pisarna. Tako ostane pregled nad tem, kaj se zaračuna, brez prepisovanja.' },
     ],
-    detail: { src: '/pictures/heva-detail', alt: 'Delovni nalog na monterjevem telefonu s fotografijami in poljem za material in čas, ob njem osnutek računa, ki čaka na potrditev.', caption: 'Nalog na telefonu z naslovom, fotografijami in materialom. Desno osnutek računa, ki je nastal iz istih podatkov.' },
+    detail: { src: '/pictures/delovni-nalogi-detail', alt: 'Delovni nalog na monterjevem telefonu s fotografijami in poljem za material in čas, ob njem osnutek računa, ki čaka na potrditev.', caption: 'Nalog na telefonu z naslovom, fotografijami in materialom. Desno osnutek računa, ki je nastal iz istih podatkov.' },
   },
 
-  epolac: {
+  'tehnicni-asistent': {
     before: [
       'Gradbišče ob sedmih zvečer. Izvajalec ima v rokah primer z dvokomponentnim temeljnim premazom in vprašanje: koliko redčiti za brezzračno brizganje. Tehnični list je nekje v e-pošti. Pokliče tehnično službo, ki ima že konec delovnika. Vprašanje enako kot prejšnji teden, samo druga oseba.',
       'Naslednji dan tehnolog odgovori na dvanajst takih vprašanj v angleščini in hebrejščini in za razvoj ne ostane časa.',
@@ -211,6 +211,6 @@ export const deep = {
       { q: 'Kako deluje izračun porabe?', a: 'Iz površine, podlage in števila nanosov in teoretične porabe z lista izračuna količino in predlaga pakiranje. Izvajalec vidi račun, ne le številko.' },
       { q: 'Zakaj cene in projekti gredo prodaji?', a: 'Ker so odvisni od količin, pogodb in rokov, ki jih list ne pozna. Prodaja dobi povpraševanje s povzetkom pogovora, ne z golim kontaktom.' },
     ],
-    detail: { src: '/pictures/epolac-detail', alt: 'Odgovor tehničnega asistenta v angleščini z navedbo tehničnega lista, izračun porabe in vrstica v hebrejščini.', caption: 'Odgovor z virom v angleščini, izračun porabe iz površine in nanosov, in ista storitev v hebrejščini.' },
+    detail: { src: '/pictures/tehnicni-asistent-detail', alt: 'Odgovor tehničnega asistenta v angleščini z navedbo tehničnega lista, izračun porabe in vrstica v hebrejščini.', caption: 'Odgovor z virom v angleščini, izračun porabe iz površine in nanosov, in ista storitev v hebrejščini.' },
   },
 };

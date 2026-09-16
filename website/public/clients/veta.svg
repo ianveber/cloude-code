@@ -1,16 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#000000"/>
-  <rect width="512" height="512" rx="112" fill="url(#g1)" opacity="0.6"/>
-  <defs>
-    <radialGradient id="g1" cx="50%" cy="0%" r="100%">
-      <stop offset="0%" stop-color="#0A84FF" stop-opacity="0.4"/>
-      <stop offset="100%" stop-color="#BF5AF2" stop-opacity="0.15"/>
-    </radialGradient>
-    <linearGradient id="bolt" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="100%" stop-color="#0A84FF"/>
-    </linearGradient>
-  </defs>
-  <!-- Lightning bolt -->
-  <polygon points="296,80 176,280 248,280 216,432 336,232 264,232" fill="url(#bolt)"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">
+  <polygon points="356,276 440,345 442,391" fill="#59AEDB"/>
+  <polygon points="356,276 442,391 444,437" fill="#1A5F8F"/>
+  <polygon points="472,352 600,328 560,370" fill="#7FC4E6"/>
+  <polygon points="560,370 600,328 535,402" fill="#1A5F8F"/>
+  <polygon points="472,352 560,370 535,402" fill="#3A93C8"/>
+  <polygon points="472,352 535,402 462,434" fill="#2478AF"/>
+  <polygon points="444,437 462,434 486,500" fill="#3A93C8"/>
+  <polygon points="462,434 498,468 486,500" fill="#59AEDB"/>
+  <polygon points="498,468 560,495 620,540" fill="#7FC4E6"/>
+  <polygon points="498,468 620,540 486,500" fill="#3A93C8"/>
+  <polygon points="560,495 650,486 620,540" fill="#59AEDB"/>
+  <polygon points="650,486 720,520 620,540" fill="#3A93C8"/>
+  <polygon points="650,486 760,468 720,520" fill="#7FC4E6"/>
+  <polygon points="760,468 860,464 720,520" fill="#59AEDB"/>
+  <polygon points="860,464 840,540 720,520" fill="#3A93C8"/>
+  <polygon points="860,464 928,494 840,540" fill="#7FC4E6"/>
+  <polygon points="928,494 897,588 840,540" fill="#2478AF"/>
+  <polygon points="897,588 860,600 840,540" fill="#1A5F8F"/>
+  <polygon points="897,588 852,640 860,600" fill="#123F66"/>
+  <polygon points="486,500 620,540 540,560" fill="#2478AF"/>
+  <polygon points="620,540 600,600 540,560" fill="#3A93C8"/>
+  <polygon points="620,540 720,520 680,590" fill="#2478AF"/>
+  <polygon points="620,540 680,590 600,600" fill="#3A93C8"/>
+  <polygon points="720,520 760,560 680,590" fill="#1A5F8F"/>
+  <polygon points="720,520 840,540 760,560" fill="#2478AF"/>
+  <polygon points="840,540 860,600 760,560" fill="#123F66"/>
+  <polygon points="444,437 486,500 455,500" fill="#2478AF"/>
+  <polygon points="455,500 486,500 476,572" fill="#1A5F8F"/>
+  <polygon points="486,500 540,560 476,572" fill="#123F66"/>
+  <polygon points="476,572 540,560 516,642" fill="#1A5F8F"/>
+  <polygon points="540,560 560,640 516,642" fill="#0C2A47"/>
+  <polygon points="540,560 600,600 560,640" fill="#1A5F8F"/>
+  <polygon points="516,642 560,640 582,690" fill="#123F66"/>
+  <polygon points="560,640 700,650 582,690" fill="#0C2A47"/>
+  <polygon points="560,640 600,600 700,650" fill="#123F66"/>
+  <polygon points="600,600 680,590 700,650" fill="#1A5F8F"/>
+  <polygon points="582,690 700,650 652,706" fill="#123F66"/>
+  <polygon points="652,706 700,650 730,700" fill="#0C2A47"/>
+  <polygon points="700,650 680,590 760,560" fill="#123F66"/>
+  <polygon points="700,650 760,560 730,700" fill="#1A5F8F"/>
+  <polygon points="730,700 760,560 800,676" fill="#123F66"/>
+  <polygon points="800,676 760,560 860,600" fill="#0C2A47"/>
+  <polygon points="800,676 860,600 852,640" fill="#123F66"/>
+  <polygon points="590,692 636,701 572,742" fill="#1A5F8F"/>
+  <polygon points="640,702 668,704 603,772" fill="#123F66"/>
+  <polygon points="668,704 702,703 603,772" fill="#2478AF"/>
 </svg>

@@ -422,93 +422,19 @@
      seconds before the next move. A click on a screen or a tab, or the
      arrow keys, bring a screen forward at once. Runs with reduced motion
      too, without the beats, because the tabs are real controls. */
+  /* The stage animates in CSS; this only starts it when the panel is on
+     screen and stops it when it scrolls away. */
   function buildStage() {
     var section = document.querySelector('[data-build]');
     if (!section) return;
-
-    var stage = section.querySelector('[data-build-stage]');
-    var screens = Array.prototype.slice.call(section.querySelectorAll('[data-build-screen]'));
-    var tabs = Array.prototype.slice.call(section.querySelectorAll('[data-build-tab]'));
-    if (screens.length < 3) return;
-
-    var active = 1;
-    var timer = null;
-    var paused = false;
-    var visible = false;
-    var HOLD = 3000;
-    var TRAVEL = 1600;
-
-    function paint() {
-      screens.forEach(function (screen, i) {
-        var rel = (i - active + screens.length) % screens.length;
-        screen.classList.toggle('is-active', rel === 0);
-        screen.classList.toggle('is-right', rel === 1);
-        screen.classList.toggle('is-left', rel === 2);
-        screen.setAttribute('aria-hidden', rel === 0 ? 'false' : 'true');
-      });
-      tabs.forEach(function (tab, i) {
-        var on = i === active;
-        tab.classList.toggle('is-active', on);
-        tab.setAttribute('aria-pressed', on ? 'true' : 'false');
-      });
-    }
-
-    function schedule() {
-      window.clearTimeout(timer);
-      if (reduce || paused || !visible) return;
-      timer = window.setTimeout(function () { setActive(active + 1); }, HOLD + TRAVEL);
-    }
-
-    function setActive(index) {
-      active = (index + screens.length) % screens.length;
-      paint();
-      schedule();
-    }
-
-    screens.forEach(function (screen, i) {
-      screen.addEventListener('click', function () {
-        if (i !== active) setActive(i);
-      });
-    });
-
-    tabs.forEach(function (tab, i) {
-      tab.addEventListener('click', function () { setActive(i); });
-      tab.addEventListener('focus', function () { paused = true; schedule(); });
-      tab.addEventListener('blur', function () { paused = false; schedule(); });
-    });
-
-    section.addEventListener('keydown', function (event) {
-      if (event.key === 'ArrowRight') { event.preventDefault(); setActive(active + 1); }
-      if (event.key === 'ArrowLeft') { event.preventDefault(); setActive(active - 1); }
-    });
-
-    if (stage) {
-      stage.addEventListener('pointerenter', function () { paused = true; schedule(); });
-      stage.addEventListener('pointerleave', function () { paused = false; schedule(); });
-    }
-
-    if ('IntersectionObserver' in window) {
-      var observer = new IntersectionObserver(
-        function (entries) {
-          visible = entries[0].isIntersecting;
-          if (visible) section.classList.add('is-on');
-          schedule();
-        },
-        { threshold: 0.3 }
-      );
-      observer.observe(section);
-    } else {
-      visible = true;
-      schedule();
-    }
-
-    paint();
+    if (!('IntersectionObserver' in window)) { section.classList.add('is-on'); return; }
+    var observer = new IntersectionObserver(
+      function (entries) { section.classList.toggle('is-on', entries[0].isIntersecting); },
+      { threshold: 0.15 }
+    );
+    observer.observe(section);
   }
 
-  /* ── Clients line ────────────────────────────────────────────────────────
-     The row drifts to the left on its own. The items are cloned once so the
-     loop has no visible seam; clones are hidden from assistive tech. Under
-     the pointer the drift slows to a crawl so a card can be read. */
   function clientsLine() {
     var line = document.querySelector('[data-clients-line]');
     var track = document.querySelector('[data-clients-track]');
