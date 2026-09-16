@@ -1,11 +1,13 @@
-/* Cookie choice and the page-view beacon.
-   Necessary: one cookie that remembers the choice (ais_consent, 180 days).
-   Analytics, only when allowed: a short session id (ais_sid, 30 minutes)
-   and one beacon per page view to /api/hit with the path, the referrer
-   host, the viewport width and that id. Nothing else leaves the browser. */
+/* The page-view beacon, and the cookie choice when the site asks for one.
+   data-analytics on <html> says which: "cookieless" sets no cookies and
+   sends one beacon per page view with the path, the referrer host and the
+   viewport width; "consent" shows the banner, remembers the choice in
+   ais_consent (180 days) and, only when analytics is allowed, adds a short
+   session id (ais_sid, 30 minutes) to the beacon. */
 (function () {
   var CONSENT = 'ais_consent';
   var SID = 'ais_sid';
+  var mode = document.documentElement.getAttribute('data-analytics') || 'consent';
 
   function read(name) {
     var parts = document.cookie.split('; ');
@@ -54,7 +56,7 @@
     choice = { analytics: analytics };
     write(CONSENT, '1.' + (analytics ? '1' : '0'), 180 * 86400);
     hide();
-    if (analytics) track();
+    if (analytics) track(true);
     else write(SID, '', 0);
   }
 
@@ -72,7 +74,7 @@
   }
 
   var sent = false;
-  function track() {
+  function track(withSession) {
     if (sent) return;
     sent = true;
     var ref = '';
@@ -82,7 +84,9 @@
         if (host && host !== location.host) ref = host;
       }
     } catch (e) {}
-    var body = JSON.stringify({ p: location.pathname, r: ref, w: window.innerWidth, s: sessionId() });
+    var hit = { p: location.pathname, r: ref, w: window.innerWidth };
+    if (withSession) hit.s = sessionId();
+    var body = JSON.stringify(hit);
     try {
       if (navigator.sendBeacon && navigator.sendBeacon('/api/hit', new Blob([body], { type: 'application/json' }))) return;
     } catch (e) {}
@@ -108,6 +112,13 @@
     show(true);
   });
 
+  if (mode === 'cookieless') {
+    /* nothing is stored in the browser; cookies from an earlier version go */
+    if (read(CONSENT)) write(CONSENT, '', 0);
+    if (read(SID)) write(SID, '', 0);
+    track(false);
+    return;
+  }
   if (!choice) show(false);
-  else if (choice.analytics) track();
+  else if (choice.analytics) track(true);
 })();

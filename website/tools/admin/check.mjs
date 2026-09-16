@@ -168,12 +168,14 @@ try {
   r = await call('POST', '/hit', { p: '/blog/drugi-del/', r: 'www.google.com', w: 390, s: 'abcdef1234' }, { url: `${origin}/api/hit`, headers: { 'x-ais-admin': '' } });
   check(r.status === 204, 'beacon sprejet');
   r = await call('POST', '/hit', { p: '/blog/drugi-del/', w: 1440, s: 'abcdef1234' }, { url: `${origin}/api/hit` });
+  r = await call('POST', '/hit', { p: '/', w: 800 }, { url: `${origin}/api/hit` }); /* no id: the daily code counts the visit */
+  r = await call('POST', '/hit', { p: '/', w: 800 }, { url: `${origin}/api/hit` });
   r = await call('POST', '/hit', { p: '/admin/', w: 1440 }, { url: `${origin}/api/hit` });
   r = await call('POST', '/hit', { p: '/', w: 800 }, { url: `${origin}/api/hit`, headers: { 'user-agent': 'Googlebot/2.1' } });
   await analytics.flush?.();
   r = await call('GET', '/analytics?days=7');
-  check(r.status === 200 && r.body.configured && r.body.totals.views === 2 && r.body.totals.sessions === 1, `analitika šteje oglede in obiske (${r.body.totals?.views}/${r.body.totals?.sessions})`);
-  check(r.body.pages[0]?.key === '/blog/drugi-del/' && r.body.refs[0]?.key === 'google.com' && r.body.devices.phone === 1 && r.body.devices.desktop === 1, 'strani, viri in naprave');
+  check(r.status === 200 && r.body.configured && r.body.totals.views === 4 && r.body.totals.sessions === 2, `analitika šteje oglede in obiske, tudi brez piškotka (${r.body.totals?.views}/${r.body.totals?.sessions})`);
+  check(r.body.pages[0]?.key === '/blog/drugi-del/' && r.body.refs[0]?.key === 'google.com' && r.body.devices.phone === 1 && r.body.devices.desktop === 1 && r.body.devices.tablet === 2, 'strani, viri in naprave');
   check(!r.body.pages.some((p) => p.key.startsWith('/admin')), 'admin in roboti se ne štejejo');
 
   r = await call('DELETE', '/media', { src: pic.src });

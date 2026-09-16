@@ -251,12 +251,18 @@ function footer() {
     <p class="footer-wordmark" data-footer-mark aria-hidden="true">${esc(site.footer.wordmark)}</p>
     <div class="footer-bottom">
       <span>&copy; ${site.copyrightYear} ${esc(site.legalName)}. Vse pravice pridržane.</span>
-      <span class="footer-legal"><a href="/piskotki/">Piškotki</a><button class="footer-consent" type="button" data-consent-open>Nastavitve piškotkov</button></span>
+      <span class="footer-legal">${
+        analyticsMode() === 'consent'
+          ? '<a href="/piskotki/">Piškotki</a><button class="footer-consent" type="button" data-consent-open>Nastavitve piškotkov</button>'
+          : '<a href="/piskotki/">Zasebnost in analitika</a>'
+      }</span>
       <span>${esc(site.contact.city)}, ${esc(site.contact.country)}</span>
     </div>
   </div>
 </footer>`;
 }
+
+const analyticsMode = () => (site.analytics?.mode === 'consent' ? 'consent' : 'cookieless');
 
 /* ── Cookie choice ─────────────────────────────────────────────────────
    Hidden until consent.js finds no stored choice. Two buttons decide at
@@ -338,7 +344,7 @@ export function renderPage(page) {
 
 function document(page) {
   return `<!doctype html>
-<html lang="${site.lang}">
+<html lang="${site.lang}" data-analytics="${analyticsMode()}">
 <head>
 ${head(page)}
 </head>
@@ -352,7 +358,7 @@ ${breadcrumbs(page)}
 ${page.body}
 </main>
 ${footer()}
-${consent()}
+${analyticsMode() === 'consent' ? consent() : ''}
 <script src="/js/motion.js" defer></script>
 <script src="/js/consent.js" defer></script>
 </body>

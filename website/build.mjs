@@ -461,18 +461,20 @@ function contactPage() {
 }
 
 function cookiesPage() {
-  const rows = COOKIES.table.map((c) => ({ term: c.name, definition: `${c.purpose} Traja ${c.duration}. ${c.kind}.` }));
+  const consentMode = site.analytics?.mode === 'consent';
+  const C = COOKIES[consentMode ? 'consent' : 'cookieless'];
+  const rows = C.table.map((c) => ({ term: c.name, definition: consentMode ? `${c.purpose} Traja ${c.duration}. ${c.kind}.` : `${c.purpose} ${c.duration}.` }));
   const body = [
-    pageHero({ eyebrow: COOKIES.eyebrow, title: COOKIES.title, lead: COOKIES.lead }),
+    pageHero({ eyebrow: C.eyebrow, title: C.title, lead: C.lead }),
     `<section class="section section--plain section--flush-top">
   <div class="shell">
-    ${takeaway({ label: 'Na kratko', text: COOKIES.answer })}
+    ${takeaway({ label: 'Na kratko', text: C.answer })}
   </div>
 </section>`,
     `<section class="section guide-body">
   <div class="shell">
     <div class="study__text">
-      ${COOKIES.sections
+      ${C.sections
         .map(
           (s) => `
       <section class="study__section" data-reveal>
@@ -482,9 +484,9 @@ function cookiesPage() {
         )
         .join('\n')}
       <section class="study__section" data-reveal>
-        <h2>Seznam piškotkov</h2>
+        <h2>${consentMode ? 'Seznam piškotkov' : 'Kaj se pošlje ob ogledu'}</h2>
         <div class="cookie-table">${definitionList(rows)}</div>
-        <p class="btn-row"><button class="btn btn--secondary" type="button" data-consent-open>Nastavitve piškotkov</button></p>
+        ${consentMode ? '<p class="btn-row"><button class="btn btn--secondary" type="button" data-consent-open>Nastavitve piškotkov</button></p>' : ''}
       </section>
     </div>
   </div>
@@ -494,10 +496,10 @@ function cookiesPage() {
 
   return {
     path: '/piskotki/',
-    title: COOKIES.metaTitle,
-    description: COOKIES.metaDescription,
-    keywords: COOKIES.keywords,
-    breadcrumbs: [HOME_CRUMB, { label: 'Piškotki', href: '/piskotki/' }],
+    title: C.metaTitle,
+    description: C.metaDescription,
+    keywords: C.keywords,
+    breadcrumbs: [HOME_CRUMB, { label: consentMode ? 'Piškotki' : 'Zasebnost', href: '/piskotki/' }],
     priority: '0.3',
     changefreq: 'yearly',
     body,

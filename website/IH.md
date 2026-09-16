@@ -12,18 +12,20 @@ every API route needs a signed session cookie that only the password gives.
 ## What IH does
 
 One screen. On the left the list of everything (Novice, Blog, Dogodki,
-Strani, with search). In the middle the page as a reader sees it: title,
-summary, main picture, text. On the right the panel that says where the
-page goes and what search engines see.
+Strani, with search). In the middle the content form in cards: title,
+summary, category and date; the text with a fixed toolbar above it; the
+main picture. On the right the panel that says where the page goes and
+what search engines see. Light green is the accent.
 
-- **Text**: select words and a bar appears: bold, italic, underline, strike,
-  six colours, highlight, link, block type (paragraph, heading, subheading,
-  quote, callout), alignment, lists. Hover a block for the handle that moves
-  it up or down, duplicates or removes it. Insert blocks from the buttons
-  under the text or from the panel: paragraph, heading, subheading, quote,
-  list, steps, picture, callout, button, two columns, table, divider, code.
-  Paste text and it becomes paragraphs; paste from Word or a web page and
-  it is cleaned to the allowed tags. The panel also takes raw text or HTML.
+- **Text**: the toolbar over the text does headings, bold, italic,
+  underline, strike, six colours, highlight, lists, quote, link, a picture
+  in the text, alignment and clearing. Selecting words also raises a small
+  bar with the same tools. Hover a block for the handle that moves it up or
+  down, duplicates or removes it. Insert blocks from the buttons under the
+  text or from the panel: paragraph, heading, quote, list, steps, picture,
+  callout, button, two columns, table, divider, code. Paste text and it
+  becomes paragraphs; paste from Word or a web page and it is cleaned to
+  the allowed tags. The panel also takes raw text or HTML.
 - **Pictures**: the main picture and pictures in the text go through the
   picture tool: crop with free or fixed ratios (16:10, 16:9, 4:3, 3:2, 1:1,
   4:5), rotate, largest width (800 to 2000 px), JPG quality. Every picture is
@@ -53,12 +55,24 @@ page goes and what search engines see.
 
 ## Cookies and analytics on the site
 
-Every page carries a cookie banner. Necessary: `ais_consent` remembers the
-choice for 180 days. Analytics, only when allowed: `ais_sid` (a random id,
-30 minutes) and one beacon per page view to `/api/hit` with the path, the
-referrer host, the viewport width and that id. Country comes from Vercel's
-header. No IP address, no names. `/piskotki/` explains this to visitors and
-the footer button reopens the banner.
+`site.analytics.mode` in `content/site.mjs` picks one of two behaviours:
+
+- `cookieless` (the default): the site sets no cookies and shows no banner.
+  Every page view sends one beacon to `/api/hit` with the path, the
+  referrer host and the viewport width; country comes from Vercel's header.
+  Visits are told apart by a code the server makes from the day, the
+  address and the browser: it changes every day, is never stored on its own
+  and cannot be turned back into an address. Nothing is stored in the
+  visitor's browser, so nothing needs consent. `/piskotki/` says so.
+- `consent`: every page carries a cookie banner. `ais_consent` remembers
+  the choice for 180 days; only when analytics is allowed, `ais_sid` (a
+  random id, 30 minutes) is added to the beacon. The footer button reopens
+  the banner and `/piskotki/` lists both cookies.
+
+A banner that is hidden while cookies are still set is not allowed in the
+EU, which is why the cookieless mode exists: it counts everyone without
+asking, because there is nothing to ask about. Switch to `consent` the day
+the site adds a cookie of any kind (a chat widget, a third-party tool).
 
 Storage for the counts:
 
@@ -130,7 +144,7 @@ From the Claude desktop app the preview entry is `ais-admin`.
 | Storage | `api/_lib/store-local.mjs`, `api/_lib/store-github.mjs` |
 | Password and sessions | `api/_lib/auth.mjs` |
 | The app | `public/admin/` (`ih.js`, `editor.js`, `picture-tool.js`, `ih.css`) |
-| Cookie banner | `src/layout.mjs` (markup), `public/js/consent.js`, `content/cookies.mjs` |
+| Cookie banner and beacon script | `src/layout.mjs` (markup), `public/js/consent.js`, `content/cookies.mjs` (both versions of the privacy page), mode in `content/site.mjs` |
 | Smoke test | `npm run admin:check` (part of `npm run check`) |
 
 An item file:

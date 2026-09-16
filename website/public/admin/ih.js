@@ -518,6 +518,11 @@ function docView() {
   const it = ed.item;
   const c = COLLECTIONS[it.collection];
   const live = it.status === 'published';
+  const cats = state.categories?.[it.collection] ?? [];
+  const colors = [
+    ['ink', 'Črna', '#17181c'], ['muted', 'Siva', '#6f7178'], ['blue', 'Modra', '#1d77fe'],
+    ['green', 'Zelena', '#166534'], ['orange', 'Oranžna', '#9a5b00'], ['red', 'Rdeča', '#991b1b'],
+  ];
   return `
   <div class="top">
     <button class="btn btn--sm btn--ghost btn--icon" type="button" data-action="drawer" aria-label="Vsebina" title="Vsebina">${ICON.list}</button>
@@ -529,30 +534,87 @@ function docView() {
       <button class="btn btn--sm btn--ghost top__panel-toggle" type="button" data-action="panel">Stran ▸</button>
     </div>
   </div>
-  <article class="doc">
-    ${ed.errors.length ? `<div class="note note--bad" style="margin-bottom:1rem"><b>Ni mogoče shraniti.</b><ul>${ed.errors.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></div>` : ''}
-    ${ed.problems.length ? `<div class="note note--warn" style="margin-bottom:1rem"><b>Pred objavo uredite.</b><ul>${ed.problems.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></div>` : ''}
-    <div class="doc__meta"><span data-meta-cat>${esc(it.kicker || c.singular)}</span><span>·</span><span data-meta-date>${esc(dateLabel(it.date))}</span></div>
-    <h1 class="doc__title" contenteditable="plaintext-only" data-plain="title" data-placeholder="Naslov">${esc(it.title)}</h1>
-    <p class="doc__lead" contenteditable="plaintext-only" data-plain="summary" data-placeholder="Kratek povzetek: ena ali dve povedi o tem, kaj bralec dobi.">${esc(it.summary)}</p>
-    <div class="doc__hero" data-hero>${heroView()}</div>
-    <div class="doc__body" data-body></div>
-    <div class="doc__add">
-      ${[
-        ['p', 'Odstavek'], ['h2', 'Naslov'], ['h3', 'Podnaslov'], ['quote', 'Citat'], ['ul', 'Seznam'], ['ol', 'Koraki'],
-        ['image', 'Slika'], ['callout', 'Poudarek'], ['cta', 'Gumb'], ['columns', 'Stolpca'], ['table', 'Tabela'], ['hr', 'Ločilo'],
-      ]
-        .map(([k, l]) => `<button class="btn btn--sm btn--ghost" type="button" data-insert="${k}">+ ${l}</button>`)
-        .join('')}
-    </div>
+  <div class="form">
+    ${ed.errors.length ? `<div class="note note--bad"><b>Ni mogoče shraniti.</b><ul>${ed.errors.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></div>` : ''}
+    ${ed.problems.length ? `<div class="note note--warn"><b>Pred objavo uredite.</b><ul>${ed.problems.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></div>` : ''}
+
+    <section class="card section">
+      <div class="field">
+        <label for="d-title">Naslov</label>
+        <input class="input input--title" id="d-title" data-doc="title" value="${esc(it.title)}" placeholder="${esc(c.singular)}" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="d-summary">Kratek povzetek <span class="counter" data-counter="summary"></span></label>
+        <textarea class="input" id="d-summary" data-doc="summary" rows="3" placeholder="Ena ali dve povedi. Prikaže se na seznamu in pod naslovom.">${esc(it.summary)}</textarea>
+        <p class="field__help">Napišite tako, da razume vsak: kaj je in zakaj je pomembno.</p>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="d-cat">Kategorija</label>
+          <select class="input" id="d-cat" data-doc="kicker">
+            <option value="">Brez (privzeto: ${esc(c.singular)})</option>
+            ${cats.map((k) => `<option value="${esc(k)}" ${k === it.kicker ? 'selected' : ''}>${esc(k)}</option>`).join('')}
+            ${it.kicker && !cats.includes(it.kicker) ? `<option value="${esc(it.kicker)}" selected>${esc(it.kicker)}</option>` : ''}
+            <option value="__new">+ Nova kategorija …</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="d-date">${c.event ? 'Datum dogodka' : 'Datum'}</label>
+          <input class="input" id="d-date" type="date" data-doc="date" value="${esc(it.date)}">
+        </div>
+      </div>
+    </section>
+
+    <section class="card section">
+      <div class="section__head"><h2>Besedilo</h2><span class="section__hint">Označite besedilo in nad njim se pokaže še vrstica za barvo in poravnavo. Ob robu bloka so puščice za premik.</span></div>
+      <div class="tools" role="toolbar" aria-label="Oblikovanje" data-tools>
+        <button type="button" data-tool="block:h2">Naslov</button>
+        <button type="button" data-tool="block:h3">Podnaslov</button>
+        <button type="button" data-tool="block:p">Odstavek</button>
+        <span class="tools__sep"></span>
+        <button type="button" data-tool="cmd:bold" title="Krepko"><b>K</b></button>
+        <button type="button" data-tool="cmd:italic" title="Ležeče"><i>L</i></button>
+        <button type="button" data-tool="cmd:underline" title="Podčrtano"><u>P</u></button>
+        <button type="button" data-tool="cmd:strikeThrough" title="Prečrtano"><s>S</s></button>
+        <span class="tools__sep"></span>
+        ${colors.map(([k, l, hex]) => `<button type="button" data-tool="color:${k}" title="${l}"><span class="sw" style="background:${hex}"></span></button>`).join('')}
+        <button type="button" data-tool="color:none" title="Brez barve">∅</button>
+        <button type="button" data-tool="hl">Poudari</button>
+        <span class="tools__sep"></span>
+        <button type="button" data-tool="cmd:insertUnorderedList">• Seznam</button>
+        <button type="button" data-tool="cmd:insertOrderedList">1. Seznam</button>
+        <button type="button" data-tool="block:blockquote">Citat</button>
+        <button type="button" data-tool="link">Povezava</button>
+        <button type="button" data-tool="image">Slika v besedilu</button>
+        <span class="tools__sep"></span>
+        <button type="button" data-tool="align:left" title="Levo">⇤</button>
+        <button type="button" data-tool="align:center" title="Sredina">↔</button>
+        <button type="button" data-tool="align:right" title="Desno">⇥</button>
+        <button type="button" data-tool="clear" title="Počisti oblikovanje">Počisti</button>
+      </div>
+      <div class="doc__body rte" data-body></div>
+      <div class="doc__add">
+        ${[
+          ['p', 'Odstavek'], ['h2', 'Naslov'], ['quote', 'Citat'], ['ul', 'Seznam'], ['ol', 'Koraki'], ['image', 'Slika'],
+          ['callout', 'Poudarek'], ['cta', 'Gumb'], ['columns', 'Stolpca'], ['table', 'Tabela'], ['hr', 'Ločilo'], ['code', 'Koda'],
+        ]
+          .map(([k, l]) => `<button class="btn btn--sm btn--ghost" type="button" data-insert="${k}">+ ${l}</button>`)
+          .join('')}
+      </div>
+    </section>
+
+    <section class="card section">
+      <div class="section__head"><h2>Slika</h2><span class="section__hint">Glavna slika strani. JPG ali PNG; pomanjša se in shrani v več velikostih.</span></div>
+      <div class="doc__hero" data-hero>${heroView()}</div>
+    </section>
     <input type="file" accept="image/*" class="visually-hidden" data-file="inline">
     <input type="file" accept="image/*" class="visually-hidden" data-file="main">
-  </article>`;
+  </div>`;
 }
 
 function heroView() {
   const p = state.ed.item.picture;
-  if (!p) return `<div class="hero-pic" data-drop="main" role="button" tabindex="0">Glavna slika: povlecite sem ali kliknite</div>`;
+  if (!p) return `<div class="hero-pic hero-pic--empty" data-drop="main" role="button" tabindex="0"><span>Povlecite sliko sem ali jo izberite</span><span class="btn btn--sm">Izberi sliko</span></div>`;
   return `
     <div class="hero-pic" data-drop="main">
       <img src="${esc(p.src)}${p.upload ? '-1600.jpg' : '.jpg'}" alt="">
@@ -781,28 +843,63 @@ function mountEditor() {
 
   const work = $('.work');
   work.addEventListener('input', onDocInput);
+  work.addEventListener('change', (e) => {
+    if (e.target.matches('[data-doc]')) onDocInput(e);
+  });
+  const tools = $('[data-tools]');
+  tools.addEventListener('mousedown', (e) => {
+    if (e.target.closest('button')) e.preventDefault();
+  });
+  tools.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-tool]');
+    if (!b) return;
+    const [kind, val] = b.dataset.tool.split(':');
+    const E = ed.editor;
+    if (kind === 'image') return $('[data-file="inline"]').click();
+    if (!E.currentBlock()) E.focus();
+    if (kind === 'cmd') E.exec(val);
+    else if (kind === 'block') (E.currentBlock() ? E.setBlock(val) : E.insertBlock(val === 'blockquote' ? 'quote' : val));
+    else if (kind === 'color') E.setColor(val);
+    else if (kind === 'hl') E.toggleHighlight();
+    else if (kind === 'link') E.makeLink();
+    else if (kind === 'align') E.setAlign(val);
+    else if (kind === 'clear') E.clearFormat();
+  });
   $('[data-panel]')?.addEventListener('input', onPanelInput);
   $('[data-panel]')?.addEventListener('change', onPanelChange);
   bindPanelExtras();
   bindHero();
   refreshLive();
-  if (ed.isNew) $('[data-plain="title"]')?.focus();
+  if (ed.isNew) $('#d-title')?.focus();
   document.addEventListener('keydown', editorKeys);
 }
 
 function onDocInput(e) {
   const ed = state.ed;
   const t = e.target;
-  if (t.matches('[data-plain]')) {
-    if (t.innerHTML.includes('<')) {
-      const text = t.textContent;
-      t.textContent = text;
+  if (t.matches('[data-doc]')) {
+    const key = t.dataset.doc;
+    if (key === 'kicker' && t.value === '__new') {
+      const name = prompt('Ime nove kategorije:');
+      t.value = ed.item.kicker;
+      if (name && name.trim()) {
+        const k = name.trim().slice(0, 40);
+        (state.categories[ed.item.collection] ??= []).push(k);
+        ed.item.kicker = k;
+        syncDocFields();
+        remountPanel();
+      }
+      return;
     }
-    ed.item[t.dataset.plain] = t.textContent.replace(/\s+/g, ' ').trim();
-    if (t.dataset.plain === 'title' && !ed.slugTouched) {
+    ed.item[key] = key === 'title' || key === 'summary' ? t.value.replace(/\s+/g, ' ').trim() : t.value;
+    if (key === 'title' && !ed.slugTouched) {
       ed.item.slug = slugify(ed.item.title);
-      const s = $('#f-slug');
-      if (s) s.value = ed.item.slug;
+      const sl = $('#f-slug');
+      if (sl) sl.value = ed.item.slug;
+    }
+    if (key === 'date' || key === 'kicker') {
+      const twin = $(key === 'date' ? '#f-date' : '#f-cat');
+      if (twin) twin.value = ed.item[key];
     }
     ed.dirty = true;
     liveSoon();
@@ -812,6 +909,24 @@ function onDocInput(e) {
     ed.dirty = true;
     liveSoon();
     backup();
+  }
+}
+
+/* the category and the date live in the form and in the panel: keep both current */
+function syncDocFields() {
+  const it = state.ed?.item;
+  if (!it) return;
+  for (const [sel, key] of [['#d-date', 'date'], ['#d-cat', 'kicker'], ['#f-date', 'date'], ['#f-cat', 'kicker']]) {
+    const el = $(sel);
+    if (el && document.activeElement !== el) {
+      if (el.tagName === 'SELECT' && ![...el.options].some((o) => o.value === it[key])) {
+        const o = document.createElement('option');
+        o.value = it[key];
+        o.textContent = it[key];
+        el.insertBefore(o, el.lastElementChild);
+      }
+      el.value = it[key];
+    }
   }
 }
 
@@ -858,6 +973,7 @@ function onPanelChange(e) {
     return;
   }
   if (t.matches('[data-field]')) readPanel();
+  syncDocFields();
   liveSoon();
   backup();
 }
@@ -922,8 +1038,7 @@ function refreshLive() {
     if (cls !== undefined) el.className = el.className.replace(/\s?is-(warn|bad|good)/g, '') + (cls ? ` ${cls}` : '');
   };
   set('[data-top-title]', it.title || (ed.isNew ? c.newLabel : c.singular));
-  set('[data-meta-cat]', it.kicker || c.singular);
-  set('[data-meta-date]', dateLabel(it.date));
+  set('[data-counter="summary"]', `${it.summary.length} / ${LIMITS.summaryMax}`, it.summary.length > LIMITS.summaryMax ? 'is-bad' : '');
   const mt = it.seo.metaTitle || (it.title ? `${it.title} | AIS Slovenia` : '');
   set('[data-counter="metaTitle"]', `${mt.length} / ${LIMITS.titleMax}`, mt.length > LIMITS.titleMax ? 'is-warn' : '');
   const md = it.seo.metaDescription || it.summary;

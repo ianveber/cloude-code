@@ -515,11 +515,19 @@ is `IH.md` in full; the short version:
 - `/api/admin/*` is one Node function (`api/_lib/handler.mjs`). Locally
   (`npm run admin`) it writes files and rebuilds; on Vercel every save is a
   commit on the deployed branch through the GitHub API.
-- Cookies: every page has the banner from `src/layout.mjs` and
-  `public/js/consent.js`; the choice lives in `ais_consent`. With consent the
-  page posts a beacon to `/api/hit` (`api/_lib/analytics.mjs`), counted per
+- Cookies: `site.analytics.mode` is `cookieless` (Ian, 2026-09-16: "can we
+  hide cookies so cookies are accepted regardless"): no cookies, no banner,
+  every view counts, visits by a daily server-side code. Set it to
+  `consent` and every page gets the banner from `src/layout.mjs` and
+  `public/js/consent.js` again, with the beacon only after consent. Either
+  way the beacon goes to `/api/hit` (`api/_lib/analytics.mjs`), counted per
   day in Upstash Redis on Vercel or `data/analytics.json` locally, and IH
-  shows the numbers. `/piskotki/` (`content/cookies.mjs`) explains it.
+  shows the numbers. `/piskotki/` (`content/cookies.mjs`, two versions)
+  explains whichever mode is on; the design audit checks the mode.
+- IH's colour is light green (Ian: "change the color to a light green
+  color from purple"); the content entry is the first version's card form
+  (title, summary, category and date, a text card with a fixed toolbar over
+  the rich editor, a picture card) with the panel on the right kept.
 - Content is one JSON per item in `content/cms/<collection>/`, categories
   in `content/cms/categories.json`, pictures in `public/uploads/<year>/`.
   `src/cms.mjs` is the model, the checks and the page template. Drafts

@@ -354,21 +354,37 @@ expect(
   expect(!/\/admin\//.test(sitemap), 'The sitemap must not list /admin/.');
   const styles = await dist.readFile('src/styles.css', 'utf8');
   expect(/\.cms-body/.test(styles) && /\.cms-preview-bar/.test(styles), 'Admin content pages need their body and preview styles.');
-  /* Cookie choice (2026-09-16): every page carries the hidden banner and the
-     consent script; the beacon runs only after consent; the cookie page exists
-     and the footer links to it. */
-  expect(
-    Object.values(pages).every((html) => /class="consent" data-consent hidden/.test(html) && /<script src="\/js\/consent\.js" defer><\/script>/.test(html) && /data-consent-open/.test(html)),
-    'Every page needs the hidden cookie banner, the consent script and a footer button that reopens it.'
-  );
+  /* Cookies (2026-09-16). site.analytics.mode picks the behaviour: with
+     'consent' every page carries the hidden banner and the beacon runs only
+     after consent; with 'cookieless' (Ian: "hide cookies so cookies are
+     accepted regardless") the site sets no cookies, shows no banner and the
+     privacy page says so. The script itself must handle both. */
+  const cookieMode = /analytics:\s*\{\s*mode:\s*'cookieless'/.test(siteConfig) ? 'cookieless' : 'consent';
   const cookiePage = await dist.readFile('dist/piskotki/index.html', 'utf8').catch(() => '');
-  expect(/ais_consent/.test(cookiePage) && /ais_sid/.test(cookiePage), 'The cookie page must name both cookies.');
   const consentJs = await dist.readFile('public/js/consent.js', 'utf8');
+  if (cookieMode === 'consent') {
+    expect(
+      Object.values(pages).every((html) => /class="consent" data-consent hidden/.test(html) && /data-consent-open/.test(html)),
+      'In consent mode every page needs the hidden cookie banner and a footer button that reopens it.'
+    );
+    expect(/ais_consent/.test(cookiePage) && /ais_sid/.test(cookiePage), 'The cookie page must name both cookies.');
+  } else {
+    expect(
+      Object.values(pages).every((html) => /<html lang="sl" data-analytics="cookieless">/.test(html) && !/data-consent/.test(html) && /href="\/piskotki\/"/.test(html)),
+      'In cookieless mode no page may carry the banner; every page marks the mode and links the privacy page.'
+    );
+    expect(/Brez piškotkov/.test(cookiePage) && !/ais_sid/.test(cookiePage), 'The privacy page must say the site sets no cookies.');
+  }
   expect(
-    /if \(!choice\) show\(false\);\s*else if \(choice\.analytics\) track\(\);/.test(consentJs) &&
-      /if \(analytics\) track\(\);/.test(consentJs) &&
-      (consentJs.match(/\btrack\(\);/g) ?? []).length === 2,
-    'The beacon must run only after the visitor allowed analytics.'
+    Object.values(pages).every((html) => /<script src="\/js\/consent\.js" defer><\/script>/.test(html)),
+    'Every page loads the consent script (it carries the beacon in both modes).'
+  );
+  expect(
+    /if \(mode === 'cookieless'\)/.test(consentJs) && /track\(false\);/.test(consentJs) &&
+      /if \(!choice\) show\(false\);\s*else if \(choice\.analytics\) track\(true\);/.test(consentJs) &&
+      /if \(analytics\) track\(true\);/.test(consentJs) &&
+      (consentJs.match(/\btrack\(true\);/g) ?? []).length === 2,
+    'The beacon sends a session id only after consent, and never sets cookies in cookieless mode.'
   );
   expect(/\.consent__panel\s*\{[^}]*box-shadow: var\(--shadow-popover\)/s.test(styles) && !/\.consent[^{]*\{[^}]*border:\s*1px/.test(styles), 'The cookie panel is a soft popover, without borders.');
 }

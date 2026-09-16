@@ -11,6 +11,7 @@
  */
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { createHash, randomBytes } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
@@ -214,7 +215,12 @@ const PATH_RE = /^\/[a-z0-9\-._~/]*$/i;
 const SID_RE = /^[a-z0-9]{8,32}$/i;
 const rate = new Map();
 
-export function createHitHandler({ analytics }) {
+export function createHitHandler({ analytics, secret = process.env.ADMIN_SESSION_SECRET || randomBytes(16).toString('hex') }) {
+  /* Without a session id from the browser (the cookieless mode), a visit is a
+     code from the day, the address and the browser. It changes every day,
+     is never stored on its own and cannot be turned back into an address. */
+  const dailyCode = (ip, ua, day) => createHash('sha256').update(`${secret}|${day}|${ip}|${ua}`).digest('hex').slice(0, 16);
+
   return async function handle(req, res) {
     const done = (status) => {
       res.writeHead(status, { 'cache-control': 'no-store', 'x-robots-tag': 'noindex' });
@@ -259,11 +265,12 @@ export function createHitHandler({ analytics }) {
       .replace(/^www\./, '')
       .slice(0, 100);
     if (!/^[a-z0-9.-]+$/.test(ref)) ref = '';
-    const sid = SID_RE.test(String(hit?.s ?? '')) ? String(hit.s) : '';
+    const day = localDay();
+    const sid = SID_RE.test(String(hit?.s ?? '')) ? String(hit.s) : dailyCode(ip, String(req.headers['user-agent'] ?? ''), day);
 
     try {
       await analytics.record({
-        day: localDay(),
+        day,
         path: p.replace(/\/index\.html$/, '/').replace(/([^/])$/, '$1/'),
         device: w && w < 768 ? 'phone' : w && w < 1100 ? 'tablet' : 'desktop',
         ref,

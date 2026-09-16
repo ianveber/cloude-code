@@ -20,6 +20,13 @@ export const site = {
      Add only URLs that were opened and confirmed; an empty list emits nothing. */
   sameAs: [],
 
+  /* Page-view counting. 'cookieless': the site sets no cookies at all, shows
+     no banner and counts every view; visits are told apart by a code made
+     from the address and the browser that changes every day and cannot name
+     a person. 'consent': a banner asks first, and a 30-minute session cookie
+     is set only when the visitor allows analytics. */
+  analytics: { mode: 'cookieless' },
+
   /* IndexNow: the key is served at /<key>.txt and tools/indexnow.mjs submits
      every sitemap URL to Bing, Yandex, Naver, Seznam and Yep after a deploy. */
   indexNowKey: '373707ac9dafb9a7798caf5c6a3541e1',

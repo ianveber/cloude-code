@@ -83,9 +83,18 @@ export function createEditor({ body, onChange, onEditImage, onReplaceImage, onPi
       const marker = f.getAttribute('face') || (f.style.fontFamily || '').replace(/["']/g, '');
       const span = document.createElement(marker === 'ih-hl' ? 'mark' : 'span');
       if (marker.startsWith('ih-c-')) span.className = `c-${marker.slice(5)}`;
+      const s0 = sel();
+      const wasSelected = Boolean(s0 && s0.rangeCount && s0.getRangeAt(0).intersectsNode(f));
       while (f.firstChild) span.append(f.firstChild);
       f.replaceWith(span);
       if (marker === 'ih-c-none') span.replaceWith(...span.childNodes);
+      else if (wasSelected) {
+        /* keep the words selected, so the next tool applies to the same ones */
+        const r = document.createRange();
+        r.selectNodeContents(span);
+        s0.removeAllRanges();
+        s0.addRange(r);
+      }
     }
     /* colour spans should not nest */
     for (const inner of body.querySelectorAll('span[class^="c-"] span[class^="c-"]')) inner.replaceWith(...inner.childNodes);
@@ -153,8 +162,16 @@ export function createEditor({ body, onChange, onEditImage, onReplaceImage, onPi
   function rename(el, tag) {
     const n = document.createElement(tag);
     for (const a of el.attributes) n.setAttribute(a.name, a.value);
+    const s0 = sel();
+    const wasSelected = Boolean(s0 && s0.rangeCount && s0.getRangeAt(0).intersectsNode(el));
     while (el.firstChild) n.append(el.firstChild);
     el.replaceWith(n);
+    if (wasSelected && !BLOCK_TAGS.has(tag.toUpperCase())) {
+      const r = document.createRange();
+      r.selectNodeContents(n);
+      s0.removeAllRanges();
+      s0.addRange(r);
+    }
     return n;
   }
 
@@ -725,6 +742,12 @@ export function createEditor({ body, onChange, onEditImage, onReplaceImage, onPi
     insertText,
     insertHtml,
     setColor,
+    setBlock,
+    setAlign,
+    makeLink,
+    toggleHighlight,
+    clearFormat,
+    currentBlock,
     exec,
     focus: () => body.focus(),
     selectedFigure: () => selectedFigure,
