@@ -1,6 +1,6 @@
 # Other projects and clients
 
-Last updated: 2026-09-01
+Last updated: 2026-09-17
 
 Names from Agentic OS daily skill and repo dashboards. Do not invent status.
 
@@ -16,5 +16,6 @@ Names from Agentic OS daily skill and repo dashboards. Do not invent status.
 | AI Univerza | Daily-summary skill | No file in this repo yet |
 | AISOS | `aisos.html` | Dashboard present; treat as a Veta project until confirmed otherwise |
 | Taskmaster | `taskmaster.html` | Internal tool surface |
+| Biomasa d.o.o. | `biomasa-social.html` + `agents/energy-biomasa/` | See [[clients/biomasa]] — not a dashboard-only name |
 
 When a client becomes a real engagement, create `_claude-memory/clients/[slug].md` using the [[ethospheres]] structure and add them under Active Clients in [[context]].

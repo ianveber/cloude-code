@@ -16,6 +16,12 @@ Append-only. Newest first. Every ChatGPT, Claude, or Cursor session that changes
 
 ---
 
+## 2026-09-17 — cursor (Biomasa social agent)
+
+- Worked on: Continued Claude/iPROM Biomasa social-media agent. Gmail has `BIOMASA_digitalna_revizija.docx/.xlsx` (16 Sep, to Maja Gorjanc) and `session-export-1789638664349.zip` (17 Sep); MCP cannot download attachments.
+- Files changed: `biomasa-social.html`, `agents/energy-biomasa/**`, `dashboard.html` nav, `_claude-memory/clients/biomasa.md`
+- For the other models: Read-only operator console. Do not auto-post. Do not email iPROM. Drop the original audit files into `agents/energy-biomasa/source/` when available. Ambassador is iPROM+Retoba.
+
 ## 2026-09-17 — cursor (Mac path was wrong)
 
 - Worked on: Ian's Terminal failed because `~/Desktop/Cloude CODE` does not exist. Setup now clones to `~/Desktop/cloude-code` if needed.

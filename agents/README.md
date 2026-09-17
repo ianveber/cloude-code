@@ -19,6 +19,13 @@ agents/
 │   ├── content-strategy.md
 │   └── partnership-outreach.md
 │
+├── energy-biomasa/               # Biomasa d.o.o. social publishing (via iPROM)
+│   ├── agent-spec-social.md
+│   ├── brand-voice.md
+│   ├── content-pillars.md
+│   ├── tool-manifest-publishing.md
+│   └── eval-log.md
+│
 └── {vertical}-{client}/          # Client-specific agent systems (created per engagement)
     ├── agent-spec-{agent-name}.md
     ├── tool-manifest-{tool-name}.md

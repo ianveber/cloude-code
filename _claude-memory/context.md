@@ -52,6 +52,7 @@ From daily-summary skill and dashboards. Status in each file is a snapshot, not 
 | Tower Spa | Named in Agentic OS daily skill | [[clients/other-projects]] |
 | 10th Planet | Named in Agentic OS daily skill | [[clients/other-projects]] |
 | AI Univerza | Named in Agentic OS daily skill | [[clients/other-projects]] |
+| Biomasa d.o.o. | Social publishing agent with iPROM; ambassador is iPROM+Retoba | [[clients/biomasa]] |
 
 ## Active verticals (Veta)
 

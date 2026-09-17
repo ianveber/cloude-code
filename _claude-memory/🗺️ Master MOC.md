@@ -26,6 +26,7 @@ Map of maps. Start here every session.
 - [[veta-agency]] — AI-native vertical agent agency
 - [[agentic-os]] — personal operating agents
 - [[clients/autoflow]] — lead-scoring SaaS
+- [[clients/biomasa]] — Biomasa d.o.o. social agent (iPROM)
 - [[clients/other-projects]] — Pacom, ZaLife, ATHLOS, remaining Veta clients
 - [[zalife]] — ZaLife youth leadership (research-agent target)
 
