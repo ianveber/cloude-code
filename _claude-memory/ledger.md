@@ -16,6 +16,14 @@ Append-only. Newest first. Every ChatGPT, Claude, or Cursor session that changes
 
 ---
 
+## 2026-09-17 — ian / cursor
+
+- Worked on: Ian finished ChatGPT `Veta Memory` GPT. Claude.ai Project skipped for now; do later.
+- Files changed: `decisions-log.md`, this ledger, handoff marked deferred.
+- For the other models: Do not ask Ian to set up Claude.ai this session. Cursor + ChatGPT + Claude Code already share `_claude-memory/`.
+
+---
+
 ## 2026-09-17 — cursor (Mac path was wrong)
 
 - Worked on: Ian's Terminal failed because `~/Desktop/Cloude CODE` does not exist. Setup now clones to `~/Desktop/cloude-code` if needed.

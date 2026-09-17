@@ -6,6 +6,18 @@ Append-only. Newest first. Do not rewrite history — add a superseding entry.
 
 ---
 
+## 2026-09-17 — Claude.ai Project deferred
+
+**Decision:** Do not set up the Claude.ai browser Project now. Ian will do it later if he wants Claude in the browser on the same memory.
+
+**Live today:** git `_claude-memory/` on `main`; Cursor; Claude Code (this repo); ChatGPT Custom GPT `Veta Memory` (Actions + knowledge pack). Obsidian linked via `~/Desktop/cloude-code`.
+
+**Later:** `connectors/claude/setup.md`.
+
+**Do not:** Nag Ian to create the Claude.ai Project in every session.
+
+---
+
 ## 2026-09-17 — Private memory cloud for ChatGPT + Claude + Cursor
 
 **Decision:** One private knowledge base: `./_claude-memory/` in `ianveber/cloude-code`. ChatGPT (Custom GPT Actions + knowledge pack), Claude (Code + Claude.ai Project), and Cursor all read and write it. Cross-model work goes through `ledger.md` and `handoffs/`, not pasted chats.

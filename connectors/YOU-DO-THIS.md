@@ -65,8 +65,6 @@ Then open the file again. Keep it beside https://chatgpt.com/gpts/editor
 
 ---
 
-## 4. Claude.ai Project
+## 4. Claude.ai Project — later (skip for now)
 
-https://claude.ai → Projects → `Veta Memory Cloud`  
-Paste `connectors/claude/project-instructions.md`  
-Upload the same `knowledge-pack.md`
+Ian deferred this. When you want it: `connectors/claude/setup.md`.
