@@ -1,3 +1,8 @@
+---
+source: cursor
+sources:
+  - cursor
+---
 # Master MOC
 
 Last updated: 2026-09-17
@@ -7,7 +12,7 @@ Map of maps. Start here every session.
 ## How agents use this vault
 
 - ChatGPT, Claude, and Cursor all load from `./_claude-memory/` in this repo (the private cloud)
-- Architecture: `docs/memory-cloud.md`. Wiring: `connectors/README.md`. Local editor: [[SYNC]]
+- Architecture: `docs/memory-cloud.md`. Wiring: `connectors/README.md`. Local editor: [[SYNC]]. Colored vault: [[memory-space]] (`./scripts/memory-space.sh`) — Claude orange, ChatGPT blue, Cursor purple
 - Also read [[ledger]] and `handoffs/` so you can continue the other models' work
 - Confirm load with one line. Do not ask Ian to re-explain what is already here
 
@@ -52,6 +57,7 @@ Map of maps. Start here every session.
 | Skills | `skills/` |
 | Vertical playbooks | `verticals/` |
 | Delivery | `delivery/` |
+| Memory Space (Obsidian-style, writer colors) | `memory-space/` + `docs/memory-space.md` |
 | Dashboards | `dashboard.html`, `agentic-os.html`, `zalife.html`, `pacom.html`, `athlos.html` |
 | Notion Business OS | https://app.notion.com/p/345a5cb8d3d281cba3f7cb57bf9b5898 |
 | Notion VETA HQ | https://app.notion.com/p/344a5cb8d3d2813ca1a7f27074efb068 |

@@ -48,6 +48,10 @@ Load client files only if the task needs them: `ethospheres.md`, `veta-agency.md
 - `ledger.md` is append-only. Newest first.
 - Do not rewrite history. Add a superseding entry.
 - Update `Last updated: YYYY-MM-DD` on files you change.
+- Stamp YAML so Memory Space paints you blue:
+  `source: chatgpt` and merge `chatgpt` into `sources:`.
+  Partial edits: wrap in `<!-- source:chatgpt --> … <!-- /source -->`.
+  Claude is orange. Cursor is purple. Do not fake those labels.
 - Commit message prefix: `memory(chatgpt):`
 
 ## Business facts (if Actions are down)

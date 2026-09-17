@@ -1,3 +1,8 @@
+---
+source: cursor
+sources:
+  - cursor
+---
 # Veta principles (memory)
 
 Last updated: 2026-09-01

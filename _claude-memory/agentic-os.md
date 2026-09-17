@@ -1,3 +1,8 @@
+---
+source: cursor
+sources:
+  - cursor
+---
 # Agentic OS
 
 Last updated: 2026-09-01

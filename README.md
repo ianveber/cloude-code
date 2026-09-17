@@ -19,7 +19,7 @@ This is the agency's internal operating repo. It contains:
 
 This repo is also the working environment for the Veta Business Manager agent, which runs daily briefings pulling from GitHub Issues, Notion, Calendar, and Gmail. See `CLAUDE.md` for that agent's configuration.
 
-**Private memory cloud (ChatGPT + Claude + Cursor):** `_claude-memory/`. Ian's remaining setup: `connectors/YOU-DO-THIS.md`.
+**Private memory cloud (ChatGPT + Claude + Cursor):** `_claude-memory/`. Colored vault (Claude orange, ChatGPT blue, Cursor purple): `./scripts/memory-space.sh`. Ian's remaining setup: `connectors/YOU-DO-THIS.md`.
 
 ## Quick navigation
 

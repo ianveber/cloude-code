@@ -133,6 +133,7 @@ SESSION END (before closing or when Ian says goodbye/done/thanks):
   4. Any new context Ian provided about himself, Veta, or clients → context.md or veta-agency.md
   5. What this model did → ledger.md; pickup for ChatGPT/Cursor → handoffs/
   6. Update the "Last updated" date at the top of any file that was changed
+  7. Stamp YAML `source: claude` (orange) and merge `claude` into `sources:`. Partial edits: `<!-- source:claude --> … <!-- /source -->`. ChatGPT is blue; Cursor is purple.
 - Do this silently and efficiently — do not ask permission, just do it
 - After writing, confirm with: "Memory updated." and list what changed in one line per file
 

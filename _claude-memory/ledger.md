@@ -1,3 +1,8 @@
+---
+source: cursor
+sources:
+  - cursor
+---
 # Ledger
 
 Last updated: 2026-09-17
@@ -13,6 +18,14 @@ Append-only. Newest first. Every ChatGPT, Claude, or Cursor session that changes
 - Files changed:
 - For the other models:
 ```
+
+---
+
+## 2026-09-17 — cursor
+
+- Worked on: Memory Space — Obsidian-style vault viewer with LLM colors (Claude orange, ChatGPT blue, Cursor purple).
+- Files changed: `memory-space/`, `scripts/build-memory-space.py`, `scripts/memory-space.sh`, `_claude-memory/memory-space.md`, `docs/memory-space.md`, agent source-stamp protocol.
+- For the other models: Stamp `source:` / `sources:` when you write. Partial blocks: `<!-- source:chatgpt -->` or `<!-- source:claude -->`. Ian opens the vault with `./scripts/memory-space.sh`.
 
 ---
 

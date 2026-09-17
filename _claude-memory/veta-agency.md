@@ -1,3 +1,8 @@
+---
+source: cursor
+sources:
+  - cursor
+---
 # Veta Agency
 
 Last updated: 2026-09-01

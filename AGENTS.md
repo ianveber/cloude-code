@@ -28,8 +28,17 @@ Write back to `./_claude-memory/` only:
 - What this model did, and what the others should know → `ledger.md`
 - Explicit pickup for another model → `handoffs/YYYY-MM-DD-<from>-to-<to>.md`
 - Update `Last updated` on every file you change
+- Stamp YAML provenance so Memory Space can color the note:
+  - Cursor → `source: cursor` (purple)
+  - Claude → `source: claude` (orange)
+  - ChatGPT → `source: chatgpt` (blue)
+  - Ian → `source: ian` (teal)
+  - Merge yourself into `sources:` if the file already has other writers
+  - If you only add a section, wrap it in `<!-- source:cursor --> … <!-- /source -->` (use your own name)
 
 Confirm with `Memory updated.` and one line per file. Push so ChatGPT Actions and the other agents can see it.
+
+Ian can browse the vault like Obsidian, with writer colors, at `memory-space/` (`./scripts/memory-space.sh`). Architecture: `docs/memory-space.md`.
 
 ## Hard rules (all three)
 

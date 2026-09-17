@@ -21,6 +21,7 @@ Session end — if the conversation produced decisions, status changes, or new f
 - Update the matching memory note
 - Append to ledger.md
 - Write a handoff if ChatGPT or Cursor should continue
+- Stamp YAML so Memory Space paints you orange: `source: claude` and merge `claude` into `sources:`. Partial edits: `<!-- source:claude --> … <!-- /source -->`. ChatGPT is blue. Cursor is purple. Do not fake those labels.
 - Say `Memory updated.`
 
 If you cannot write the repo from this chat, output the exact markdown Ian (or Cursor) should paste into `_claude-memory/`. Do not leave new facts only in this thread.

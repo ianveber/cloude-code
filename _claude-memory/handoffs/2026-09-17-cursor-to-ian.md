@@ -1,3 +1,8 @@
+---
+source: cursor
+sources:
+  - cursor
+---
 # Handoff — cursor → ian
 
 Date: 2026-09-17

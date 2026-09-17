@@ -1,3 +1,8 @@
+---
+source: cursor
+sources:
+  - cursor
+---
 # BOOT — Veta Memory Cloud
 
 Last updated: 2026-09-17

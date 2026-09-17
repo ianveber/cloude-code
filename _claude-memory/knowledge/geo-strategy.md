@@ -1,3 +1,8 @@
+---
+source: cursor
+sources:
+  - cursor
+---
 # GEO strategy
 
 Last updated: 2026-09-01

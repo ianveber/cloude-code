@@ -1,3 +1,8 @@
+---
+source: cursor
+sources:
+  - cursor
+---
 # Other projects and clients
 
 Last updated: 2026-09-01

@@ -19,6 +19,10 @@ need=(
   "connectors/obsidian/setup.md"
   "scripts/memory-sync.sh"
   "scripts/upgrade-obsidian.sh"
+  "scripts/build-memory-space.py"
+  "scripts/memory-space.sh"
+  "memory-space/index.html"
+  "docs/memory-space.md"
   "AGENTS.md"
   ".cursor/rules/memory.mdc"
 )

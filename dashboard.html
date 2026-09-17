@@ -160,6 +160,8 @@ tr:hover td{background:var(--surface2)}
     <a class="nav-item" href="athlos.html" style="text-decoration:none;color:inherit"><span class="icon">🏆</span> ATHLOS</a>
     <div class="nav-label">Reference</div>
     <div class="nav-item" data-view="guide"><span class="icon">📖</span> Agency Guide</div>
+    <div class="nav-label">Memory</div>
+    <a class="nav-item" href="memory-space/index.html" style="text-decoration:none;color:inherit"><span class="icon">🟣</span> Memory Space</a>
     <div class="nav-label">AI Infrastructure</div>
     <div class="nav-item" data-view="ruflo"><span class="icon">🤖</span> Ruflo</div>
   </div>
@@ -916,7 +918,7 @@ function go(v){
   document.getElementById('page-title').textContent=titles[v];
   render(v);
 }
-document.querySelectorAll('.nav-item').forEach(el=>el.addEventListener('click',()=>go(el.dataset.view)));
+document.querySelectorAll('.nav-item').forEach(el=>el.addEventListener('click',()=>{ if(!el.dataset.view) return; go(el.dataset.view); }));
 
 // ── MODALS ────────────────────────────────────────────────────────
 function openModal(id){document.getElementById(id).classList.add('open');}
