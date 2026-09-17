@@ -1747,15 +1747,17 @@ Based on what you know about Ian's current priorities, provide:
     sub: 'os · memory',
     accentColor: '#bf5af2',
     type: 'os',
-    prompt: `Update the Obsidian memory files with what happened in this session.
+    prompt: `Update the shared memory files with what happened in this session.
 
-Obsidian vault: /Users/ianveber/Documents/Obsidian Vault/_claude-memory/
+Private cloud (ChatGPT + Claude + Cursor): ./_claude-memory/ in this repo (same files Obsidian shows after ./scripts/link-obsidian-memory.sh). See docs/memory-cloud.md.
+Mac fallback only if the repo folder is missing: /Users/ianveber/Documents/Obsidian Vault/_claude-memory/
 
 Review this conversation and:
 1. Identify any new decisions made → decisions-log.md
 2. Any tasks completed or phase status changes → ethospheres.md or relevant file
 3. Any new context about Ian, Veta, or clients → context.md
 4. Any new files created → update relevant memory file
+5. Append ledger.md so ChatGPT and Claude can see what changed; write a handoff if they should continue
 
 Then write the updates to the appropriate files and confirm what was updated.
 End with: "Memory updated — [one line per file changed]"`
@@ -1810,14 +1812,15 @@ Report status for each agent: ✅ running / ⚠️ warning / ❌ error`
     sub: 'os · obsidian',
     accentColor: '#bf5af2',
     type: 'os',
-    prompt: `Read the current state of all Obsidian memory files and give me a full context summary.
+    prompt: `Read the current state of all shared memory files and give me a full context summary.
 
-Read in this order:
-1. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/🗺️ Master MOC.md
-2. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/context.md
-3. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/ethospheres.md
-4. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/decisions-log.md
-5. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/agentic-os.md
+Read in this order from ./_claude-memory/ (repo). After the Obsidian symlink these are the same files as the vault. ChatGPT and Claude use this same folder.
+1. ./_claude-memory/🗺️ Master MOC.md
+2. ./_claude-memory/context.md
+3. ./_claude-memory/decisions-log.md
+4. ./_claude-memory/ledger.md
+5. ./_claude-memory/ethospheres.md
+6. ./_claude-memory/agentic-os.md
 
 Then summarize:
 - What's the current state of each active project?

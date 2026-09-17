@@ -19,10 +19,13 @@ This is the agency's internal operating repo. It contains:
 
 This repo is also the working environment for the Veta Business Manager agent, which runs daily briefings pulling from GitHub Issues, Notion, Calendar, and Gmail. See `CLAUDE.md` for that agent's configuration.
 
+**Private memory cloud (ChatGPT + Claude + Cursor):** `_claude-memory/`. Ian's remaining setup: `connectors/YOU-DO-THIS.md`.
+
 ## Quick navigation
 
 | What you need | Where to look |
 |---|---|
+| **Turn on shared memory (Ian)** | `connectors/YOU-DO-THIS.md` |
 | What we sell and how we price it | `docs/service-catalog.md` + `ops/pricing-architecture.md` |
 | How to scope a new client | `delivery/discovery-framework.md` |
 | SOW template | `delivery/sow-template.md` |
@@ -31,6 +34,7 @@ This repo is also the working environment for the Veta Business Manager agent, w
 | Agency positioning (for pitches) | `docs/positioning.md` |
 | Daily ops + run-book | `ops/run-book.md` |
 | How we acquire clients (organic) | `agents/acquirer/` |
+| Shared ChatGPT / Claude / Cursor memory | `_claude-memory/` + `docs/memory-cloud.md` |
 
 ## Build status
 

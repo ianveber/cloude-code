@@ -1,0 +1,22 @@
+{
+  "commitMessage": "memory(obsidian): {{date}}",
+  "autoCommitMessage": "memory(obsidian): {{date}}",
+  "commitDateFormat": "YYYY-MM-DD HH:mm:ss",
+  "autoSaveInterval": 0,
+  "autoPushInterval": 0,
+  "autoPullInterval": 5,
+  "autoPullOnBoot": true,
+  "disablePush": true,
+  "pullBeforePush": true,
+  "syncMethod": "merge",
+  "disablePopups": false,
+  "showStatusBar": true,
+  "updateSubmodules": false,
+  "customMessageOnAutoBackup": false,
+  "autoBackupAfterFileChange": false,
+  "treeStructure": true,
+  "refreshSourceControl": true,
+  "basePath": "../",
+  "differentIntervalCommitAndPush": false,
+  "changedFilesInStatusBar": true
+}
