@@ -1,116 +1,71 @@
-# You do this (only these clicks)
+# You do this (PR is already merged)
 
-Cursor already built the private memory cloud in git. ChatGPT, Claude, and Cursor share `_claude-memory/` in `ianveber/cloude-code`.
+Cursor merged https://github.com/ianveber/cloude-code/pull/8 to `main` on 2026-09-17.
 
-**PR to merge:** https://github.com/ianveber/cloude-code/pull/8
-
-Do these six things, in order. Skip nothing. About 20 minutes.
+This cloud agent is **not your Mac**. It cannot open Obsidian, log into ChatGPT, or log into Claude.ai. Those four steps are yours. About 15 minutes.
 
 ---
 
-## 1. Merge the PR
-
-Open https://github.com/ianveber/cloude-code/pull/8 → **Merge pull request**.
-
-Until this is on `main`, ChatGPT Actions looking at `main` will not see the memory folder.
-
----
-
-## 2. Mac — link Obsidian + update the app
-
-Terminal:
+## 1. Mac — link Obsidian (copy-paste)
 
 ```bash
-cd "$HOME/Desktop/Cloude CODE"
+cd "$HOME/Desktop/Cloude CODE" || cd "$HOME/Desktop/cloude-code"
 git checkout main
 git pull origin main
 ./scripts/upgrade-obsidian.sh
 ```
 
-If the repo is not on Desktop, `cd` to wherever `cloude-code` actually is, then run the last three lines.
+If the repo lives somewhere else, `cd` there first, then run the last three lines.
 
-Then in Obsidian: **Obsidian → Check for updates** → restart.
+Then: **Obsidian → Check for updates** → restart.
 
-Confirm you can open `_claude-memory/ledger.md` and see a Cursor entry dated 2026-09-17.
+Open `_claude-memory/ledger.md`. You should see Cursor entries from 2026-09-17.
 
-**Later, every time you edit those notes:**
-
-```bash
-./scripts/memory-sync.sh
-```
-
-**When you sit down and want ChatGPT/Cursor writes:**
-
-```bash
-./scripts/memory-sync.sh --pull
-```
+**When you edit those notes:** `./scripts/memory-sync.sh`  
+**When you sit down:** `./scripts/memory-sync.sh --pull`
 
 Do not enable Obsidian Sync. Do not `git init` inside `Documents/Obsidian Vault`.
 
 ---
 
-## 3. GitHub — fine-grained token (once)
+## 2. GitHub token (once)
 
 1. https://github.com/settings/personal-access-tokens
-2. **Generate new token** → Fine-grained
-3. Name: `veta-memory-chatgpt`
-4. Resource owner: **ianveber**
-5. Repository access: **Only select repositories** → `cloude-code`
-6. Permissions → Repository → **Contents**: Read and write. Nothing else.
-7. Expiration: 90 days
-8. Generate. **Copy it once.** It can commit to this private repo. Do not use a classic PAT.
+2. Generate fine-grained token named `veta-memory-chatgpt`
+3. Resource owner: **ianveber**
+4. Only select repositories → **cloude-code**
+5. Repository permissions → **Contents: Read and write** (nothing else)
+6. Expiration: 90 days. Copy it once. Not a classic PAT.
 
 ---
 
-## 4. ChatGPT — Custom GPT (live cloud)
+## 3. ChatGPT Custom GPT
 
-Need ChatGPT Plus / Team / Enterprise (Custom GPTs).
+Need Plus/Team. https://chatgpt.com/gpts/editor
 
-1. https://chatgpt.com/gpts/editor
-2. Name: `Veta Memory`
-3. Description: `Private Veta knowledge cloud. Reads and writes _claude-memory in ianveber/cloude-code.`
-4. Instructions: paste the entire file `connectors/chatgpt/gpt-instructions.md`
-5. Knowledge: upload `connectors/chatgpt/knowledge-pack.md`
-6. Conversation starters:
-   - `Load shared memory and tell me what is active.`
-   - `What did Cursor or Claude last write to the ledger?`
-   - `Draft a handoff for Cursor from this chat.`
-7. **Create** → **Add actions** → Import OpenAPI → paste `connectors/chatgpt/openapi.yaml`
-8. Authentication: API Key → **Bearer** → paste the token from step 3
-9. Save. Open the GPT (not a blank chat). Ask: `List the memory folder.`
+- Name: `Veta Memory`
+- Description: `Private Veta knowledge cloud. Reads and writes _claude-memory in ianveber/cloude-code.`
+- Instructions: paste `connectors/chatgpt/gpt-instructions.md`
+- Knowledge: upload `connectors/chatgpt/knowledge-pack.md`
+- Actions → import `connectors/chatgpt/openapi.yaml` → Auth: **Bearer** + the token from step 2
+- Ask: `List the memory folder.` You should see `context.md` and `ledger.md`.
 
-You should see `context.md`, `decisions-log.md`, `ledger.md`.
-
-Always use **this GPT** for Veta / Ethospheres / client work.
+Use this GPT for Veta work, not a blank ChatGPT chat.
 
 ---
 
-## 5. Claude.ai — Project (browser)
+## 4. Claude.ai Project (browser)
 
-Claude Code in this repo is already wired. This step is only for claude.ai in the browser.
+Claude Code in this repo is already live. This is only for claude.ai.
 
-1. https://claude.ai → Projects → New → name `Veta Memory Cloud`
-2. Custom instructions: paste `connectors/claude/project-instructions.md`
-3. Upload `connectors/chatgpt/knowledge-pack.md`
-4. Chat in that Project, not a blank Claude chat
-
-Re-upload the pack after big memory changes, or run `./scripts/export-memory-pack.sh` first.
+https://claude.ai → Projects → New → `Veta Memory Cloud`  
+Paste `connectors/claude/project-instructions.md`  
+Upload `connectors/chatgpt/knowledge-pack.md`
 
 ---
 
-## 6. 30-second test
+## 5. Test
 
-1. In Cursor (after merge, on `main`): ask it to read `ledger.md`.
-2. In the ChatGPT GPT: `Read ledger.md from memory.` Same content.
-3. In Claude Code or the Claude Project: same ask.
+Ask Cursor, the ChatGPT GPT, and Claude: `Read ledger.md.` Same text.
 
-If ChatGPT disagrees, it is using the uploaded snapshot — tell it: `Use getMemoryFile, do not rely on uploaded knowledge.`
-
----
-
-## You do not need to
-
-- Rewrite the memory files (already seeded)
-- Configure Cursor or Claude Code (already in `AGENTS.md` / `CLAUDE.md`)
-- Buy Obsidian Sync
-- Give ChatGPT access to any repo except `cloude-code`
+If ChatGPT disagrees: `Use getMemoryFile, do not rely on uploaded knowledge.`

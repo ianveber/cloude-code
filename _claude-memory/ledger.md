@@ -16,6 +16,14 @@ Append-only. Newest first. Every ChatGPT, Claude, or Cursor session that changes
 
 ---
 
+## 2026-09-17 — cursor (merged + remaining Mac/account steps)
+
+- Worked on: Merged PR #8 to main. Cloud VM has no Mac, no ChatGPT login, no Claude.ai login.
+- Files changed: `connectors/YOU-DO-THIS.md` updated to remaining steps only.
+- For the other models: Memory cloud is on `main`. Ian still links Obsidian and creates the GPT/Project.
+
+---
+
 ## 2026-09-17 — cursor (Obsidian upgrade)
 
 - Worked on: How to upgrade Obsidian so the Mac vault uses the private memory cloud (app update + symlink + memory-sync).
