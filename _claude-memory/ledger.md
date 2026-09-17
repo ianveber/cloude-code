@@ -16,6 +16,14 @@ Append-only. Newest first. Every ChatGPT, Claude, or Cursor session that changes
 
 ---
 
+## 2026-09-17 — cursor (Mac path was wrong)
+
+- Worked on: Ian's Terminal failed because `~/Desktop/Cloude CODE` does not exist. Setup now clones to `~/Desktop/cloude-code` if needed.
+- Files changed: `connectors/YOU-DO-THIS.md`, `scripts/mac-bootstrap.sh`
+- For the other models: Do not tell Ian to cd into Desktop/Cloude CODE.
+
+---
+
 ## 2026-09-17 — cursor (merged + remaining Mac/account steps)
 
 - Worked on: Merged PR #8 to main. Cloud VM has no Mac, no ChatGPT login, no Claude.ai login.

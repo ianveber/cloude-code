@@ -25,9 +25,12 @@ PR #8 is merged. `_claude-memory/` is live. Ian's remaining clicks: [`YOU-DO-THI
 
 App update is **Obsidian → Check for updates**. That does not share memory.
 
-To put the vault on the same cloud as ChatGPT / Claude / Cursor:
+To put the vault on the same cloud as ChatGPT / Claude / Cursor, paste the clone block in [`YOU-DO-THIS.md`](YOU-DO-THIS.md) from **any** Terminal folder. Do not assume `~/Desktop/Cloude CODE` exists.
+
+After the repo is at `~/Desktop/cloude-code`:
 
 ```bash
+cd ~/Desktop/cloude-code
 ./scripts/upgrade-obsidian.sh
 ```
 
