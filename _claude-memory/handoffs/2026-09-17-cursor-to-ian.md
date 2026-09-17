@@ -1,41 +1,35 @@
-# Handoff — cursor → ian (then chatgpt + claude)
+# Handoff — cursor → ian
 
 Date: 2026-09-17
-Status: open
+Status: waiting on Ian (all repo work is done)
 
 ## Goal
 
-Turn on the private memory cloud so ChatGPT, Claude, and Cursor share `_claude-memory/` in `ianveber/cloude-code`.
+Turn on the private memory cloud. Cursor cannot click your Mac, ChatGPT, or Claude.ai.
 
-## Context already in memory
+## Do this
 
-- `docs/memory-cloud.md`
-- `connectors/README.md`
-- `_claude-memory/BOOT.md`
-- `_claude-memory/ledger.md`
+Follow **`connectors/YOU-DO-THIS.md`** — six steps, copy-paste.
 
-## Done so far
+Short version:
 
-- Repo vault `_claude-memory/` (Claude + Cursor + Obsidian) extended into a three-model cloud.
-- ChatGPT Custom GPT instructions + GitHub OpenAPI Actions spec.
-- Claude.ai Project instructions.
-- Export script for a knowledge pack ChatGPT/Claude can upload.
-- Session protocol: load MOC/context/decisions/ledger; write ledger + handoffs at end.
+1. Merge https://github.com/ianveber/cloude-code/pull/8
+2. Mac: `git pull` then `./scripts/upgrade-obsidian.sh` then Obsidian → Check for updates
+3. Fine-grained GitHub PAT: this repo only, Contents read/write
+4. ChatGPT Custom GPT: paste `connectors/chatgpt/gpt-instructions.md` + `openapi.yaml` + upload `knowledge-pack.md`
+5. Claude.ai Project: paste `connectors/claude/project-instructions.md` + upload the same pack
+6. Test: all three can read `ledger.md`
 
-## Your next actions
+## Already done (do not redo)
 
-1. Merge this PR to `main`.
-2. On the Mac: `./scripts/upgrade-obsidian.sh` (app: Obsidian → Check for updates).
-3. After editing notes: `./scripts/memory-sync.sh`. Pull others' writes: `./scripts/memory-sync.sh --pull`.
-4. Create a fine-grained GitHub PAT (this repo, Contents read/write) and the ChatGPT Custom GPT using `connectors/chatgpt/setup.md`.
-5. Create a Claude.ai Project using `connectors/claude/setup.md`.
-6. Run `./scripts/export-memory-pack.sh` and upload `connectors/chatgpt/knowledge-pack.md` to both web UIs.
-7. Test: add a line to `ledger.md` in Cursor, push, ask ChatGPT "read ledger.md".
+- `_claude-memory/` vault, protocol, ledger, handoffs
+- Cursor rules + `AGENTS.md` + `CLAUDE.md`
+- ChatGPT / Claude / Obsidian connector files and scripts
+- Knowledge pack export
 
 ## Do not
 
-- Do not paste a classic GitHub PAT with access to every repo.
-- Do not treat a ChatGPT or Claude Project upload as a second source of truth.
-- Do not enable Obsidian Sync (paid) on `_claude-memory`.
-- Do not `git init` inside `Documents/Obsidian Vault`.
-- Do not ask any model to send email or edit Calendar as part of setup.
+- Classic GitHub PAT
+- Obsidian Sync on `_claude-memory`
+- `git init` inside `Documents/Obsidian Vault`
+- Second wiki inside a ChatGPT or Claude Project

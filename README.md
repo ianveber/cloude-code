@@ -19,12 +19,13 @@ This is the agency's internal operating repo. It contains:
 
 This repo is also the working environment for the Veta Business Manager agent, which runs daily briefings pulling from GitHub Issues, Notion, Calendar, and Gmail. See `CLAUDE.md` for that agent's configuration.
 
-**Private memory cloud (ChatGPT + Claude + Cursor):** `_claude-memory/`. All three models read and write those files. Architecture: `docs/memory-cloud.md`. Connectors: `connectors/README.md`. On a Mac, run `./scripts/link-obsidian-memory.sh` so Obsidian uses the same folder.
+**Private memory cloud (ChatGPT + Claude + Cursor):** `_claude-memory/`. Ian's remaining setup: `connectors/YOU-DO-THIS.md`.
 
 ## Quick navigation
 
 | What you need | Where to look |
 |---|---|
+| **Turn on shared memory (Ian)** | `connectors/YOU-DO-THIS.md` |
 | What we sell and how we price it | `docs/service-catalog.md` + `ops/pricing-architecture.md` |
 | How to scope a new client | `delivery/discovery-framework.md` |
 | SOW template | `delivery/sow-template.md` |

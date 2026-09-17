@@ -16,8 +16,6 @@ Append-only. Newest first. Every ChatGPT, Claude, or Cursor session that changes
 
 ---
 
----
-
 ## 2026-09-17 — cursor (Obsidian upgrade)
 
 - Worked on: How to upgrade Obsidian so the Mac vault uses the private memory cloud (app update + symlink + memory-sync).
@@ -28,4 +26,4 @@ Append-only. Newest first. Every ChatGPT, Claude, or Cursor session that changes
 
 - Worked on: Private memory cloud so ChatGPT, Claude, and Cursor share one knowledge base.
 - Files changed: `docs/memory-cloud.md`, `connectors/**`, `_claude-memory/BOOT.md`, `_claude-memory/ledger.md`, `_claude-memory/handoffs/`, protocol updates in `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/memory.mdc`, `SYNC.md`.
-- For the other models: After this lands on `main`, Ian must create the ChatGPT Custom GPT (Actions + PAT) and the Claude.ai Project. Then read `BOOT.md` + this ledger at session start. Do not keep a second wiki in ChatGPT or Claude Projects.
+- For the other models: Ian's remaining clicks are in `connectors/YOU-DO-THIS.md`. Merge PR #8, then Mac symlink, PAT, ChatGPT GPT, Claude Project.

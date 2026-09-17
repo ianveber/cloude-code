@@ -1,3 +1,5 @@
+**Your setup checklist (six clicks):** [`connectors/YOU-DO-THIS.md`](YOU-DO-THIS.md)
+
 # Connectors — ChatGPT, Claude, Cursor, Obsidian
 
 Wire all three models — and the Obsidian vault — to the same private memory cloud. Architecture: `docs/memory-cloud.md`. Files: `_claude-memory/`.
