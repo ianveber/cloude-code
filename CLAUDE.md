@@ -80,17 +80,20 @@ Compile a structured markdown report at ./reports/YYYY-MM-DD-daily-briefing.md u
 </memory_instructions>
 
 <obsidian_memory>
-Obsidian vault: /Users/ianveber/Documents/Obsidian Vault
-Memory folder: /Users/ianveber/Documents/Obsidian Vault/_claude-memory/
+Private memory cloud (ChatGPT + Claude + Cursor): ./_claude-memory/ in this repo.
+Obsidian vault (Mac UI): /Users/ianveber/Documents/Obsidian Vault
+Those two must be the same folder. On a Mac, run ./scripts/link-obsidian-memory.sh so the vault _claude-memory path is a symlink to this repo. Protocol: ./docs/memory-cloud.md, ./_claude-memory/SYNC.md, and AGENTS.md. ChatGPT connects via connectors/chatgpt/. Claude.ai via connectors/claude/.
 
-At the start of EVERY session, before doing anything else, read these three files in order:
-1. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/context.md
-2. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/ethospheres.md
-3. /Users/ianveber/Documents/Obsidian Vault/_claude-memory/decisions-log.md
+At the start of EVERY session, before doing anything else, read these files from the REPO copy first:
+1. ./_claude-memory/🗺️ Master MOC.md
+2. ./_claude-memory/context.md
+3. ./_claude-memory/decisions-log.md
+
+Fallback only if the repo folder is missing: /Users/ianveber/Documents/Obsidian Vault/_claude-memory/
 
 This restores full working memory of the user's business, active projects, and all decisions already made. Do not ask the user to re-explain context that is already in these files. After reading, confirm with one line: "Memory loaded — [brief summary of what's active]."
 
-When a session produces new decisions, completed tasks, or major project updates — write them to the relevant memory file before ending the session.
+When a session produces new decisions, completed tasks, or major project updates — write them to ./_claude-memory/ before ending the session (that is what Cursor Cloud, Claude, and ChatGPT Actions can see after git push). Also append ./_claude-memory/ledger.md and write a handoff if another model should continue.
 </obsidian_memory>
 
 <error_handling>
@@ -117,7 +120,8 @@ When a session produces new decisions, completed tasks, or major project updates
 MANDATORY — apply to EVERY conversation without exception.
 
 SESSION START:
-- Read all 4 files in _claude-memory/ before doing anything else
+- Read MOC, context.md, decisions-log.md, and ledger.md in _claude-memory/ before doing anything else
+- Check handoffs/ for work from ChatGPT or Cursor
 - Confirm with: "Memory loaded — [one line summary of what's active]"
 - Never ask Ian to re-explain context already in the memory files
 
@@ -127,7 +131,8 @@ SESSION END (before closing or when Ian says goodbye/done/thanks):
   2. Any tasks completed or phase status changes → ethospheres.md (or relevant client file)
   3. Any new files created (with full paths) → ethospheres.md
   4. Any new context Ian provided about himself, Veta, or clients → context.md or veta-agency.md
-  5. Update the "Last updated" date at the top of any file that was changed
+  5. What this model did → ledger.md; pickup for ChatGPT/Cursor → handoffs/
+  6. Update the "Last updated" date at the top of any file that was changed
 - Do this silently and efficiently — do not ask permission, just do it
 - After writing, confirm with: "Memory updated." and list what changed in one line per file
 
@@ -136,26 +141,34 @@ NEW CLIENT OR PROJECT:
 - Follow the same structure as ethospheres.md
 - Add the client to context.md under Active Clients
 
-Memory files (read in this order at session start):
+Memory files (read in this order at session start). Prefer ./_claude-memory/ so ChatGPT, Claude, and Cursor stay in sync. The Obsidian path is the same folder after symlink.
+
 CORE (read every session):
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/🗺️ Master MOC.md       ← START HERE
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/context.md
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/decisions-log.md
+- ./_claude-memory/🗺️ Master MOC.md       ← START HERE
+- ./_claude-memory/context.md
+- ./_claude-memory/decisions-log.md
+- ./_claude-memory/ledger.md
+- ./_claude-memory/handoffs/ (open notes only)
 
 CLIENTS (read when relevant):
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/ethospheres.md           ← PRIMARY
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/clients/autoflow.md
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/clients/other-projects.md
+- ./_claude-memory/ethospheres.md           ← PRIMARY
+- ./_claude-memory/clients/autoflow.md
+- ./_claude-memory/clients/other-projects.md
+- ./_claude-memory/zalife.md
 
 VETA INTERNAL:
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-agency.md
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-internal/veta-positioning.md
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-internal/veta-services.md
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-internal/veta-principles.md
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-internal/veta-kpis.md
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/veta-internal/vertical-aesthetic-medicine.md
+- ./_claude-memory/veta-agency.md
+- ./_claude-memory/agentic-os.md
+- ./_claude-memory/veta-internal/veta-positioning.md
+- ./_claude-memory/veta-internal/veta-services.md
+- ./_claude-memory/veta-internal/veta-principles.md
+- ./_claude-memory/veta-internal/veta-kpis.md
+- ./_claude-memory/veta-internal/vertical-aesthetic-medicine.md
 
 KNOWLEDGE BASE:
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/knowledge/ethosome-technology.md
-- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/knowledge/geo-strategy.md
+- ./_claude-memory/knowledge/ethosome-technology.md
+- ./_claude-memory/knowledge/geo-strategy.md
+
+Mac fallback (only if repo copy is missing):
+- /Users/ianveber/Documents/Obsidian Vault/_claude-memory/
 </memory_update_protocol>

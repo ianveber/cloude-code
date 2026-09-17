@@ -1,0 +1,105 @@
+openapi: 3.1.0
+info:
+  title: Veta Memory Cloud
+  description: >
+    Private read/write access to _claude-memory in ianveber/cloude-code.
+    ChatGPT, Claude, and Cursor share this folder. Only touch paths under
+    _claude-memory/. GitHub returns file content as Base64.
+  version: "1.0.0"
+servers:
+  - url: https://api.github.com
+security:
+  - GitHubToken: []
+paths:
+  /repos/ianveber/cloude-code/contents/_claude-memory:
+    get:
+      operationId: listMemory
+      summary: List the root of shared memory
+      parameters:
+        - $ref: "#/components/parameters/Ref"
+      responses:
+        "200":
+          description: Directory listing
+  /repos/ianveber/cloude-code/contents/_claude-memory/handoffs:
+    get:
+      operationId: listHandoffs
+      summary: List cross-model handoff notes
+      parameters:
+        - $ref: "#/components/parameters/Ref"
+      responses:
+        "200":
+          description: Directory listing
+  /repos/ianveber/cloude-code/contents/_claude-memory/{path}:
+    get:
+      operationId: getMemoryFile
+      summary: Read one memory file (content is Base64)
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+          description: >
+            Path relative to _claude-memory/. Examples: context.md,
+            decisions-log.md, ledger.md, ethospheres.md,
+            clients/autoflow.md, handoffs/README.md
+        - $ref: "#/components/parameters/Ref"
+      responses:
+        "200":
+          description: File payload with base64 content and sha
+    put:
+      operationId: putMemoryFile
+      summary: Create or update one memory file (commit on main)
+      description: >
+        Always GET first so you have the current sha. Encode the full
+        markdown file as Base64 in content. Do not write outside
+        _claude-memory/.
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+                - content
+              properties:
+                message:
+                  type: string
+                  description: Commit message. Use prefix memory(chatgpt):
+                content:
+                  type: string
+                  description: Full file body, Base64-encoded
+                sha:
+                  type: string
+                  description: Required when updating an existing file (from GET)
+                branch:
+                  type: string
+                  default: main
+      responses:
+        "200":
+          description: File updated
+        "201":
+          description: File created
+components:
+  securitySchemes:
+    GitHubToken:
+      type: http
+      scheme: bearer
+      bearerFormat: token
+      description: Fine-grained PAT, Contents read/write, repo ianveber/cloude-code only
+  parameters:
+    Ref:
+      name: ref
+      in: query
+      required: false
+      schema:
+        type: string
+        default: main
+      description: Git ref. Always use main for live memory.

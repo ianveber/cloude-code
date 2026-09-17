@@ -16,8 +16,15 @@ import urllib.error
 from pathlib import Path
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
-VAULT      = Path("/Users/ianveber/Documents/Obsidian Vault/_claude-memory")
-REPORTS    = Path("/Users/ianveber/Desktop/Cloude CODE/agents/research-agent/reports")
+REPO_ROOT  = Path(__file__).resolve().parents[2]
+REPO_MEM   = REPO_ROOT / "_claude-memory"
+LOCAL_MEM  = Path("/Users/ianveber/Documents/Obsidian Vault/_claude-memory")
+VAULT      = REPO_MEM if REPO_MEM.is_dir() else LOCAL_MEM
+_DESKTOP_REPORTS = Path.home() / "Desktop/Cloude CODE/agents/research-agent/reports"
+REPORTS    = Path(
+    os.environ.get("VETA_RESEARCH_REPORTS")
+    or (_DESKTOP_REPORTS if _DESKTOP_REPORTS.parent.exists() else REPO_ROOT / "agents/research-agent/reports")
+)
 API_KEY    = os.environ.get("ANTHROPIC_API_KEY") or open(Path.home()/".anthropic_key").read().strip() if (Path.home()/".anthropic_key").exists() else None
 HAIKU      = "claude-haiku-4-5-20251001"   # cheapest Claude — Ruflo Tier 2 routing
 SONNET     = "claude-sonnet-4-6"           # only for final synthesis
