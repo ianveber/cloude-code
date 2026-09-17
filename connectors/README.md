@@ -6,9 +6,9 @@ Wire all three models — and the Obsidian vault — to the same private memory 
 
 ## Do this in order
 
-### 1. Land memory on `main`
+### 1. Memory is on `main`
 
-Merge the PR that adds `_claude-memory/`. After that, `main` is the live cloud.
+PR #8 is merged. `_claude-memory/` is live. Ian's remaining clicks: [`YOU-DO-THIS.md`](YOU-DO-THIS.md).
 
 ### 2. Cursor (already done in this repo)
 
