@@ -1,8 +1,24 @@
+---
+source: cursor
+sources:
+  - cursor
+  - ian
+---
 # Decisions log
 
 Last updated: 2026-09-17
 
 Append-only. Newest first. Do not rewrite history — add a superseding entry.
+
+---
+
+## 2026-09-17 — Memory Space viewer with LLM colors
+
+**Decision:** `_claude-memory/` gets a local Obsidian-style viewer at `memory-space/`. Each note is colored by writer: Claude orange, ChatGPT blue, Cursor purple, Ian teal.
+
+**How:** YAML `source` / `sources` plus `<!-- source:name -->` blocks. Open with `./scripts/memory-space.sh`. Do not deploy that folder publicly.
+
+**Do not:** Keep a second unsynced wiki. This is a view of the same git files.
 
 ---
 

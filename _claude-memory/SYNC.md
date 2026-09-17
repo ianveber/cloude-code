@@ -1,3 +1,8 @@
+---
+source: cursor
+sources:
+  - cursor
+---
 # ChatGPT ↔ Claude ↔ Cursor ↔ Obsidian sync
 
 Last updated: 2026-09-17
@@ -40,6 +45,8 @@ That runs `link-obsidian-memory.sh`:
 Open Obsidian after that. The `_claude-memory` notes should still appear; they now are these git files.
 
 Then wire ChatGPT and Claude.ai using `connectors/README.md`.
+
+Colored vault (same notes, LLM colors): `./scripts/memory-space.sh` — Claude orange, ChatGPT blue, Cursor purple. Docs: `docs/memory-space.md`.
 
 ## Daily loop
 

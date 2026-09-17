@@ -1,3 +1,8 @@
+---
+source: cursor
+sources:
+  - cursor
+---
 # Handoffs
 
 Last updated: 2026-09-17

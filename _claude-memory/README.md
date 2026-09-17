@@ -1,3 +1,8 @@
+---
+source: cursor
+sources:
+  - cursor
+---
 # Shared agent memory
 
 This folder is the **private cloud** for ChatGPT, Claude, and Cursor.
@@ -20,4 +25,6 @@ At the start of every session, read in this order:
 
 Then open client or knowledge files only if the task needs them. Confirm with: `Memory loaded — [one line].`
 
-At session end, write decisions, status changes, and new files back here. Append `ledger.md`. Update `Last updated` on every file you change.
+At session end, write decisions, status changes, and new files back here. Append `ledger.md`. Update `Last updated` on every file you change. Stamp `source:` / `sources:` (Claude orange, ChatGPT blue, Cursor purple).
+
+Browse the vault like Obsidian, with writer colors: `./scripts/memory-space.sh` → `memory-space/`.

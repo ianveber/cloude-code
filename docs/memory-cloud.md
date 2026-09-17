@@ -51,7 +51,10 @@ A ChatGPT write is a git commit. Claude and Cursor see it on the next pull. A Cu
 1. Update the matching memory file. Set `Last updated`.
 2. Append one entry to `ledger.md` (who, what, files, next for the others).
 3. If another model should continue a specific job, write `handoffs/YYYY-MM-DD-<from>-to-<to>.md`.
-4. Confirm: `Memory updated.`
+4. Stamp `source:` / `sources:` (claude orange, chatgpt blue, cursor purple) so Memory Space can color the note. Partial edits: `<!-- source:YOURNAME --> … <!-- /source -->`.
+5. Confirm: `Memory updated.`
+
+Ian can browse the vault like Obsidian, colored by writer: `./scripts/memory-space.sh` → `memory-space/`. Docs: `docs/memory-space.md`.
 
 ## How they combine work
 

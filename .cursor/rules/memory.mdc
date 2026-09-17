@@ -9,7 +9,9 @@ You, Claude, and ChatGPT use the same notes. They live in `_claude-memory/` at t
 
 At the start of a session, read `_claude-memory/🗺️ Master MOC.md`, `_claude-memory/context.md`, `_claude-memory/decisions-log.md`, and `_claude-memory/ledger.md` before asking Ian for background. Check `_claude-memory/handoffs/` for work left by Claude or ChatGPT. Confirm: `Memory loaded — [one line].`
 
-At the end of a session that produced decisions, status changes, or new files, update the matching `_claude-memory/` file, append `ledger.md`, write a handoff if another model should continue, and set `Last updated`. Confirm: `Memory updated.`
+At the end of a session that produced decisions, status changes, or new files, update the matching `_claude-memory/` file, append `ledger.md`, write a handoff if another model should continue, and set `Last updated`. Stamp YAML `source: cursor` and merge `sources:` (Claude orange, ChatGPT blue, Cursor purple). If you only add a section, wrap it in `<!-- source:cursor --> … <!-- /source -->`. Confirm: `Memory updated.`
+
+Ian can open the colored vault with `./scripts/memory-space.sh` (`memory-space/`).
 
 Never invent client progress. If the local Obsidian vault has extra notes not in git, merge them into `_claude-memory/` rather than keeping a second copy. Do not treat ChatGPT or Claude Project uploads as a second source of truth.
 
