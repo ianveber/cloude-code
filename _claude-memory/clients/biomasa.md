@@ -1,7 +1,7 @@
 # Biomasa d.o.o.
 
 Last updated: 2026-09-17
-Status: Active engagement — social publishing agent, read-only phase.
+Status: Active engagement — social publishing agent, read-only phase. Console verified in browser.
 
 ## One line
 
@@ -21,6 +21,8 @@ Slovenian wood-biomass heating company (Fröling SI, BBC Nazarje). Veta is build
 Cluster: organic social publishing (FB, IG, LinkedIn, YouTube). Operator console: `biomasa-social.html`. Spec: `agents/energy-biomasa/`.
 
 Does **not** auto-post. Does **not** replace the Retoba ambassador.
+
+Operator console (verified 2026-09-17): generate + weekly mix + approve/export clipboard; Eko sklad checkbox gates kurilna only; unapproved export blocked; queue CTA is a separate line; mobile ≤820px uses hamburger (sidebar is not deleted).
 
 ## Claude trail (do not invent extra progress)
 

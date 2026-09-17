@@ -17,6 +17,7 @@ iPROM (Maja) can run Biomasa social from `biomasa-social.html` without the agent
 - Spec, voice, pillars, copy-out tool manifest
 - Working console: generate, weekly mix, queue approve/reject/export, optional Claude rewrite that discards new numbers
 - Seeded drafts from public 2026 content (Črnomelj, Bovec, Solčava, ambassador, servis)
+- Browser pass: Fröling generate without subsidy checkbox; kurilna blocked until checkbox; unapproved export toast `Najprej odobri`; queue CTA on its own line; mobile hamburger
 
 ## Your next actions
 

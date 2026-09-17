@@ -16,6 +16,12 @@ Append-only. Newest first. Every ChatGPT, Claude, or Cursor session that changes
 
 ---
 
+## 2026-09-17 — cursor (Biomasa console UX)
+
+- Worked on: Browser-verified the read-only Biomasa console. Fröling generate works without the Eko sklad checkbox; kurilna generate does not. Export stays blocked until approve. Queue CTA no longer concatenates onto hashtags. Mobile hamburger restores nav (sidebar used to vanish ≤820px).
+- Files changed: `biomasa-social.html` (hamburger + queue CTA), this ledger, `clients/biomasa.md`, handoff
+- For the other models: PR #13. Still do not post. Still do not email Maja. Original Claude zip/docx still not in `agents/energy-biomasa/source/`.
+
 ## 2026-09-17 — cursor (Biomasa social agent)
 
 - Worked on: Continued Claude/iPROM Biomasa social-media agent. Gmail has `BIOMASA_digitalna_revizija.docx/.xlsx` (16 Sep, to Maja Gorjanc) and `session-export-1789638664349.zip` (17 Sep); MCP cannot download attachments.
