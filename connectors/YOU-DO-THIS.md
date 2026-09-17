@@ -51,14 +51,17 @@ Do not enable Obsidian Sync. Do not `git init` inside `Documents/Obsidian Vault`
 
 ## 3. ChatGPT Custom GPT
 
-https://chatgpt.com/gpts/editor (you must be logged in)
+Open this file and follow it in ChatGPT. It has every click plus copy-paste blocks:
 
-- Name: `Veta Memory`
-- Instructions: paste `connectors/chatgpt/gpt-instructions.md` (inside `~/Desktop/cloude-code`)
-- Knowledge: upload `connectors/chatgpt/knowledge-pack.md`
-- Actions: paste `connectors/chatgpt/openapi.yaml` → Bearer + the token
+`~/Desktop/cloude-code/connectors/chatgpt/CHATGPT-FULL-SETUP.md`
 
-Ask: `List the memory folder.`
+If that file is missing, in Terminal:
+
+```bash
+cd ~/Desktop/cloude-code && git pull origin main
+```
+
+Then open the file again. Keep it beside https://chatgpt.com/gpts/editor
 
 ---
 

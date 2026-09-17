@@ -1,5 +1,7 @@
 # ChatGPT → Veta Memory Cloud
 
+**Do this now (one file, click-by-click):** [CHATGPT-FULL-SETUP.md](CHATGPT-FULL-SETUP.md)
+
 Two layers. Use both.
 
 | Layer | What it is | Freshness |
