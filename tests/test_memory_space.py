@@ -67,6 +67,14 @@ class WikiAndSpansTests(unittest.TestCase):
         spans = builder.extract_source_spans(text)
         self.assertEqual([span["source"] for span in spans], ["claude", "chatgpt"])
 
+    def test_ignores_source_comments_inside_code(self) -> None:
+        text = (
+            "Use `<!-- source:chatgpt -->` in docs.\n"
+            "```\n<!-- source:ian -->\n```\n"
+            "<!-- source:claude -->real<!-- /source -->\n"
+        )
+        self.assertEqual(builder.extract_inline_sources(text), ["claude"])
+
 
 class LedgerTests(unittest.TestCase):
     def test_parse_ledger_and_file_map(self) -> None:

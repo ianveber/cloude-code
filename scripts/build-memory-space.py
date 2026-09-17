@@ -68,6 +68,8 @@ SOURCE_BLOCK_RE = re.compile(
     re.S | re.I,
 )
 SOURCE_MARK_RE = re.compile(r"<!--\s*source:\s*([A-Za-z0-9_-]+)\s*-->", re.I)
+CODE_FENCE_RE = re.compile(r"```[\s\S]*?```")
+INLINE_CODE_RE = re.compile(r"`[^`\n]+`")
 LEDGER_HEAD_RE = re.compile(
     r"^##\s+(\d{4}-\d{2}-\d{2})\s+[—–-]\s+(.+)$",
     re.M,
@@ -147,6 +149,15 @@ def dump_frontmatter(data: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def mask_code(text: str) -> str:
+    """Replace fences and inline code with spaces so source comments in docs are ignored."""
+
+    def blank(match: re.Match[str]) -> str:
+        return " " * len(match.group(0))
+
+    return INLINE_CODE_RE.sub(blank, CODE_FENCE_RE.sub(blank, text))
+
+
 def extract_wiki_links(text: str) -> list[dict[str, str]]:
     links = []
     seen: set[tuple[str, str]] = set()
@@ -162,12 +173,13 @@ def extract_wiki_links(text: str) -> list[dict[str, str]]:
 
 
 def extract_inline_sources(text: str) -> list[str]:
+    masked = mask_code(text)
     found: list[str] = []
-    for match in SOURCE_BLOCK_RE.finditer(text):
+    for match in SOURCE_BLOCK_RE.finditer(masked):
         source = normalize_source(match.group(1))
         if source and source not in found:
             found.append(source)
-    for match in SOURCE_MARK_RE.finditer(text):
+    for match in SOURCE_MARK_RE.finditer(masked):
         source = normalize_source(match.group(1))
         if source and source not in found:
             found.append(source)
@@ -175,15 +187,17 @@ def extract_inline_sources(text: str) -> list[str]:
 
 
 def extract_source_spans(text: str) -> list[dict[str, Any]]:
+    masked = mask_code(text)
     spans: list[dict[str, Any]] = []
-    for match in SOURCE_BLOCK_RE.finditer(text):
+    for match in SOURCE_BLOCK_RE.finditer(masked):
         source = normalize_source(match.group(1))
         if not source:
             continue
+        inner = text[match.start(2) : match.end(2)] if match.lastindex and match.lastindex >= 2 else ""
         spans.append(
             {
                 "source": source,
-                "text": match.group(2).strip(),
+                "text": inner.strip(),
                 "start": match.start(),
                 "end": match.end(),
             }

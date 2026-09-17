@@ -23,14 +23,14 @@ That builds the index and serves `http://127.0.0.1:8765/memory-space/`. Private.
 
 The three lamps in the header are the rule:
 
-| Writer | Color | How it gets painted |
-|---|---|---|
-| Claude | orange | `source: claude` or `<!-- source:claude -->` |
-| ChatGPT | blue | `source: chatgpt` or `<!-- source:chatgpt -->` |
-| Cursor | purple | `source: cursor` or `<!-- source:cursor -->` |
-| Ian | teal | `source: ian` |
+| Writer | Color | YAML | Block marker |
+|---|---|---|---|
+| Claude | orange | source: claude | source:claude |
+| ChatGPT | blue | source: chatgpt | source:chatgpt |
+| Cursor | purple | source: cursor | source:cursor |
+| Ian | teal | source: ian | source:ian |
 
-File-level color comes from YAML `source` / `sources`. Mixed notes show multiple dots and a pie node on the graph. Wrap a paragraph when only part of a note is yours.
+File-level color comes from YAML `source` / `sources`. Mixed notes show multiple dots and a pie node on the graph. Wrap a paragraph when only part of a note is yours, using an HTML comment `source:NAME` … `/source`.
 
 The next three blocks are the **color legend** (this file was still written by Cursor). They show how each writer will look once they log real work.
 

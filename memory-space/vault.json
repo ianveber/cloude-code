@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-17T11:43:34Z",
+  "generated_at": "2026-09-17T11:51:09Z",
   "memory_root": "_claude-memory",
   "palette": {
     "claude": {
@@ -28,8 +28,8 @@
     }
   },
   "counts": {
-    "claude": 3,
-    "chatgpt": 3,
+    "claude": 1,
+    "chatgpt": 1,
     "cursor": 24,
     "ian": 1
   },
@@ -235,18 +235,9 @@
       "body": "# Handoff — cursor → chatgpt / claude\n\nDate: 2026-09-17\nStatus: open\n\n## Goal\n\nWhen you write `_claude-memory/` notes, stamp who wrote them so Memory Space can color the vault.\n\n## Context already in memory\n\n- [[memory-space]]\n- `docs/memory-space.md`\n- Colors: Claude orange, ChatGPT blue, Cursor purple, Ian teal\n\n## Done so far\n\nCursor built `memory-space/` (Notes / Graph / Ledger / search). Index: `python3 scripts/build-memory-space.py`. Open: `./scripts/memory-space.sh`.\n\n## Your next actions\n\n1. On any file you change, set `source: chatgpt` or `source: claude` and merge yourself into `sources:`.\n2. If you only add a section, wrap it in `<!-- source:chatgpt -->` or `<!-- source:claude -->` … `<!-- /source -->`.\n3. Do not label Cursor's older notes as yours.\n\n## Do not\n\n- Deploy `memory-space/` publicly\n- Invent client progress\n- Skip the YAML stamp — without it the note stays purple (Cursor) or uncolored\n",
       "source": "cursor",
       "sources": [
-        "cursor",
-        "chatgpt",
-        "claude"
+        "cursor"
       ],
-      "spans": [
-        {
-          "source": "chatgpt",
-          "text": "` or `<!-- source:claude -->` … `",
-          "start": 649,
-          "end": 721
-        }
-      ],
+      "spans": [],
       "links": [
         {
           "target": "memory-space",
@@ -341,9 +332,7 @@
       "body": "# Ledger\n\nLast updated: 2026-09-17\n\nAppend-only. Newest first. Every ChatGPT, Claude, or Cursor session that changes shared knowledge adds one entry. This is how the three models combine work without sharing a chat.\n\n## Format\n\n```\n## YYYY-MM-DD — {chatgpt | claude | cursor | ian}\n\n- Worked on:\n- Files changed:\n- For the other models:\n```\n\n---\n\n## 2026-09-17 — cursor\n\n- Worked on: Memory Space — Obsidian-style vault viewer with LLM colors (Claude orange, ChatGPT blue, Cursor purple).\n- Files changed: `memory-space/`, `scripts/build-memory-space.py`, `scripts/memory-space.sh`, `_claude-memory/memory-space.md`, `docs/memory-space.md`, agent source-stamp protocol.\n- For the other models: Stamp `source:` / `sources:` when you write. Partial blocks: `<!-- source:chatgpt -->` or `<!-- source:claude -->`. Ian opens the vault with `./scripts/memory-space.sh`.\n\n---\n\n## 2026-09-17 — ian / cursor\n\n- Worked on: Ian finished ChatGPT `Veta Memory` GPT. Claude.ai Project skipped for now; do later.\n- Files changed: `decisions-log.md`, this ledger, handoff marked deferred.\n- For the other models: Do not ask Ian to set up Claude.ai this session. Cursor + ChatGPT + Claude Code already share `_claude-memory/`.\n\n---\n\n## 2026-09-17 — cursor (Mac path was wrong)\n\n- Worked on: Ian's Terminal failed because `~/Desktop/Cloude CODE` does not exist. Setup now clones to `~/Desktop/cloude-code` if needed.\n- Files changed: `connectors/YOU-DO-THIS.md`, `scripts/mac-bootstrap.sh`\n- For the other models: Do not tell Ian to cd into Desktop/Cloude CODE.\n\n---\n\n## 2026-09-17 — cursor (merged + remaining Mac/account steps)\n\n- Worked on: Merged PR #8 to main. Cloud VM has no Mac, no ChatGPT login, no Claude.ai login.\n- Files changed: `connectors/YOU-DO-THIS.md` updated to remaining steps only.\n- For the other models: Memory cloud is on `main`. Ian still links Obsidian and creates the GPT/Project.\n\n---\n\n## 2026-09-17 — cursor (Obsidian upgrade)\n\n- Worked on: How to upgrade Obsidian so the Mac vault uses the private memory cloud (app update + symlink + memory-sync).\n- Files changed: `connectors/obsidian/`, `scripts/upgrade-obsidian.sh`, `scripts/memory-sync.sh`, `SYNC.md`.\n- For the other models: After merge, Ian runs `./scripts/upgrade-obsidian.sh` on the Mac, then `./scripts/memory-sync.sh` when he edits notes. Do not turn on Obsidian Sync. Do not git-init the personal vault.\n\n## 2026-09-17 — cursor\n\n- Worked on: Private memory cloud so ChatGPT, Claude, and Cursor share one knowledge base.\n- Files changed: `docs/memory-cloud.md`, `connectors/**`, `_claude-memory/BOOT.md`, `_claude-memory/ledger.md`, `_claude-memory/handoffs/`, protocol updates in `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/memory.mdc`, `SYNC.md`.\n- For the other models: Ian's remaining clicks are in `connectors/YOU-DO-THIS.md`. Merge PR #8, then Mac symlink, PAT, ChatGPT GPT, Claude Project.\n",
       "source": "cursor",
       "sources": [
-        "cursor",
-        "chatgpt",
-        "claude"
+        "cursor"
       ],
       "spans": [],
       "links": [],
@@ -360,7 +349,7 @@
       "path": "memory-space.md",
       "folder": "",
       "title": "Memory Space",
-      "body": "# Memory Space\n\nLast updated: 2026-09-17\n\nCustom vault for this folder — same job as Obsidian, plus a color for **which LLM wrote the data**.\n\nOpen from the repo root:\n\n```bash\n./scripts/memory-space.sh\n```\n\nThat builds the index and serves `http://127.0.0.1:8765/memory-space/`. Private. Do not host this folder on a public URL.\n\n## Colors\n\nThe three lamps in the header are the rule:\n\n| Writer | Color | How it gets painted |\n|---|---|---|\n| Claude | orange | `source: claude` or `<!-- source:claude -->` |\n| ChatGPT | blue | `source: chatgpt` or `<!-- source:chatgpt -->` |\n| Cursor | purple | `source: cursor` or `<!-- source:cursor -->` |\n| Ian | teal | `source: ian` |\n\nFile-level color comes from YAML `source` / `sources`. Mixed notes show multiple dots and a pie node on the graph. Wrap a paragraph when only part of a note is yours.\n\nThe next three blocks are the **color legend** (this file was still written by Cursor). They show how each writer will look once they log real work.\n\n<!-- source:claude -->\n**Claude · orange.** Notes and blocks Claude writes use orange — tree dot, graph node, left rail, and this rail.\n<!-- /source -->\n\n<!-- source:chatgpt -->\n**ChatGPT · blue.** Notes and blocks ChatGPT writes use blue. Live writes still go to git via Custom GPT Actions.\n<!-- /source -->\n\n<!-- source:cursor -->\n**Cursor · purple.** Cursor seeded this memory cloud and built Memory Space. Most notes start purple until the others write.\n<!-- /source -->\n\n## Views\n\n- **Notes** — file tree, wiki links `[[like this]]`, backlinks\n- **Graph** — constellation of notes; node color is the writer\n- **Ledger** — `ledger.md` timeline, colored by model\n- **Search** — `/` or Cmd+K\n\nSee [[🗺️ Master MOC]], [[ledger]], [[SYNC]], and `docs/memory-space.md`.\n",
+      "body": "# Memory Space\n\nLast updated: 2026-09-17\n\nCustom vault for this folder — same job as Obsidian, plus a color for **which LLM wrote the data**.\n\nOpen from the repo root:\n\n```bash\n./scripts/memory-space.sh\n```\n\nThat builds the index and serves `http://127.0.0.1:8765/memory-space/`. Private. Do not host this folder on a public URL.\n\n## Colors\n\nThe three lamps in the header are the rule:\n\n| Writer | Color | YAML | Block marker |\n|---|---|---|---|\n| Claude | orange | source: claude | source:claude |\n| ChatGPT | blue | source: chatgpt | source:chatgpt |\n| Cursor | purple | source: cursor | source:cursor |\n| Ian | teal | source: ian | source:ian |\n\nFile-level color comes from YAML `source` / `sources`. Mixed notes show multiple dots and a pie node on the graph. Wrap a paragraph when only part of a note is yours, using an HTML comment `source:NAME` … `/source`.\n\nThe next three blocks are the **color legend** (this file was still written by Cursor). They show how each writer will look once they log real work.\n\n<!-- source:claude -->\n**Claude · orange.** Notes and blocks Claude writes use orange — tree dot, graph node, left rail, and this rail.\n<!-- /source -->\n\n<!-- source:chatgpt -->\n**ChatGPT · blue.** Notes and blocks ChatGPT writes use blue. Live writes still go to git via Custom GPT Actions.\n<!-- /source -->\n\n<!-- source:cursor -->\n**Cursor · purple.** Cursor seeded this memory cloud and built Memory Space. Most notes start purple until the others write.\n<!-- /source -->\n\n## Views\n\n- **Notes** — file tree, wiki links `[[like this]]`, backlinks\n- **Graph** — constellation of notes; node color is the writer\n- **Ledger** — `ledger.md` timeline, colored by model\n- **Search** — `/` or Cmd+K\n\nSee [[🗺️ Master MOC]], [[ledger]], [[SYNC]], and `docs/memory-space.md`.\n",
       "source": "cursor",
       "sources": [
         "cursor",
@@ -370,21 +359,21 @@
       "spans": [
         {
           "source": "claude",
-          "text": "` |\n| ChatGPT | blue | `source: chatgpt` or `<!-- source:chatgpt -->` |\n| Cursor | purple | `source: cursor` or `<!-- source:cursor -->` |\n| Ian | teal | `source: ian` |\n\nFile-level color comes from YAML `source` / `sources`. Mixed notes show multiple dots and a pie node on the graph. Wrap a paragraph when only part of a note is yours.\n\nThe next three blocks are the **color legend** (this file was still written by Cursor). They show how each writer will look once they log real work.\n\n<!-- source:claude -->\n**Claude · orange.** Notes and blocks Claude writes use orange — tree dot, graph node, left rail, and this rail.",
-          "start": 483,
-          "end": 1146
+          "text": "**Claude · orange.** Notes and blocks Claude writes use orange — tree dot, graph node, left rail, and this rail.",
+          "start": 1016,
+          "end": 1168
         },
         {
           "source": "chatgpt",
           "text": "**ChatGPT · blue.** Notes and blocks ChatGPT writes use blue. Live writes still go to git via Custom GPT Actions.",
-          "start": 1148,
-          "end": 1302
+          "start": 1170,
+          "end": 1324
         },
         {
           "source": "cursor",
           "text": "**Cursor · purple.** Cursor seeded this memory cloud and built Memory Space. Most notes start purple until the others write.",
-          "start": 1304,
-          "end": 1468
+          "start": 1326,
+          "end": 1490
         }
       ],
       "links": [
@@ -410,7 +399,7 @@
         }
       ],
       "last_updated": "2026-09-17",
-      "word_count": 297,
+      "word_count": 300,
       "resolved_links": [
         "🗺️ Master MOC",
         "ledger",
@@ -1038,9 +1027,7 @@
           "path": "ledger.md",
           "source": "cursor",
           "sources": [
-            "cursor",
-            "chatgpt",
-            "claude"
+            "cursor"
           ]
         },
         {
@@ -1128,9 +1115,7 @@
               "path": "handoffs/2026-09-17-cursor-to-chatgpt.md",
               "source": "cursor",
               "sources": [
-                "cursor",
-                "chatgpt",
-                "claude"
+                "cursor"
               ]
             },
             {

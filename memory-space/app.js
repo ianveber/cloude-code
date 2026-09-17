@@ -73,12 +73,17 @@
   }
 
   function renderInline(text) {
-    let html = escapeHtml(text);
+    const codes = [];
+    let html = escapeHtml(text).replace(/`([^`]+)`/g, (_, code) => {
+      const index = codes.length;
+      codes.push(`<code>${code}</code>`);
+      return `\u0000C${index}\u0000`;
+    });
     html = html.replace(
       /\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]/g,
       (_, target, display) => {
         const resolved = resolveTarget(target);
-        const label = escapeHtml(display || target);
+        const label = display || target;
         if (!resolved) {
           return `<a class="wiki missing" href="#note/${encodeURIComponent(target)}">${label}</a>`;
         }
@@ -91,10 +96,10 @@
       /\[([^\]]+)\]\((https?:[^)\s]+)\)/g,
       '<a class="ext" href="$2" target="_blank" rel="noopener">$1</a>'
     );
-    html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
     html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
     html = html.replace(/__([^_]+)__/g, "<strong>$1</strong>");
     html = html.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>");
+    html = html.replace(/\u0000C(\d+)\u0000/g, (_, index) => codes[Number(index)]);
     return html;
   }
 
@@ -223,20 +228,28 @@
       );
       return `\n\u0000FENCE${index}\u0000\n`;
     });
+    const codes = [];
+    text = text.replace(/`([^`\n]+)`/g, (_, code) => {
+      const index = codes.length;
+      codes.push(code);
+      return `\u0000CODE${index}\u0000`;
+    });
     const blocks = [];
     text = text.replace(
       /<!--\s*source:\s*([A-Za-z0-9_-]+)\s*-->([\s\S]*?)<!--\s*\/source\s*-->/gi,
       (_, src, inner) => {
         const source = normalizeSource(src) || String(src).toLowerCase();
-        const index = blocks.length;
+        const restored = inner.replace(/\u0000CODE(\d+)\u0000/g, (__, index) => "`" + codes[Number(index)] + "`");
+        const blockIndex = blocks.length;
         blocks.push(
           `<section class="src-block src-${escapeHtml(source)}" data-source="${escapeHtml(source)}"><div class="src-block-label">${escapeHtml(
             sourceLabel(source)
-          )}</div><div class="src-block-body">${renderMarkdownBlocks(inner)}</div></section>`
+          )}</div><div class="src-block-body">${renderMarkdownBlocks(restored)}</div></section>`
         );
-        return `\n\u0000BLOCK${index}\u0000\n`;
+        return `\n\u0000BLOCK${blockIndex}\u0000\n`;
       }
     );
+    text = text.replace(/\u0000CODE(\d+)\u0000/g, (_, index) => "`" + codes[Number(index)] + "`");
     let html = renderMarkdownBlocks(text);
     html = html.replace(/\u0000BLOCK(\d+)\u0000/g, (_, index) => blocks[Number(index)]);
     html = html.replace(/\u0000FENCE(\d+)\u0000/g, (_, index) => fences[Number(index)]);
@@ -277,7 +290,10 @@
     parts.push(walkFolder(tree, 0));
     root.innerHTML = parts.join("");
     root.querySelectorAll(".tree-item").forEach((button) => {
-      button.addEventListener("click", () => openNote(button.dataset.id));
+      button.addEventListener("click", () => {
+        openNote(button.dataset.id);
+        $("shell").classList.remove("tree-open");
+      });
     });
     root.querySelectorAll(".folder-name").forEach((label) => {
       label.addEventListener("click", () => {
@@ -519,9 +535,9 @@
         c.arc(p.x, p.y, radius, 0, Math.PI * 2);
         c.strokeStyle = "rgba(8,8,12,0.7)";
         c.stroke();
-        if (graph.hover === node || n < 18) {
-          c.font = "12px Avenir Next, Segoe UI, sans-serif";
-          c.fillStyle = "rgba(236,232,225,0.82)";
+        if (graph.hover === node || nodes.length < 22) {
+          c.font = "11px Avenir Next, Segoe UI, sans-serif";
+          c.fillStyle = graph.hover === node ? "#ece8e1" : "rgba(236,232,225,0.72)";
           c.fillText(node.title, p.x + 12, p.y + 4);
         }
       });
@@ -580,16 +596,22 @@
 
   function paletteItems() {
     const query = state.paletteQuery.trim().toLowerCase();
-    return visibleNotes()
-      .filter((note) => {
-        if (!query) return true;
-        return (
-          note.title.toLowerCase().includes(query) ||
-          note.path.toLowerCase().includes(query) ||
-          note.body.toLowerCase().includes(query)
-        );
+    const ranked = visibleNotes()
+      .map((note) => {
+        if (!query) return { note, score: 1 };
+        const title = note.title.toLowerCase();
+        const path = note.path.toLowerCase();
+        const body = note.body.toLowerCase();
+        let score = 0;
+        if (title.includes(query)) score += 6;
+        if (path.includes(query)) score += 3;
+        if (body.includes(query)) score += 1;
+        if (title === query || path === `${query}.md`) score += 8;
+        return { note, score };
       })
-      .slice(0, 20);
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score || a.note.title.localeCompare(b.note.title));
+    return ranked.slice(0, 20).map((item) => item.note);
   }
 
   function renderPalette() {
