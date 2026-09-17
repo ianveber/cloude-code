@@ -18,6 +18,7 @@ Map of maps. Start here every session.
 - [[ledger]] — what ChatGPT / Claude / Cursor last wrote
 - [[BOOT]] — short pack for ChatGPT and Claude.ai uploads
 - [[SYNC]] — how all three models + Obsidian stay in sync
+- `connectors/obsidian/setup.md` — upgrade the Mac app and vault
 
 ## Primary work
 

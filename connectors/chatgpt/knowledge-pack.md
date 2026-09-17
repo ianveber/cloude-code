@@ -1,6 +1,6 @@
 # Veta Memory Cloud — knowledge pack
 
-Generated: 2026-09-17T06:54:05Z
+Generated: 2026-09-17T06:58:49Z
 
 This is a snapshot of `_claude-memory/` for ChatGPT and Claude.ai uploads.
 Live source of truth is the git folder. Re-run `./scripts/export-memory-pack.sh` after memory changes.
@@ -93,6 +93,7 @@ Map of maps. Start here every session.
 - [[ledger]] — what ChatGPT / Claude / Cursor last wrote
 - [[BOOT]] — short pack for ChatGPT and Claude.ai uploads
 - [[SYNC]] — how all three models + Obsidian stay in sync
+- `connectors/obsidian/setup.md` — upgrade the Mac app and vault
 
 ## Primary work
 
@@ -243,7 +244,7 @@ Append-only. Newest first. Do not rewrite history — add a superseding entry.
 
 **Why:** The three models cannot share a conversation. They can share files. Cursor Cloud still cannot see the Mac Obsidian vault. ChatGPT cannot see the git working tree unless it calls GitHub.
 
-**Do not:** Keep a second wiki inside a ChatGPT Project or Claude Project. Re-upload `connectors/chatgpt/knowledge-pack.md` only as a snapshot. Live writes go to git.
+**Do not:** Keep a second wiki inside a ChatGPT Project or Claude Project. Do not enable Obsidian Sync on `_claude-memory`. Re-upload `connectors/chatgpt/knowledge-pack.md` only as a snapshot. Live writes go to git.
 
 **Setup:** `connectors/README.md`. Architecture: `docs/memory-cloud.md`.
 
@@ -328,6 +329,14 @@ Append-only. Newest first. Every ChatGPT, Claude, or Cursor session that changes
 
 ---
 
+---
+
+## 2026-09-17 — cursor (Obsidian upgrade)
+
+- Worked on: How to upgrade Obsidian so the Mac vault uses the private memory cloud (app update + symlink + memory-sync).
+- Files changed: `connectors/obsidian/`, `scripts/upgrade-obsidian.sh`, `scripts/memory-sync.sh`, `SYNC.md`.
+- For the other models: After merge, Ian runs `./scripts/upgrade-obsidian.sh` on the Mac, then `./scripts/memory-sync.sh` when he edits notes. Do not turn on Obsidian Sync. Do not git-init the personal vault.
+
 ## 2026-09-17 — cursor
 
 - Worked on: Private memory cloud so ChatGPT, Claude, and Cursor share one knowledge base.
@@ -343,6 +352,8 @@ Append-only. Newest first. Every ChatGPT, Claude, or Cursor session that changes
 
 Last updated: 2026-09-17
 
+Upgrade path for the Mac vault: `connectors/obsidian/setup.md`.
+
 ## What is connected
 
 | Surface | Role | How it stays in sync |
@@ -352,22 +363,25 @@ Last updated: 2026-09-17
 | **Claude Code** | Code + ops agent | `CLAUDE.md` + `AGENTS.md`. |
 | **ChatGPT** | Web operator | Custom GPT Actions → GitHub Contents API. Snapshot fallback: uploaded knowledge pack. |
 | **Claude.ai** | Web operator | Project instructions + knowledge pack (or GitHub connector). |
-| **Obsidian** | Local reading + editing | Symlink to this folder. |
+| **Obsidian** | Local notebook | Symlink + `./scripts/memory-sync.sh`. Upgrade: `connectors/obsidian/setup.md`. |
 | **Notion** | Human hub + live ops | MCP. Not a second memory dump. Hub: https://app.notion.com/p/3cea5cb8d3d2814f8cb2ecd4e05ed0e9 |
 
 Full architecture: `docs/memory-cloud.md`. Connectors: `connectors/README.md`.
 
 Cursor Cloud cannot see your Mac disk. Anything a cloud agent must know lives in this git repo.
 
-## One-time setup on your Mac
+## Upgrade Obsidian (Mac)
 
-From the repo root:
+Two steps. Details: `connectors/obsidian/setup.md`.
+
+1. **App:** Obsidian → Check for updates.
+2. **Vault:** from the repo root:
 
 ```bash
-./scripts/link-obsidian-memory.sh
+./scripts/upgrade-obsidian.sh
 ```
 
-That script:
+That runs `link-obsidian-memory.sh`:
 
 1. Copies any existing Obsidian `_claude-memory/` files into this repo if they are newer or missing here
 2. Backs up the old vault folder to `_claude-memory.pre-sync-backup/`
@@ -608,16 +622,19 @@ Turn on the private memory cloud so ChatGPT, Claude, and Cursor share `_claude-m
 ## Your next actions
 
 1. Merge this PR to `main`.
-2. On the Mac: `./scripts/link-obsidian-memory.sh`
-3. Create a fine-grained GitHub PAT (this repo, Contents read/write) and the ChatGPT Custom GPT using `connectors/chatgpt/setup.md`.
-4. Create a Claude.ai Project using `connectors/claude/setup.md`.
-5. Run `./scripts/export-memory-pack.sh` and upload `connectors/chatgpt/knowledge-pack.md` to both web UIs.
-6. Test: add a line to `ledger.md` in Cursor, push, ask ChatGPT "read ledger.md".
+2. On the Mac: `./scripts/upgrade-obsidian.sh` (app: Obsidian → Check for updates).
+3. After editing notes: `./scripts/memory-sync.sh`. Pull others' writes: `./scripts/memory-sync.sh --pull`.
+4. Create a fine-grained GitHub PAT (this repo, Contents read/write) and the ChatGPT Custom GPT using `connectors/chatgpt/setup.md`.
+5. Create a Claude.ai Project using `connectors/claude/setup.md`.
+6. Run `./scripts/export-memory-pack.sh` and upload `connectors/chatgpt/knowledge-pack.md` to both web UIs.
+7. Test: add a line to `ledger.md` in Cursor, push, ask ChatGPT "read ledger.md".
 
 ## Do not
 
 - Do not paste a classic GitHub PAT with access to every repo.
 - Do not treat a ChatGPT or Claude Project upload as a second source of truth.
+- Do not enable Obsidian Sync (paid) on `_claude-memory`.
+- Do not `git init` inside `Documents/Obsidian Vault`.
 - Do not ask any model to send email or edit Calendar as part of setup.
 
 

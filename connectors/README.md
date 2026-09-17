@@ -1,6 +1,6 @@
-# Connectors — ChatGPT, Claude, Cursor
+# Connectors — ChatGPT, Claude, Cursor, Obsidian
 
-Wire all three models to the same private memory cloud. Architecture: `docs/memory-cloud.md`. Files: `_claude-memory/`.
+Wire all three models — and the Obsidian vault — to the same private memory cloud. Architecture: `docs/memory-cloud.md`. Files: `_claude-memory/`.
 
 ## Do this in order
 
@@ -19,11 +19,17 @@ Merge the PR that adds `_claude-memory/`. After that, `main` is the live cloud.
 - `CLAUDE.md` points at `./_claude-memory/`
 - Same session protocol as Cursor
 
-### 4. Obsidian (Mac, once)
+### 4. Obsidian (Mac) — upgrade the vault, not just the app
+
+App update is **Obsidian → Check for updates**. That does not share memory.
+
+To put the vault on the same cloud as ChatGPT / Claude / Cursor:
 
 ```bash
-./scripts/link-obsidian-memory.sh
+./scripts/upgrade-obsidian.sh
 ```
+
+Full guide: [`obsidian/setup.md`](obsidian/setup.md). After you edit notes: `./scripts/memory-sync.sh`.
 
 ### 5. ChatGPT (live cloud)
 

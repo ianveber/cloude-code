@@ -25,14 +25,17 @@ Turn on the private memory cloud so ChatGPT, Claude, and Cursor share `_claude-m
 ## Your next actions
 
 1. Merge this PR to `main`.
-2. On the Mac: `./scripts/link-obsidian-memory.sh`
-3. Create a fine-grained GitHub PAT (this repo, Contents read/write) and the ChatGPT Custom GPT using `connectors/chatgpt/setup.md`.
-4. Create a Claude.ai Project using `connectors/claude/setup.md`.
-5. Run `./scripts/export-memory-pack.sh` and upload `connectors/chatgpt/knowledge-pack.md` to both web UIs.
-6. Test: add a line to `ledger.md` in Cursor, push, ask ChatGPT "read ledger.md".
+2. On the Mac: `./scripts/upgrade-obsidian.sh` (app: Obsidian → Check for updates).
+3. After editing notes: `./scripts/memory-sync.sh`. Pull others' writes: `./scripts/memory-sync.sh --pull`.
+4. Create a fine-grained GitHub PAT (this repo, Contents read/write) and the ChatGPT Custom GPT using `connectors/chatgpt/setup.md`.
+5. Create a Claude.ai Project using `connectors/claude/setup.md`.
+6. Run `./scripts/export-memory-pack.sh` and upload `connectors/chatgpt/knowledge-pack.md` to both web UIs.
+7. Test: add a line to `ledger.md` in Cursor, push, ask ChatGPT "read ledger.md".
 
 ## Do not
 
 - Do not paste a classic GitHub PAT with access to every repo.
 - Do not treat a ChatGPT or Claude Project upload as a second source of truth.
+- Do not enable Obsidian Sync (paid) on `_claude-memory`.
+- Do not `git init` inside `Documents/Obsidian Vault`.
 - Do not ask any model to send email or edit Calendar as part of setup.

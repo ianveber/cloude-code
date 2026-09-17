@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-17
 
+Upgrade path for the Mac vault: `connectors/obsidian/setup.md`.
+
 ## What is connected
 
 | Surface | Role | How it stays in sync |
@@ -11,22 +13,25 @@ Last updated: 2026-09-17
 | **Claude Code** | Code + ops agent | `CLAUDE.md` + `AGENTS.md`. |
 | **ChatGPT** | Web operator | Custom GPT Actions → GitHub Contents API. Snapshot fallback: uploaded knowledge pack. |
 | **Claude.ai** | Web operator | Project instructions + knowledge pack (or GitHub connector). |
-| **Obsidian** | Local reading + editing | Symlink to this folder. |
+| **Obsidian** | Local notebook | Symlink + `./scripts/memory-sync.sh`. Upgrade: `connectors/obsidian/setup.md`. |
 | **Notion** | Human hub + live ops | MCP. Not a second memory dump. Hub: https://app.notion.com/p/3cea5cb8d3d2814f8cb2ecd4e05ed0e9 |
 
 Full architecture: `docs/memory-cloud.md`. Connectors: `connectors/README.md`.
 
 Cursor Cloud cannot see your Mac disk. Anything a cloud agent must know lives in this git repo.
 
-## One-time setup on your Mac
+## Upgrade Obsidian (Mac)
 
-From the repo root:
+Two steps. Details: `connectors/obsidian/setup.md`.
+
+1. **App:** Obsidian → Check for updates.
+2. **Vault:** from the repo root:
 
 ```bash
-./scripts/link-obsidian-memory.sh
+./scripts/upgrade-obsidian.sh
 ```
 
-That script:
+That runs `link-obsidian-memory.sh`:
 
 1. Copies any existing Obsidian `_claude-memory/` files into this repo if they are newer or missing here
 2. Backs up the old vault folder to `_claude-memory.pre-sync-backup/`

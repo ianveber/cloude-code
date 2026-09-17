@@ -16,6 +16,9 @@ need=(
   "connectors/chatgpt/setup.md"
   "connectors/claude/project-instructions.md"
   "docs/memory-cloud.md"
+  "connectors/obsidian/setup.md"
+  "scripts/memory-sync.sh"
+  "scripts/upgrade-obsidian.sh"
   "AGENTS.md"
   ".cursor/rules/memory.mdc"
 )

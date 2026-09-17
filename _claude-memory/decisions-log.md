@@ -12,7 +12,7 @@ Append-only. Newest first. Do not rewrite history — add a superseding entry.
 
 **Why:** The three models cannot share a conversation. They can share files. Cursor Cloud still cannot see the Mac Obsidian vault. ChatGPT cannot see the git working tree unless it calls GitHub.
 
-**Do not:** Keep a second wiki inside a ChatGPT Project or Claude Project. Re-upload `connectors/chatgpt/knowledge-pack.md` only as a snapshot. Live writes go to git.
+**Do not:** Keep a second wiki inside a ChatGPT Project or Claude Project. Do not enable Obsidian Sync on `_claude-memory`. Re-upload `connectors/chatgpt/knowledge-pack.md` only as a snapshot. Live writes go to git.
 
 **Setup:** `connectors/README.md`. Architecture: `docs/memory-cloud.md`.
 

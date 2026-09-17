@@ -16,6 +16,14 @@ Append-only. Newest first. Every ChatGPT, Claude, or Cursor session that changes
 
 ---
 
+---
+
+## 2026-09-17 — cursor (Obsidian upgrade)
+
+- Worked on: How to upgrade Obsidian so the Mac vault uses the private memory cloud (app update + symlink + memory-sync).
+- Files changed: `connectors/obsidian/`, `scripts/upgrade-obsidian.sh`, `scripts/memory-sync.sh`, `SYNC.md`.
+- For the other models: After merge, Ian runs `./scripts/upgrade-obsidian.sh` on the Mac, then `./scripts/memory-sync.sh` when he edits notes. Do not turn on Obsidian Sync. Do not git-init the personal vault.
+
 ## 2026-09-17 — cursor
 
 - Worked on: Private memory cloud so ChatGPT, Claude, and Cursor share one knowledge base.

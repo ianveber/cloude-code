@@ -20,7 +20,7 @@ The repo is private. Git is the database. Every model that can read or write tho
 | **Claude Code** | Same files via `CLAUDE.md` + `AGENTS.md`. |
 | **Claude.ai Projects** | Project instructions + uploaded knowledge pack. Re-upload after big memory changes, or use GitHub MCP. |
 | **ChatGPT** (GPT / Project) | Custom instructions + knowledge pack for offline context. **Live** sync via GPT Actions against the GitHub Contents API. |
-| **Obsidian** (Mac) | Symlink to the same folder. `./scripts/link-obsidian-memory.sh` |
+| **Obsidian** (Mac) | Symlink to the same folder. Upgrade: `./scripts/upgrade-obsidian.sh` + `connectors/obsidian/setup.md`. |
 | **Notion** | Human ops hub. Not a second memory dump. |
 
 ## Why git, not a new SaaS
@@ -71,7 +71,7 @@ Example: Cursor builds a page → writes a handoff for Claude to review copy →
 Follow `connectors/README.md`. Short version:
 
 1. Merge this PR so `_claude-memory/` is on `main`.
-2. Mac: `./scripts/link-obsidian-memory.sh`
+2. Mac: `./scripts/upgrade-obsidian.sh` (links the vault; see `connectors/obsidian/setup.md`)
 3. ChatGPT: create a Custom GPT with `connectors/chatgpt/` (instructions + OpenAPI + fine-grained PAT).
 4. Claude.ai: create a Project with `connectors/claude/project-instructions.md` and upload `connectors/chatgpt/knowledge-pack.md`.
 5. Refresh the knowledge pack after large memory updates: `./scripts/export-memory-pack.sh`
