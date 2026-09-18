@@ -1,0 +1,757 @@
+<title>IHG Design Handoff</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --paper: #f6f5f2;
+    --deep: #efede8;
+    --card: #ffffff;
+    --ink: #17181c;
+    --ink-2: #3d3f45;
+    --muted: #6f7178;
+    --faint: #a4a6ad;
+    --line: #e4e2dc;
+    --line-2: #d8d5cf;
+    --accent: #4ade80;
+    --accent-ink: #15803d;
+    --accent-soft: rgba(74, 222, 128, .18);
+    --warn: #b45309;
+    --bad: #c2410c;
+    --shadow: 0 1px 2px rgba(23, 24, 28, .04), 0 10px 30px rgba(23, 24, 28, .06);
+    --display: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #121317;
+      --deep: #1a1c21;
+      --card: #1e2026;
+      --ink: #eceae4;
+      --ink-2: #c8c6c0;
+      --muted: #9a9ca3;
+      --faint: #74767d;
+      --line: #2b2d34;
+      --line-2: #383b43;
+      --accent: #4ade80;
+      --accent-ink: #86efac;
+      --accent-soft: rgba(74, 222, 128, .14);
+      --warn: #e59a4a;
+      --bad: #f08a5d;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 30px rgba(0, 0, 0, .35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #121317;
+    --deep: #1a1c21;
+    --card: #1e2026;
+    --ink: #eceae4;
+    --ink-2: #c8c6c0;
+    --muted: #9a9ca3;
+    --faint: #74767d;
+    --line: #2b2d34;
+    --line-2: #383b43;
+    --accent: #4ade80;
+    --accent-ink: #86efac;
+    --accent-soft: rgba(74, 222, 128, .14);
+    --warn: #e59a4a;
+    --bad: #f08a5d;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 30px rgba(0, 0, 0, .35);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 16px/1.62 var(--ui);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1100px;
+    margin-inline: auto;
+    padding-inline: 20px;
+    padding-block: 0 96px;
+  }
+
+  h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -.02em; text-wrap: balance; }
+  h1 { font-size: clamp(2.3rem, 1.7rem + 2.4vw, 3.6rem); font-weight: 700; letter-spacing: -.045em; line-height: 1.02; }
+  h2 { font-size: clamp(1.5rem, 1.25rem + 1vw, 2rem); font-weight: 650; letter-spacing: -.035em; }
+  h3 { font-size: 1.06rem; font-weight: 650; letter-spacing: -.02em; }
+  h4 { font-size: .92rem; font-weight: 600; }
+  p { margin: 0; max-width: 68ch; }
+  a { color: var(--accent-ink); text-underline-offset: .18em; text-decoration-thickness: 1px; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: .68rem;
+    font-weight: 500;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .mono { font-family: var(--mono); font-size: .82em; }
+  .muted { color: var(--muted); }
+  code { font-family: var(--mono); font-size: .82em; background: var(--deep); padding: .1em .38em; border-radius: 5px; }
+
+  /* ── Masthead ───────────────────────────────────────────────────────── */
+
+  .mast { padding-block: 56px 40px; display: grid; gap: 20px; }
+  .mast__id { display: flex; align-items: center; gap: 12px; }
+  .mark {
+    display: inline-grid; place-items: center;
+    width: 40px; height: 40px; border-radius: 12px;
+    background: #4ade80; color: #052e16;
+    font-family: var(--display); font-weight: 700; font-size: .82rem; letter-spacing: -.05em;
+  }
+  .mast__id span { font-family: var(--mono); font-size: .78rem; color: var(--muted); }
+  .mast p { font-size: 1.16rem; color: var(--ink-2); max-width: 60ch; }
+
+  .facts {
+    display: grid; gap: 1px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    background: var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-top: 12px;
+  }
+  .facts div { background: var(--paper); padding: 14px 16px; display: grid; gap: 3px; }
+  .facts dt { font-family: var(--mono); font-size: .64rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .facts dd { margin: 0; font-size: .92rem; font-weight: 550; }
+
+  .toc { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .toc a {
+    font-family: var(--mono); font-size: .72rem; letter-spacing: .04em;
+    padding: 7px 11px; border-radius: 8px;
+    background: var(--deep); color: var(--ink-2); text-decoration: none;
+  }
+  .toc a:hover { background: var(--accent-soft); color: var(--accent-ink); }
+
+  /* ── Sections ───────────────────────────────────────────────────────── */
+
+  section { padding-block: 40px; border-top: 1px solid var(--line); }
+  .head { display: grid; gap: 8px; margin-bottom: 22px; }
+  .head p { color: var(--ink-2); }
+
+  .row { display: grid; gap: 18px; }
+  @media (min-width: 900px) {
+    .row { grid-template-columns: 260px minmax(0, 1fr); gap: 32px; align-items: start; }
+  }
+  .row + .row { margin-top: 26px; }
+  .row__note { display: grid; gap: 6px; align-content: start; }
+  .row__note p { font-size: .9rem; color: var(--muted); }
+
+  ul.clean { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  ul.clean li { max-width: 72ch; }
+  ul.clean b { font-weight: 650; }
+  ol.steps { margin: 0; padding-left: 1.3rem; display: grid; gap: 12px; }
+  ol.steps li { max-width: 72ch; padding-left: 4px; }
+  ol.steps::marker, ol.steps li::marker { font-family: var(--mono); color: var(--accent-ink); font-size: .85em; }
+
+  .tablewrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; min-width: 460px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px 10px 0; }
+  th { font-family: var(--mono); font-size: .64rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+  tbody tr { border-top: 1px solid var(--line); }
+  td:first-child { font-weight: 600; white-space: nowrap; }
+
+  /* ── Region diagram ─────────────────────────────────────────────────── */
+
+  .bp { display: grid; gap: 14px; }
+  .bp__row { display: grid; gap: 8px; }
+  .bp__label { font-family: var(--mono); font-size: .68rem; color: var(--muted); letter-spacing: .08em; }
+  .bp__bar { display: flex; gap: 4px; height: 66px; }
+  .bp__bar span {
+    display: grid; place-items: center; text-align: center;
+    font-family: var(--mono); font-size: .62rem; letter-spacing: .04em;
+    border-radius: 8px; padding: 4px;
+  }
+  .z-rail { background: #17181c; color: #c9cbd2; flex: 0 0 46px; }
+  .z-drawer { background: var(--deep); color: var(--ink-2); flex: 0 0 120px; }
+  .z-work { background: var(--card); color: var(--ink-2); flex: 1 1 auto; box-shadow: inset 0 0 0 1px var(--line); }
+  .z-panel { background: var(--card); color: var(--ink-2); flex: 0 0 150px; box-shadow: inset 0 0 0 1px var(--line); }
+  .z-ghost { background: repeating-linear-gradient(135deg, var(--deep), var(--deep) 6px, transparent 6px, transparent 12px); color: var(--muted); flex: 0 0 150px; box-shadow: inset 0 0 0 1px var(--line); }
+  .bp__bar--phone { height: 92px; flex-direction: column; max-width: 240px; }
+  .bp__bar--phone .z-work { flex: 1 1 auto; }
+  .bp__bar--phone .z-rail { flex: 0 0 26px; }
+
+  /* ── Token swatches ─────────────────────────────────────────────────── */
+
+  .swatches { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(146px, 1fr)); }
+  .sw { display: grid; gap: 7px; }
+  .sw__chip { height: 54px; border-radius: 10px; box-shadow: inset 0 0 0 1px rgba(23, 24, 28, .12); }
+  .sw__name { font-family: var(--mono); font-size: .7rem; }
+  .sw__hex { font-family: var(--mono); font-size: .66rem; color: var(--muted); }
+  .sw__use { font-size: .74rem; color: var(--muted); line-height: 1.35; }
+
+  .shapes { display: flex; flex-wrap: wrap; gap: 12px; }
+  .shape { width: 92px; height: 62px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line-2); display: grid; place-items: end center; padding-bottom: 6px; font-family: var(--mono); font-size: .64rem; color: var(--muted); }
+
+  .scale { display: grid; gap: 12px; }
+  .scale div { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .scale span:last-child { font-family: var(--mono); font-size: .66rem; color: var(--muted); }
+
+  /* ── Live specimens: IHG's real light palette, pinned ───────────────── */
+
+  .spec {
+    --s-bg: #f6f5f2; --s-deep: #efede8; --s-card: #fff; --s-ink: #17181c; --s-ink2: #3d3f45;
+    --s-muted: #6f7178; --s-faint: #a4a6ad; --s-line: #e6e4df; --s-line2: #d8d5cf;
+    --s-accent: #4ade80; --s-accent-ink: #15803d; --s-good: #178a4e; --s-warn: #b45309; --s-bad: #c2410c;
+    background: var(--s-bg); color: var(--s-ink);
+    font-family: var(--ui); font-size: 14.5px; line-height: 1.5;
+    padding: 18px; border-radius: 16px; box-shadow: var(--shadow);
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  }
+  .spec--stack { display: grid; align-items: stretch; }
+  .spec__cap { flex-basis: 100%; font-family: var(--mono); font-size: .64rem; letter-spacing: .13em; text-transform: uppercase; color: var(--s-muted); }
+
+  .spec .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; min-height: 40px; padding: 0 .95rem; border: 0; border-radius: 11px; background: var(--s-card); color: var(--s-ink); font: 600 .88rem var(--ui); cursor: pointer; box-shadow: inset 0 0 0 1px var(--s-line2); }
+  .spec .btn--primary { background: var(--s-accent); color: #052e16; box-shadow: none; }
+  .spec .btn--ink { background: var(--s-ink); color: #fff; box-shadow: none; }
+  .spec .btn--danger { color: var(--s-bad); }
+  .spec .btn--ghost { background: transparent; box-shadow: none; }
+  .spec .btn--sm { min-height: 34px; padding: 0 .7rem; font-size: .82rem; border-radius: 9px; }
+  .spec .btn--xs { min-height: 30px; padding: 0 .55rem; font-size: .78rem; border-radius: 8px; }
+
+  .spec .input { width: 100%; min-height: 40px; padding: .5rem .7rem; border: 0; border-radius: 10px; background: var(--s-card); box-shadow: inset 0 0 0 1px var(--s-line2); font: inherit; color: var(--s-ink); }
+  .spec .input--focus { box-shadow: inset 0 0 0 1.5px var(--s-accent-ink); }
+  .spec .field { display: grid; gap: .3rem; flex: 1 1 210px; }
+  .spec .field__label { font-weight: 600; font-size: .8rem; color: var(--s-ink2); display: flex; gap: .4rem; align-items: center; }
+  .spec .counter { margin-left: auto; font-family: var(--mono); font-size: .74rem; color: var(--s-faint); }
+  .spec .counter--good { color: var(--s-good); }
+
+  .spec .pill { display: inline-flex; align-items: center; padding: .15rem .55rem; border-radius: 8px; font-size: .74rem; font-weight: 650; background: var(--s-deep); color: var(--s-muted); }
+  .spec .pill--live { background: rgba(23, 138, 78, .12); color: var(--s-good); }
+  .spec .pill--draft { background: rgba(180, 83, 9, .12); color: var(--s-warn); }
+  .spec .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .spec .dot--live { background: var(--s-good); }
+  .spec .dot--draft { background: var(--s-warn); }
+
+  .spec .tools { display: flex; flex-wrap: wrap; gap: .25rem; align-items: center; }
+  .spec .tools button { min-height: 34px; min-width: 34px; padding: 0 .6rem; border: 0; border-radius: 9px; background: var(--s-deep); color: var(--s-ink); font: 600 .8rem var(--ui); cursor: pointer; }
+  .spec .tools__sep { width: 1px; height: 22px; background: var(--s-line2); margin: 0 .15rem; }
+  .spec .tools .swz { width: 18px; height: 18px; border-radius: 50%; display: inline-block; vertical-align: middle; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12); }
+
+  .spec .card { background: var(--s-card); border-radius: 20px; box-shadow: var(--shadow); padding: 1.1rem; display: grid; gap: .15rem; flex: 1 1 180px; }
+  .spec .stat__n { font-size: 1.9rem; font-weight: 700; letter-spacing: -.03em; line-height: 1.1; }
+  .spec .stat__l { color: var(--s-muted); font-size: .82rem; }
+  .spec .stat__d { color: var(--s-faint); font-size: .78rem; }
+
+  .spec .score { display: flex; align-items: center; gap: .6rem; }
+  .spec .score__ring { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: .85rem; background: conic-gradient(var(--s-accent) 72%, var(--s-deep) 0); }
+  .spec .score__ring span { width: 34px; height: 34px; border-radius: 50%; background: var(--s-card); display: grid; place-items: center; }
+  .spec .check { display: grid; gap: .25rem; flex: 1 1 240px; }
+  .spec .check__row { display: flex; gap: .5rem; align-items: flex-start; font-size: .8rem; color: var(--s-ink2); }
+  .spec .check__row i { flex: 0 0 auto; width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: .65rem; font-weight: 800; color: #fff; margin-top: 2px; }
+  .spec .is-ok i { background: var(--s-good); }
+  .spec .is-warn i { background: var(--s-warn); }
+  .spec .is-bad i { background: var(--s-bad); }
+
+  .spec .bars { display: flex; align-items: flex-end; gap: 2px; height: 74px; flex: 1 1 100%; box-shadow: inset 0 -1px 0 var(--s-line); }
+  .spec .bars i { flex: 1 1 0; background: var(--s-accent); opacity: .85; border-radius: 3px 3px 0 0; }
+
+  .spec .toast { padding: .7rem .95rem; border-radius: 12px; background: var(--s-ink); color: #fff; font-size: .88rem; }
+  .spec .toast--good { background: var(--s-good); }
+  .spec .toast--bad { background: var(--s-bad); }
+
+  .spec .note { padding: .7rem .85rem; border-radius: 11px; background: rgba(180, 83, 9, .12); color: var(--s-warn); font-size: .82rem; flex: 1 1 100%; }
+
+  .spec .sec { flex: 1 1 100%; background: var(--s-card); border-radius: 12px; padding: .1rem .9rem; box-shadow: inset 0 0 0 1px var(--s-line); }
+  .spec .sec__sum { display: flex; align-items: center; gap: .5rem; min-height: 42px; font-weight: 650; font-size: .88rem; }
+  .spec .sec__sum::after { content: ''; margin-left: auto; width: 8px; height: 8px; border-right: 2px solid var(--s-faint); border-bottom: 2px solid var(--s-faint); transform: rotate(45deg); }
+
+  .spec .snippet { display: grid; gap: .1rem; padding: .75rem .85rem; border-radius: 10px; background: var(--s-deep); font-family: arial, sans-serif; flex: 1 1 100%; }
+  .spec .snippet__url { font-size: .74rem; color: #202124; }
+  .spec .snippet__url em { font-style: normal; color: #5f6368; }
+  .spec .snippet__title { font-size: 1rem; color: #1a0dab; line-height: 1.3; }
+  .spec .snippet__desc { font-size: .8rem; color: #4d5156; line-height: 1.4; }
+
+  .spec .rail { background: #17181c; border-radius: 14px; padding: .4rem; display: flex; gap: .25rem; flex: 1 1 100%; }
+  .spec .rail span { flex: 1; display: grid; place-items: center; gap: .15rem; min-height: 48px; border-radius: 12px; color: #c9cbd2; font-size: .62rem; }
+  .spec .rail span.on { background: rgba(74, 222, 128, .2); color: #bbf7d0; }
+
+  .pin { font-size: .78rem; color: var(--muted); margin-top: 8px; }
+
+  /* ── Briefs ─────────────────────────────────────────────────────────── */
+
+  .briefs { display: grid; gap: 12px; counter-reset: brief; }
+  .brief {
+    display: grid; gap: 6px;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 14px;
+    background: var(--card); border-radius: 14px; padding: 16px 18px; box-shadow: var(--shadow);
+  }
+  .brief::before {
+    counter-increment: brief; content: counter(brief, decimal-leading-zero);
+    font-family: var(--mono); font-size: .72rem; color: var(--accent-ink);
+    grid-row: span 2; padding-top: 3px;
+  }
+  .brief h3 { margin: 0; }
+  .brief p { font-size: .92rem; color: var(--ink-2); }
+
+  .keep { display: grid; gap: 10px; }
+  .keep li { max-width: 72ch; }
+
+  footer { padding-top: 34px; border-top: 1px solid var(--line); margin-top: 8px; font-size: .88rem; color: var(--muted); display: grid; gap: 6px; }
+
+  :focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; border-radius: 4px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="page">
+
+  <header class="mast">
+    <div class="mast__id">
+      <span class="mark" aria-hidden="true">IHG</span>
+      <span>Design handoff · 18 September 2026 · AIS Slovenia</span>
+    </div>
+    <h1>IHG</h1>
+    <p>The private workspace behind ais-slovenia.si. Two people use it to write the site's news, blog posts, events and pages, and to see how those pages are doing.</p>
+    <dl class="facts">
+      <div><dt>Users</dt><dd>Two, by password</dd></div>
+      <div><dt>Lives at</dt><dd class="mono">/admin/</dd></div>
+      <div><dt>Built from</dt><dd>1 CSS file, 4 ES modules</dd></div>
+      <div><dt>Language</dt><dd>Slovene</dd></div>
+      <div><dt>Themes</dt><dd>Light only</dd></div>
+    </dl>
+    <nav class="toc" aria-label="Contents">
+      <a href="#screen">The one screen</a>
+      <a href="#screens">Screens</a>
+      <a href="#tokens">Tokens</a>
+      <a href="#components">Components</a>
+      <a href="#editor">The editor</a>
+      <a href="#flows">Flows</a>
+      <a href="#keep">What cannot move</a>
+      <a href="#briefs">Where it is weak</a>
+      <a href="#files">Files</a>
+    </nav>
+  </header>
+
+  <section id="what">
+    <div class="head">
+      <p class="eyebrow">What it is</p>
+      <h2>A writing tool that happens to publish a website</h2>
+    </div>
+    <div class="row">
+      <div class="row__note">
+        <p>The site itself is static. IHG writes content files into the repository; on the live site every save is a commit on the deployed branch, so publishing is deploying and a page appears in about two minutes.</p>
+      </div>
+      <ul class="clean">
+        <li><b>Nothing links to it.</b> It is noindex, robots.txt disallows it, and every request needs the password. It is not a product anyone but the two of them will ever see.</li>
+        <li><b>The audience is not technical.</b> The screen says "Kje na spletni strani", not "collection". It says "Osnutek vidite samo vi", not "status: draft". Any word that only makes sense to an engineer is a bug.</li>
+        <li><b>The point.</b> A person writes a page the way they will read it, and the machine-facing parts, the URL, the meta description, the structured data, where it shows up on the site, sit beside it without taking over.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="screen">
+    <div class="head">
+      <p class="eyebrow">Layout</p>
+      <h2>One screen, four regions</h2>
+      <p>There is no separate list page and edit page. The list, the document and its settings are all present at once on a wide screen, and become overlays as the screen narrows.</p>
+    </div>
+    <div class="row">
+      <div class="row__note">
+        <p><b>Rail</b> 64px, dark, always there. <b>Drawer</b> 280px, the list of everything. <b>Work</b> the view itself. <b>Panel</b> 360px, only on the editor route.</p>
+        <p>Breakpoints are 900px and 1200px. Below 900 the rail is a bottom bar with six items.</p>
+      </div>
+      <div class="bp">
+        <div class="bp__row">
+          <p class="bp__label">≥ 1200px — everything docked</p>
+          <div class="bp__bar">
+            <span class="z-rail">rail<br>64</span>
+            <span class="z-drawer">drawer 280</span>
+            <span class="z-work">work</span>
+            <span class="z-panel">panel 360</span>
+          </div>
+        </div>
+        <div class="bp__row">
+          <p class="bp__label">900 – 1199px — panel becomes an overlay</p>
+          <div class="bp__bar">
+            <span class="z-rail">rail<br>64</span>
+            <span class="z-drawer">drawer 280</span>
+            <span class="z-work">work</span>
+            <span class="z-ghost">panel<br>overlay</span>
+          </div>
+        </div>
+        <div class="bp__row">
+          <p class="bp__label">&lt; 900px — drawer and panel both overlay, rail at the bottom</p>
+          <div class="bp__bar bp__bar--phone">
+            <span class="z-work">work</span>
+            <span class="z-rail">rail as a bottom bar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screens">
+    <div class="head">
+      <p class="eyebrow">Inventory</p>
+      <h2>Screens, and how each one stands today</h2>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Route</th><th>What it is for</th><th>State</th></tr></thead>
+        <tbody>
+          <tr><td>Login</td><td>One password field on paper with a soft green glow behind it.</td><td>Fine. Carries a setup warning when no password is configured yet.</td></tr>
+          <tr><td class="mono">#/</td><td>Pregled: four totals, views per day, most read pages, what was edited last, where content saves.</td><td>Works, says little.</td></tr>
+          <tr><td class="mono">#/e/…</td><td>The editor: three cards in the middle, the panel on the right. The heart of the product.</td><td>Strongest screen. Weak between 900 and 1199, and on phones.</td></tr>
+          <tr><td class="mono">#/slike</td><td>Slike: every upload, with its size, how often it is used, and buttons to copy the path, edit or delete.</td><td>Plain grid. No filter, no sense of where a picture is used.</td></tr>
+          <tr><td class="mono">#/analitika</td><td>Analitika: 7, 30 or 90 days, four totals, a taller chart, then pages, sources and countries.</td><td>Readable. All bars, no comparison over time.</td></tr>
+          <tr><td class="mono">#/nastavitve</td><td>Nastavitve: the category lists, then plain text about storage, analytics and the password.</td><td>Functional, unloved.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="tokens">
+    <div class="head">
+      <p class="eyebrow">Tokens</p>
+      <h2>Warm paper, an ink rail, one light green</h2>
+      <p>Everything below is declared at the top of <code>ihg.css</code>. The accent was indigo until 18 September 2026 and is now light green by the owner's decision. Do not go back to purple.</p>
+    </div>
+
+    <div class="row">
+      <div class="row__note">
+        <p><b>Colour.</b> The ground is warm paper, never white; white is reserved for things you can act on. Green appears on primary actions, chart bars and the score ring, and nowhere else.</p>
+      </div>
+      <div class="swatches">
+        <div class="sw"><div class="sw__chip" style="background:#f6f5f2"></div><div class="sw__name">--bg</div><div class="sw__hex">#f6f5f2</div><div class="sw__use">The page</div></div>
+        <div class="sw"><div class="sw__chip" style="background:#efede8"></div><div class="sw__name">--bg-deep</div><div class="sw__hex">#efede8</div><div class="sw__use">Drawer, inset rows, toolbar</div></div>
+        <div class="sw"><div class="sw__chip" style="background:#ffffff"></div><div class="sw__name">--card</div><div class="sw__hex">#ffffff</div><div class="sw__use">Cards, inputs, the text area</div></div>
+        <div class="sw"><div class="sw__chip" style="background:#17181c"></div><div class="sw__name">--ink</div><div class="sw__hex">#17181c</div><div class="sw__use">Text, rail, toasts</div></div>
+        <div class="sw"><div class="sw__chip" style="background:#6f7178"></div><div class="sw__name">--muted</div><div class="sw__hex">#6f7178</div><div class="sw__use">Secondary text</div></div>
+        <div class="sw"><div class="sw__chip" style="background:#e6e4df"></div><div class="sw__name">--line</div><div class="sw__hex">#e6e4df</div><div class="sw__use">Hairlines</div></div>
+        <div class="sw"><div class="sw__chip" style="background:#4ade80"></div><div class="sw__name">--accent</div><div class="sw__hex">#4ade80</div><div class="sw__use">Primary action, bars, ring</div></div>
+        <div class="sw"><div class="sw__chip" style="background:#15803d"></div><div class="sw__name">--accent-ink</div><div class="sw__hex">#15803d</div><div class="sw__use">Green text, focus rings</div></div>
+        <div class="sw"><div class="sw__chip" style="background:#178a4e"></div><div class="sw__name">--good</div><div class="sw__hex">#178a4e</div><div class="sw__use">Published</div></div>
+        <div class="sw"><div class="sw__chip" style="background:#b45309"></div><div class="sw__name">--warn</div><div class="sw__hex">#b45309</div><div class="sw__use">Draft, things to fix</div></div>
+        <div class="sw"><div class="sw__chip" style="background:#c2410c"></div><div class="sw__name">--bad</div><div class="sw__hex">#c2410c</div><div class="sw__use">Errors, destructive</div></div>
+        <div class="sw"><div class="sw__chip" style="background:#c9cbd2"></div><div class="sw__name">--rail-ink</div><div class="sw__hex">#c9cbd2</div><div class="sw__use">Idle icons on the rail</div></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row__note">
+        <p><b>Shape and elevation.</b> Four radii, by role. Controls carry an inset ring rather than a border, so focus thickens the ring without shifting layout.</p>
+      </div>
+      <div>
+        <div class="shapes">
+          <div class="shape" style="border-radius:20px">20 · cards, modals</div>
+          <div class="shape" style="border-radius:14px">14 · small surfaces</div>
+          <div class="shape" style="border-radius:11px">11 · buttons</div>
+          <div class="shape" style="border-radius:10px">10 · inputs</div>
+          <div class="shape" style="border-radius:8px">8 · pills</div>
+        </div>
+        <p class="pin"><span class="mono">--shadow</span> lifts cards. <span class="mono">--shadow-pop</span> (deeper, 40px) is for the floating toolbar, modals and toasts. Nothing else is elevated.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row__note">
+        <p><b>Type.</b> The platform stack, no webfont, no external request of any kind. Mono is for paths, counters and URL fields only.</p>
+      </div>
+      <div class="scale spec spec--stack">
+        <div><span style="font-size:1.5rem;font-weight:650;letter-spacing:-.02em">Pregled</span><span>1.5rem / 650 · page title</span></div>
+        <div><span style="font-size:1.3rem;font-weight:650;letter-spacing:-.02em">Kako smo preizkusili IHG</span><span>1.3rem / 650 · the title field</span></div>
+        <div><span style="font-size:1.05rem;font-weight:650">Besedilo</span><span>1.05rem / 650 · card heading</span></div>
+        <div><span style="font-size:1rem;line-height:1.65">Besedilo članka, kot ga bo videl bralec.</span><span>1rem / 1.65 · the document</span></div>
+        <div><span style="font-size:.9375rem">Vmesnik in gumbi</span><span>14.5px / 1.5 · the interface</span></div>
+        <div><span style="font-size:.8rem;font-weight:600;color:#3d3f45">Kratek povzetek</span><span>.8rem / 600 · field label</span></div>
+        <div><span style="font-size:.76rem;color:#6f7178">Napišite tako, da razume vsak.</span><span>.76rem · help text</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="components">
+    <div class="head">
+      <p class="eyebrow">Components</p>
+      <h2>Every piece, as it renders today</h2>
+      <p>These specimens are live, and pinned to IHG's real light palette, so they stay truthful whichever theme you are reading this page in.</p>
+    </div>
+
+    <div class="row">
+      <div class="row__note"><p><b>Buttons.</b> 40px, 11px radius, 600 weight. Green is the one primary action on a screen; ink is for a second heavy action; danger is text only.</p></div>
+      <div class="spec">
+        <span class="spec__cap">.btn</span>
+        <button class="btn btn--primary" type="button">Objavi</button>
+        <button class="btn" type="button">Shrani osnutek</button>
+        <button class="btn btn--ink" type="button">Predogled</button>
+        <button class="btn btn--ghost" type="button">Stran ▸</button>
+        <button class="btn btn--danger btn--sm" type="button">Izbriši</button>
+        <button class="btn btn--xs" type="button">Uredi</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row__note"><p><b>Fields.</b> Label, control, help. The counter sits at the end of the label line and turns amber then red as it runs out.</p></div>
+      <div class="spec">
+        <span class="spec__cap">.field · .input · .counter</span>
+        <div class="field">
+          <span class="field__label">Naslov</span>
+          <input class="input" id="spec-title" value="Kako smo preizkusili IHG" readonly>
+        </div>
+        <div class="field">
+          <span class="field__label">Meta opis <span class="counter counter--good">142 / 165</span></span>
+          <input class="input input--focus" id="spec-meta" value="Preizkus urejevalnika IHG: besedilo, slika in podatki za iskalnike." readonly>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row__note"><p><b>Status.</b> Two states, everywhere: draft is amber, published is green. The pill names it; the 7px dot carries it in the list.</p></div>
+      <div class="spec">
+        <span class="spec__cap">.pill · .dot</span>
+        <span class="pill pill--live">Objavljeno</span>
+        <span class="pill pill--draft">Osnutek</span>
+        <span class="pill">Zapis</span>
+        <span style="display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;color:#6f7178"><i class="dot dot--live"></i> v seznamu</span>
+        <span style="display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;color:#6f7178"><i class="dot dot--draft"></i> v seznamu</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row__note"><p><b>The text toolbar.</b> Fixed above the editable area. Groups separated by hairlines: block type, weight, colour, lists and links, alignment.</p></div>
+      <div class="spec">
+        <span class="spec__cap">.tools</span>
+        <div class="tools">
+          <button type="button">Naslov</button>
+          <button type="button">Podnaslov</button>
+          <button type="button">Odstavek</button>
+          <span class="tools__sep"></span>
+          <button type="button"><b>K</b></button>
+          <button type="button"><i>L</i></button>
+          <button type="button"><u>P</u></button>
+          <button type="button"><s>S</s></button>
+          <span class="tools__sep"></span>
+          <button type="button"><span class="swz" style="background:#17181c"></span></button>
+          <button type="button"><span class="swz" style="background:#6f7178"></span></button>
+          <button type="button"><span class="swz" style="background:#1d77fe"></span></button>
+          <button type="button"><span class="swz" style="background:#166534"></span></button>
+          <button type="button"><span class="swz" style="background:#9a5b00"></span></button>
+          <button type="button"><span class="swz" style="background:#991b1b"></span></button>
+          <button type="button">Poudari</button>
+          <span class="tools__sep"></span>
+          <button type="button">• Seznam</button>
+          <button type="button">Citat</button>
+          <button type="button">Povezava</button>
+          <button type="button">Slika v besedilu</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row__note"><p><b>Numbers.</b> One stat is a big figure, a label and a quiet third line. The chart is bare: green bars, a hairline baseline, three dates.</p></div>
+      <div class="spec">
+        <span class="spec__cap">.stat · .bars</span>
+        <div class="card"><span class="stat__n">8</span><span class="stat__l">Ogledi danes</span><span class="stat__d">3 obiskov</span></div>
+        <div class="card"><span class="stat__n">25%</span><span class="stat__l">Na telefonu</span><span class="stat__d">delež ogledov</span></div>
+        <div class="bars" aria-hidden="true">
+          <i style="height:12%"></i><i style="height:20%"></i><i style="height:16%"></i><i style="height:34%"></i><i style="height:26%"></i><i style="height:48%"></i><i style="height:40%"></i><i style="height:62%"></i><i style="height:54%"></i><i style="height:78%"></i><i style="height:66%"></i><i style="height:92%"></i><i style="height:74%"></i><i style="height:100%"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row__note"><p><b>The SEO block.</b> A ring, a checklist of up to twelve rows, then a Google result drawn as Google draws it.</p></div>
+      <div class="spec spec--stack">
+        <span class="spec__cap">.score · .check · .snippet</span>
+        <div class="score">
+          <div class="score__ring"><span>72</span></div>
+          <div style="font-size:.8rem"><b>Ocena SEO</b><br><span style="color:#6f7178">Dobro, nekaj stvari lahko izboljšate.</span></div>
+        </div>
+        <div class="check">
+          <div class="check__row is-ok"><i>✓</i><span><b>Meta opis.</b> 142 znakov (70 do 165).</span></div>
+          <div class="check__row is-warn"><i>!</i><span><b>Dolžina besedila.</b> 180 besed (priporočeno vsaj 300).</span></div>
+          <div class="check__row is-bad"><i>×</i><span><b>Glavna slika.</b> Manjka opis slike.</span></div>
+        </div>
+        <div class="snippet">
+          <div class="snippet__url">ais-slovenia.si<em> › blog › kako-smo-preizkusili-ihg</em></div>
+          <div class="snippet__title">Kako smo preizkusili IHG | AIS Slovenia</div>
+          <div class="snippet__desc">Preizkus urejevalnika IHG: besedilo z oblikovanjem, glavna slika, kategorija in podatki za iskalnike na eni strani.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row__note"><p><b>Feedback and structure.</b> A panel section is a details element with a rotating chevron. Notes warn before publishing. Toasts confirm after.</p></div>
+      <div class="spec spec--stack">
+        <span class="spec__cap">.sec · .note · .toast · .rail</span>
+        <div class="sec"><div class="sec__sum">Iskalniki (SEO)</div></div>
+        <div class="note"><b>Pred objavo uredite.</b> Slika potrebuje opis. Meta opis je kratek.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <div class="toast toast--good">Objavljeno. Na spletu bo v približno dveh minutah.</div>
+          <div class="toast">Osnutek shranjen.</div>
+          <div class="toast toast--bad">Geslo ni pravilno.</div>
+        </div>
+        <div class="rail">
+          <span class="on">◻<br>Pregled</span><span>☰<br>Vsebina</span><span>▣<br>Slike</span><span>▤<br>Analitika</span><span>⚙<br>Nastavitve</span><span>→<br>Odjava</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="editor">
+    <div class="head">
+      <p class="eyebrow">The editor</p>
+      <h2>Three cards, one panel, three ways to format</h2>
+    </div>
+
+    <div class="row">
+      <div class="row__note"><p><b>The middle column</b> is a form in three cards, not a canvas. It reads top to bottom in the order a person thinks.</p></div>
+      <ol class="steps">
+        <li><b>Naslov, povzetek, kategorija, datum.</b> The summary carries a <span class="mono">0 / 220</span> counter. The category select ends with "+ Nova kategorija …".</li>
+        <li><b>Besedilo.</b> A hint line, the fixed toolbar, the editable area, then a row of block buttons: Odstavek, Naslov, Citat, Seznam, Koraki, Slika, Poudarek, Gumb, Stolpca, Tabela, Ločilo, Koda.</li>
+        <li><b>Slika.</b> The main picture, dropped or chosen, then its description and caption.</li>
+      </ol>
+    </div>
+
+    <div class="row">
+      <div class="row__note"><p><b>Formatting exists in three places at once.</b> This is the part to be careful with in any redesign.</p></div>
+      <ul class="clean">
+        <li><b>The fixed toolbar</b> above the text, always visible.</li>
+        <li><b>A floating bar</b> that rises over a selection with the same tools.</li>
+        <li><b>A block handle</b> that appears on hover at the left of a block: move up, move down, duplicate, remove.</li>
+        <li><b>A picture in the text</b> gets its own bar: 25 / 33 / 50 / 75 / 100 %, float left, centre, float right, then Opis, Uredi, Zamenjaj, Odstrani. It also resizes by dragging the dot at its corner.</li>
+      </ul>
+    </div>
+
+    <div class="row">
+      <div class="row__note"><p><b>The panel</b> holds seven collapsible sections, in this order.</p></div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Section</th><th>Holds</th></tr></thead>
+          <tbody>
+            <tr><td>Objava</td><td>Save, publish, preview, delete, the live URL, date, slug.</td></tr>
+            <tr><td>Kje na spletni strani</td><td>Collection, category, parent page, event fields, the button under the title.</td></tr>
+            <tr><td>Slike</td><td>The main picture and the library as a picker.</td></tr>
+            <tr><td>Besedilo</td><td>Block inserts and a box that takes pasted text or HTML.</td></tr>
+            <tr><td>Iskalniki (SEO)</td><td>Score, checklist, meta title and description, snippet, keywords, structured data type, canonical, Open Graph, noindex, nofollow, FAQ.</td></tr>
+            <tr><td>Povezano</td><td>Related links, picked from any page of the site.</td></tr>
+            <tr><td>Ogledi te strani</td><td>This page's views, with a sparkline.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row__note"><p><b>The picture tool</b> is a full screen modal, used for the main picture, pictures in the text and re-editing anything in the library.</p></div>
+      <p>A dark stage holds the picture with a draggable crop box and four round handles. The control bar underneath carries the ratios (Prosto, 16:10, 16:9, 4:3, 3:2, 1:1, 4:5), Zavrti, Cel, the largest width (800, 1200, 1600, 2000), a quality slider and the resulting pixel size. Applying it uploads four files: 800 and 1600 pixels wide, as JPG and WebP.</p>
+    </div>
+  </section>
+
+  <section id="flows">
+    <div class="head">
+      <p class="eyebrow">Flows</p>
+      <h2>What a session actually looks like</h2>
+    </div>
+    <ol class="steps">
+      <li><b>Write and publish.</b> New item from the rail or the drawer, fill the three cards, watch the score, Predogled opens the real page in a desktop or phone frame, Objavi. A toast says it will be on the web in about two minutes and the drawer row turns from amber to green.</li>
+      <li><b>Fix a published page.</b> Open it from the drawer, edit, Shrani. Changing the URL of a published page asks first, because the old address stops working.</li>
+      <li><b>Add a picture.</b> Drop it on the picture card or the library, crop and size it, and it cannot be published until it has a description.</li>
+      <li><b>Move an item.</b> Change the collection in the panel. A published item warns that its address changes; its children stay behind without a parent.</li>
+    </ol>
+  </section>
+
+  <section id="keep">
+    <div class="head">
+      <p class="eyebrow">Constraints</p>
+      <h2>What cannot move</h2>
+    </div>
+    <ul class="clean keep">
+      <li><b>No build step, no framework.</b> One stylesheet and four ES modules loaded directly by <code>index.html</code>, with no external request of any kind, fonts included. A redesign is CSS plus the template strings inside <code>ihg.js</code>.</li>
+      <li><b>The text the editor produces is filtered on save.</b> Only a fixed set of tags survives, and only these classes: <span class="mono">cms-figure, cms-callout, cms-cta, cms-columns, cms-column, cms-table, cms-note</span> (with modifiers), <span class="mono">align-left|center|right</span>, <span class="mono">c-ink|muted|blue|green|orange|red</span>, <span class="mono">hl, lead, small</span>. A new editing affordance must emit one of these, or the class has to be added to the site's stylesheet and the allow-list together.</li>
+      <li><b>What the editor shows must match the site.</b> The editable area renders the same classes the published page will. Restyle one, restyle the other.</li>
+      <li><b>Targets stay finger sized.</b> Rail 48px, buttons 40 (34 and 30 for dense desktop toolbars), inputs 40.</li>
+      <li><b>Slovene, plain words.</b> No English on screen, no internal vocabulary, ever.</li>
+      <li><b>Phone first.</b> Drawer and panel are overlays below their breakpoints, and everything works with one thumb.</li>
+      <li><b>Very little motion,</b> and reduced motion is respected. Keep it that way.</li>
+      <li><b>IHG's CSS is its own.</b> The public site's design audit does not apply here, so borders, radii and shadows are free in a way they are not on the site itself.</li>
+    </ul>
+  </section>
+
+  <section id="briefs">
+    <div class="head">
+      <p class="eyebrow">Briefs</p>
+      <h2>Where the design is weakest</h2>
+      <p>Ranked by how much fixing them would help. The first four are worth more than the rest together.</p>
+    </div>
+    <div class="briefs">
+      <div class="brief">
+        <h3>The editor between 900 and 1199px</h3>
+        <p>The panel is an overlay at that width, so the form sits alone in a wide column and the screen looks abandoned. Either dock the panel earlier, or let the form use the width.</p>
+      </div>
+      <div class="brief">
+        <h3>Seven accordions is not a structure</h3>
+        <p>Publishing, placement, pictures, blocks, SEO, links and stats sit in one flat list of collapsibles. Stages, tabs, or surfacing only what matters at this moment would all beat it.</p>
+      </div>
+      <div class="brief">
+        <h3>The SEO block is long and flat</h3>
+        <p>Twelve checklist rows, a ring and eight fields, all at the same volume. Decide what a person looks at first and what can stay hidden until it fails.</p>
+      </div>
+      <div class="brief">
+        <h3>The toolbar wraps to three rows</h3>
+        <p>Even at 1440px the text toolbar runs to three rows inside the editor column, and on a phone it fills the screen before a word is written. The same tools need a compact form.</p>
+      </div>
+      <div class="brief">
+        <h3>The dashboard says little</h3>
+        <p>Four totals and a bar chart. It could say which page is rising, which is falling, what was published last and what it did.</p>
+      </div>
+      <div class="brief">
+        <h3>The media library has no states</h3>
+        <p>No filter, no sense of which pictures are used where, and the same grid is reused as a picker inside the editor without looking like one.</p>
+      </div>
+      <div class="brief">
+        <h3>Empty states are one grey line</h3>
+        <p>"Tu še ni ničesar" in the drawer, "Knjižnica je prazna" in the library, "Še ni vsebin" on the dashboard. Each is a chance to teach the product.</p>
+      </div>
+      <div class="brief">
+        <h3>The picture tool is plain</h3>
+        <p>A dark stage and a row of small buttons. It is the moment a person feels most in control of the page, and it looks like a utility.</p>
+      </div>
+      <div class="brief">
+        <h3>There is no dark theme at all</h3>
+        <p>Worth a deliberate decision: either commit to the paper look and say so, or build the second palette properly. Today it is an omission, not a choice.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="files">
+    <div class="head">
+      <p class="eyebrow">Working on it</p>
+      <h2>Files, and how to see your changes</h2>
+    </div>
+    <div class="row">
+      <div class="row__note">
+        <p>Run <span class="mono">npm run admin</span> in <span class="mono">website/</span>, then open <span class="mono">localhost:4321/admin/</span>. Saving rewrites real content files and rebuilds the site, so the preview is exactly what the public page will be.</p>
+        <p>Before anything ships: <span class="mono">npm run check</span>. It covers the API and the site, not the look.</p>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>File</th><th>What is in it</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">public/admin/index.html</td><td>The shell: title, favicon, two links.</td></tr>
+            <tr><td class="mono">public/admin/ihg.css</td><td>Everything visual. One file, no imports, about 35 kB.</td></tr>
+            <tr><td class="mono">public/admin/ihg.js</td><td>Views as template strings, state, routing, data.</td></tr>
+            <tr><td class="mono">public/admin/editor.js</td><td>The editable document: toolbar behaviour, blocks, figures.</td></tr>
+            <tr><td class="mono">public/admin/picture-tool.js</td><td>Crop, rotate, resize, the four variants.</td></tr>
+            <tr><td class="mono">src/cms.mjs</td><td>The data model, and how an item becomes a public page.</td></tr>
+            <tr><td class="mono">src/clean-html.mjs</td><td>The allow-list.</td></tr>
+            <tr><td class="mono">IHG.md</td><td>How IHG works end to end, including setup and security.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Screenshots of the current build sit next to the written version of this handoff, in <span class="mono">website/docs/ihg-design/</span>.</p>
+    <p class="mono">docs/IHG-DESIGN-HANDOFF.md · ihg.css · ihg.js</p>
+  </footer>
+
+</div>
