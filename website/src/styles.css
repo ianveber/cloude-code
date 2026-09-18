@@ -2446,11 +2446,21 @@ html.motion-on .marquee--reverse .marquee__track {
 
 .client__logo--dark { background: var(--ink); }
 
+.client__logo--wordmark {
+  width: 6.75rem;
+  border-radius: var(--control-radius);
+}
+
 .client__logo img {
   display: block;
   width: 78%;
   height: 78%;
   object-fit: contain;
+}
+
+.client__logo--wordmark img {
+  width: 88%;
+  height: 78%;
 }
 
 .client__name {
@@ -3644,3 +3654,32 @@ label.consent__row { cursor: pointer; }
   .cms-figure--left,
   .cms-figure--right { float: none; margin: var(--space-2) 0; }
 }
+
+/* ── Free resources ────────────────────────────────────────────────────── */
+
+.resource__cols {
+  display: grid;
+  gap: var(--space-3) var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  margin-top: var(--space-3);
+}
+
+.resource__cols h4 {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.resource .deflist { margin-top: var(--space-3); }
+
+.resource__note {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--muted);
+  max-width: 60ch;
+}
+
+.resources .project { align-items: start; }

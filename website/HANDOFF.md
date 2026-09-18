@@ -177,7 +177,7 @@ push that touches `website/`.
 | `/blog/` | Live: index of the posts |
 | `/blog/<slug>/` | Live: four plain-language posts (content/blog.mjs) |
 | `/o-podjetju/` | Live |
-| `/ekipa/` | Live — Anej Vučič, Nejc Feigel Boh (Ian Veber removed at his request, 2026-09-10) |
+| `/ekipa/` | Live — Anej Vučič, Nejc Feigel Boh, Ian Veber |
 | `/pogosta-vprasanja/` | Live — ten Q&As |
 | `/kontakt/` | Live — `mailto:` fallback until `formEndpoint` is set |
 | `/404.html` | Live, `noindex` |
@@ -228,8 +228,10 @@ Clients: `clients.items` in `content/showcase.mjs` lists the clients
 Institute, SI-BIG, HEVA, Epolac) and our own brands (AISOS, VETA, ATHLOS),
 each with a logo in `public/clients/` taken from the client's own website or
 our repositories. VETA is the real whale mark from `~/builds/veta-site`
-(`public/brand/whale.svg`), ATHLOS the real favicon from the Athloss repo;
-both replaced drawn stand-ins on 2026-09-16. `tone: 'dark'` puts a dark disc
+(`public/brand/whale.svg`), ATHLOS is the full official lockup from
+`clients/athlos-landing/assets/logo-nav-t.png`, optimized to
+`public/clients/athlos.webp`; both replaced drawn stand-ins.
+`tone: 'dark'` puts a dark disc
 behind a logo drawn for dark surfaces (Epolac). This marquee is the only
 place on the site where a client company is named. Items alternate between the two marquee rows; each
 row repeats its pills four times so the loop is seamless on wide screens.
@@ -538,6 +540,26 @@ is `IH.md` in full; the short version:
 The rules from the rest of this file still hold for content written in IH:
 same hero, bands, pictures and structured data as hand-written pages, no
 client company names, no dashes in copy.
+
+## Free resources (2026-09-16)
+
+`/viri/` lists tools anyone may use at no cost (`content/resources.mjs`,
+`resourceList` in `src/showcase.mjs`, linked under Podjetje in the nav and
+under Objave in the footer). The first is God's Eye View, slovenska izdaja:
+AIS's edition of the MIT-licensed open-source globe by Bilawal Sidhu
+(github.com/bilawalsidhu/gods-eye-view), with 657 Slovenian public cameras
+(promet.si, DARS, ARSO), a live camera relay, a cleaner screen and a faster
+boot; the edition lives in `~/builds/gods-eye-view` as uncommitted changes
+on `local/clean-view` and is not published yet, so the page offers it on
+request through /kontakt/.
+
+Ian asked to "take full credit because we made it better". The page credits
+AIS for the edition and everything AIS added, and keeps one line naming the
+source project and its licence. Do not remove that line: the source is a
+well-known project by a named author, MIT requires the notice to travel with
+the code, and a page claiming AIS wrote it would be false and easy to
+disprove. The picture is a real capture of the running app at Ljubljana
+(`tools/pictures/real/gods-eye-view.png` through `captures.html`).
 
 ## Adding a page
 

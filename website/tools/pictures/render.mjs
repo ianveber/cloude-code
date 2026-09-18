@@ -40,7 +40,7 @@ const FILES = {
   'scene.html': ['saas', 'flow', 'security'],
   'products.html': ['aisos', 'svetovalec-plemenite-kovine', 'asistent-rezervacije', 'svetovalec-nega-koze', 'spremljanje-razpisov', 'delovni-nalogi', 'tehnicni-asistent'],
   'terminal.html': ['model-premazi', 'model-premazi-detail'],
-  'captures.html': ['athlos', 'ais-command', 'vldr-kartice', 'pametni-filter-vin', 'athlos-detail', 'ais-command-detail', 'vldr-kartice-detail', 'pametni-filter-vin-detail'],
+  'captures.html': ['athlos', 'ais-command', 'vldr-kartice', 'pametni-filter-vin', 'athlos-detail', 'ais-command-detail', 'vldr-kartice-detail', 'pametni-filter-vin-detail', 'gods-eye-view'],
   'details.html': ['aisos-detail', 'svetovalec-plemenite-kovine-detail', 'asistent-rezervacije-detail', 'svetovalec-nega-koze-detail', 'spremljanje-razpisov-detail', 'delovni-nalogi-detail', 'tehnicni-asistent-detail'],
   'blog.html': ['blog-kaj-je-ai-avtomatizacija', 'blog-kaj-je-ai-agent', 'blog-prvi-proces-za-avtomatizacijo', 'blog-sistem-mora-znati-reci-ne-vem', 'blog-kako-ai-odgovarja-iz-dokumentov', 'blog-koliko-casa-vzame-uvedba', 'blog-kaj-se-zgodi-z-vasimi-podatki', 'blog-ai-chatbot-v-slovenscini'],
 };

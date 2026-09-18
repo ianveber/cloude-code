@@ -103,6 +103,7 @@ export const site = {
         { label: 'Proces', href: '/proces/', note: 'Osem korakov uvedbe' },
         { label: 'Pogosta vprašanja', href: '/pogosta-vprasanja/', note: 'Odgovori pred začetkom' },
         { label: 'Vodiči', href: '/vodici/', note: 'Kaj izbrati in koliko stane' },
+        { label: 'Brezplačni viri', href: '/viri/', note: 'Orodja, ki jih lahko uporabite' },
       ],
     },
     { label: 'Kontakt', href: '/kontakt/' },
@@ -135,6 +136,7 @@ export const site = {
         title: 'Objave',
         links: [
           { label: 'Vodiči', href: '/vodici/' },
+          { label: 'Brezplačni viri', href: '/viri/' },
           { label: 'Novice', href: '/novice/' },
           { label: 'Dogodki', href: '/dogodki/' },
           { label: 'Blog', href: '/blog/' },

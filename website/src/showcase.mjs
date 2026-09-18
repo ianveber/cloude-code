@@ -192,7 +192,7 @@ function clientPill(item, clone) {
   return `
         <li class="client"${clone ? ' aria-hidden="true"' : ''}>
           <${tag} class="client__tile"${attrs}${clone ? ' tabindex="-1"' : ''}>
-            <span class="client__logo${item.tone === 'dark' ? ' client__logo--dark' : ''}">
+            <span class="client__logo${item.tone === 'dark' ? ' client__logo--dark' : ''}${item.logo.variant === 'wordmark' ? ' client__logo--wordmark' : ''}">
               <img src="${esc(item.logo.src)}" alt="" width="${item.logo.width}" height="${item.logo.height}" loading="lazy" decoding="async">
             </span>
             <span class="client__name">${esc(item.name)}</span>
@@ -626,6 +626,61 @@ export function caseStudyArticle(item, product, service = null) {
       </section>
       <p class="study__back"><a class="link" href="/studije-primerov/">Vse študije primerov</a></p>
     </div>
+  </div>
+</section>`;
+}
+
+/* ── Free resources ───────────────────────────────────────────────────── */
+
+export function resourceList(data) {
+  if (data.items.length === 0) {
+    return emptyState({ id: 'viri-list', eyebrow: data.eyebrow, ...data.empty });
+  }
+
+  return `
+<section class="section projects resources" aria-labelledby="viri-list" data-projects>
+  <div class="shell">
+    <h2 class="visually-hidden" id="viri-list">Seznam brezplačnih virov</h2>
+  </div>
+  <div class="shell projects__list">
+    ${each(
+      data.items,
+      (item) => `
+    <article class="project resource" id="${esc(item.id)}" data-project>
+      <div class="project__copy" data-reveal>
+        <p class="project__kicker">${esc(item.kicker)}${item.kind ? ` <span class="project__kind">${esc(item.kind)}</span>` : ''}</p>
+        <h3 class="project__name">${esc(item.name)}</h3>
+        <p class="project__body">${esc(item.body)}</p>
+        ${item.simple ? `<p class="project__simple"><strong>Preprosto povedano.</strong> ${esc(item.simple)}</p>` : ''}
+        <div class="resource__cols">
+          <div>
+            <h4>Kaj zna</h4>
+            <ul class="study__parts">${each(item.can, (c) => `<li>${esc(c)}</li>`)}</ul>
+          </div>
+          <div>
+            <h4>Kaj je dodal AIS</h4>
+            <ul class="study__parts">${each(item.added, (c) => `<li>${esc(c)}</li>`)}</ul>
+          </div>
+        </div>
+        <dl class="deflist deflist--facts">
+          ${each(item.facts, (f) => `<div class="deflist__row"><dt>${esc(f.term)}</dt><dd>${esc(f.definition)}</dd></div>`)}
+        </dl>
+        <p class="btn-row">
+          ${each(
+            item.actions,
+            (a) => `<a class="btn ${a.primary ? 'btn--primary' : 'btn--secondary'}" href="${esc(a.href)}"${a.external ? ' rel="noopener" target="_blank"' : ''}>${esc(a.label)}</a>`
+          )}
+        </p>
+        ${item.note ? `<p class="resource__note">${esc(item.note)}</p>` : ''}
+      </div>
+      <div class="project__panel">
+        <div class="project__frame" data-tilt>
+          ${projectPicture(item.picture, PICTURE_SIZES.half)}
+          <span class="pillar__glare"></span>
+        </div>
+      </div>
+    </article>`
+    )}
   </div>
 </section>`;
 }

@@ -46,6 +46,7 @@ const PATHS = [
   '/pogosta-vprasanja/',
   '/kontakt/',
   '/piskotki/',
+  '/viri/',
 ];
 
 /* Common desktop, laptop, tablet and phone widths, plus the exact widths
@@ -201,8 +202,8 @@ function findProblems(path, width) {
         return (photo.width / photo.height).toFixed(3);
       })
     );
-    /* Two members since 2026-09-10 (Ian asked to be removed); the grid keeps its columns. */
-    if (members.length !== 2 || teamColumns < members.length || crops.size !== 1) {
+    /* Three current team members; every portrait keeps the same crop. */
+    if (members.length !== 3 || teamColumns < members.length || crops.size !== 1) {
       components.push(
         `team composition has ${members.length} members, ${teamColumns} columns and ${crops.size} crop ratios`
       );
@@ -239,8 +240,8 @@ function findProblems(path, width) {
     if (!mark || mark.getBoundingClientRect().right > window.innerWidth + 1) {
       components.push('footer wordmark is missing or overflows');
     }
-    if (document.querySelectorAll('.footer-people li').length !== 2) {
-      components.push('footer must list both team members');
+    if (document.querySelectorAll('.footer-people li').length !== 3) {
+      components.push('footer must list all three team members');
     }
   }
 

@@ -57,6 +57,7 @@ import {
   PICTURE_SIZES,
   newsList,
   eventList,
+  resourceList,
 } from './src/showcase.mjs';
 import { caseStudies } from './content/case-studies.mjs';
 import {
@@ -79,6 +80,7 @@ import * as S from './content/showcase.mjs';
 import { loadCmsFromDir, organize, cmsItemPage, toListItem } from './src/cms.mjs';
 import { closingCta } from './src/closing-cta.mjs';
 import { cookies as COOKIES } from './content/cookies.mjs';
+import { resources as RESOURCES } from './content/resources.mjs';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.join(ROOT, 'dist');
@@ -391,10 +393,10 @@ function teamPage() {
 
   return {
     path: '/ekipa/',
-    title: 'Ekipa AIS Slovenia: Anej Vučič in Nejc Feigel Boh',
+    title: 'Ekipa AIS Slovenia: Anej, Nejc in Ian',
     description:
-      'Spoznajte ekipo AIS Slovenia: Anej Vučič (CEO) in Nejc Feigel Boh (CEO). Majhna ekipa, ki AI sisteme postavi in jih tudi vzdržuje.',
-    keywords: ['ekipa AIS Slovenia', 'Anej Vučič', 'Nejc Feigel Boh'],
+      'Spoznajte ekipo AIS Slovenia: Anej Vučič in Nejc Feigel Boh vodita podjetje, Ian Veber pa vodi tehnologijo. Sisteme postavimo in jih tudi vzdržujemo.',
+    keywords: ['ekipa AIS Slovenia', 'Anej Vučič', 'Nejc Feigel Boh', 'Ian Veber'],
     breadcrumbs: [HOME_CRUMB, { label: 'Ekipa', href: '/ekipa/' }],
     priority: '0.6',
     changefreq: 'yearly',
@@ -456,6 +458,30 @@ function contactPage() {
     priority: '0.9',
     changefreq: 'monthly',
     schema: [contactPageNode('/kontakt/'), placeNode()],
+    body,
+  };
+}
+
+function resourcesPage() {
+  const body = [
+    pageHero({ eyebrow: RESOURCES.eyebrow, title: RESOURCES.title, lead: RESOURCES.lead }),
+    `<section class="section section--plain section--flush-top">
+  <div class="shell">
+    ${takeaway({ label: 'Na kratko', text: RESOURCES.answer })}
+  </div>
+</section>`,
+    resourceList(RESOURCES),
+    closingCta,
+  ].join('\n');
+
+  return {
+    path: '/viri/',
+    title: RESOURCES.metaTitle,
+    description: RESOURCES.metaDescription,
+    keywords: RESOURCES.keywords,
+    breadcrumbs: [HOME_CRUMB, { label: 'Brezplačni viri', href: '/viri/' }],
+    priority: '0.7',
+    changefreq: 'monthly',
     body,
   };
 }
@@ -881,6 +907,7 @@ export function collectPages() {
     teamPage(),
     faqPage(),
     contactPage(),
+    resourcesPage(),
     cookiesPage(),
     notFoundPage(),
   ];

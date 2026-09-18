@@ -80,7 +80,7 @@ export const SCHEMA_TYPES = ['auto', 'Article', 'NewsArticle', 'BlogPosting', 'E
 /* First path segments the site already uses; a page slug may not take them. */
 export const RESERVED_SLUGS = new Set([
   'admin', 'ih', 'api', 'uploads', 'pictures', 'js', 'fonts', 'brand', 'clients', 'video', 'team', 'data',
-  'produkti', 'studije-primerov', 'vodici', 'storitve', 'proces', 'novice', 'dogodki', 'blog', 'piskotki',
+  'produkti', 'studije-primerov', 'vodici', 'storitve', 'proces', 'novice', 'dogodki', 'blog', 'piskotki', 'viri',
   'o-podjetju', 'o-nas', 'ekipa', 'pogosta-vprasanja', 'kontakt', 'sitemap.xml', 'robots.txt', 'llms.txt', 'styles.css', '404',
 ]);
 
