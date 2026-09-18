@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<title>AIS — scene source</title>
+<style>
+  /* Frames are captured by tools/video/render.mjs and encoded to mp4/webm.
+     Every animated value is a pure function of the frame time, so a capture is
+     reproducible and never lands mid-transition. */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #05060a;
+    --panel: #0c0e15;
+    --panel-2: #10131c;
+    --line: #1e2331;
+    --ink: #e8eaf2;
+    --dim: #79809a;
+    --blue: #3d8bff;
+    --violet: #8b73ff;
+    --teal: #2bd4c4;
+    --amber: #f0a93c;
+    --green: #3ddc91;
+  }
+
+  html, body {
+    width: 1280px;
+    height: 800px;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    color: var(--ink);
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .stage {
+    position: absolute;
+    inset: 0;
+    display: none;
+    padding: 54px 58px;
+  }
+  .stage.on { display: block; }
+
+  /* Window chrome shared by every scene so the three clips read as one system. */
+  .win {
+    position: absolute;
+    inset: 54px 58px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 40px 90px rgba(0, 0, 0, 0.6);
+  }
+  .win__bar {
+    height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel-2);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #2a3040; }
+  .win__title {
+    margin-left: 12px;
+    font-size: 12.5px;
+    color: var(--dim);
+    letter-spacing: 0.02em;
+  }
+  .win__body { position: absolute; inset: 42px 0 0 0; }
+
+  /* ── Scene 1: flowchart ─────────────────────────────────────────── */
+  #flow .win__body { padding: 34px 40px; }
+  .flow-svg { width: 100%; height: 100%; overflow: visible; }
+  .node-box { fill: #121622; stroke: #232a3b; stroke-width: 1.5; }
+  .node-label { font-size: 15px; fill: var(--ink); font-weight: 600; }
+  .node-sub { font-size: 12px; fill: var(--dim); }
+  .edge { stroke: #2b3346; stroke-width: 2; fill: none; }
+  .edge-live { stroke-width: 2.4; fill: none; stroke-linecap: round; }
+
+  /* ── Scene 2: code ──────────────────────────────────────────────── */
+  #code .win__body { display: grid; grid-template-rows: 1fr 190px; }
+  .editor {
+    display: grid;
+    grid-template-columns: 62px 1fr;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 15.5px;
+    line-height: 26px;
+    overflow: hidden;
+    padding-top: 18px;
+  }
+  .gutter { text-align: right; padding-right: 18px; color: #39405a; user-select: none; }
+  .lines { padding-right: 30px; white-space: pre; }
+  .ln { min-height: 26px; }
+  .k { color: #ff7ab6; }
+  .s { color: var(--teal); }
+  .f { color: var(--blue); }
+  .c { color: #4d5573; font-style: italic; }
+  .n { color: var(--amber); }
+  .p { color: #c4b5fd; }
+  .caret {
+    display: inline-block;
+    width: 8px;
+    height: 18px;
+    vertical-align: -3px;
+    background: var(--blue);
+  }
+  .term {
+    border-top: 1px solid var(--line);
+    background: #070910;
+    padding: 16px 24px;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 14.5px;
+    line-height: 25px;
+    white-space: pre;
+    color: #9aa3bd;
+  }
+  .term .ok { color: var(--green); }
+  .term .cmd { color: var(--ink); }
+  .term .hi { color: var(--teal); }
+
+  /* ── Scene 3: SaaS dashboard ────────────────────────────────────── */
+  #saas .win__body { padding: 26px 30px; display: grid; grid-template-rows: auto auto 1fr; gap: 20px; }
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .kpi {
+    background: #10141f;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .kpi__label { font-size: 12.5px; color: var(--dim); letter-spacing: 0.04em; text-transform: uppercase; }
+  .kpi__value { font-size: 32px; font-weight: 700; margin-top: 6px; letter-spacing: -0.02em; }
+  .kpi__delta { font-size: 12.5px; color: var(--green); margin-top: 2px; }
+  .chart-wrap {
+    background: #10141f;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 18px 10px;
+    height: 250px;
+  }
+  .chart-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .chart-title { font-size: 13.5px; font-weight: 600; }
+  .chart-note { font-size: 12px; color: var(--dim); }
+  .chart { width: 100%; height: 186px; overflow: visible; }
+  .rows { background: #10141f; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 130px 110px;
+    align-items: center;
+    padding: 11px 18px;
+    border-bottom: 1px solid #171c29;
+    font-size: 13.5px;
+  }
+  .row--head { color: var(--dim); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .pill {
+    justify-self: start;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(61, 220, 145, 0.12);
+    color: var(--green);
+  }
+  .mono { font-family: ui-monospace, Menlo, monospace; color: var(--dim); }
+</style>
+</head>
+<body>
+
+<div class="stage" id="flow">
+  <div class="win">
+    <div class="win__bar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="win__title">avtomatizacija · potek dela</span>
+    </div>
+    <div class="win__body">
+      <svg class="flow-svg" viewBox="0 0 1100 620" preserveAspectRatio="xMidYMid meet" id="flowSvg"></svg>
+    </div>
+  </div>
+</div>
+
+<div class="stage" id="code">
+  <div class="win">
+    <div class="win__bar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="win__title">agents/invoice-intake.ts — ais</span>
+    </div>
+    <div class="win__body">
+      <div class="editor">
+        <div class="gutter" id="codeGutter"></div>
+        <div class="lines" id="codeLines"></div>
+      </div>
+      <div class="term" id="codeTerm"></div>
+    </div>
+  </div>
+</div>
+
+<div class="stage" id="saas">
+  <div class="win">
+    <div class="win__bar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="win__title">nadzorna plošča · obdelava dokumentov</span>
+    </div>
+    <div class="win__body">
+      <div class="kpis" id="saasKpis"></div>
+      <div class="chart-wrap">
+        <div class="chart-head">
+          <span class="chart-title">Ročno delo proti avtomatizirano</span>
+          <span class="chart-note" id="saasNote"></span>
+        </div>
+        <svg class="chart" viewBox="0 0 1000 186" preserveAspectRatio="none" id="saasChart"></svg>
+      </div>
+      <div class="rows" id="saasRows"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── helpers ─────────────────────────────────────────────────────── */
+var clamp01 = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
+var ease = function (v) { v = clamp01(v); return 1 - Math.pow(1 - v, 3); };
+var seg = function (t, start, dur) { return ease((t - start) / dur); };
+var SVG = 'http://www.w3.org/2000/svg';
+
+function el(name, attrs) {
+  var node = document.createElementNS(SVG, name);
+  for (var k in attrs) node.setAttribute(k, attrs[k]);
+  return node;
+}
+
+/* ── Scene 1: a workflow drawing itself, then data flowing through ── */
+var NODES = [
+  { x: 40,  y: 60,  w: 250, h: 92, label: 'Nov e-račun',    sub: 'sprožilec · e-pošta',  c: 'var(--blue)' },
+  { x: 40,  y: 250, w: 250, h: 92, label: 'AI razčlenitev', sub: 'branje dokumenta',     c: 'var(--violet)' },
+  { x: 40,  y: 440, w: 250, h: 92, label: 'Preveri v ERP',  sub: 'ujemanje naročilnice', c: 'var(--teal)' },
+  { x: 430, y: 250, w: 250, h: 92, label: 'Pravilo',        sub: 'znesek < 5.000 €',     c: 'var(--amber)' },
+  { x: 810, y: 130, w: 250, h: 92, label: 'Samodejno knjiži', sub: 'brez človeka',       c: 'var(--green)' },
+  { x: 810, y: 380, w: 250, h: 92, label: 'V odobritev',    sub: 'ena poteza',           c: 'var(--dim)' }
+];
+
+var EDGES = [
+  { from: 0, to: 3 }, { from: 1, to: 3 }, { from: 2, to: 3 },
+  { from: 3, to: 4 }, { from: 3, to: 5 }
+];
+
+function anchor(n, side) {
+  var node = NODES[n];
+  return side === 'out'
+    ? { x: node.x + node.w, y: node.y + node.h / 2 }
+    : { x: node.x, y: node.y + node.h / 2 };
+}
+
+function edgePath(e) {
+  var a = anchor(e.from, 'out');
+  var b = anchor(e.to, 'in');
+  var mid = (a.x + b.x) / 2;
+  return 'M' + a.x + ' ' + a.y + ' C' + mid + ' ' + a.y + ', ' + mid + ' ' + b.y + ', ' + b.x + ' ' + b.y;
+}
+
+function drawFlow(t) {
+  var svg = document.getElementById('flowSvg');
+  svg.textContent = '';
+
+  EDGES.forEach(function (e, i) {
+    var path = el('path', { class: 'edge', d: edgePath(e) });
+    svg.appendChild(path);
+    var len = path.getTotalLength();
+    var grow = seg(t, 1.1 + i * 0.16, 0.75);
+    path.setAttribute('stroke-dasharray', len);
+    path.setAttribute('stroke-dashoffset', len * (1 - grow));
+
+    /* Pulse travelling along the finished edge. */
+    if (t > 3.4) {
+      var cycle = ((t - 3.4) * 0.62 + i * 0.13) % 1;
+      var live = el('path', {
+        class: 'edge-live',
+        d: edgePath(e),
+        stroke: NODES[e.to].c,
+        'stroke-dasharray': (len * 0.16) + ' ' + len,
+        'stroke-dashoffset': len * (1 - cycle) - len * 0.16,
+        opacity: 0.9
+      });
+      svg.appendChild(live);
+    }
+  });
+
+  NODES.forEach(function (n, i) {
+    var appear = seg(t, 0.15 + i * 0.14, 0.55);
+    if (appear <= 0) return;
+    var g = el('g', { opacity: appear, transform: 'translate(0,' + (1 - appear) * 14 + ')' });
+    g.appendChild(el('rect', {
+      class: 'node-box', x: n.x, y: n.y, width: n.w, height: n.h, rx: 12
+    }));
+    g.appendChild(el('rect', { x: n.x, y: n.y, width: 4, height: n.h, rx: 2, fill: n.c }));
+    var label = el('text', { class: 'node-label', x: n.x + 22, y: n.y + 39 });
+    label.textContent = n.label;
+    g.appendChild(label);
+    var sub = el('text', { class: 'node-sub', x: n.x + 22, y: n.y + 63 });
+    sub.textContent = n.sub;
+    g.appendChild(sub);
+
+    /* Node lights up as the pulse reaches it. */
+    if (t > 3.6) {
+      var glow = 0.35 + 0.35 * Math.sin(t * 2.1 + i * 0.9);
+      g.appendChild(el('rect', {
+        x: n.x, y: n.y, width: n.w, height: n.h, rx: 12,
+        fill: 'none', stroke: n.c, 'stroke-width': 1.4, opacity: Math.max(0, glow) * 0.7
+      }));
+    }
+    svg.appendChild(g);
+  });
+}
+
+/* ── Scene 2: code typing itself, then a deploy in the terminal ───── */
+var CODE = [
+  '<span class="c">// intake agent — 4 h ročnega dela na dan</span>',
+  '<span class="k">import</span> { agent, tool } <span class="k">from</span> <span class="s">\'@ais/core\'</span>;',
+  '<span class="k">import</span> { erp, inbox } <span class="k">from</span> <span class="s">\'./connectors\'</span>;',
+  '',
+  '<span class="k">export const</span> <span class="f">invoiceIntake</span> = <span class="f">agent</span>({',
+  '  name: <span class="s">\'invoice-intake\'</span>,',
+  '  schedule: <span class="s">\'every 5m\'</span>,',
+  '  tools: [erp.<span class="p">matchPurchaseOrder</span>, erp.<span class="p">book</span>],',
+  '',
+  '  <span class="k">async</span> <span class="f">run</span>({ log }) {',
+  '    <span class="k">const</span> docs = <span class="k">await</span> inbox.<span class="f">pull</span>({ type: <span class="s">\'pdf\'</span> });',
+  '',
+  '    <span class="k">for</span> (<span class="k">const</span> doc <span class="k">of</span> docs) {',
+  '      <span class="k">const</span> parsed = <span class="k">await</span> <span class="f">extract</span>(doc);',
+  '      <span class="k">const</span> po = <span class="k">await</span> erp.<span class="f">matchPurchaseOrder</span>(parsed);',
+  '',
+  '      <span class="k">if</span> (po.confidence &gt; <span class="n">0.94</span>) {',
+  '        <span class="k">await</span> erp.<span class="f">book</span>(parsed);',
+  '        log.<span class="f">ok</span>(<span class="s">`knjiženo ${parsed.number}`</span>);',
+  '      }',
+  '    }',
+  '  },',
+  '});'
+];
+
+var TERM = [
+  { at: 6.2,  html: '<span class="cmd">$ ais deploy invoice-intake</span>' },
+  { at: 6.9,  html: '<span class="ok">✓</span> gradnja       1.24 s' },
+  { at: 7.4,  html: '<span class="ok">✓</span> testi         31 uspešnih' },
+  { at: 7.9,  html: '<span class="ok">✓</span> objavljeno    prod · eu-central' },
+  { at: 8.5,  html: '  prihranek     <span class="hi">— 31 h / mesec</span>' }
+];
+
+/* Characters typed per second, so the reveal reads like real typing. */
+var CPS = 78;
+
+function stripTags(html) { return html.replace(/<[^>]+>/g, ''); }
+
+/* Reveal `count` visible characters of a tagged line without breaking markup. */
+function partial(html, count) {
+  var out = '';
+  var shown = 0;
+  var i = 0;
+  while (i < html.length && shown < count) {
+    if (html.charAt(i) === '<') {
+      var close = html.indexOf('>', i);
+      out += html.slice(i, close + 1);
+      i = close + 1;
+    } else if (html.charAt(i) === '&') {
+      var semi = html.indexOf(';', i);
+      if (semi !== -1 && semi - i <= 6) {
+        out += html.slice(i, semi + 1);
+        i = semi + 1;
+        shown += 1;
+      } else { out += html.charAt(i); i += 1; shown += 1; }
+    } else {
+      out += html.charAt(i);
+      i += 1;
+      shown += 1;
+    }
+  }
+  return out;
+}
+
+function drawCode(t) {
+  var gutter = document.getElementById('codeGutter');
+  var lines = document.getElementById('codeLines');
+  var term = document.getElementById('codeTerm');
+
+  var budget = Math.max(0, (t - 0.35)) * CPS;
+  var html = '';
+  var shownLines = 0;
+
+  for (var i = 0; i < CODE.length; i++) {
+    var raw = stripTags(CODE[i]);
+    var cost = raw.length + 8; /* newline + indent settle */
+    if (budget <= 0) break;
+    shownLines = i + 1;
+    if (budget >= cost) {
+      html += '<div class="ln">' + CODE[i] + '</div>';
+      budget -= cost;
+    } else {
+      html += '<div class="ln">' + partial(CODE[i], Math.floor(budget)) +
+              (Math.floor(t * 2) % 2 === 0 ? '<span class="caret"></span>' : '') + '</div>';
+      budget = 0;
+      break;
+    }
+  }
+
+  var nums = '';
+  for (var g = 1; g <= Math.max(shownLines, 1); g++) nums += '<div class="ln">' + g + '</div>';
+  gutter.innerHTML = nums;
+  lines.innerHTML = html;
+
+  var termHtml = '';
+  TERM.forEach(function (row) {
+    if (t >= row.at) termHtml += row.html + '\n';
+  });
+  if (t > 6.0 && Math.floor(t * 2) % 2 === 0) termHtml += '<span class="caret"></span>';
+  term.innerHTML = termHtml;
+}
+
+/* ── Scene 3: the product those two things become ─────────────────── */
+var KPIS = [
+  { label: 'Obdelani dokumenti', to: 8412, suffix: '', delta: '+18 % ta teden' },
+  { label: 'Prihranjene ure',    to: 312,  suffix: ' h', delta: '— 31 h / mesec' },
+  { label: 'Strošek na dokument', to: 64,  suffix: ' %', prefix: '− ', delta: 'proti ročni obdelavi' }
+];
+
+var ROWS = [
+  ['Račun 2026-04117', 'Knjiženo', '0,8 s'],
+  ['Račun 2026-04118', 'Knjiženo', '0,6 s'],
+  ['Dobavnica DN-9921', 'Ujemanje', '1,1 s'],
+  ['Račun 2026-04119', 'Knjiženo', '0,7 s'],
+  ['Pogodba POG-338', 'V pregled', '1,4 s']
+];
+
+function fmt(v) { return Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+
+function drawSaas(t) {
+  var kpiWrap = document.getElementById('saasKpis');
+  if (!kpiWrap.dataset.built) {
+    kpiWrap.innerHTML = KPIS.map(function (k) {
+      return '<div class="kpi"><div class="kpi__label">' + k.label +
+             '</div><div class="kpi__value">0</div><div class="kpi__delta">' + k.delta + '</div></div>';
+    }).join('');
+    kpiWrap.dataset.built = '1';
+  }
+  var values = kpiWrap.querySelectorAll('.kpi__value');
+  KPIS.forEach(function (k, i) {
+    var p = seg(t, 0.3 + i * 0.18, 1.5);
+    values[i].textContent = (k.prefix || '') + fmt(k.to * p) + (k.suffix || '');
+    values[i].parentElement.style.opacity = String(clamp01((t - i * 0.14) / 0.5));
+  });
+
+  /* Two series: manual work flat and high, automated work falling away. */
+  var chart = document.getElementById('saasChart');
+  chart.textContent = '';
+  var W = 1000, H = 186, N = 26;
+  var grow = seg(t, 1.0, 2.6);
+  var visible = Math.max(2, Math.round(N * grow));
+
+  function series(fn, colour, fill) {
+    var d = '';
+    for (var i = 0; i < visible; i++) {
+      var x = (i / (N - 1)) * W;
+      var y = H - fn(i / (N - 1)) * (H - 24) - 12;
+      d += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1) + ' ';
+    }
+    if (fill) {
+      var lastX = ((visible - 1) / (N - 1)) * W;
+      chart.appendChild(el('path', {
+        d: d + 'L' + lastX.toFixed(1) + ' ' + H + ' L0 ' + H + ' Z',
+        fill: fill, stroke: 'none'
+      }));
+    }
+    chart.appendChild(el('path', { d: d, fill: 'none', stroke: colour, 'stroke-width': 2.5, 'stroke-linecap': 'round' }));
+  }
+
+  for (var g = 1; g < 4; g++) {
+    chart.appendChild(el('line', { x1: 0, x2: W, y1: (H / 4) * g, y2: (H / 4) * g, stroke: '#171c29', 'stroke-width': 1 }));
+  }
+  series(function (u) { return 0.72 + Math.sin(u * 7) * 0.05; }, '#39415c', null);
+  series(function (u) { return 0.68 * Math.pow(1 - u, 1.7) + 0.06; }, 'var(--teal)', 'rgba(43,212,196,0.12)');
+
+  document.getElementById('saasNote').textContent =
+    t > 2.4 ? 'ročno 0,72 → avtomatizirano 0,06' : '';
+
+  var rowsWrap = document.getElementById('saasRows');
+  var html = '<div class="row row--head"><span>Dokument</span><span>Status</span><span>Čas</span></div>';
+  ROWS.forEach(function (r, i) {
+    var appear = seg(t, 2.4 + i * 0.38, 0.5);
+    if (appear <= 0) return;
+    html += '<div class="row" style="opacity:' + appear.toFixed(3) + '">' +
+            '<span>' + r[0] + '</span>' +
+            '<span class="pill">' + r[1] + '</span>' +
+            '<span class="mono">' + r[2] + '</span></div>';
+  });
+  rowsWrap.innerHTML = html;
+}
+
+/* ── frame driver ─────────────────────────────────────────────────── */
+var SCENES = { flow: drawFlow, code: drawCode, saas: drawSaas };
+var current = new URLSearchParams(location.search).get('scene') || 'flow';
+document.getElementById(current).classList.add('on');
+
+window.renderFrame = function (t) {
+  SCENES[current](t);
+  return true;
+};
+
+window.renderFrame(0);
+</script>
+</body>
+</html>

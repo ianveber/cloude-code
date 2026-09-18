@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<title>AIS Slovenia, the coatings model as it really runs: a terminal session</title>
+<style>
+  /* The coatings model has no app yet; its real interface is the command line.
+     This is a verbatim session: `demo`, then two `predict` runs, one with an
+     unknown raw material and one far from the training data, both refused by
+     the model with its own wording. Only the shell prompt and window chrome
+     are drawn; every output line is what the program printed. */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1600px; height: 1000px; overflow: hidden; background: #e9ebef; }
+  .stage { position: absolute; inset: 0; display: none; background: linear-gradient(180deg, #eef0f4, #dfe3ea); }
+  .stage.on { display: block; }
+  .win { position: absolute; left: 100px; top: 36px; width: 1400px; height: 928px; border-radius: 12px; background: #1e1f24; box-shadow: 0 40px 90px rgba(17,19,24,.35), 0 0 0 1px rgba(0,0,0,.35); overflow: hidden; }
+  .bar { height: 40px; display: flex; align-items: center; padding: 0 14px; background: linear-gradient(180deg, #3a3b41, #2d2e33); border-bottom: 1px solid #141518; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+  .title { flex: 1; text-align: center; font: 500 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #c9cbd1; margin-left: -60px; }
+  pre { margin: 0; padding: 18px 26px; font: 14px/1.45 "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; color: #d8dbe2; white-space: pre-wrap; }
+  .p { color: #8ab4ff; }
+  .c { color: #f0f2f5; font-weight: 600; }
+  .d { color: #8f95a3; }
+  .w { color: #f2c94c; }
+  .r { color: #ff7b72; }
+  .g { color: #7ee787; }
+  .k { color: #9ecbff; }
+</style>
+</head>
+<body>
+<div class="stage on" id="model-premazi">
+  <div class="win">
+    <div class="bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="title">coating-property-model, zsh, 128×48</span></div>
+<pre><span class="p">~/coating-property-model</span> <span class="c">$</span> cat recipe.json
+{"R01": 42.0, "P01": 18.5, "F02": 12.0, "S01": 20.5, "A01": 2.0, "W01": 5.0}
+<span class="p">~/coating-property-model</span> <span class="c">$</span> uv run python -m coating_property_model.cli predict --data data/synthetic --provenance synthetic --recipe recipe.json
+<span class="w">======================================================================
+  NOT A REAL PREDICTION -- model trained on SYNTHETIC data
+  These numbers describe an invented chemistry. Do not report them.
+======================================================================</span>
+     density: <span class="g">1.217</span>  +/- 0.00307
+ nonvolatile: <span class="g">52.03</span>  +/- 0.267
+   viscosity: <span class="g">301.2</span>  +/- 71.8
+     opacity: <span class="g">0.9104</span>  +/- 0.0174
+
+<span class="p">~/coating-property-model</span> <span class="c">$</span> cat recipe-unknown.json
+{"R01": 42.0, "P01": 18.5, "F02": 12.0, "S01": 20.5, "X99": 2.0, "W01": 5.0}
+<span class="p">~/coating-property-model</span> <span class="c">$</span> uv run python -m coating_property_model.cli predict --data data/synthetic --provenance synthetic --recipe recipe-unknown.json
+<span class="w">======================================================================
+  NOT A REAL PREDICTION -- model trained on SYNTHETIC data
+  These numbers describe an invented chemistry. Do not report them.
+======================================================================</span>
+     density: <span class="r">REFUSED</span> -- raw material(s) not in our records: X99
+ nonvolatile: <span class="r">REFUSED</span> -- raw material(s) not in our records: X99
+   viscosity: <span class="r">REFUSED</span> -- raw material(s) not in our records: X99
+     opacity: <span class="r">REFUSED</span> -- raw material(s) not in our records: X99
+
+<span class="p">~/coating-property-model</span> <span class="c">$</span> uv run python -m coating_property_model.cli predict --data data/synthetic --provenance synthetic --recipe recipe-far.json
+<span class="w">======================================================================
+  NOT A REAL PREDICTION -- model trained on SYNTHETIC data
+  These numbers describe an invented chemistry. Do not report them.
+======================================================================</span>
+     density: <span class="r">REFUSED</span> -- formulation lies outside anything we have made (distance 2000.2 vs limit 3.8)
+ nonvolatile: <span class="r">REFUSED</span> -- formulation lies outside anything we have made (distance 2000.2 vs limit 3.8)
+   viscosity: <span class="r">REFUSED</span> -- formulation lies outside anything we have made (distance 2000.2 vs limit 3.8)
+     opacity: <span class="r">REFUSED</span> -- formulation lies outside anything we have made (distance 2000.2 vs limit 3.8)
+
+<span class="p">~/coating-property-model</span> <span class="c">$</span> <span style="display:inline-block;width:9px;height:18px;background:#d8dbe2;vertical-align:-3px"></span></pre>
+  </div>
+</div>
+
+<div class="stage" id="model-premazi-detail">
+  <div class="win">
+    <div class="bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="title">coating-property-model, zsh, 128×48</span></div>
+<pre><span class="p">~/coating-property-model</span> <span class="c">$</span> uv run python -m coating_property_model.cli --help
+usage: coating-property-model [-h] {demo,predict} ...
+
+positional arguments:
+  {demo,predict}
+    demo          fit on synthetic data and predict one known recipe
+    predict       predict properties for a recipe
+
+options:
+  -h, --help      show this help message and exit
+
+<span class="p">~/coating-property-model</span> <span class="c">$</span> uv run python -m coating_property_model.cli predict --help
+usage: coating-property-model predict [-h] --data DATA
+                                      [--provenance {real,synthetic}] --recipe
+                                      RECIPE
+
+options:
+  -h, --help            show this help message and exit
+  --data DATA           directory holding the three CSVs
+  --provenance {real,synthetic}
+  --recipe RECIPE       JSON file: {"R01": 45.0, "P01": 20.0, ...}
+
+<span class="p">~/coating-property-model</span> <span class="c">$</span> uv run python -m coating_property_model.cli demo
+<span class="d">Recipe (weight %):</span>
+  <span class="k">A01</span>: 1.93
+  <span class="k">A02</span>: 0.95
+  <span class="k">F02</span>: 2.31
+  <span class="k">P01</span>: 3.80
+  <span class="k">R02</span>: 35.66
+  <span class="k">S01</span>: 55.35
+
+<span class="w">======================================================================
+  NOT A REAL PREDICTION -- model trained on SYNTHETIC data
+  These numbers describe an invented chemistry. Do not report them.
+======================================================================</span>
+     density: <span class="g">0.9037</span>  +/- 0.00282
+ nonvolatile: <span class="g">31.78</span>  +/- 0.212
+   viscosity: <span class="g">29.76</span>  +/- 5.88
+     opacity: <span class="g">0.3853</span>  +/- 0.00836
+
+<span class="p">~/coating-property-model</span> <span class="c">$</span> <span style="display:inline-block;width:9px;height:18px;background:#d8dbe2;vertical-align:-3px"></span></pre>
+  </div>
+</div>
+</body>
+</html>

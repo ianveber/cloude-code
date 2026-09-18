@@ -1,0 +1,27 @@
+{
+  "novice": [
+    "Spletna stran",
+    "Stranke",
+    "Izdelki",
+    "Blog",
+    "Podjetje"
+  ],
+  "blog": [
+    "Osnove",
+    "Nasvet",
+    "Kako gradimo",
+    "Primer",
+    "Vodič"
+  ],
+  "dogodki": [
+    "Za vodstvo",
+    "Za ekipo",
+    "Za vse"
+  ],
+  "strani": [
+    "Stran",
+    "Storitev",
+    "Ponudba",
+    "Pravno"
+  ]
+}

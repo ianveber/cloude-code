@@ -1,0 +1,209 @@
+/**
+ * A small Markdown renderer with no dependencies. It runs in Node (the build
+ * and the admin API) and in the browser (the admin editor's live preview), so
+ * it uses nothing but strings.
+ *
+ * Supported: headings, paragraphs, bold, italic, inline code, links, images
+ * (a paragraph that is only an image becomes a figure with a caption), bullet
+ * and numbered lists (one level of nesting), block quotes, fenced code, tables,
+ * horizontal rules. Everything else is text. HTML in the source is escaped, so
+ * an editor cannot inject scripts into the site.
+ *
+ * `picture(src, alt)` renders an uploaded picture (a path with no extension
+ * under /uploads/) as responsive markup; without it a plain <img> is used.
+ */
+
+const ENTITIES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ENTITIES[c]);
+
+const safeHref = (href) => {
+  const h = String(href ?? '').trim();
+  if (/^(https?:|mailto:|tel:|\/|#)/i.test(h)) return h;
+  return '#';
+};
+
+const isUploadBase = (src) => /^\/uploads\/[a-z0-9/_-]+$/i.test(src) && !/\.[a-z0-9]{2,5}$/i.test(src);
+
+export function renderInline(text, opts = {}) {
+  const codes = [];
+  let out = esc(text);
+
+  /* code spans first, so nothing inside them is formatted */
+  out = out.replace(/`([^`]+)`/g, (_, code) => {
+    codes.push(`<code>${code}</code>`);
+    return `\u0000${codes.length - 1}\u0000`;
+  });
+
+  /* images inline (rare in running text; figures are handled at block level) */
+  out = out.replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+&quot;([^&]*)&quot;)?\)/g, (_, alt, src) => imageTag(src, alt, opts));
+
+  /* links */
+  out = out.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, label, href) => {
+    const h = safeHref(href);
+    const external = /^https?:/i.test(h);
+    return `<a href="${esc(h)}"${external ? ' rel="noopener"' : ''}>${label}</a>`;
+  });
+
+  /* bold, then italic */
+  out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  out = out.replace(/(^|[^*\w])\*([^*\n]+)\*(?!\w)/g, '$1<em>$2</em>');
+  out = out.replace(/(^|[^_\w])_([^_\n]+)_(?!\w)/g, '$1<em>$2</em>');
+
+  /* two trailing spaces = line break */
+  out = out.replace(/ {2,}\n/g, '<br>\n');
+
+  return out.replace(/\u0000(\d+)\u0000/g, (_, i) => codes[Number(i)]);
+}
+
+function imageTag(src, alt, opts) {
+  const s = safeHref(src);
+  if (opts.picture && isUploadBase(s)) return opts.picture(s, alt);
+  return `<img src="${esc(s)}" alt="${alt}" loading="lazy" decoding="async">`;
+}
+
+export function renderMarkdown(source, opts = {}) {
+  const lines = String(source ?? '').replace(/\r\n?/g, '\n').split('\n');
+  const html = [];
+  let i = 0;
+
+  const para = [];
+  const flush = () => {
+    if (!para.length) return;
+    const text = para.join('\n').trim();
+    para.length = 0;
+    if (!text) return;
+    /* a paragraph that is only an image becomes a figure */
+    const fig = text.match(/^!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)$/);
+    if (fig) {
+      const [, alt, src, caption] = fig;
+      html.push(
+        `<figure class="cms-figure">${imageTag(src, esc(alt), opts)}${caption ? `<figcaption>${renderInline(caption, opts)}</figcaption>` : ''}</figure>`
+      );
+      return;
+    }
+    html.push(`<p>${renderInline(text, opts)}</p>`);
+  };
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    /* fenced code */
+    if (/^```/.test(line)) {
+      flush();
+      const buf = [];
+      i++;
+      while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]);
+      i++;
+      html.push(`<pre><code>${esc(buf.join('\n'))}</code></pre>`);
+      continue;
+    }
+
+    /* blank line ends a paragraph */
+    if (!line.trim()) {
+      flush();
+      i++;
+      continue;
+    }
+
+    /* heading: # and ## are sections (h2), ### is h3, deeper is h4 */
+    const h = line.match(/^(#{1,6})\s+(.+?)\s*#*$/);
+    if (h) {
+      flush();
+      const depth = h[1].length;
+      const level = depth <= 2 ? 2 : depth === 3 ? 3 : 4;
+      html.push(`<h${level}>${renderInline(h[2], opts)}</h${level}>`);
+      i++;
+      continue;
+    }
+
+    /* rule */
+    if (/^(?:-{3,}|\*{3,}|_{3,})\s*$/.test(line)) {
+      flush();
+      html.push('<hr>');
+      i++;
+      continue;
+    }
+
+    /* block quote */
+    if (/^>\s?/.test(line)) {
+      flush();
+      const buf = [];
+      while (i < lines.length && /^>\s?/.test(lines[i])) buf.push(lines[i++].replace(/^>\s?/, ''));
+      html.push(`<blockquote>${renderMarkdown(buf.join('\n'), opts)}</blockquote>`);
+      continue;
+    }
+
+    /* table */
+    if (/^\|/.test(line) && i + 1 < lines.length && /^\|?\s*:?-{2,}/.test(lines[i + 1])) {
+      flush();
+      const cells = (l) =>
+        l
+          .trim()
+          .replace(/^\||\|$/g, '')
+          .split('|')
+          .map((c) => c.trim());
+      const head = cells(line);
+      i += 2;
+      const rows = [];
+      while (i < lines.length && /^\|/.test(lines[i])) rows.push(cells(lines[i++]));
+      html.push(
+        `<div class="cms-table"><table><thead><tr>${head.map((c) => `<th>${renderInline(c, opts)}</th>`).join('')}</tr></thead><tbody>${rows
+          .map((r) => `<tr>${r.map((c) => `<td>${renderInline(c, opts)}</td>`).join('')}</tr>`)
+          .join('')}</tbody></table></div>`
+      );
+      continue;
+    }
+
+    /* lists */
+    const li = line.match(/^(\s*)([-*+]|\d+[.)])\s+(.*)$/);
+    if (li && !li[1]) {
+      flush();
+      const ordered = /\d/.test(li[2]);
+      const items = [];
+      while (i < lines.length) {
+        const m = lines[i].match(/^(\s*)([-*+]|\d+[.)])\s+(.*)$/);
+        if (!m) break;
+        if (!m[1]) {
+          items.push({ text: m[3], children: [] });
+        } else if (items.length) {
+          items[items.length - 1].children.push(m[3]);
+        }
+        i++;
+        /* a continuation line indented under the item */
+        while (i < lines.length && /^\s{2,}\S/.test(lines[i]) && !/^\s*([-*+]|\d+[.)])\s+/.test(lines[i])) {
+          const last = items[items.length - 1];
+          if (last) last.text += ' ' + lines[i].trim();
+          i++;
+        }
+      }
+      const tag = ordered ? 'ol' : 'ul';
+      html.push(
+        `<${tag}>${items
+          .map(
+            (it) =>
+              `<li>${renderInline(it.text, opts)}${
+                it.children.length ? `<ul>${it.children.map((c) => `<li>${renderInline(c, opts)}</li>`).join('')}</ul>` : ''
+              }</li>`
+          )
+          .join('')}</${tag}>`
+      );
+      continue;
+    }
+
+    para.push(line);
+    i++;
+  }
+  flush();
+  return html.join('\n');
+}
+
+/** Plain text of a Markdown source, for summaries and length checks. */
+export function markdownToText(source) {
+  return String(source ?? '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/[#>*_`|]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
