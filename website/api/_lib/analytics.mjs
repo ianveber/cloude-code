@@ -1,5 +1,5 @@
 /**
- * First-party page-view counting for IH. No third party, no IP addresses,
+ * First-party page-view counting for IHG. No third party, no IP addresses,
  * no names: a hit is a path, a referrer host, a device class, a country
  * code and a short session id that the visitor's browser holds for half an
  * hour, only after they allow analytics in the cookie banner.
@@ -15,7 +15,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
-const PREFIX = 'ih:';
+const PREFIX = 'ihg:';
 const KEEP_DAYS = 400;
 
 /* Today in Ljubljana, as YYYY-MM-DD. */

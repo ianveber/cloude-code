@@ -1093,7 +1093,7 @@ async function build() {
     await cp(PUBLIC, DIST, { recursive: true });
   }
 
-  /* IH's editor renders Markdown and cleans HTML with the same code as the build. */
+  /* IHG's editor renders Markdown and cleans HTML with the same code as the build. */
   await mkdir(path.join(DIST, 'admin'), { recursive: true });
   await cp(path.join(ROOT, 'src', 'md.mjs'), path.join(DIST, 'admin', 'md.js'));
   await cp(path.join(ROOT, 'src', 'clean-html.mjs'), path.join(DIST, 'admin', 'clean-html.js'));

@@ -1,4 +1,4 @@
-/* IH: the workspace behind ais-slovenia.si. One page: the list on the left,
+/* IHG: the workspace behind ais-slovenia.si. One page: the list on the left,
    the article in the middle as you would read it, and on the right the
    panel that says where it goes, what search engines see and how it is
    doing. Talks to /api/admin. No dependencies. */
@@ -139,8 +139,8 @@ function shell(content, { view, panel = '' } = {}) {
   const link = (href, icon, label, active) => `<a href="#/${href}" class="${active ? 'is-active' : ''}" title="${esc(label)}">${icon}<span>${esc(label)}</span></a>`;
   return `
   <div class="shell">
-    <nav class="rail" aria-label="IH">
-      <a class="rail__mark" href="#/" aria-label="IH, pregled"><span class="ihmark ihmark--accent">IH</span></a>
+    <nav class="rail" aria-label="IHG">
+      <a class="rail__mark" href="#/" aria-label="IHG, pregled"><span class="ihgmark ihgmark--accent">IHG</span></a>
       ${link('', ICON.home, 'Pregled', view === 'home')}
       <button type="button" data-action="drawer" title="Vsebina">${ICON.list}<span>Vsebina</span></button>
       ${link('slike', ICON.image, 'Slike', view === 'media')}
@@ -206,9 +206,9 @@ function loginView() {
   return `
   <div class="login">
     <form class="login__card" data-form="login">
-      <div class="login__brand"><span class="ihmark ihmark--accent">IH</span><span><b>IH</b><br><span class="muted small">za ais-slovenia.si</span></span></div>
+      <div class="login__brand"><span class="ihgmark ihgmark--accent">IHG</span><span><b>IHG</b><br><span class="muted small">za ais-slovenia.si</span></span></div>
       <h1>Prijava</h1>
-      ${state.setup ? `<p class="note note--bad">Geslo še ni nastavljeno. Zaženite <span class="mono">npm run admin:password</span> in vrstici vpišite v nastavitve strežnika (glejte IH.md).</p>` : ''}
+      ${state.setup ? `<p class="note note--bad">Geslo še ni nastavljeno. Zaženite <span class="mono">npm run admin:password</span> in vrstici vpišite v nastavitve strežnika (glejte IHG.md).</p>` : ''}
       <div class="field">
         <label for="pw">Geslo</label>
         <input class="input" id="pw" name="password" type="password" autocomplete="current-password" required autofocus>
@@ -282,7 +282,7 @@ function homeView() {
         .map((c) => `<a class="btn btn--sm" href="#/e/${c.key}/novo">${ICON.plus} ${esc(c.newLabel)}</a>`)
         .join('')}</div>
     </div>
-    ${a && !a.configured ? `<p class="note note--warn">Analitika še ne shranjuje. Vklopite jo z Upstash Redis (spremenljivki UPSTASH_REDIS_REST_URL in UPSTASH_REDIS_REST_TOKEN v Vercelu); navodila so v IH.md. Lokalno se šteje v datoteko data/analytics.json.</p>` : ''}
+    ${a && !a.configured ? `<p class="note note--warn">Analitika še ne shranjuje. Vklopite jo z Upstash Redis (spremenljivki UPSTASH_REDIS_REST_URL in UPSTASH_REDIS_REST_TOKEN v Vercelu); navodila so v IHG.md. Lokalno se šteje v datoteko data/analytics.json.</p>` : ''}
     ${stats}
     <div class="grid" style="grid-template-columns: 1fr">
       <div class="card">
@@ -413,7 +413,7 @@ function settingsView() {
         <p class="small">${st.mode === 'github' ? `Vsaka sprememba je zapis v <span class="mono">${esc(st.repo)}</span> na veji <span class="mono">${esc(st.branch)}</span>, mapa <span class="mono">${esc(st.root)}</span>. Vercel iz nje zgradi spletno stran.` : `Lokalni način: datoteke v <span class="mono">${esc(st.root ?? '')}</span>. Za splet jih je treba potrditi v git in potisniti.`}</p>
         ${st.url ? `<p class="small"><a href="${esc(st.url)}" target="_blank" rel="noopener">Odpri mapo z vsebino na GitHubu</a></p>` : ''}
         <h2>Analitika</h2>
-        <p class="small">${st.analytics?.configured ? `Shranjuje se (${esc(st.analytics.mode === 'upstash' ? 'Upstash Redis' : 'lokalna datoteka')}).` : 'Ni vklopljena. V Vercelu dodajte UPSTASH_REDIS_REST_URL in UPSTASH_REDIS_REST_TOKEN (glejte IH.md).'} Obiskovalci jo dovolijo v pasici s piškotki; brez dovoljenja se ne šteje nič.</p>
+        <p class="small">${st.analytics?.configured ? `Shranjuje se (${esc(st.analytics.mode === 'upstash' ? 'Upstash Redis' : 'lokalna datoteka')}).` : 'Ni vklopljena. V Vercelu dodajte UPSTASH_REDIS_REST_URL in UPSTASH_REDIS_REST_TOKEN (glejte IHG.md).'} Obiskovalci jo dovolijo v pasici s piškotki; brez dovoljenja se ne šteje nič.</p>
         <h2>Geslo</h2>
         <p class="small">Eno geslo za vse, ki urejajo. Novo naredite z <span class="mono">npm run admin:password</span> in vrstici vpišite v Vercel (Settings → Environment Variables). Prijava velja 12 ur; po osmih napačnih poskusih je naslov 15 minut zaklenjen.</p>
         <div><button class="btn btn--sm" type="button" data-action="logout">Odjava</button></div>
@@ -444,7 +444,7 @@ function blankItem(c) {
   };
 }
 
-const backupKey = (c, slug) => `ih:${c}:${slug || 'novo'}`;
+const backupKey = (c, slug) => `ihg:${c}:${slug || 'novo'}`;
 
 function itemHref(item) {
   const c = COLLECTIONS[item.collection];

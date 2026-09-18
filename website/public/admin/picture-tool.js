@@ -1,4 +1,4 @@
-/* Pictures in IH: load, crop, rotate, resize, make the four variants the site
+/* Pictures in IHG: load, crop, rotate, resize, make the four variants the site
    serves (800 and 1600 px, JPG and WebP) and upload them. The tool is a full
    screen modal with a draggable crop box; it works with a mouse and a finger. */
 

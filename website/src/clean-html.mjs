@@ -1,5 +1,5 @@
 /**
- * An HTML cleaner for text written in IH's editor. Runs in Node (build,
+ * An HTML cleaner for text written in IHG's editor. Runs in Node (build,
  * preview) and in the browser (before saving), with strings only.
  *
  * Only the tags and attributes an article needs survive: paragraphs,

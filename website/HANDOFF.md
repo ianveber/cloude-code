@@ -463,10 +463,10 @@ Vercel project **root directory = `website/`**.
 `vercel.json`: `npm run build` → `dist/`, trailing slashes, static headers,
 one serverless function for the admin API (`api/admin/[...route].js`).
 
-Environment variables (only IH needs them; the site builds without):
+Environment variables (only IHG needs them; the site builds without):
 `ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET`, `GITHUB_TOKEN`, `GITHUB_REPO`,
 `GITHUB_BRANCH`, `CMS_ROOT`, and for analytics `UPSTASH_REDIS_REST_URL` and
-`UPSTASH_REDIS_REST_TOKEN`. What each is and how to make them: `IH.md`.
+`UPSTASH_REDIS_REST_TOKEN`. What each is and how to make them: `IHG.md`.
 
 After a production deploy:
 
@@ -496,20 +496,20 @@ Known implementation notes:
 
 ---
 
-## IH, the workspace behind the site (2026-09-16)
+## IHG, the workspace behind the site (2026-09-16)
 
 Ian asked for "very detailed software for the backend... nobody else has
-access except us", then named it IH and asked for cookies with analytics
+access except us", then named it IHG and asked for cookies with analytics
 shown inside it, a different design, a one-page editor with the category
 panel on the right, richer SEO, picture editing and free text editing. It
-is `IH.md` in full; the short version:
+is `IHG.md` in full; the short version:
 
-- `/admin/` is the IH app (`public/admin/`): ink rail, list drawer, the
+- `/admin/` is the IHG app (`public/admin/`): ink rail, list drawer, the
   page as a document in the middle, the panel on the right (Objava, Kje na
   spletni strani, Slike, Besedilo, SEO, Povezano, Ogledi). Password-gated,
   `noindex`, disallowed in `robots.txt`, linked from nowhere; the design
   audit fails if a public page links to it. Its stylesheet is its own
-  (`ih.css`), so the site's design rules do not apply to it.
+  (`ihg.css`), so the site's design rules do not apply to it.
 - Text is HTML from a contenteditable editor (`editor.js`), cleaned with an
   allow-list (`src/clean-html.mjs`) in the browser, in the API and in the
   build. Pictures go through `picture-tool.js` (crop, rotate, size,
@@ -523,10 +523,10 @@ is `IH.md` in full; the short version:
   `consent` and every page gets the banner from `src/layout.mjs` and
   `public/js/consent.js` again, with the beacon only after consent. Either
   way the beacon goes to `/api/hit` (`api/_lib/analytics.mjs`), counted per
-  day in Upstash Redis on Vercel or `data/analytics.json` locally, and IH
+  day in Upstash Redis on Vercel or `data/analytics.json` locally, and IHG
   shows the numbers. `/piskotki/` (`content/cookies.mjs`, two versions)
   explains whichever mode is on; the design audit checks the mode.
-- IH's colour is light green (Ian: "change the color to a light green
+- IHG's colour is light green (Ian: "change the color to a light green
   color from purple"); the content entry is the first version's card form
   (title, summary, category and date, a text card with a fixed toolbar over
   the rich editor, a picture card) with the panel on the right kept.
@@ -537,7 +537,7 @@ is `IH.md` in full; the short version:
 - `npm run admin:check` walks the API, the beacon and the analytics end to
   end and is part of `npm run check`.
 
-The rules from the rest of this file still hold for content written in IH:
+The rules from the rest of this file still hold for content written in IHG:
 same hero, bands, pictures and structured data as hand-written pages, no
 client company names, no dashes in copy.
 

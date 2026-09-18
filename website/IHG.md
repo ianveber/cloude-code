@@ -1,6 +1,6 @@
-# IH: the workspace behind ais-slovenia.si
+# IHG: the workspace behind ais-slovenia.si
 
-The site stays static. IH is the private app at `/admin/` and an API under
+The site stays static. IHG is the private app at `/admin/` and an API under
 `/api/admin/` that writes content into the repository. Every publish is a
 commit on the deployed branch, so Vercel rebuilds the site and the page is
 live in about two minutes. Drafts are committed too; the build leaves them
@@ -9,7 +9,7 @@ out.
 Nothing links to `/admin/`. It is `noindex`, `robots.txt` disallows it, and
 every API route needs a signed session cookie that only the password gives.
 
-## What IH does
+## What IHG does
 
 One screen. On the left the list of everything (Novice, Blog, Dogodki,
 Strani, with search). In the middle the content form in cards: title,
@@ -80,7 +80,7 @@ Storage for the counts:
 | --- | --- |
 | Live site | Upstash Redis over REST. Create a database (Vercel Marketplace → Upstash, or upstash.com) and set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` (Vercel's `KV_REST_API_URL` / `KV_REST_API_TOKEN` also work). Free tier is plenty. |
 | Local | `data/analytics.json` (ignored by git). |
-| Nothing set | Beacons are accepted and dropped; IH says analytics is off. |
+| Nothing set | Beacons are accepted and dropped; IHG says analytics is off. |
 
 Counts are kept per day for 400 days: views, unique sessions, per page,
 per referrer host, per device class, per country.
@@ -134,7 +134,7 @@ From the Claude desktop app the preview entry is `ais-admin`.
 | --- | --- |
 | Items | `content/cms/<novice|blog|dogodki|strani>/<slug>.json` |
 | Categories | `content/cms/categories.json` |
-| Index IH lists from | `content/cms/index.json` (rebuild with `npm run admin:reindex`) |
+| Index IHG lists from | `content/cms/index.json` (rebuild with `npm run admin:reindex`) |
 | Uploaded pictures | `public/uploads/<year>/<name>-{800,1600}.{jpg,webp}` |
 | Data model, checks, page template | `src/cms.mjs` |
 | HTML cleaner (build, preview, editor) | `src/clean-html.mjs` |
@@ -143,7 +143,7 @@ From the Claude desktop app the preview entry is `ais-admin`.
 | Beacon and counts | `api/_lib/analytics.mjs`, entry `api/hit.js` |
 | Storage | `api/_lib/store-local.mjs`, `api/_lib/store-github.mjs` |
 | Password and sessions | `api/_lib/auth.mjs` |
-| The app | `public/admin/` (`ih.js`, `editor.js`, `picture-tool.js`, `ih.css`) |
+| The app | `public/admin/` (`ihg.js`, `editor.js`, `picture-tool.js`, `ihg.css`) |
 | Cookie banner and beacon script | `src/layout.mjs` (markup), `public/js/consent.js`, `content/cookies.mjs` (both versions of the privacy page), mode in `content/site.mjs` |
 | Smoke test | `npm run admin:check` (part of `npm run check`) |
 
@@ -175,7 +175,7 @@ An item file:
 ```
 
 Events also carry `"event": { "dateLabel", "time", "mode", "place" }`.
-`kicker` is the category. `format` is `html` for anything written in IH;
+`kicker` is the category. `format` is `html` for anything written in IHG;
 `markdown` items from the first version still render.
 
 The body HTML is limited to paragraphs, headings h2 to h4, strong, em, u, s,
@@ -196,7 +196,7 @@ sitemap entry, a Markdown twin and a place in `llms-full.txt`. News and
 events appear on `/novice/` and `/dogodki/` above the hand-written items,
 blog posts in the blog grid and the home teaser, newest first.
 
-The audit (`node audit.mjs`) checks the published pages like any other. IH
+The audit (`node audit.mjs`) checks the published pages like any other. IHG
 refuses to publish an item that would fail the obvious ones (empty text,
 missing meta description, a picture without a description).
 

@@ -1,14 +1,14 @@
 /**
- * The content layer behind IH: what a news item, blog post, event or page
+ * The content layer behind IHG: what a news item, blog post, event or page
  * looks like as data, how it is checked, and how it becomes a page.
  *
  * Items live as one JSON file each in content/cms/<collection>/<slug>.json.
- * IH's API writes them (locally or as commits to the repository); the build
+ * IHG's API writes them (locally or as commits to the repository); the build
  * reads them next to the hand-written content and renders a page per item
  * with the same templates the rest of the site uses. Drafts are left out of
- * the build unless CMS_DRAFTS=1 (the local IH preview), and then noindex.
+ * the build unless CMS_DRAFTS=1 (the local IHG preview), and then noindex.
  *
- * Bodies are HTML from IH's editor (format "html", cleaned on the way in
+ * Bodies are HTML from IHG's editor (format "html", cleaned on the way in
  * and on the way out) or Markdown from the first version (format
  * "markdown"); both render through the same picture helper.
  */
@@ -311,7 +311,7 @@ export function parentChain(item, all) {
   return chain;
 }
 
-/* ── Loading from disk (the build and the local IH) ───────────────────── */
+/* ── Loading from disk (the build and the local IHG) ───────────────────── */
 
 export async function loadCmsFromDir(root, { drafts = false } = {}) {
   const dir = path.join(root, 'content', 'cms');
@@ -353,7 +353,7 @@ const SIZES = {
   third: '(min-width: 1100px) 320px, (min-width: 768px) 45vw, calc(100vw - 2rem)',
 };
 
-/** Responsive markup for a picture uploaded through IH. */
+/** Responsive markup for a picture uploaded through IHG. */
 export function uploadPicture(picture, sizes = SIZES.full, { eager = false } = {}) {
   const src = esc(picture.src);
   const big = Number(picture.width) > 0 ? Math.round(picture.width) : 1600;
@@ -583,7 +583,7 @@ function legacyPicture(picture) {
         </picture>`;
 }
 
-/* ── The index IH lists from ──────────────────────────────────────────── */
+/* ── The index IHG lists from ──────────────────────────────────────────── */
 
 export function indexEntry(item) {
   return {

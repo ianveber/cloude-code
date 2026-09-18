@@ -1,5 +1,5 @@
 /**
- * IH's API. One handler serves every route under /api/admin, on Vercel
+ * IHG's API. One handler serves every route under /api/admin, on Vercel
  * (api/admin/[...route].js) and on the local dev server (build.mjs --serve
  * --admin). Everything except login needs a valid session cookie; every
  * change goes through the store, which is either the local folder or a
@@ -122,7 +122,7 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
   const authed = (req) => verifySession(parseCookies(req)[COOKIE], secret);
 
   async function login(req, res) {
-    if (!passwordHash) return fail(res, 503, 'Geslo za IH še ni nastavljeno. Glejte IH.md.', { setup: true });
+    if (!passwordHash) return fail(res, 503, 'Geslo za IHG še ni nastavljeno. Glejte IHG.md.', { setup: true });
     const ip = clientIp(req);
     if (!loginAllowed(ip)) return fail(res, 429, 'Preveč poskusov. Poskusite čez 15 minut.');
     const body = await readBody(req);
@@ -221,7 +221,7 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
     files.push(indexFile({ ...idx, items: idxItems }), ...catFiles);
     const verb = item.status === 'published' ? 'objavi' : 'shrani osnutek';
     const note = moving ? ` (prej ${fromCollection}/${from})` : '';
-    const result = await store.write(files, `ih: ${verb} ${c}/${slug}${note}`);
+    const result = await store.write(files, `ihg: ${verb} ${c}/${slug}${note}`);
     return json(res, { ok: true, item, problems, commit: result.commit, commitUrl: result.url ?? null, href: pathOf(item, idxItems) });
   }
 
@@ -238,7 +238,7 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
     const idx = await loadIndex();
     const idxItems = idx.items.filter((i) => !(i.collection === c && i.slug === slug));
     idxItems.push(indexEntry(item));
-    const result = await store.write([itemFile(item), indexFile({ ...idx, items: idxItems })], `ih: ${status === 'published' ? 'objavi' : 'umakni'} ${c}/${slug}`);
+    const result = await store.write([itemFile(item), indexFile({ ...idx, items: idxItems })], `ihg: ${status === 'published' ? 'objavi' : 'umakni'} ${c}/${slug}`);
     return json(res, { ok: true, item, commit: result.commit, commitUrl: result.url ?? null, href: pathOf(item, idxItems) });
   }
 
@@ -257,7 +257,7 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
       idxItems = idxItems.map((i) => (i.collection === c && i.slug === child.slug ? { ...i, parent: '' } : i));
     }
     files.push(indexFile({ ...idx, items: idxItems }));
-    const result = await store.write(files, `ih: izbriši ${c}/${slug}`);
+    const result = await store.write(files, `ihg: izbriši ${c}/${slug}`);
     return json(res, { ok: true, commit: result.commit });
   }
 
@@ -270,7 +270,7 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
   async function putCategories(req, res) {
     const body = await readBody(req);
     const cats = normalizeCategories(body.categories ?? body);
-    await store.write([categoriesFile(cats)], 'ih: kategorije');
+    await store.write([categoriesFile(cats)], 'ihg: kategorije');
     return json(res, { ok: true, categories: cats });
   }
 
@@ -312,7 +312,7 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
       uploadedAt: new Date().toISOString(),
     };
     out.push(indexFile({ ...idx, media: [...idx.media, entry] }));
-    const result = await store.write(out, `ih: naloži sliko ${src}`);
+    const result = await store.write(out, `ihg: naloži sliko ${src}`);
     return json(res, { ok: true, picture: { src, alt: entry.alt, width: entry.width, height: entry.height, upload: true, webp }, media: entry, commit: result.commit });
   }
 
@@ -336,7 +336,7 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
     if (used.length) return fail(res, 409, `Slika je v uporabi: ${used.join(', ')}. Najprej jo odstranite tam.`);
     const files = [...UPLOAD_SUFFIXES].map((s) => ({ path: `public${src}${s}`, delete: true }));
     files.push(indexFile({ ...idx, media: idx.media.filter((m) => m.src !== src) }));
-    const result = await store.write(files, `ih: izbriši sliko ${src}`);
+    const result = await store.write(files, `ihg: izbriši sliko ${src}`);
     return json(res, { ok: true, commit: result.commit });
   }
 
@@ -425,7 +425,7 @@ export function createAdminHandler({ root, store: storeMode, onChange, env = pro
       if (parts[0] === 'login' && method === 'POST') return login(req, res);
       if (parts[0] === 'logout' && method === 'POST') return logout(req, res);
 
-      if (!passwordHash) return fail(res, 503, 'Geslo za IH še ni nastavljeno. Glejte IH.md.', { setup: true });
+      if (!passwordHash) return fail(res, 503, 'Geslo za IHG še ni nastavljeno. Glejte IHG.md.', { setup: true });
       if (!authed(req)) return fail(res, 401, 'Prijavite se.', { authenticated: false });
 
       if (parts[0] === 'me') return json(res, { ok: true, authenticated: true, mode: store.mode });

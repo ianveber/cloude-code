@@ -79,15 +79,15 @@ export function createEditor({ body, onChange, onEditImage, onReplaceImage, onPi
 
   function normalize() {
     /* colour and highlight markers made with fontName */
-    for (const f of body.querySelectorAll('font[face^="ih-"], [style*="ih-"]')) {
+    for (const f of body.querySelectorAll('font[face^="ihg-"], [style*="ihg-"]')) {
       const marker = f.getAttribute('face') || (f.style.fontFamily || '').replace(/["']/g, '');
-      const span = document.createElement(marker === 'ih-hl' ? 'mark' : 'span');
-      if (marker.startsWith('ih-c-')) span.className = `c-${marker.slice(5)}`;
+      const span = document.createElement(marker === 'ihg-hl' ? 'mark' : 'span');
+      if (marker.startsWith('ihg-c-')) span.className = `c-${marker.slice(6)}`;
       const s0 = sel();
       const wasSelected = Boolean(s0 && s0.rangeCount && s0.getRangeAt(0).intersectsNode(f));
       while (f.firstChild) span.append(f.firstChild);
       f.replaceWith(span);
-      if (marker === 'ih-c-none') span.replaceWith(...span.childNodes);
+      if (marker === 'ihg-c-none') span.replaceWith(...span.childNodes);
       else if (wasSelected) {
         /* keep the words selected, so the next tool applies to the same ones */
         const r = document.createRange();
@@ -186,7 +186,7 @@ export function createEditor({ body, onChange, onEditImage, onReplaceImage, onPi
   }
 
   function setColor(key) {
-    exec('fontName', key === 'none' ? 'ih-c-none' : `ih-c-${key}`);
+    exec('fontName', key === 'none' ? 'ihg-c-none' : `ihg-c-${key}`);
   }
 
   function toggleHighlight() {
@@ -199,7 +199,7 @@ export function createEditor({ body, onChange, onEditImage, onReplaceImage, onPi
       refreshBars();
       return;
     }
-    exec('fontName', 'ih-hl');
+    exec('fontName', 'ihg-hl');
   }
 
   function setBlock(tag) {

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Smoke test for IH: runs the API against a temporary copy of the content
+ * Smoke test for IHG: runs the API against a temporary copy of the content
  * folder and walks through login, save, publish, upload, preview, rename,
  * subpage, move between collections, categories, the page-view beacon and
  * analytics, delete. No browser and no network.
@@ -20,7 +20,7 @@ import { createAdminHandler } from '../../api/_lib/handler.mjs';
 import { createAnalytics, createHitHandler } from '../../api/_lib/analytics.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const work = await mkdtemp(path.join(tmpdir(), 'ih-'));
+const work = await mkdtemp(path.join(tmpdir(), 'ihg-'));
 await mkdir(path.join(work, 'content', 'cms'), { recursive: true });
 await mkdir(path.join(work, 'public', 'uploads'), { recursive: true });
 if (existsSync(path.join(ROOT, 'content', 'cms', 'index.json'))) {
@@ -202,5 +202,5 @@ try {
   await rm(work, { recursive: true, force: true });
 }
 
-console.log(failures ? `\n${failures} napak.` : '\nIH: vse preverjeno.');
+console.log(failures ? `\n${failures} napak.` : '\nIHG: vse preverjeno.');
 process.exit(failures ? 1 : 0);
